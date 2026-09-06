@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working Examples: Marginal Analysis & the Decision Rule</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+    --mb: #2F6F62;
+    --mc: #C1542C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:760px;margin:0 auto;}
+
+  header{
+    margin-bottom:20px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  header h1{
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .count-group{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .card-count{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .score-badge{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px;
+  }
+
+  .scenario{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+
+  table.mbmc-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:20px;
+    font-size:14.5px;
+  }
+  table.mbmc-table th, table.mbmc-table td{
+    border:1px solid var(--border);
+    padding:9px 10px;
+    text-align:center;
+  }
+  table.mbmc-table th{
+    background:var(--surface-alt);
+    font-weight:700;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  table.mbmc-table td.unit-label{
+    font-weight:700;
+    text-align:left;
+  }
+  table.mbmc-table td.mb-cell{color:var(--mb); font-weight:700;}
+  table.mbmc-table td.mc-cell{color:var(--mc); font-weight:700;}
+
+  .prompt{
+    font-size:18px;
+    font-weight:600;
+    line-height:1.4;
+    color:var(--ink);
+    margin-bottom:18px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .choice-btn{
+    text-align:left;
+    padding:13px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){
+    border-color:var(--accent);
+    background:#FFFBF2;
+  }
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{
+    background:var(--correct-soft);
+    border-color:var(--correct);
+    color:var(--correct);
+  }
+  .choice-btn.incorrect{
+    background:var(--incorrect-soft);
+    border-color:var(--incorrect);
+    color:var(--incorrect);
+  }
+
+  .feedback{
+    display:none;
+    margin-bottom:16px;
+  }
+  .feedback.show{display:block;}
+  .feedback-verdict{
+    font-weight:800;
+    font-size:15px;
+    margin-bottom:6px;
+  }
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    padding:12px 14px;
+    border-radius:0 8px 8px 0;
+  }
+
+  .controls{
+    display:flex;
+    justify-content:flex-end;
+  }
+  .btn{
+    padding:11px 20px;
+    border-radius:10px;
+    border:none;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover{background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  footer.reset-row{
+    margin-top:20px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Working Examples: Marginal Analysis</h1>
+    <p>The Decision Rule — pursue an action when MB ≥ MC, stop when MB &lt; MC</p>
+  </header>
+
+  <div class="meta-row">
+    <div class="count-group">
+      <span class="card-count" id="problemCount">Problem 1 of 6</span>
+      <span class="card-count" id="stepCount">Step 1 of 5</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="panel">
+    <div class="scenario" id="scenarioText"></div>
+
+    <table class="mbmc-table" id="mbmcTable">
+      <thead>
+        <tr>
+          <th id="unitHeader">Unit</th>
+          <th>Marginal Benefit</th>
+          <th>Marginal Cost</th>
+        </tr>
+      </thead>
+      <tbody id="mbmcBody"></tbody>
+    </table>
+
+    <div class="prompt" id="promptText">Loading…</div>
+
+    <div class="options" id="optionsWrap"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-verdict" id="feedbackVerdict"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn" disabled>Next step</button>
+    </div>
+  </div>
+
+  <footer class="reset-row">
+    <button class="link-btn" id="resetBtn">Restart from problem 1</button>
+  </footer>
+</div>
+
+<script>
+const PROBLEMS = [
+  {
+    scenario: "Each slice of pizza costs $3. Here's how much enjoyment (in dollars) you get from each slice.",
+    unitLabel: "Slice #", hasTable: true,
+    units: [
+      { label:"Slice 1", mb:8, mc:3 },
+      { label:"Slice 2", mb:6, mc:3 },
+      { label:"Slice 3", mb:3, mc:3 },
+      { label:"Slice 4", mb:1, mc:3 },
+    ],
+    steps: [
+      { prompt:"Should you eat slice 1?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is $8, MC is $3. Since 8 ≥ 3, eat it." },
+      { prompt:"Should you eat slice 2?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is $6, MC is $3. Since 6 ≥ 3, eat it." },
+      { prompt:"Should you eat slice 3?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is $3, MC is $3. Since MB = MC, the decision rule (MB ≥ MC) still says pursue it — you're indifferent, but not worse off." },
+      { prompt:"Should you eat slice 4?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:1,
+        explain:"MB is $1, MC is $3. Since 1 < 3, this slice makes you worse off — don't eat it." },
+      { prompt:"Following the decision rule, what is the total number of slices you should eat?",
+        options:["2 slices","3 slices","4 slices","1 slice"], correct:1,
+        explain:"Slices 1–3 all satisfy MB ≥ MC. Slice 4 doesn't. So the optimal quantity is 3 slices — even though slice 3 only breaks even, it still meets the rule." }
+    ]
+  },
+  {
+    scenario: "A software company could run up to three ads for its new app. Each ad costs exactly $20,000.",
+    unitLabel: "Ad #", hasTable: true,
+    units: [
+      { label:"Ad 1", mb:50000, mc:20000 },
+      { label:"Ad 2", mb:30000, mc:20000 },
+      { label:"Ad 3", mb:12000, mc:20000 },
+    ],
+    steps: [
+      { prompt:"Should the company run ad 1?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is $50,000, MC is $20,000. Since 50,000 ≥ 20,000, run it." },
+      { prompt:"Should the company run ad 2?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is $30,000, MC is $20,000. Since 30,000 ≥ 20,000, run it." },
+      { prompt:"Should the company run ad 3?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:1,
+        explain:"MB is $12,000, MC is $20,000. Since 12,000 < 20,000, running this ad would reduce profit by $8,000 — don't run it." },
+      { prompt:"How much does the first ad contribute to the company's profit (MB − MC)?",
+        options:["$50,000","$30,000","$20,000","$8,000"], correct:1,
+        explain:"Contribution to profit = Marginal Benefit − Marginal Cost = $50,000 − $20,000 = $30,000." },
+      { prompt:"Following the decision rule, how many ads should the company run?",
+        options:["1 ad","2 ads","3 ads","0 ads"], correct:1,
+        explain:"Ads 1 and 2 both satisfy MB ≥ MC. Ad 3 doesn't (12,000 < 20,000). So the optimal quantity is 2 ads." }
+    ]
+  },
+  {
+    scenario: "A student is deciding how many hours to study for a test tonight. Each hour has an opportunity cost of $5 (measured in forgone value of time). Here's the expected gain in test-score points (converted to dollars) from each additional hour.",
+    unitLabel: "Hour #", hasTable: true,
+    units: [
+      { label:"Hour 1", mb:20, mc:5 },
+      { label:"Hour 2", mb:14, mc:5 },
+      { label:"Hour 3", mb:8, mc:5 },
+      { label:"Hour 4", mb:3, mc:5 },
+    ],
+    steps: [
+      { prompt:"Should the student study hour 1?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is $20, MC is $5. Since 20 ≥ 5, study it." },
+      { prompt:"Should the student study hour 2?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is $14, MC is $5. Since 14 ≥ 5, study it." },
+      { prompt:"Should the student study hour 3?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is $8, MC is $5. Since 8 ≥ 5, study it." },
+      { prompt:"Should the student study hour 4?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:1,
+        explain:"MB is $3, MC is $5. Since 3 < 5, this hour costs more than it's worth — stop studying before this hour." },
+      { prompt:"Following the decision rule, how many hours should the student study?",
+        options:["2 hours","3 hours","4 hours","1 hour"], correct:1,
+        explain:"Hours 1–3 all satisfy MB ≥ MC. Hour 4 doesn't. So the optimal amount of studying is 3 hours." }
+    ]
+  },
+  {
+    scenario: "A firm sells each unit of its product for a constant $50 (its marginal revenue, which is also its marginal benefit of producing one more unit). Here's the marginal cost of producing each additional unit, which rises as the firm produces more.",
+    unitLabel: "Unit #", hasTable: true,
+    units: [
+      { label:"Unit 1", mb:50, mc:20 },
+      { label:"Unit 2", mb:50, mc:35 },
+      { label:"Unit 3", mb:50, mc:50 },
+      { label:"Unit 4", mb:50, mc:65 },
+    ],
+    steps: [
+      { prompt:"Should the firm produce unit 1?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is $50, MC is $20. Since 50 ≥ 20, produce it." },
+      { prompt:"Should the firm produce unit 2?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is $50, MC is $35. Since 50 ≥ 35, produce it." },
+      { prompt:"Should the firm produce unit 3?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is $50, MC is $50. Since MB = MC, the decision rule still says produce it — the firm breaks even on this exact unit." },
+      { prompt:"Should the firm produce unit 4?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:1,
+        explain:"MB is $50, MC is $65. Since 50 < 65, this unit would cost the firm money to produce — stop before this unit." },
+      { prompt:"Following the decision rule, how many units should the firm produce?",
+        options:["2 units","3 units","4 units","1 unit"], correct:1,
+        explain:"Units 1–3 all satisfy MB ≥ MC. Unit 4 doesn't. So the optimal output is 3 units." }
+    ]
+  },
+  {
+    scenario: "An athlete is deciding how many extra hours to practice this week. Each hour has an opportunity cost of 4 skill-points (time that could go toward other training). Here's the skill improvement (in points) from each additional hour of practice.",
+    unitLabel: "Hour #", hasTable: true,
+    units: [
+      { label:"Hour 1", mb:10, mc:4 },
+      { label:"Hour 2", mb:7, mc:4 },
+      { label:"Hour 3", mb:4, mc:4 },
+      { label:"Hour 4", mb:2, mc:4 },
+    ],
+    steps: [
+      { prompt:"Should the athlete practice hour 1?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is 10 points, MC is 4 points. Since 10 ≥ 4, practice it." },
+      { prompt:"Should the athlete practice hour 2?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is 7 points, MC is 4 points. Since 7 ≥ 4, practice it." },
+      { prompt:"Should the athlete practice hour 3?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:0,
+        explain:"MB is 4 points, MC is 4 points. Since MB = MC, the decision rule still says practice it." },
+      { prompt:"Should the athlete practice hour 4?", options:["Yes — MB ≥ MC","No — MB < MC"], correct:1,
+        explain:"MB is 2 points, MC is 4 points. Since 2 < 4, this hour isn't worth it — stop before this hour." },
+      { prompt:"Following the decision rule, how many hours should the athlete practice?",
+        options:["2 hours","3 hours","4 hours","1 hour"], correct:1,
+        explain:"Hours 1–3 all satisfy MB ≥ MC. Hour 4 doesn't. So the optimal amount of practice is 3 hours." }
+    ]
+  },
+  {
+    scenario: "You paid a non-refundable $80 fee to reserve a table at a weekend fair to sell drinks. On the morning of the fair, it starts raining. If you still go, you expect $150 in drink sales. The ingredients and your time for the day (not the $80 fee, which is already spent either way) would cost $100.",
+    unitLabel: "", hasTable: false,
+    steps: [
+      { prompt:"What kind of cost is the $80 fee, in terms of today's decision?",
+        options:["A sunk cost","A fixed cost that recurs weekly","A variable cost that depends on sales","Not a real cost at all"], correct:0,
+        explain:"The $80 is a sunk cost — it's already paid, it can't be recovered, and it should NOT influence today's decision about whether to go." },
+      { prompt:"Should the $80 fee affect your decision about whether to go today?",
+        options:["Yes — you need to go to try to recoup it","No — sunk costs shouldn't influence future decisions"], correct:1,
+        explain:"Rational decision-makers ignore sunk costs. Whether you go or not, the $80 is already gone — it shouldn't factor into today's choice." },
+      { prompt:"Ignoring the sunk $80, what is the marginal benefit of going today?",
+        options:["$150","$70","$50","$30"], correct:0,
+        explain:"The marginal benefit of going today is the $150 in drink sales you'd gain — that's the additional benefit still available to you." },
+      { prompt:"What is the marginal cost of going today (ignoring the $80 already spent)?",
+        options:["$180","$100","$80","$20"], correct:1,
+        explain:"Only forward-looking costs count: the $100 in ingredients and time you'd still need to spend. The $80 already spent is sunk and irrelevant to this decision." },
+      { prompt:"Applying the decision rule (MB ≥ MC) to today's choice, should you go?",
+        options:["Yes — MB ($150) ≥ MC ($100)","No — you already lost $80 with nothing to show for it","Yes, but only to try to recoup the $80","No — $80 + $100 = $180 exceeds the $150 in sales"], correct:0,
+        explain:"Comparing only the forward-looking numbers: MB ($150) ≥ MC ($100), so you should go. The $80 already spent doesn't change today's decision either way — including it (as in the other options) is exactly the sunk-cost mistake to avoid." }
+    ]
+  }
+];
+
+let problemOrder = [];
+let problemIndex = 0;
+let stepIndex = 0;
+let answered = false;
+let score = { correct:0, total:0 };
+
+function shuffledIndices(n){
+  const arr = [...Array(n).keys()];
+  for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+  return arr;
+}
+
+function init(){
+  problemOrder = shuffledIndices(PROBLEMS.length);
+  problemIndex = 0;
+  score = { correct:0, total:0 };
+  loadProblem();
+}
+
+function loadProblem(){
+  stepIndex = 0;
+  const problem = PROBLEMS[problemOrder[problemIndex]];
+  document.getElementById('scenarioText').textContent = problem.scenario;
+  document.getElementById('problemCount').textContent = `Problem ${problemIndex+1} of ${PROBLEMS.length}`;
+
+  const table = document.getElementById('mbmcTable');
+  if(problem.hasTable){
+    table.style.display = 'table';
+    document.getElementById('unitHeader').textContent = problem.unitLabel;
+    const body = document.getElementById('mbmcBody');
+    body.innerHTML = '';
+    problem.units.forEach(u=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td class="unit-label">${u.label}</td><td class="mb-cell">${typeof u.mb === 'number' ? '$'+u.mb.toLocaleString() : u.mb}</td><td class="mc-cell">${typeof u.mc === 'number' ? '$'+u.mc.toLocaleString() : u.mc}</td>`;
+      body.appendChild(tr);
+    });
+  } else {
+    table.style.display = 'none';
+  }
+  loadStep();
+}
+
+function loadStep(){
+  answered = false;
+  const problem = PROBLEMS[problemOrder[problemIndex]];
+  const step = problem.steps[stepIndex];
+  document.getElementById('stepCount').textContent = `Step ${stepIndex+1} of ${problem.steps.length}`;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('promptText').textContent = step.prompt;
+  document.getElementById('feedback').classList.remove('show');
+  document.getElementById('nextBtn').disabled = true;
+  document.getElementById('nextBtn').textContent = (stepIndex === problem.steps.length - 1) ? 'Next problem' : 'Next step';
+
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  step.options.forEach((optText, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = optText;
+    btn.addEventListener('click', ()=>handleAnswer(step, i, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+function handleAnswer(step, chosenIndex, btnEl){
+  if(answered) return;
+  answered = true;
+  const isCorrect = chosenIndex === step.correct;
+  score.total++;
+  if(isCorrect) score.correct++;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b,i)=>{
+    b.disabled = true;
+    if(i === step.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect ? 'Correct.' : `Not quite — the answer is "${step.options[step.correct]}."`;
+  verdict.className = 'feedback-verdict ' + (isCorrect?'correct':'incorrect');
+  document.getElementById('feedbackExplain').textContent = step.explain;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  const problem = PROBLEMS[problemOrder[problemIndex]];
+  if(stepIndex < problem.steps.length - 1){
+    stepIndex++;
+    loadStep();
+  } else {
+    problemIndex = (problemIndex+1) % PROBLEMS.length;
+    if(problemIndex === 0) problemOrder = shuffledIndices(PROBLEMS.length);
+    loadProblem();
+  }
+});
+
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
