@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shift or Slide? — Supply &amp; Demand Trainer</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --demand: #2F6F62;
+    --demand-soft: #E4F0EC;
+    --supply: #C1542C;
+    --supply-soft: #F8E8DF;
+    --movement: #4A5FB0;
+    --movement-soft: #E9EBF8;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:1100px;margin:0 auto;}
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:22px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  .title-block h1{
+    font-size:28px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+    color:var(--ink);
+  }
+  .title-block p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+  }
+  .modebar{
+    display:flex;
+    gap:6px;
+    background:var(--surface-alt);
+    padding:5px;
+    border-radius:12px;
+    border:1px solid var(--border);
+  }
+  .mode-btn{
+    border:none;
+    background:transparent;
+    padding:9px 16px;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .mode-btn.active{
+    background:var(--surface);
+    color:var(--ink);
+    box-shadow:0 1px 3px rgba(43,33,24,0.12);
+  }
+  .mode-btn:hover:not(.active){color:var(--ink);}
+
+  .main{
+    display:grid;
+    grid-template-columns:1fr 1.15fr;
+    gap:22px;
+  }
+  @media (max-width:820px){
+    .main{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px;
+  }
+
+  /* --- Card panel --- */
+  .card-meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+  }
+  .card-count{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+  }
+  .score-badge{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .shock-card{
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px;
+    font-size:19px;
+    font-weight:600;
+    line-height:1.4;
+    color:var(--ink);
+    min-height:88px;
+    display:flex;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .predict-buttons{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .predict-btn, .choice-btn{
+    text-align:left;
+    padding:13px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .predict-btn:hover:not(:disabled), .choice-btn:hover:not(:disabled){
+    border-color:var(--accent);
+    background:#FFFBF2;
+  }
+  .predict-btn:disabled, .choice-btn:disabled{cursor:default;}
+  .predict-btn.correct, .choice-btn.correct{
+    background:var(--correct-soft);
+    border-color:var(--correct);
+    color:var(--correct);
+  }
+  .predict-btn.incorrect, .choice-btn.incorrect{
+    background:var(--incorrect-soft);
+    border-color:var(--incorrect);
+    color:var(--incorrect);
+  }
+
+  .feedback{
+    display:none;
+    margin-top:4px;
+    margin-bottom:16px;
+  }
+  .feedback.show{display:block;}
+  .feedback-verdict{
+    font-weight:800;
+    font-size:15px;
+    margin-bottom:6px;
+  }
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    padding:12px 14px;
+    border-radius:0 8px 8px 0;
+  }
+
+  .card-controls{
+    display:flex;
+    gap:10px;
+  }
+  .btn{
+    padding:11px 18px;
+    border-radius:10px;
+    border:none;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover{background:#453427;}
+  .btn-secondary{background:var(--surface-alt);color:var(--ink);border:1px solid var(--border);}
+  .btn-secondary:hover{background:#EDE1CB;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  /* --- Graph panel --- */
+  .legend{
+    display:flex;
+    gap:16px;
+    margin-bottom:12px;
+    flex-wrap:wrap;
+  }
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+  }
+  .legend-swatch{width:14px;height:14px;border-radius:4px;display:inline-block;}
+
+  svg#graph{width:100%;height:auto;display:block;}
+
+  .readout{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+    flex-wrap:wrap;
+  }
+  .readout-chip{
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:14px;
+    min-width:110px;
+  }
+  .readout-chip .label{
+    display:block;
+    font-size:11.5px;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin-bottom:2px;
+  }
+  .readout-chip .value{
+    font-size:16px;
+    font-weight:800;
+  }
+  .readout-chip.warn .value{color:var(--incorrect);}
+
+  .assumptions{
+    margin-top:16px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    border-top:1px dashed var(--border);
+    padding-top:12px;
+  }
+
+  footer.reset-row{
+    margin-top:22px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="title-block">
+      <h1>Shift or Slide?</h1>
+      <p>The grape market at Abraham &amp; Sara's vineyard</p>
+    </div>
+    <div class="modebar">
+      <button class="mode-btn active" data-mode="step" id="modeStepBtn">Step-Through</button>
+      <button class="mode-btn" data-mode="diagnose" id="modeDiagnoseBtn">Diagnose (Advanced)</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <!-- CARD PANEL -->
+    <div class="panel">
+      <div class="card-meta">
+        <span class="card-count" id="cardCount">Card 1 of 18</span>
+        <span class="score-badge" id="scoreBadge" style="display:none;">Score: 0 / 0</span>
+      </div>
+
+      <div class="shock-card" id="shockText">Loading…</div>
+
+      <div class="predict-buttons" id="predictButtons"></div>
+
+      <div class="feedback" id="feedback">
+        <div class="feedback-verdict" id="feedbackVerdict"></div>
+        <div class="feedback-explain" id="feedbackExplain"></div>
+      </div>
+
+      <div class="card-controls">
+        <button class="btn btn-secondary" id="replayBtn" disabled>Replay animation</button>
+        <button class="btn btn-primary" id="nextBtn" disabled>Next card</button>
+      </div>
+    </div>
+
+    <!-- GRAPH PANEL -->
+    <div class="panel">
+      <div class="legend">
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--demand)"></span>Demand</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--supply)"></span>Supply</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--movement)"></span>Point sliding along a curve</span>
+      </div>
+
+      <svg id="graph" viewBox="0 0 640 440" xmlns="http://www.w3.org/2000/svg">
+        <g id="ticks"></g>
+        <line id="axisX" x1="70" y1="380" x2="610" y2="380" stroke="#2B2118" stroke-width="2"/>
+        <line id="axisY" x1="70" y1="20" x2="70" y2="380" stroke="#2B2118" stroke-width="2"/>
+        <text x="340" y="418" text-anchor="middle" font-size="14" font-weight="700" fill="#6B5D4C">Quantity of grapes (crates / week)</text>
+        <text x="26" y="200" text-anchor="middle" font-size="14" font-weight="700" fill="#6B5D4C" transform="rotate(-90 26 200)">Price per crate ($)</text>
+
+        <line id="demandLineBase" stroke="#2F6F62" stroke-width="2" stroke-dasharray="5 5" opacity="0"/>
+        <line id="supplyLineBase" stroke="#C1542C" stroke-width="2" stroke-dasharray="5 5" opacity="0"/>
+        <line id="demandLine" stroke="#2F6F62" stroke-width="3.5"/>
+        <line id="supplyLine" stroke="#C1542C" stroke-width="3.5"/>
+
+        <text id="demandLabel" font-size="15" font-weight="800" fill="#2F6F62">D</text>
+        <text id="supplyLabel" font-size="15" font-weight="800" fill="#C1542C">S</text>
+        <text id="demandLabelNew" font-size="15" font-weight="800" fill="#2F6F62" opacity="0">D'</text>
+        <text id="supplyLabelNew" font-size="15" font-weight="800" fill="#C1542C" opacity="0">S'</text>
+
+        <line id="eqCrossX" stroke="#2B2118" stroke-width="1" stroke-dasharray="3 3" opacity="0"/>
+        <line id="eqCrossY" stroke="#2B2118" stroke-width="1" stroke-dasharray="3 3" opacity="0"/>
+        <circle id="eqDotBase" r="5.5" fill="#9C8E7A" opacity="0"/>
+        <circle id="eqDot" r="6.5" fill="#2B2118"/>
+        <circle id="moveDot" r="7" fill="#4A5FB0" opacity="0"/>
+      </svg>
+
+      <div class="readout" id="readout"></div>
+
+      <div class="assumptions">
+        Simplified linear model, one shock resolved at a time. Curves are straight lines for clarity — real supply and demand curves are rarely perfectly linear, and real markets rarely settle instantly. Direction and which-curve reasoning is the point here, not the exact numbers.
+      </div>
+    </div>
+  </div>
+
+  <footer class="reset-row">
+    <button class="link-btn" id="resetAllBtn">Reset the whole trainer</button>
+  </footer>
+</div>
+
+<script>
+/* ================= ECONOMIC MODEL ================= */
+// Demand: P = k - Q      Supply: P = c + Q
+const Q_MAX = 100, P_MAX = 140;
+const BASE_K = 100, BASE_C = 20; // baseline intercepts -> Eq at Q=40, P=60
+const SHIFT = 18; // how far a shift moves the intercept
+const MOVE = 16;  // how far a price movement goes for "movement along" cards
+
+function eq(k,c){ return { Q:(k-c)/2, P:(k+c)/2 }; }
+
+/* ================= CARD BANK ================= */
+// category: 'demand' | 'supply' | 'movement'
+// for demand/supply: direction 'increase'|'decrease'
+// for movement: curve 'demand'|'supply', priceDir 'increase'|'decrease'
+const CARDS = [
+  { text:"A new medical study reports that fresh grapes are a superfood.", category:'demand', direction:'increase',
+    explain:"A story that changes tastes and preferences for the good itself shifts the whole demand curve — buyers now want more grapes at every price. That's demand increasing (curve shifts right)." },
+  { text:"Regional incomes rise as a new employer opens a large office nearby.", category:'demand', direction:'increase',
+    explain:"Grapes are a normal good here: as income rises, buyers want more at every price. Demand shifts right." },
+  { text:"The price of raisins — a close substitute for fresh grapes — drops sharply.", category:'demand', direction:'decrease',
+    explain:"When a substitute gets cheaper, some buyers switch to it instead of grapes. Fewer grapes are wanted at every price — demand shifts left." },
+  { text:"Buyers hear that grape prices will jump sharply next month.", category:'demand', direction:'increase',
+    explain:"Expecting a higher price later makes buyers want to purchase more now, before the price rises. Demand shifts right today." },
+  { text:"The price of artisanal cheese — often paired with grapes on a board — rises.", category:'demand', direction:'decrease',
+    explain:"Cheese and grapes are complements: when cheese gets pricier, some buyers cut back on the whole pairing, wanting fewer grapes at every price. Demand shifts left." },
+  { text:"A new housing development brings hundreds of new households into the area.", category:'demand', direction:'increase',
+    explain:"More buyers in the market means more grapes wanted at every price. Demand shifts right." },
+
+  { text:"A new drip-irrigation system cuts water costs for grape growers.", category:'supply', direction:'increase',
+    explain:"Cheaper, better technology lowers the cost of growing grapes, so farmers are willing to supply more at every price. Supply shifts right." },
+  { text:"The price of fertilizer, a key input for grape farming, spikes.", category:'supply', direction:'decrease',
+    explain:"A pricier input raises the cost of growing grapes, so farmers supply less at every price. Supply shifts left." },
+  { text:"Three new vineyards open in the region, joining Abraham and Sara's farm.", category:'supply', direction:'increase',
+    explain:"More sellers in the market means more grapes offered at every price. Supply shifts right." },
+  { text:"A drought damages irrigation systems across local farms.", category:'supply', direction:'decrease',
+    explain:"Damage that raises production costs (or destroys crop capacity) means less is offered at every price. Supply shifts left." },
+  { text:"The government offers a subsidy to grape farmers for sustainable practices.", category:'supply', direction:'increase',
+    explain:"A subsidy effectively lowers farmers' costs, so they're willing to supply more at every price. Supply shifts right." },
+  { text:"Expecting higher grape prices next season, farmers hold back part of this year's harvest.", category:'supply', direction:'decrease',
+    explain:"When sellers expect a better price later, they supply less right now. Supply shifts left today." },
+
+  { text:"Today's market tag: grapes are priced higher than usual. What happens to quantity demanded?", category:'movement', curve:'demand', priceDir:'increase',
+    explain:"Nothing about buyers' tastes, income, or the price of other goods changed — only the price of grapes itself. That's a movement UP along the fixed demand curve: quantity demanded falls, but demand itself hasn't shifted." },
+  { text:"Grapes go on sale at a lower price today. What happens to quantity demanded?", category:'movement', curve:'demand', priceDir:'decrease',
+    explain:"Only the price of grapes changed. That's a movement DOWN along the fixed demand curve: quantity demanded rises, but the whole curve stays put." },
+  { text:"Today's market tag: grapes are priced higher than usual. What happens to quantity supplied?", category:'movement', curve:'supply', priceDir:'increase',
+    explain:"With costs and technology unchanged, a higher price simply makes it more worthwhile for farmers to sell more. That's a movement UP along the fixed supply curve." },
+  { text:"Grapes go on sale at a lower price today. What happens to quantity supplied?", category:'movement', curve:'supply', priceDir:'decrease',
+    explain:"With nothing else changed, a lower price makes farmers willing to sell less. That's a movement DOWN along the fixed supply curve." },
+  { text:"A one-day in-store markup raises the price of grapes for a single afternoon.", category:'movement', curve:'demand', priceDir:'increase',
+    explain:"A temporary sticker-price change, with nothing else about the market different, moves buyers along the existing demand curve rather than shifting it." },
+  { text:"A flash discount temporarily lowers the price of grapes for one afternoon.", category:'movement', curve:'supply', priceDir:'decrease',
+    explain:"A temporary price drop with no change in costs or technology moves sellers along the existing supply curve — quantity supplied falls, the curve itself doesn't move." },
+];
+
+function answerKey(card){
+  return card.category === 'movement'
+    ? `movement-${card.curve}-${card.priceDir}`
+    : `${card.category}-${card.direction}`;
+}
+function correctButtonLabel(card){
+  if(card.category==='demand') return 'Demand shifts';
+  if(card.category==='supply') return 'Supply shifts';
+  return 'Movement along the curve';
+}
+
+/* ================= SVG HELPERS ================= */
+const svg = document.getElementById('graph');
+const MARGIN = {left:70, right:30, top:20, bottom:60};
+const PLOT_W = 640 - MARGIN.left - MARGIN.right;
+const PLOT_H = 380 - MARGIN.top;
+
+function qToX(q){ return MARGIN.left + (q/Q_MAX)*PLOT_W; }
+function pToY(p){ return MARGIN.top + (PLOT_H) - (p/P_MAX)*PLOT_H; }
+
+function lineEndpoints(intercept, slope){
+  let pts = [];
+  const p0 = intercept; if(p0>=0 && p0<=P_MAX) pts.push({q:0,p:p0});
+  const pQmax = intercept + slope*Q_MAX; if(pQmax>=0 && pQmax<=P_MAX) pts.push({q:Q_MAX,p:pQmax});
+  if(slope!==0){
+    const qAtP0 = (0-intercept)/slope; if(qAtP0>=0 && qAtP0<=Q_MAX) pts.push({q:qAtP0,p:0});
+    const qAtPMax = (P_MAX-intercept)/slope; if(qAtPMax>=0 && qAtPMax<=Q_MAX) pts.push({q:qAtPMax,p:P_MAX});
+  }
+  pts.sort((a,b)=>a.q-b.q);
+  return [pts[0], pts[pts.length-1]];
+}
+
+function setLine(el, intercept, slope){
+  const [a,b] = lineEndpoints(intercept, slope);
+  el.setAttribute('x1', qToX(a.q)); el.setAttribute('y1', pToY(a.p));
+  el.setAttribute('x2', qToX(b.q)); el.setAttribute('y2', pToY(b.p));
+}
+
+function drawTicks(){
+  const g = document.getElementById('ticks');
+  g.innerHTML = '';
+  for(let q=0; q<=Q_MAX; q+=20){
+    const x = qToX(q);
+    g.innerHTML += `<line x1="${x}" y1="20" x2="${x}" y2="380" stroke="#E7DCC6" stroke-width="1"/>`;
+    g.innerHTML += `<text x="${x}" y="396" text-anchor="middle" font-size="11" fill="#6B5D4C">${q}</text>`;
+  }
+  for(let p=0; p<=P_MAX; p+=20){
+    const y = pToY(p);
+    g.innerHTML += `<line x1="70" y1="${y}" x2="610" y2="${y}" stroke="#E7DCC6" stroke-width="1"/>`;
+    g.innerHTML += `<text x="60" y="${y+4}" text-anchor="end" font-size="11" fill="#6B5D4C">${p}</text>`;
+  }
+}
+drawTicks();
+
+const demandLine = document.getElementById('demandLine');
+const supplyLine = document.getElementById('supplyLine');
+const demandLineBase = document.getElementById('demandLineBase');
+const supplyLineBase = document.getElementById('supplyLineBase');
+const demandLabel = document.getElementById('demandLabel');
+const supplyLabel = document.getElementById('supplyLabel');
+const demandLabelNew = document.getElementById('demandLabelNew');
+const supplyLabelNew = document.getElementById('supplyLabelNew');
+const eqDot = document.getElementById('eqDot');
+const eqDotBase = document.getElementById('eqDotBase');
+const moveDot = document.getElementById('moveDot');
+const eqCrossX = document.getElementById('eqCrossX');
+const eqCrossY = document.getElementById('eqCrossY');
+
+function positionLabel(el, intercept, slope, side){
+  // side 'left' places label near left/top end, used to keep D/S labels near curve ends
+  const [a,b] = lineEndpoints(intercept, slope);
+  const pt = slope < 0 ? a : b; // demand label near top-left end, supply near top-right end
+  el.setAttribute('x', qToX(pt.q) + (slope<0 ? 6 : -18));
+  el.setAttribute('y', pToY(pt.p) - 6);
+}
+
+function renderStatic(k, c){
+  setLine(demandLine, k, -1);
+  setLine(supplyLine, c, 1);
+  positionLabel(demandLabel, k, -1);
+  positionLabel(supplyLabel, c, 1);
+  demandLineBase.setAttribute('opacity', 0);
+  supplyLineBase.setAttribute('opacity', 0);
+  demandLabelNew.setAttribute('opacity', 0);
+  supplyLabelNew.setAttribute('opacity', 0);
+  eqCrossX.setAttribute('opacity', 0);
+  eqCrossY.setAttribute('opacity', 0);
+  eqDotBase.setAttribute('opacity', 0);
+  moveDot.setAttribute('opacity', 0);
+  const e = eq(k,c);
+  eqDot.setAttribute('cx', qToX(e.Q));
+  eqDot.setAttribute('cy', pToY(e.P));
+  eqDot.setAttribute('opacity', 1);
+  return e;
+}
+
+function showEqCross(e){
+  eqCrossX.setAttribute('x1', qToX(e.Q)); eqCrossX.setAttribute('x2', qToX(e.Q));
+  eqCrossX.setAttribute('y1', pToY(e.P)); eqCrossX.setAttribute('y2', 380);
+  eqCrossY.setAttribute('y1', pToY(e.P)); eqCrossY.setAttribute('y2', pToY(e.P));
+  eqCrossY.setAttribute('x1', 70); eqCrossY.setAttribute('x2', qToX(e.Q));
+  eqCrossX.setAttribute('opacity', 1);
+  eqCrossY.setAttribute('opacity', 1);
+}
+
+function lerp(a,b,t){ return a + (b-a)*t; }
+function easeInOut(t){ return t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
+
+function animate(durationMs, onFrame, onDone){
+  const start = performance.now();
+  function frame(now){
+    let t = Math.min(1, (now-start)/durationMs);
+    onFrame(easeInOut(t));
+    if(t<1) requestAnimationFrame(frame); else if(onDone) onDone();
+  }
+  requestAnimationFrame(frame);
+}
+
+function updateReadout(elId, chips){
+  const el = document.getElementById(elId);
+  el.innerHTML = chips.map(c=>`<div class="readout-chip ${c.warn?'warn':''}"><span class="label">${c.label}</span><span class="value">${c.value}</span></div>`).join('');
+}
+
+/* ================= STEP-THROUGH MODE ================= */
+let stepOrder = [];
+let stepIndex = 0;
+let stepAnswered = false;
+
+function shuffledIndices(n){
+  const arr = [...Array(n).keys()];
+  for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+  return arr;
+}
+
+function initStep(){
+  stepOrder = shuffledIndices(CARDS.length);
+  stepIndex = 0;
+  loadStepCard();
+}
+
+function loadStepCard(){
+  stepAnswered = false;
+  const card = CARDS[stepOrder[stepIndex]];
+  document.getElementById('cardCount').textContent = `Card ${stepIndex+1} of ${CARDS.length}`;
+  document.getElementById('shockText').textContent = card.text;
+  document.getElementById('feedback').classList.remove('show');
+  document.getElementById('replayBtn').disabled = true;
+  document.getElementById('nextBtn').disabled = true;
+
+  const e = renderStatic(BASE_K, BASE_C);
+  showEqCross(e);
+  updateReadout('readout', [
+    {label:'Equilibrium price', value:'$'+e.P.toFixed(0)},
+    {label:'Equilibrium quantity', value:e.Q.toFixed(0)},
+  ]);
+
+  const buttonsEl = document.getElementById('predictButtons');
+  buttonsEl.innerHTML = '';
+  const options = ['Demand shifts', 'Supply shifts', 'Movement along the curve'];
+  options.forEach(label=>{
+    const btn = document.createElement('button');
+    btn.className = 'predict-btn';
+    btn.textContent = label;
+    btn.addEventListener('click', ()=>handleStepAnswer(card, label, btn));
+    buttonsEl.appendChild(btn);
+  });
+}
+
+function handleStepAnswer(card, chosenLabel, btnEl){
+  if(stepAnswered) return;
+  stepAnswered = true;
+  const correctLabel = correctButtonLabel(card);
+  const isCorrect = chosenLabel === correctLabel;
+
+  [...document.getElementById('predictButtons').children].forEach(b=>{
+    b.disabled = true;
+    if(b.textContent === correctLabel) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect ? 'Correct.' : `Not quite — the answer is "${correctLabel}."`;
+  verdict.className = 'feedback-verdict ' + (isCorrect?'correct':'incorrect');
+  document.getElementById('feedbackExplain').textContent = card.explain;
+
+  document.getElementById('replayBtn').disabled = false;
+  document.getElementById('nextBtn').disabled = false;
+  document.getElementById('replayBtn').onclick = ()=>runStepAnimation(card);
+  runStepAnimation(card);
+}
+
+function runStepAnimation(card){
+  if(card.category==='movement'){
+    animateMovement(card);
+  } else {
+    animateShift(card);
+  }
+}
+
+function animateShift(card){
+  const startK = BASE_K, startC = BASE_C;
+  let endK = BASE_K, endC = BASE_C;
+  if(card.category==='demand') endK = BASE_K + (card.direction==='increase'? SHIFT : -SHIFT);
+  if(card.category==='supply') endC = BASE_C + (card.direction==='increase'? -SHIFT : SHIFT);
+
+  const e0 = eq(startK, startC);
+  demandLineBase.setAttribute('opacity', 1);
+  supplyLineBase.setAttribute('opacity', 1);
+  setLine(demandLineBase, startK, -1);
+  setLine(supplyLineBase, startC, 1);
+  eqDotBase.setAttribute('cx', qToX(e0.Q));
+  eqDotBase.setAttribute('cy', pToY(e0.P));
+  eqDotBase.setAttribute('opacity', 1);
+
+  if(card.category==='demand'){ demandLabelNew.setAttribute('opacity',1); }
+  if(card.category==='supply'){ supplyLabelNew.setAttribute('opacity',1); }
+
+  animate(900, (t)=>{
+    const k = lerp(startK, endK, t);
+    const c = lerp(startC, endC, t);
+    setLine(demandLine, k, -1);
+    setLine(supplyLine, c, 1);
+    positionLabel(demandLabel, k, -1);
+    positionLabel(supplyLabel, c, 1);
+    if(card.category==='demand') positionLabel(demandLabelNew, k, -1);
+    if(card.category==='supply') positionLabel(supplyLabelNew, c, 1);
+    const e = eq(k,c);
+    eqDot.setAttribute('cx', qToX(e.Q));
+    eqDot.setAttribute('cy', pToY(e.P));
+    showEqCross(e);
+  }, ()=>{
+    const e1 = eq(endK, endC);
+    updateReadout('readout', [
+      {label:'Old equilibrium', value:`$${e0.P.toFixed(0)}, Q=${e0.Q.toFixed(0)}`},
+      {label:'New equilibrium', value:`$${e1.P.toFixed(0)}, Q=${e1.Q.toFixed(0)}`},
+    ]);
+  });
+}
+
+function animateMovement(card){
+  renderStatic(BASE_K, BASE_C);
+  const e0 = eq(BASE_K, BASE_C);
+  const targetP = e0.P + (card.priceDir==='increase' ? MOVE : -MOVE);
+
+  moveDot.setAttribute('opacity', 1);
+  eqDot.setAttribute('opacity', 0.35);
+
+  animate(900, (t)=>{
+    const p = lerp(e0.P, targetP, t);
+    let q;
+    if(card.curve==='demand') q = BASE_K - p; else q = p - BASE_C;
+    moveDot.setAttribute('cx', qToX(q));
+    moveDot.setAttribute('cy', pToY(p));
+    eqCrossX.setAttribute('opacity',1); eqCrossY.setAttribute('opacity',1);
+    eqCrossX.setAttribute('x1', qToX(q)); eqCrossX.setAttribute('x2', qToX(q));
+    eqCrossX.setAttribute('y1', pToY(p)); eqCrossX.setAttribute('y2', 380);
+    eqCrossY.setAttribute('y1', pToY(p)); eqCrossY.setAttribute('y2', pToY(p));
+    eqCrossY.setAttribute('x1', 70); eqCrossY.setAttribute('x2', qToX(q));
+  }, ()=>{
+    const qMoved = card.curve==='demand' ? BASE_K-targetP : targetP-BASE_C;
+    const qOther = card.curve==='demand' ? targetP-BASE_C : BASE_K-targetP; // quantity on the OTHER, unmentioned curve at that price
+    const otherLabel = card.curve==='demand' ? 'Quantity supplied at that price' : 'Quantity demanded at that price';
+    const gapLabel = qMoved > qOther ? 'Surplus' : (qMoved < qOther ? 'Shortage' : 'No gap');
+    updateReadout('readout', [
+      {label: card.curve==='demand'?'Quantity demanded':'Quantity supplied', value: qMoved.toFixed(0)},
+      {label: otherLabel, value: qOther.toFixed(0)},
+      {label: gapLabel + ' at this price', value: Math.abs(qMoved-qOther).toFixed(0), warn: gapLabel!=='No gap'},
+    ]);
+  });
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  stepIndex = (stepIndex+1) % CARDS.length;
+  loadStepCard();
+});
+
+/* ================= DIAGNOSE MODE ================= */
+let diagnoseScore = {correct:0, total:0};
+let currentDiagnoseCard = null;
+let diagnoseAnswered = false;
+
+function initDiagnose(){
+  diagnoseScore = {correct:0, total:0};
+  document.getElementById('scoreBadge').style.display = 'inline-block';
+  loadDiagnoseCard();
+}
+
+function pickDistractors(correctCard, count){
+  const correctKey = answerKey(correctCard);
+  const seenKeys = new Set([correctKey]);
+  const pool = shuffledIndices(CARDS.length).map(i=>CARDS[i]);
+  const result = [];
+  for(const c of pool){
+    const k = answerKey(c);
+    if(!seenKeys.has(k)){
+      seenKeys.add(k);
+      result.push(c);
+      if(result.length===count) break;
+    }
+  }
+  return result;
+}
+
+function loadDiagnoseCard(){
+  const card = CARDS[Math.floor(Math.random()*CARDS.length)];
+  currentDiagnoseCard = card;
+  diagnoseAnswered = false;
+  document.getElementById('cardCount').textContent = 'Diagnose the cause';
+  document.getElementById('scoreBadge').textContent = `Score: ${diagnoseScore.correct} / ${diagnoseScore.total}`;
+  document.getElementById('shockText').textContent = 'Look at the graph. Which shock caused this?';
+  document.getElementById('feedback').classList.remove('show');
+  document.getElementById('replayBtn').disabled = true;
+  document.getElementById('nextBtn').disabled = true;
+  document.getElementById('replayBtn').style.display = 'none';
+
+  // Render the FINAL state directly, no animation, no explanation yet
+  let k = BASE_K, c = BASE_C;
+  if(card.category==='demand') k = BASE_K + (card.direction==='increase'? SHIFT : -SHIFT);
+  if(card.category==='supply') c = BASE_C + (card.direction==='increase'? -SHIFT : SHIFT);
+
+  if(card.category==='movement'){
+    renderStatic(BASE_K, BASE_C);
+    const e0 = eq(BASE_K, BASE_C);
+    const targetP = e0.P + (card.priceDir==='increase' ? MOVE : -MOVE);
+    let q = card.curve==='demand' ? BASE_K - targetP : targetP - BASE_C;
+    moveDot.setAttribute('cx', qToX(q));
+    moveDot.setAttribute('cy', pToY(targetP));
+    moveDot.setAttribute('opacity', 1);
+    eqDot.setAttribute('opacity', 0.35);
+    updateReadout('readout', [{label:'Price shown', value:'$'+targetP.toFixed(0)}]);
+  } else {
+    const e0 = eq(BASE_K, BASE_C);
+    const e1 = renderStatic(k, c);
+    demandLineBase.setAttribute('opacity', card.category==='demand'?1:0);
+    supplyLineBase.setAttribute('opacity', card.category==='supply'?1:0);
+    setLine(demandLineBase, BASE_K, -1);
+    setLine(supplyLineBase, BASE_C, 1);
+    eqDotBase.setAttribute('cx', qToX(e0.Q)); eqDotBase.setAttribute('cy', pToY(e0.P));
+    eqDotBase.setAttribute('opacity', 1);
+    showEqCross(e1);
+    if(card.category==='demand') demandLabelNew.setAttribute('opacity',1);
+    if(card.category==='supply') supplyLabelNew.setAttribute('opacity',1);
+    updateReadout('readout', [
+      {label:'Old equilibrium', value:`$${e0.P.toFixed(0)}, Q=${e0.Q.toFixed(0)}`},
+      {label:'New equilibrium', value:`$${e1.P.toFixed(0)}, Q=${e1.Q.toFixed(0)}`},
+    ]);
+  }
+
+  const distractors = pickDistractors(card, 3);
+  const choices = [...distractors, card];
+  for(let i=choices.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [choices[i],choices[j]]=[choices[j],choices[i]]; }
+
+  const buttonsEl = document.getElementById('predictButtons');
+  buttonsEl.innerHTML = '';
+  choices.forEach(choiceCard=>{
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = choiceCard.text;
+    btn.addEventListener('click', ()=>handleDiagnoseAnswer(card, choiceCard, btn));
+    buttonsEl.appendChild(btn);
+  });
+}
+
+function handleDiagnoseAnswer(correctCard, chosenCard, btnEl){
+  if(diagnoseAnswered) return;
+  diagnoseAnswered = true;
+  const isCorrect = chosenCard === correctCard;
+  diagnoseScore.total++;
+  if(isCorrect) diagnoseScore.correct++;
+  document.getElementById('scoreBadge').textContent = `Score: ${diagnoseScore.correct} / ${diagnoseScore.total}`;
+
+  [...document.getElementById('predictButtons').children].forEach(b=>{
+    b.disabled = true;
+    if(b.textContent === correctCard.text) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect ? 'Correct.' : 'Not quite.';
+  verdict.className = 'feedback-verdict ' + (isCorrect?'correct':'incorrect');
+  document.getElementById('feedbackExplain').textContent = correctCard.explain;
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  if(currentMode==='diagnose') loadDiagnoseCard();
+});
+
+/* ================= MODE SWITCHING ================= */
+let currentMode = 'step';
+document.getElementById('modeStepBtn').addEventListener('click', ()=>switchMode('step'));
+document.getElementById('modeDiagnoseBtn').addEventListener('click', ()=>switchMode('diagnose'));
+
+function switchMode(mode){
+  currentMode = mode;
+  document.getElementById('modeStepBtn').classList.toggle('active', mode==='step');
+  document.getElementById('modeDiagnoseBtn').classList.toggle('active', mode==='diagnose');
+  document.getElementById('replayBtn').style.display = mode==='step' ? 'inline-block' : 'none';
+  document.getElementById('scoreBadge').style.display = mode==='diagnose' ? 'inline-block' : 'none';
+  // rebind Next button per mode
+  const nextBtn = document.getElementById('nextBtn');
+  const freshNext = nextBtn.cloneNode(true);
+  nextBtn.parentNode.replaceChild(freshNext, nextBtn);
+  if(mode==='step'){
+    document.getElementById('nextBtn').addEventListener('click', ()=>{
+      stepIndex = (stepIndex+1) % CARDS.length;
+      loadStepCard();
+    });
+    initStep();
+  } else {
+    document.getElementById('nextBtn').addEventListener('click', loadDiagnoseCard);
+    initDiagnose();
+  }
+}
+
+document.getElementById('resetAllBtn').addEventListener('click', ()=>{
+  switchMode(currentMode);
+});
+
+/* ================= INIT ================= */
+initStep();
+</script>
+</body>
+</html>
