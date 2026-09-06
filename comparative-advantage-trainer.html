@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working Examples: Comparative Advantage & Gains from Trade</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+    --countryA: #2F6F62;
+    --countryA-soft: #E4F0EC;
+    --countryB: #C1542C;
+    --countryB-soft: #F8E8DF;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:760px;margin:0 auto;}
+
+  header{
+    margin-bottom:20px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  header h1{
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .count-group{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .card-count{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .score-badge{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px;
+  }
+
+  .scenario{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+
+  table.prod-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:20px;
+    font-size:14.5px;
+  }
+  table.prod-table th, table.prod-table td{
+    border:1px solid var(--border);
+    padding:10px 12px;
+    text-align:center;
+  }
+  table.prod-table th{
+    background:var(--surface-alt);
+    font-weight:700;
+    color:var(--ink-soft);
+    font-size:13px;
+  }
+  table.prod-table td.country-name{
+    font-weight:700;
+    text-align:left;
+  }
+  table.prod-table tr.countryA td.country-name{color:var(--countryA);}
+  table.prod-table tr.countryB td.country-name{color:var(--countryB);}
+
+  .prompt{
+    font-size:18px;
+    font-weight:600;
+    line-height:1.4;
+    color:var(--ink);
+    margin-bottom:18px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .choice-btn{
+    text-align:left;
+    padding:13px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){
+    border-color:var(--accent);
+    background:#FFFBF2;
+  }
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{
+    background:var(--correct-soft);
+    border-color:var(--correct);
+    color:var(--correct);
+  }
+  .choice-btn.incorrect{
+    background:var(--incorrect-soft);
+    border-color:var(--incorrect);
+    color:var(--incorrect);
+  }
+
+  .feedback{
+    display:none;
+    margin-bottom:16px;
+  }
+  .feedback.show{display:block;}
+  .feedback-verdict{
+    font-weight:800;
+    font-size:15px;
+    margin-bottom:6px;
+  }
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    padding:12px 14px;
+    border-radius:0 8px 8px 0;
+  }
+
+  .controls{
+    display:flex;
+    justify-content:flex-end;
+  }
+  .btn{
+    padding:11px 20px;
+    border-radius:10px;
+    border:none;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover{background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  footer.reset-row{
+    margin-top:20px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Working Examples: Comparative Advantage</h1>
+    <p>Gains from Trade — calculate opportunity costs, find the advantage, find the trade range</p>
+  </header>
+
+  <div class="meta-row">
+    <div class="count-group">
+      <span class="card-count" id="problemCount">Problem 1 of 6</span>
+      <span class="card-count" id="stepCount">Step 1 of 5</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="panel">
+    <div class="scenario" id="scenarioText"></div>
+
+    <table class="prod-table" id="prodTable">
+      <thead>
+        <tr>
+          <th>Country</th>
+          <th id="goodXHeader">Good X</th>
+          <th id="goodYHeader">Good Y</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="countryA">
+          <td class="country-name" id="countryAName">Country A</td>
+          <td id="countryAX"></td>
+          <td id="countryAY"></td>
+        </tr>
+        <tr class="countryB">
+          <td class="country-name" id="countryBName">Country B</td>
+          <td id="countryBX"></td>
+          <td id="countryBY"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="prompt" id="promptText">Loading…</div>
+
+    <div class="options" id="optionsWrap"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-verdict" id="feedbackVerdict"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn" disabled>Next step</button>
+    </div>
+  </div>
+
+  <footer class="reset-row">
+    <button class="link-btn" id="resetBtn">Restart from problem 1</button>
+  </footer>
+</div>
+
+<script>
+const PROBLEMS = [
+  {
+    scenario: "Country A and Country B can each produce automobiles or bread. Here's the maximum of each good they could produce if they devoted all their resources to it.",
+    goodX: "Automobiles", goodY: "Bread (loaves)",
+    countryA: { name:"Country A", x:40, y:400 },
+    countryB: { name:"Country B", x:30, y:90 },
+    steps: [
+      { prompt:"What is Country A's opportunity cost of producing 1 automobile (in loaves of bread)?",
+        options:["10 loaves of bread","3 loaves of bread","1/10 loaf of bread","4 loaves of bread"], correct:0,
+        explain:"Country A gives up 400 ÷ 40 = 10 loaves of bread for every automobile it produces." },
+      { prompt:"What is Country B's opportunity cost of producing 1 automobile (in loaves of bread)?",
+        options:["10 loaves of bread","3 loaves of bread","1/3 loaf of bread","30 loaves of bread"], correct:1,
+        explain:"Country B gives up 90 ÷ 30 = 3 loaves of bread for every automobile it produces." },
+      { prompt:"Which country has the comparative advantage in producing automobiles (the lower opportunity cost)?",
+        options:["Country A","Country B"], correct:1,
+        explain:"Country B gives up only 3 loaves of bread per automobile, versus Country A's 10. B's opportunity cost is lower, so B has the comparative advantage in automobiles." },
+      { prompt:"Which country has the comparative advantage in producing bread?",
+        options:["Country A","Country B"], correct:0,
+        explain:"Country A's opportunity cost of bread is 40 ÷ 400 = 1/10 of an automobile per loaf. Country B's is 30 ÷ 90 = 1/3 of an automobile per loaf. A's opportunity cost is lower, so A has the comparative advantage in bread." },
+      { prompt:"What range of prices (in loaves of bread per automobile) would benefit BOTH countries if they trade?",
+        options:["Between 3 and 10 loaves of bread per automobile","Between 10 and 20 loaves of bread per automobile","Exactly 3 loaves of bread per automobile","Any price benefits both countries equally"], correct:0,
+        explain:"The price must exceed Country B's opportunity cost of 3 (or B wouldn't bother exporting automobiles) and stay below Country A's opportunity cost of 10 (or A would rather make its own). So: 3 < price < 10 loaves of bread per automobile." }
+    ]
+  },
+  {
+    scenario: "Country A and Country B can each produce corn or computers. Here's the maximum of each good they could produce if they devoted all their resources to it.",
+    goodX: "Corn (bushels)", goodY: "Computers",
+    countryA: { name:"Country A", x:800, y:200 },
+    countryB: { name:"Country B", x:400, y:500 },
+    steps: [
+      { prompt:"What is Country A's opportunity cost of producing 1 bushel of corn (in computers)?",
+        options:["0.25 computers","1.25 computers","4 computers","0.8 computers"], correct:0,
+        explain:"Country A gives up 200 ÷ 800 = 0.25 computers for every bushel of corn it produces." },
+      { prompt:"What is Country B's opportunity cost of producing 1 bushel of corn (in computers)?",
+        options:["0.25 computers","1.25 computers","0.8 computers","4 computers"], correct:1,
+        explain:"Country B gives up 500 ÷ 400 = 1.25 computers for every bushel of corn it produces." },
+      { prompt:"Which country has the comparative advantage in corn?",
+        options:["Country A","Country B"], correct:0,
+        explain:"Country A's opportunity cost of corn (0.25 computers) is lower than Country B's (1.25 computers), so A has the comparative advantage in corn." },
+      { prompt:"Which country has the comparative advantage in computers?",
+        options:["Country A","Country B"], correct:1,
+        explain:"Country A's opportunity cost of a computer is 800 ÷ 200 = 4 bushels of corn. Country B's is 400 ÷ 500 = 0.8 bushels of corn. B's is lower, so B has the comparative advantage in computers." },
+      { prompt:"What range of prices (in computers per bushel of corn) benefits both countries?",
+        options:["Between 0.25 and 1.25 computers per bushel of corn","Between 1.25 and 4 computers per bushel of corn","Exactly 0.25 computers per bushel of corn","No mutually beneficial price exists"], correct:0,
+        explain:"The price must be above Country A's opportunity cost (0.25) so A is willing to export corn, and below Country B's opportunity cost (1.25) so B prefers importing it. So: 0.25 < price < 1.25 computers per bushel." }
+    ]
+  },
+  {
+    scenario: "Country A and Country B can each catch fish or gather coconuts. Here's the maximum of each good they could produce if they devoted all their resources to it.",
+    goodX: "Fish", goodY: "Coconuts",
+    countryA: { name:"Country A", x:60, y:120 },
+    countryB: { name:"Country B", x:100, y:100 },
+    steps: [
+      { prompt:"What is Country A's opportunity cost of catching 1 fish (in coconuts)?",
+        options:["2 coconuts","1 coconut","0.5 coconuts","4 coconuts"], correct:0,
+        explain:"Country A gives up 120 ÷ 60 = 2 coconuts for every fish it catches." },
+      { prompt:"What is Country B's opportunity cost of catching 1 fish (in coconuts)?",
+        options:["2 coconuts","1 coconut","0.5 coconuts","3 coconuts"], correct:1,
+        explain:"Country B gives up 100 ÷ 100 = 1 coconut for every fish it catches." },
+      { prompt:"Which country has the comparative advantage in fish?",
+        options:["Country A","Country B"], correct:1,
+        explain:"Country B's opportunity cost of fish (1 coconut) is lower than Country A's (2 coconuts), so B has the comparative advantage in fish." },
+      { prompt:"Which country has the comparative advantage in coconuts?",
+        options:["Country A","Country B"], correct:0,
+        explain:"Country A's opportunity cost of a coconut is 60 ÷ 120 = 0.5 fish. Country B's is 100 ÷ 100 = 1 fish. A's is lower, so A has the comparative advantage in coconuts." },
+      { prompt:"What range of prices (in coconuts per fish) benefits both countries?",
+        options:["Between 1 and 2 coconuts per fish","Between 2 and 4 coconuts per fish","Exactly 1 coconut per fish","Any price works"], correct:0,
+        explain:"The price must exceed Country B's opportunity cost of 1 (so B is willing to export fish) and stay below Country A's opportunity cost of 2 (so A prefers importing). So: 1 < price < 2 coconuts per fish." }
+    ]
+  },
+  {
+    scenario: "Country A and Country B can each produce shirts or wheat. Here's the maximum of each good they could produce if they devoted all their resources to it.",
+    goodX: "Shirts", goodY: "Wheat (bushels)",
+    countryA: { name:"Country A", x:80, y:80 },
+    countryB: { name:"Country B", x:50, y:200 },
+    steps: [
+      { prompt:"What is Country A's opportunity cost of producing 1 shirt (in bushels of wheat)?",
+        options:["1 bushel of wheat","4 bushels of wheat","0.25 bushels of wheat","2 bushels of wheat"], correct:0,
+        explain:"Country A gives up 80 ÷ 80 = 1 bushel of wheat for every shirt it produces." },
+      { prompt:"What is Country B's opportunity cost of producing 1 shirt (in bushels of wheat)?",
+        options:["1 bushel of wheat","4 bushels of wheat","0.25 bushels of wheat","0.5 bushels of wheat"], correct:1,
+        explain:"Country B gives up 200 ÷ 50 = 4 bushels of wheat for every shirt it produces." },
+      { prompt:"Which country has the comparative advantage in shirts?",
+        options:["Country A","Country B"], correct:0,
+        explain:"Country A's opportunity cost of a shirt (1 bushel of wheat) is lower than Country B's (4 bushels), so A has the comparative advantage in shirts." },
+      { prompt:"Which country has the comparative advantage in wheat?",
+        options:["Country A","Country B"], correct:1,
+        explain:"Country A's opportunity cost of a bushel of wheat is 80 ÷ 80 = 1 shirt. Country B's is 50 ÷ 200 = 0.25 shirts. B's is lower, so B has the comparative advantage in wheat." },
+      { prompt:"What range of prices (in bushels of wheat per shirt) benefits both countries?",
+        options:["Between 1 and 4 bushels of wheat per shirt","Between 4 and 8 bushels of wheat per shirt","Exactly 1 bushel of wheat per shirt","No mutually beneficial price exists"], correct:0,
+        explain:"The price must exceed Country A's opportunity cost of 1 (so A is willing to export shirts) and stay below Country B's opportunity cost of 4 (so B prefers importing). So: 1 < price < 4 bushels of wheat per shirt." }
+    ]
+  },
+  {
+    scenario: "Country A and Country B can each produce cars or wine. Here's the maximum of each good they could produce if they devoted all their resources to it.",
+    goodX: "Cars", goodY: "Wine (bottles)",
+    countryA: { name:"Country A", x:30, y:90 },
+    countryB: { name:"Country B", x:60, y:60 },
+    steps: [
+      { prompt:"What is Country A's opportunity cost of producing 1 car (in bottles of wine)?",
+        options:["3 bottles of wine","1 bottle of wine","0.33 bottles of wine","2 bottles of wine"], correct:0,
+        explain:"Country A gives up 90 ÷ 30 = 3 bottles of wine for every car it produces." },
+      { prompt:"What is Country B's opportunity cost of producing 1 car (in bottles of wine)?",
+        options:["3 bottles of wine","1 bottle of wine","2 bottles of wine","6 bottles of wine"], correct:1,
+        explain:"Country B gives up 60 ÷ 60 = 1 bottle of wine for every car it produces." },
+      { prompt:"Which country has the comparative advantage in cars?",
+        options:["Country A","Country B"], correct:1,
+        explain:"Country B's opportunity cost of a car (1 bottle of wine) is lower than Country A's (3 bottles), so B has the comparative advantage in cars." },
+      { prompt:"Which country has the comparative advantage in wine?",
+        options:["Country A","Country B"], correct:0,
+        explain:"Country A's opportunity cost of a bottle of wine is 30 ÷ 90 = 1/3 of a car. Country B's is 60 ÷ 60 = 1 car. A's is lower, so A has the comparative advantage in wine." },
+      { prompt:"What range of prices (in bottles of wine per car) benefits both countries?",
+        options:["Between 1 and 3 bottles of wine per car","Between 3 and 6 bottles of wine per car","Exactly 1 bottle of wine per car","Any price works"], correct:0,
+        explain:"The price must exceed Country B's opportunity cost of 1 (so B is willing to export cars) and stay below Country A's opportunity cost of 3 (so A prefers importing). So: 1 < price < 3 bottles of wine per car." }
+    ]
+  },
+  {
+    scenario: "Country A and Country B can each produce toys or textiles. Here's the maximum of each good they could produce if they devoted all their resources to it.",
+    goodX: "Toys", goodY: "Textiles (units)",
+    countryA: { name:"Country A", x:100, y:100 },
+    countryB: { name:"Country B", x:40, y:160 },
+    steps: [
+      { prompt:"What is Country A's opportunity cost of producing 1 toy (in units of textiles)?",
+        options:["1 unit of textiles","4 units of textiles","0.25 units of textiles","2 units of textiles"], correct:0,
+        explain:"Country A gives up 100 ÷ 100 = 1 unit of textiles for every toy it produces." },
+      { prompt:"What is Country B's opportunity cost of producing 1 toy (in units of textiles)?",
+        options:["1 unit of textiles","4 units of textiles","0.25 units of textiles","0.5 units of textiles"], correct:1,
+        explain:"Country B gives up 160 ÷ 40 = 4 units of textiles for every toy it produces." },
+      { prompt:"Which country has the comparative advantage in toys?",
+        options:["Country A","Country B"], correct:0,
+        explain:"Country A's opportunity cost of a toy (1 unit of textiles) is lower than Country B's (4 units), so A has the comparative advantage in toys." },
+      { prompt:"Which country has the comparative advantage in textiles?",
+        options:["Country A","Country B"], correct:1,
+        explain:"Country A's opportunity cost of a unit of textiles is 100 ÷ 100 = 1 toy. Country B's is 40 ÷ 160 = 0.25 toys. B's is lower, so B has the comparative advantage in textiles." },
+      { prompt:"What range of prices (in units of textiles per toy) benefits both countries?",
+        options:["Between 1 and 4 units of textiles per toy","Between 4 and 8 units of textiles per toy","Exactly 1 unit of textiles per toy","No mutually beneficial price exists"], correct:0,
+        explain:"The price must exceed Country A's opportunity cost of 1 (so A is willing to export toys) and stay below Country B's opportunity cost of 4 (so B prefers importing). So: 1 < price < 4 units of textiles per toy." }
+    ]
+  }
+];
+
+let problemOrder = [];
+let problemIndex = 0;
+let stepIndex = 0;
+let answered = false;
+let score = { correct:0, total:0 };
+
+function shuffledIndices(n){
+  const arr = [...Array(n).keys()];
+  for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+  return arr;
+}
+
+function init(){
+  problemOrder = shuffledIndices(PROBLEMS.length);
+  problemIndex = 0;
+  score = { correct:0, total:0 };
+  loadProblem();
+}
+
+function loadProblem(){
+  stepIndex = 0;
+  const problem = PROBLEMS[problemOrder[problemIndex]];
+  document.getElementById('scenarioText').textContent = problem.scenario;
+  document.getElementById('goodXHeader').textContent = problem.goodX + ' (max)';
+  document.getElementById('goodYHeader').textContent = problem.goodY + ' (max)';
+  document.getElementById('countryAName').textContent = problem.countryA.name;
+  document.getElementById('countryBName').textContent = problem.countryB.name;
+  document.getElementById('countryAX').textContent = problem.countryA.x;
+  document.getElementById('countryAY').textContent = problem.countryA.y;
+  document.getElementById('countryBX').textContent = problem.countryB.x;
+  document.getElementById('countryBY').textContent = problem.countryB.y;
+  document.getElementById('problemCount').textContent = `Problem ${problemIndex+1} of ${PROBLEMS.length}`;
+  loadStep();
+}
+
+function loadStep(){
+  answered = false;
+  const problem = PROBLEMS[problemOrder[problemIndex]];
+  const step = problem.steps[stepIndex];
+  document.getElementById('stepCount').textContent = `Step ${stepIndex+1} of ${problem.steps.length}`;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('promptText').textContent = step.prompt;
+  document.getElementById('feedback').classList.remove('show');
+  document.getElementById('nextBtn').disabled = true;
+  document.getElementById('nextBtn').textContent = (stepIndex === problem.steps.length - 1) ? 'Next problem' : 'Next step';
+
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  step.options.forEach((optText, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = optText;
+    btn.addEventListener('click', ()=>handleAnswer(step, i, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+function handleAnswer(step, chosenIndex, btnEl){
+  if(answered) return;
+  answered = true;
+  const isCorrect = chosenIndex === step.correct;
+  score.total++;
+  if(isCorrect) score.correct++;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b,i)=>{
+    b.disabled = true;
+    if(i === step.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect ? 'Correct.' : `Not quite — the answer is "${step.options[step.correct]}."`;
+  verdict.className = 'feedback-verdict ' + (isCorrect?'correct':'incorrect');
+  document.getElementById('feedbackExplain').textContent = step.explain;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  const problem = PROBLEMS[problemOrder[problemIndex]];
+  if(stepIndex < problem.steps.length - 1){
+    stepIndex++;
+    loadStep();
+  } else {
+    problemIndex = (problemIndex+1) % PROBLEMS.length;
+    if(problemIndex === 0) problemOrder = shuffledIndices(PROBLEMS.length);
+    loadProblem();
+  }
+});
+
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
