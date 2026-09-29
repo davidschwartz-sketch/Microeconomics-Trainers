@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working Examples: Elasticity</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+    --demand: #2F6F62;
+    --supply: #C1542C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:760px;margin:0 auto;}
+
+  header{
+    margin-bottom:20px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  header h1{
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .count-group{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .card-count{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .score-badge{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px;
+  }
+
+  .method-badge{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:3px 9px;
+    border-radius:6px;
+    margin-bottom:12px;
+  }
+  .scenario{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .formula-note{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:10px 13px;
+    margin-bottom:18px;
+  }
+  .formula-note b{color:var(--ink);}
+
+  .table-wrap{overflow-x:auto;margin-bottom:20px;}
+  table.data-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.data-table th, table.data-table td{
+    border:1px solid var(--border);
+    padding:9px 11px;
+    text-align:center;
+    white-space:nowrap;
+  }
+  table.data-table th{
+    background:var(--surface-alt);
+    font-weight:700;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  table.data-table td.row-label{
+    font-weight:700;
+    text-align:left;
+    color:var(--ink-soft);
+  }
+  table.data-table td.p-cell{color:var(--supply); font-weight:700;}
+  table.data-table td.q-cell{color:var(--demand); font-weight:700;}
+
+  .graph-wrap{
+    margin-bottom:20px;
+    text-align:center;
+  }
+  .graph-wrap svg{width:100%;max-width:480px;height:auto;}
+
+  .prompt{
+    font-size:18px;
+    font-weight:600;
+    line-height:1.4;
+    color:var(--ink);
+    margin-bottom:18px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .choice-btn{
+    text-align:left;
+    padding:13px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){
+    border-color:var(--accent);
+    background:#FFFBF2;
+  }
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{
+    background:var(--correct-soft);
+    border-color:var(--correct);
+    color:var(--correct);
+  }
+  .choice-btn.incorrect{
+    background:var(--incorrect-soft);
+    border-color:var(--incorrect);
+    color:var(--incorrect);
+  }
+
+  .feedback{
+    display:none;
+    margin-bottom:16px;
+  }
+  .feedback.show{display:block;}
+  .feedback-verdict{
+    font-weight:800;
+    font-size:15px;
+    margin-bottom:6px;
+  }
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    padding:12px 14px;
+    border-radius:0 8px 8px 0;
+  }
+
+  .controls{
+    display:flex;
+    justify-content:flex-end;
+  }
+  .btn{
+    padding:11px 20px;
+    border-radius:10px;
+    border:none;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover{background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  footer.reset-row{
+    margin-top:20px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Working Examples: Elasticity</h1>
+    <p>PED, XED, YED and PES &mdash; simple vs. midpoint method, determinants, and the total revenue test</p>
+  </header>
+
+  <div class="meta-row">
+    <div class="count-group">
+      <span class="card-count" id="problemCount">Problem 1 of 10</span>
+      <span class="card-count" id="stepCount">Step 1 of 5</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="panel">
+    <span class="method-badge" id="methodBadge"></span>
+    <div class="scenario" id="scenarioText"></div>
+    <div class="formula-note" id="formulaNote"></div>
+
+    <div class="table-wrap" id="tableWrap">
+      <table class="data-table">
+        <thead><tr id="tableHead"></tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="graph-wrap" id="graphWrap"></div>
+
+    <div class="prompt" id="promptText">Loading&hellip;</div>
+
+    <div class="options" id="optionsWrap"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-verdict" id="feedbackVerdict"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn" disabled>Next step</button>
+    </div>
+  </div>
+
+  <footer class="reset-row">
+    <button class="link-btn" id="resetBtn">Restart from problem 1</button>
+  </footer>
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Every number in this bank was computed and asserted in a scratch script
+   before being written here (midpoint and simple-method percentage changes,
+   elasticities, total revenues, and the TR-maximizing point of the linear
+   demand curve). Conventions follow the Unit 2 deck: the "simple method"
+   uses the STARTING value as the base; |PED| is reported as an absolute
+   value; PES comes out positive on its own; XED and YED keep their signs.
+--------------------------------------------------------------------------- */
+
+const DEMAND_GRAPH = `
+<svg viewBox="0 0 360 250" role="img" aria-label="Straight-line demand curve P = 16 minus Q, elastic above the midpoint at P=8 Q=8 and inelastic below it">
+  <line x1="48" y1="210" x2="340" y2="210" stroke="#6B5D4C" stroke-width="1.5"/>
+  <line x1="48" y1="210" x2="48" y2="24" stroke="#6B5D4C" stroke-width="1.5"/>
+  <text x="340" y="232" text-anchor="end" font-size="10.5" fill="#6B5D4C">Q (hundreds of passes)</text>
+  <text x="44" y="20" text-anchor="end" font-size="10.5" fill="#6B5D4C">P ($)</text>
+  <line x1="48" y1="30" x2="328" y2="210" stroke="#2F6F62" stroke-width="2.5"/>
+  <text x="333" y="200" font-size="11" font-weight="700" fill="#2F6F62">D</text>
+  <line x1="48" y1="120" x2="188" y2="120" stroke="#D9A441" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="188" y1="120" x2="188" y2="210" stroke="#D9A441" stroke-width="1" stroke-dasharray="3 3"/>
+  <circle cx="118" cy="75"  r="3.5" fill="#2F6F62"/>
+  <circle cx="153" cy="98"  r="3.5" fill="#2F6F62"/>
+  <circle cx="171" cy="109" r="3"   fill="#2F6F62"/>
+  <circle cx="206" cy="131" r="3"   fill="#2F6F62"/>
+  <circle cx="223" cy="143" r="3.5" fill="#2F6F62"/>
+  <circle cx="258" cy="165" r="3.5" fill="#2F6F62"/>
+  <circle cx="188" cy="120" r="5.5" fill="#FFFFFF" stroke="#D9A441" stroke-width="2.5"/>
+  <text x="126" y="60"  font-size="10.5" font-weight="700" fill="#2F6F62">elastic  |PED| &gt; 1</text>
+  <text x="198" y="116" font-size="10.5" font-weight="700" fill="#D9A441">|PED| = 1 &middot; TR max</text>
+  <text x="200" y="192" font-size="10.5" font-weight="700" fill="#2F6F62">inelastic  |PED| &lt; 1</text>
+  <text x="44" y="124" text-anchor="end" font-size="10" fill="#6B5D4C">8</text>
+  <text x="44" y="34"  text-anchor="end" font-size="10" fill="#6B5D4C">16</text>
+  <text x="188" y="224" text-anchor="middle" font-size="10" fill="#6B5D4C">8</text>
+  <text x="328" y="224" text-anchor="middle" font-size="10" fill="#6B5D4C">16</text>
+</svg>`;
+
+const SUPPLY_GRAPH = `
+<svg viewBox="0 0 360 250" role="img" aria-label="Straight-line supply curve through the origin, unit elastic at every point">
+  <line x1="48" y1="210" x2="340" y2="210" stroke="#6B5D4C" stroke-width="1.5"/>
+  <line x1="48" y1="210" x2="48" y2="24" stroke="#6B5D4C" stroke-width="1.5"/>
+  <text x="340" y="232" text-anchor="end" font-size="10.5" fill="#6B5D4C">Q (posters)</text>
+  <text x="44" y="20" text-anchor="end" font-size="10.5" fill="#6B5D4C">P ($)</text>
+  <line x1="48" y1="210" x2="286" y2="56" stroke="#C1542C" stroke-width="2.5"/>
+  <text x="292" y="52" font-size="11" font-weight="700" fill="#C1542C">S</text>
+  <circle cx="48"  cy="210" r="3.5" fill="#C1542C"/>
+  <circle cx="116" cy="166" r="3.5" fill="#C1542C"/>
+  <circle cx="184" cy="122" r="3.5" fill="#C1542C"/>
+  <circle cx="252" cy="78"  r="3.5" fill="#C1542C"/>
+  <text x="126" y="182" font-size="10" fill="#6B5D4C">$0.50, 1</text>
+  <text x="194" y="138" font-size="10" fill="#6B5D4C">$1.00, 2</text>
+  <text x="262" y="94"  font-size="10" fill="#6B5D4C">$1.50, 3</text>
+  <text x="120" y="80"  text-anchor="middle" font-size="10.5" font-weight="700" fill="#C1542C">PES = 1.00 everywhere</text>
+  <text x="52"  y="226" font-size="10" fill="#6B5D4C">origin</text>
+  <text x="116" y="226" text-anchor="middle" font-size="10" fill="#6B5D4C">1</text>
+  <text x="184" y="226" text-anchor="middle" font-size="10" fill="#6B5D4C">2</text>
+  <text x="252" y="226" text-anchor="middle" font-size="10" fill="#6B5D4C">3</text>
+</svg>`;
+
+const PROBLEMS = [
+  /* ----------------------------------------------------------------- P1 */
+  {
+    id: "P1",
+    method: "Simple method, then midpoint method",
+    scenario: "Cedar Lane Bakery is looking at two points on the demand curve for its sourdough loaves. At $8 a loaf it sells 60 loaves a week; at $10 a loaf it sells 45.",
+    formula: "<b>Simple method:</b> %&Delta;X = (X&#8322; &minus; X&#8321;) &divide; X&#8321; &nbsp;&bull;&nbsp; <b>Midpoint method:</b> %&Delta;X = (X&#8322; &minus; X&#8321;) &divide; [(X&#8321; + X&#8322;) &divide; 2]",
+    table: {
+      cols: ["", "Price per loaf", "Loaves per week"],
+      colClass: ["row-label", "p-cell", "q-cell"],
+      rows: [["Point A", "$8", "60"], ["Point B", "$10", "45"]]
+    },
+    steps: [
+      { prompt: "Use the simple method to find |PED| for a price RISE from $8 to $10, so the $8 / 60 end supplies the base.",
+        options: ["1.00", "1.67", "0.75", "1.25"], correct: 0,
+        explain: "%ΔQ = (45 − 60) ÷ 60 = −25%. %ΔP = ($10 − $8) ÷ $8 = +25%. |PED| = 25% ÷ 25% = 1.00 — this looks like a textbook unit-elastic result. Hold on to it." },
+      { prompt: "Now run the very same pair of points in the other direction — a price FALL from $10 to $8, so the $10 / 45 end supplies the base. What is |PED| by the simple method?",
+        options: ["1.67", "1.00", "0.60", "2.00"], correct: 0,
+        explain: "%ΔQ = (60 − 45) ÷ 45 = +33.33%. %ΔP = ($8 − $10) ÷ $10 = −20%. |PED| = 33.33% ÷ 20% = 1.67. Same bakery, same two points, a different elasticity." },
+      { prompt: "Why did the same pair of points give 1.00 one way and 1.67 the other?",
+        options: ["Because the simple method divides by the starting value, and the two directions start from different bases",
+                  "Because demand is genuinely elastic going up and inelastic going down",
+                  "Because one calculation used price as the base and the other used quantity",
+                  "Because rounding to two decimals compounds across the two percentages"], correct: 0,
+        explain: "Nothing about the market changed — only the denominator did. Running the change upward divides by $8 and 60; running it downward divides by $10 and 45. That direction-dependence is exactly the flaw the midpoint method exists to fix." },
+      { prompt: "Switch to the midpoint method. What is the percentage change in quantity demanded between these two points?",
+        options: ["−28.57%", "−25%", "−33.33%", "−15%"], correct: 0,
+        explain: "Q_avg = (60 + 45) ÷ 2 = 52.5. ΔQ = 45 − 60 = −15. %ΔQ = −15 ÷ 52.5 = −28.57%. Notice it lands between the two simple-method answers, −25% and −33.33%." },
+      { prompt: "Finish the midpoint calculation. What is |PED|?",
+        options: ["1.29", "1.00", "1.67", "0.78"], correct: 0,
+        explain: "P_avg = ($8 + $10) ÷ 2 = $9, so %ΔP = $2 ÷ $9 = +22.22%. |PED| = 28.57% ÷ 22.22% = 1.29. Run it downward instead and you get 1.29 again — the midpoint method gives one answer per pair of points, whichever way you read the change." },
+      { prompt: "Using the midpoint result, how should demand for Cedar Lane's sourdough be classified?",
+        options: ["Elastic, because |PED| > 1", "Unit elastic, because |PED| = 1",
+                  "Inelastic, because |PED| < 1", "Perfectly inelastic, because |PED| = 0"], correct: 0,
+        explain: "|PED| = 1.29 > 1, so demand is elastic. This is the payoff of the whole problem: the simple method run upward gave exactly 1.00 and would have had you call this unit elastic — a different classification, not just a different decimal." }
+    ]
+  },
+
+  /* ----------------------------------------------------------------- P2 */
+  {
+    id: "P2",
+    method: "Midpoint method",
+    scenario: "Riverbend Pharmacy raises the price of a prescription asthma inhaler from $30 to $50. Inhalers dispensed per month fall from 800 to 700.",
+    formula: "<b>|PED|</b> = %&Delta; quantity demanded &divide; %&Delta; price, both on midpoint bases. <b>TR</b> = Price &times; Quantity.",
+    table: {
+      cols: ["", "Price per inhaler", "Inhalers per month"],
+      colClass: ["row-label", "p-cell", "q-cell"],
+      rows: [["Before", "$30", "800"], ["After", "$50", "700"]]
+    },
+    steps: [
+      { prompt: "What is the percentage change in quantity demanded?",
+        options: ["−13.33%", "−12.5%", "−14.29%", "−25%"], correct: 0,
+        explain: "Q_avg = (800 + 700) ÷ 2 = 750. ΔQ = −100. %ΔQ = −100 ÷ 750 = −13.33%. Dividing by the starting 800 gives −12.5%, but that is the simple method, not what this problem asked for." },
+      { prompt: "What is the percentage change in price?",
+        options: ["+50%", "+66.67%", "+40%", "+25%"], correct: 0,
+        explain: "P_avg = ($30 + $50) ÷ 2 = $40. ΔP = +$20. %ΔP = $20 ÷ $40 = +50%." },
+      { prompt: "What is |PED|?",
+        options: ["0.27", "3.75", "0.19", "1.33"], correct: 0,
+        explain: "|PED| = 13.33% ÷ 50% = 0.2667, which rounds to 0.27. Inverting the fraction (50 ÷ 13.33 = 3.75) is the most common slip here — quantity always goes on top." },
+      { prompt: "Classify this demand, and name the determinant that best explains it.",
+        options: ["Inelastic — an inhaler is a necessity with no close substitute for the patient who needs it",
+                  "Elastic — a $20 increase is a large share of a household's monthly budget",
+                  "Unit elastic — quantity and price moved by the same percentage",
+                  "Inelastic — patients had a long time horizon over which to adjust"], correct: 0,
+        explain: "|PED| = 0.27 < 1, so demand is inelastic. Two of the five determinants drive it: there is no substitute for the medication, and it is a necessity rather than a discretionary purchase. A long time horizon would push the other way, toward MORE elastic demand." },
+      { prompt: "Run the total revenue test. What happens to Riverbend's revenue on this product?",
+        options: ["It rises, from $24,000 to $35,000", "It falls, from $24,000 to $21,000",
+                  "It is unchanged at $24,000", "It rises, from $24,000 to $40,000"], correct: 0,
+        explain: "TR = P × Q. Before: $30 × 800 = $24,000. After: $50 × 700 = $35,000. That is the general rule for inelastic demand — quantity falls by a smaller percentage than price rises, so the price effect dominates and revenue rises. ($40,000 is what you get by forgetting that quantity fell at all.)" }
+    ]
+  },
+
+  /* ----------------------------------------------------------------- P3 */
+  {
+    id: "P3",
+    method: "Midpoint method",
+    scenario: "Kwan's Cafe cuts the price of its large iced coffee from $5 to $3 for a summer promotion. Sales climb from 400 cups a week to 1,200.",
+    formula: "<b>|PED|</b> = %&Delta; quantity demanded &divide; %&Delta; price, both on midpoint bases. <b>TR</b> = Price &times; Quantity.",
+    table: {
+      cols: ["", "Price per cup", "Cups per week"],
+      colClass: ["row-label", "p-cell", "q-cell"],
+      rows: [["Before", "$5", "400"], ["After", "$3", "1,200"]]
+    },
+    steps: [
+      { prompt: "What is the percentage change in quantity demanded?",
+        options: ["+100%", "+200%", "+66.67%", "+50%"], correct: 0,
+        explain: "Q_avg = (400 + 1,200) ÷ 2 = 800. ΔQ = +800. %ΔQ = 800 ÷ 800 = +100%. The simple method would have given 800 ÷ 400 = +200%." },
+      { prompt: "What is the percentage change in price?",
+        options: ["−50%", "−40%", "−66.67%", "−33.33%"], correct: 0,
+        explain: "P_avg = ($5 + $3) ÷ 2 = $4. ΔP = −$2. %ΔP = −$2 ÷ $4 = −50%." },
+      { prompt: "What is |PED|?",
+        options: ["2.00", "0.50", "1.00", "3.00"], correct: 0,
+        explain: "|PED| = 100% ÷ 50% = 2.00. In percentage terms, quantity demanded is twice as responsive as price. The negative signs cancel in the ratio, which is why we report the absolute value." },
+      { prompt: "Classify this demand, and name the determinants behind it.",
+        options: ["Elastic — a $5 iced coffee is discretionary and has many close substitutes",
+                  "Inelastic — regular customers will buy their coffee at any price",
+                  "Unit elastic — the price cut and the sales jump offset each other",
+                  "Perfectly elastic — quantity demanded responded at all"], correct: 0,
+        explain: "|PED| = 2.00 > 1, so demand is elastic. Two determinants point the same way: iced coffee is a luxury rather than a necessity, and substitutes are everywhere — a different cafe, a bottled drink, coffee brewed at home." },
+      { prompt: "Run the total revenue test. What happens to the cafe's revenue on large iced coffees?",
+        options: ["It rises, from $2,000 to $3,600", "It falls, from $2,000 to $1,200",
+                  "It is unchanged at $2,000", "It falls, from $3,600 to $2,000"], correct: 0,
+        explain: "TR = P × Q. Before: $5 × 400 = $2,000. After: $3 × 1,200 = $3,600. With elastic demand, cutting the price raises revenue, because the quantity effect dominates the price effect. Compare the inhaler problem: same test, opposite prescription, because the classification is opposite." }
+    ]
+  },
+
+  /* ----------------------------------------------------------------- P4 */
+  {
+    id: "P4",
+    method: "Midpoint method · straight-line demand curve",
+    scenario: "Harborview Ferry sells day passes. Its demand curve is the straight line P = 16 − Q, where Q is measured in hundreds of passes per day. The slope of that line is identical at every point on it.",
+    formula: "<b>|PED|</b> = %&Delta; quantity demanded &divide; %&Delta; price, both on midpoint bases. <b>TR</b> = Price &times; Quantity.",
+    table: {
+      cols: ["Price per pass", "Quantity (hundreds)"],
+      colClass: ["p-cell", "q-cell"],
+      rows: [["$12", "4"], ["$10", "6"], ["$9", "7"], ["$8", "8"], ["$7", "9"], ["$6", "10"], ["$4", "12"]]
+    },
+    graph: "DEMAND",
+    steps: [
+      { prompt: "Start high on the curve: price falls from $12 to $10 and quantity rises from 4 to 6. What is |PED| over that range?",
+        options: ["2.20", "0.45", "1.00", "1.20"], correct: 0,
+        explain: "Q_avg = (4 + 6) ÷ 2 = 5, so %ΔQ = 2 ÷ 5 = +40%. P_avg = ($12 + $10) ÷ 2 = $11, so %ΔP = −$2 ÷ $11 = −18.18%. |PED| = 40% ÷ 18.18% = 2.20 — elastic." },
+      { prompt: "Now go low on the same curve: price falls from $6 to $4 and quantity rises from 10 to 12 — the identical $2 price change and the identical 2-unit quantity change. What is |PED| here?",
+        options: ["0.45", "2.20", "1.00", "0.83"], correct: 0,
+        explain: "Q_avg = 11, so %ΔQ = 2 ÷ 11 = +18.18%. P_avg = $5, so %ΔP = −$2 ÷ $5 = −40%. |PED| = 18.18% ÷ 40% = 0.45 — inelastic. Notice that 2.20 and 0.45 are reciprocals: the two percentages simply traded places." },
+      { prompt: "The slope of this line is the same at both points. So why is |PED| 2.20 in one place and 0.45 in the other?",
+        options: ["Elasticity compares percentage changes, and the same $2 and same 2 units are different percentages of a high price and low quantity than of a low price and high quantity",
+                  "The demand curve is only approximately straight, and it bends near the intercepts",
+                  "Total revenue is different at the two points, and elasticity is derived from revenue",
+                  "The midpoint method overstates elasticity whenever the price is high"], correct: 0,
+        explain: "Slope is about absolute changes (ΔP ÷ ΔQ) and never varies on a straight line. Elasticity is about the RATIO of percentage changes. High on the curve, $2 is a thin slice of a $12 price while 2 units is a thick slice of a quantity of 4, so %ΔQ ≫ %ΔP and demand is elastic. Low on the curve the arithmetic reverses." },
+      { prompt: "Somewhere between those regions demand must be unit elastic. Test the price change from $9 to $7, where quantity goes from 7 to 9. Which point does that range straddle?",
+        options: ["P = $8, Q = 8", "P = $10, Q = 6", "P = $6, Q = 10", "P = $12, Q = 4"], correct: 0,
+        explain: "Q_avg = 8 and P_avg = $8, so %ΔQ = 2 ÷ 8 = +25% and %ΔP = −$2 ÷ $8 = −25%. |PED| = 1.00 exactly. The range straddles P = $8, Q = 8 — the midpoint of this demand curve, halfway between its price intercept of $16 and its quantity intercept of 16." },
+      { prompt: "Turn to revenue. Compare total revenue at P = $12 with total revenue at P = $8.",
+        options: ["$48 at P = $12 and $64 at P = $8, so revenue is higher at $8",
+                  "$48 at P = $12 and $32 at P = $8, so revenue is higher at $12",
+                  "$64 at both prices, because they sit on the same demand curve",
+                  "$60 at P = $12 and $64 at P = $8"], correct: 0,
+        explain: "TR = P × Q. At P = $12, Q = 4, so TR = $48. At P = $8, Q = 8, so TR = $64. Working down the elastic upper half of the curve, every price cut raises revenue — exactly what |PED| = 2.20 predicted." },
+      { prompt: "Where along this demand curve is total revenue maximized?",
+        options: ["At P = $8, Q = 8, where |PED| = 1.00 and TR = $64",
+                  "At P = $12, Q = 4, where demand is most elastic",
+                  "At P = $4, Q = 12, where the most passes are sold",
+                  "At P = $16, Q = 0, the highest price the curve allows"], correct: 0,
+        explain: "Run the whole schedule: $48, $60, $63, $64, $63, $60, $48. Revenue peaks at P = $8, Q = 8 — the unit-elastic midpoint. Above it demand is elastic, so cutting price raises revenue; below it demand is inelastic, so cutting price lowers revenue. The two forces balance exactly where |PED| = 1." }
+    ]
+  },
+
+  /* ----------------------------------------------------------------- P5 */
+  {
+    id: "P5",
+    method: "Interpretation — no calculation",
+    scenario: "No arithmetic in this one. Each part gives you an elasticity comparison and asks which determinant of price elasticity of demand is doing the work.",
+    formula: "<b>The five determinants:</b> availability of substitutes &nbsp;&bull;&nbsp; necessity vs. luxury &nbsp;&bull;&nbsp; share of income &nbsp;&bull;&nbsp; time horizon &nbsp;&bull;&nbsp; narrowness of market definition",
+    steps: [
+      { prompt: "Gasoline as a whole has |PED| of roughly 0.25. Petrolia-brand gasoline, sold at one of six stations on the same intersection, has |PED| of roughly 4. Which of the two has more elastic demand?",
+        options: ["Petrolia-brand gasoline", "Gasoline as a whole",
+                  "They are equally elastic, since it is the same fuel", "Neither — both are perfectly inelastic"], correct: 0,
+        explain: "|PED| = 4 is far above 1; |PED| = 0.25 is far below it. A single brand at a crowded intersection faces very elastic demand: raise its price a few cents and drivers pull into the station next door." },
+      { prompt: "Which determinant best explains the gap between those two numbers?",
+        options: ["Narrowness of market definition — the more narrowly a market is drawn, the more close substitutes sit outside it",
+                  "Share of income — gasoline takes up a large part of a household budget",
+                  "Time horizon — drivers adjust to fuel prices over years, not days",
+                  "Necessity vs. luxury — gasoline is a necessity and so is the brand"], correct: 0,
+        explain: "Both products are the same physical fuel; what changed is how narrowly the market is defined. \"Gasoline\" as a category has almost no substitutes — a gas car runs on nothing else. \"Petrolia-brand gasoline\" has five substitutes within sight of the pump. Narrowing the definition adds substitutes and makes demand more elastic." },
+      { prompt: "A $0.50 increase on a $3.00 container of table salt is a 17% jump, and shoppers barely react. A $5,000 increase on a $30,000 car is also 17%, and buyers react sharply. Which determinant is this?",
+        options: ["Share of income", "Time horizon", "Narrowness of market definition", "Necessity vs. luxury"], correct: 0,
+        explain: "Identical percentage increases, opposite reactions. A purchase that takes a large share of the budget commands attention and gets shopped around; $0.50 on salt never registers. The larger the share of income, the more elastic demand tends to be." },
+      { prompt: "Home heating oil prices spike. In the first month households barely cut back; two years later consumption has dropped sharply as they add insulation and install heat pumps. Which determinant?",
+        options: ["Time horizon", "Share of income",
+                  "Necessity vs. luxury", "Narrowness of market definition"], correct: 0,
+        explain: "Demand is more elastic in the long run than in the short run. In the short run households are locked into the equipment and habits they already have; given enough time, every one of those constraints can be changed." },
+      { prompt: "Insulin for a diabetic patient has |PED| very close to 0. Which determinant is doing the most work?",
+        options: ["Availability of substitutes — for that patient there is no substitute at all",
+                  "Share of income — insulin is inexpensive relative to income",
+                  "Time horizon — patients cannot afford to wait",
+                  "Narrowness of market definition — \"insulin\" is a broadly defined category"], correct: 0,
+        explain: "This is the strongest of the five determinants. With no substitute available, quantity demanded barely responds to price at all — demand approaches perfectly inelastic, a vertical demand curve. Necessity vs. luxury points the same way, but it is the outright absence of a substitute that pins |PED| near zero." }
+    ]
+  },
+
+  /* ----------------------------------------------------------------- P6 */
+  {
+    id: "P6",
+    method: "Simple method (base = starting values)",
+    scenario: "Meridian Cinemas raises its ticket price from $12 to $15. An analyst tracks two other things over the same period: subscriptions to Streamly, an at-home streaming service, and buckets of popcorn sold at Meridian's own concession stand.",
+    formula: "<b>XED</b> = %&Delta; quantity demanded of Good B &divide; %&Delta; price of Good A. Positive &rarr; substitutes. Negative &rarr; complements.",
+    table: {
+      cols: ["", "Meridian ticket price", "Streamly subscriptions", "Meridian popcorn buckets"],
+      colClass: ["row-label", "p-cell", "q-cell", "q-cell"],
+      rows: [["Before", "$12", "400", "900"], ["After", "$15", "520", "720"]]
+    },
+    steps: [
+      { prompt: "What is the percentage change in the price of a Meridian ticket?",
+        options: ["+25%", "+20%", "+30%", "+3%"], correct: 0,
+        explain: "%ΔP = ($15 − $12) ÷ $12 = $3 ÷ $12 = +25%. The simple method uses the starting price as the base. (+20% is what you get from dividing by the ending $15.)" },
+      { prompt: "What is the cross-price elasticity of demand for Streamly subscriptions with respect to the Meridian ticket price?",
+        options: ["+1.20", "−1.20", "+0.83", "+1.30"], correct: 0,
+        explain: "%ΔQ for Streamly = (520 − 400) ÷ 400 = +30%. XED = +30% ÷ +25% = +1.20. Both percentages are positive, so the result is positive." },
+      { prompt: "What does that value tell you about movie tickets and Streamly?",
+        options: ["They are substitutes", "They are complements",
+                  "They are unrelated goods", "Streamly is an inferior good"], correct: 0,
+        explain: "XED is positive: the ticket price rose and Streamly subscriptions rose along with it. Moviegoers priced out of the theater switched to watching at home — the defining pattern of substitutes." },
+      { prompt: "Now find the cross-price elasticity of demand for Meridian's popcorn with respect to its own ticket price.",
+        options: ["−0.80", "+0.80", "−1.25", "−0.20"], correct: 0,
+        explain: "%ΔQ for popcorn = (720 − 900) ÷ 900 = −20%. XED = −20% ÷ +25% = −0.80. A negative numerator over a positive denominator gives a negative XED." },
+      { prompt: "What does that value tell you about movie tickets and popcorn?",
+        options: ["They are complements", "They are substitutes",
+                  "They are unrelated goods", "Popcorn is a luxury good"], correct: 0,
+        explain: "XED is negative: fewer tickets sold means fewer people in the lobby buying popcorn. Goods consumed together move in opposite directions when one of their prices changes — that is a complement relationship. The same $3 ticket increase pushed one good up and the other down." },
+      { prompt: "Which part of a cross-price elasticity identifies the relationship, and which part measures its strength?",
+        options: ["The sign gives the relationship (positive = substitutes, negative = complements); the absolute size gives the strength",
+                  "The absolute size gives the relationship; the sign gives the strength",
+                  "Only the sign carries meaning — the size is arbitrary",
+                  "Only the size carries meaning — the sign is an artifact of the formula"], correct: 0,
+        explain: "Sign first, then size. Both +1.20 and +0.30 mean substitutes, but +1.20 means closer substitutes. Both −0.80 and −3.00 mean complements, and −3.00 is the tighter pairing." }
+    ]
+  },
+
+  /* ----------------------------------------------------------------- P7 */
+  {
+    id: "P7",
+    method: "Simple method (base = starting values)",
+    scenario: "A market-research panel follows one household as its monthly income rises from $4,000 to $5,000, recording how much of three different goods it buys each month.",
+    formula: "<b>YED</b> = %&Delta; quantity demanded &divide; %&Delta; income. Positive &rarr; normal good (above 1, a luxury; between 0 and 1, a necessity). Negative &rarr; inferior good.",
+    table: {
+      cols: ["", "Monthly income", "Restaurant meals", "Ramen (packs)", "Milk (gallons)"],
+      colClass: ["row-label", "p-cell", "q-cell", "q-cell", "q-cell"],
+      rows: [["Before", "$4,000", "12", "40", "20"], ["After", "$5,000", "18", "30", "21"]]
+    },
+    steps: [
+      { prompt: "What is the percentage change in the household's income?",
+        options: ["+25%", "+20%", "+11.11%", "+100%"], correct: 0,
+        explain: "%ΔI = ($5,000 − $4,000) ÷ $4,000 = $1,000 ÷ $4,000 = +25%. Every YED in this problem shares that same denominator, which is what makes the three goods directly comparable." },
+      { prompt: "What is the income elasticity of demand for restaurant meals?",
+        options: ["+2.00", "+0.50", "−2.00", "+1.50"], correct: 0,
+        explain: "%ΔQ = (18 − 12) ÷ 12 = +50%. YED = +50% ÷ +25% = +2.00." },
+      { prompt: "How should restaurant meals be classified?",
+        options: ["A normal good, and income-elastic — a luxury",
+                  "A normal good, but income-inelastic — a necessity",
+                  "An inferior good", "Unit income-elastic, so neither normal nor inferior"], correct: 0,
+        explain: "YED > 0 makes it a normal good: the household buys more as income rises. YED > 1 makes it income-elastic, which is what economists label a luxury — quantity rose 50% on a 25% income increase, twice as fast as income itself." },
+      { prompt: "What is the income elasticity of demand for instant ramen?",
+        options: ["−1.00", "+1.00", "−0.75", "−0.25"], correct: 0,
+        explain: "%ΔQ = (30 − 40) ÷ 40 = −25%. YED = −25% ÷ +25% = −1.00. Income went up and quantity went down, so the ratio is negative." },
+      { prompt: "How should instant ramen be classified?",
+        options: ["An inferior good — quantity demanded falls as income rises",
+                  "A normal good that is income-inelastic",
+                  "A normal good that is income-elastic",
+                  "A complement to restaurant meals"], correct: 0,
+        explain: "A negative YED is the definition of an inferior good. With more income the household substitutes toward better alternatives — including, in this very table, the restaurant meals whose quantity rose. \"Inferior\" describes the income relationship, not the quality of the noodles." },
+      { prompt: "Milk went from 20 to 21 gallons, which works out to YED = +0.20. What does that make milk?",
+        options: ["A normal good, but income-inelastic — a necessity",
+                  "An inferior good",
+                  "A normal good that is income-elastic — a luxury",
+                  "Perfectly income-inelastic"], correct: 0,
+        explain: "%ΔQ = (21 − 20) ÷ 20 = +5%, so YED = +5% ÷ +25% = +0.20. Positive, so normal; between 0 and 1, so income-inelastic — a necessity. Measured against the same +25% income change, the three YED values (+2.00, −1.00, +0.20) sort the household's goods into luxury, inferior, and necessity." }
+    ]
+  },
+
+  /* ----------------------------------------------------------------- P8 */
+  {
+    id: "P8",
+    method: "Midpoint method",
+    scenario: "The wholesale price of apples rises from $12 to $18 a crate. Sunrise Orchards responds by bringing 700 crates to market this season instead of 500.",
+    formula: "<b>PES</b> = %&Delta; quantity supplied &divide; %&Delta; price, both on midpoint bases.",
+    table: {
+      cols: ["", "Price per crate", "Crates supplied"],
+      colClass: ["row-label", "p-cell", "q-cell"],
+      rows: [["Before", "$12", "500"], ["After", "$18", "700"]]
+    },
+    steps: [
+      { prompt: "What is the percentage change in quantity supplied?",
+        options: ["+33.33%", "+40%", "+28.57%", "+20%"], correct: 0,
+        explain: "Q_avg = (500 + 700) ÷ 2 = 600. ΔQ = +200. %ΔQs = 200 ÷ 600 = +33.33%. The simple method would have given 200 ÷ 500 = +40%." },
+      { prompt: "What is the percentage change in price?",
+        options: ["+40%", "+50%", "+33.33%", "+60%"], correct: 0,
+        explain: "P_avg = ($12 + $18) ÷ 2 = $15. ΔP = +$6. %ΔP = $6 ÷ $15 = +40%." },
+      { prompt: "What is the price elasticity of supply?",
+        options: ["0.83", "1.20", "0.80", "1.33"], correct: 0,
+        explain: "PES = 33.33% ÷ 40% = 0.8333, which rounds to 0.83. Inverting the fraction gives 1.20 — the usual slip. Quantity supplied goes on top." },
+      { prompt: "PES came out positive. Could a price elasticity of supply ever come out negative?",
+        options: ["No — supply slopes upward, so price and quantity supplied always move in the same direction",
+                  "Yes — whenever the good in question is an inferior good",
+                  "Yes — whenever price falls instead of rising",
+                  "Yes — whenever producers have no spare capacity to expand into"], correct: 0,
+        explain: "This is the structural difference from PED. Demand curves slope downward, so P and Qd move in opposite directions and PED is always negative before we take the absolute value. Supply slopes upward, so P and Qs move together and PES comes out positive on its own — there is nothing to strip a sign from. A price fall makes both percentages negative, and the negatives cancel." },
+      { prompt: "Classify this supply.",
+        options: ["Inelastic, because PES < 1", "Elastic, because PES > 1",
+                  "Unit elastic, because PES = 1", "Perfectly inelastic, because PES = 0"], correct: 0,
+        explain: "PES = 0.83 < 1: quantity supplied changed by a smaller percentage (33.33%) than price did (40%). Supply is inelastic over this range." },
+      { prompt: "Sunrise Orchards is already picking every mature tree it owns, and a newly planted apple tree takes years to bear fruit. Which determinant of PES explains the inelastic result?",
+        options: ["Time available to adjust, together with a lack of spare capacity",
+                  "The availability of close substitutes for apples",
+                  "The share of a household's income spent on apples",
+                  "How narrowly the apple market has been defined"], correct: 0,
+        explain: "The determinants of supply elasticity describe the producer, not the buyer: time available to adjust, availability and substitutability of inputs, and production flexibility or spare capacity. An orchard running at full capacity inside a single growing season has almost no room to expand. The other three options are determinants of DEMAND elasticity." }
+    ]
+  },
+
+  /* ----------------------------------------------------------------- P9 */
+  {
+    id: "P9",
+    method: "Total revenue test",
+    scenario: "The Fairhaven town council is setting prices for three services. Its economist has already supplied the elasticity in each case, and the council's goal is more revenue.",
+    formula: "<b>TR</b> = Price &times; Quantity. Elastic &rarr; price and revenue move in OPPOSITE directions. Inelastic &rarr; they move TOGETHER. Unit elastic &rarr; revenue does not move at all.",
+    table: {
+      cols: ["Service", "|PED|", "Current price"],
+      colClass: ["row-label", "q-cell", "p-cell"],
+      rows: [["Municipal pool season pass", "0.35", "$80"],
+             ["Summer concert ticket", "1.80", "$25"],
+             ["Downtown parking, per hour", "1.00", "$2"]]
+    },
+    steps: [
+      { prompt: "The council wants more revenue from pool season passes, where |PED| = 0.35. What should it do to the price?",
+        options: ["Raise it — demand is inelastic, so quantity falls by a smaller percentage than price rises",
+                  "Lower it — demand is inelastic, so a cut will sell many more passes",
+                  "Raise it — demand is elastic, so revenue follows price upward",
+                  "Leave it alone — revenue cannot change when demand is inelastic"], correct: 0,
+        explain: "|PED| = 0.35 < 1, so demand is inelastic. A 10% price increase costs only about 3.5% of the quantity: the price effect dominates the quantity effect, and total revenue rises." },
+      { prompt: "Same goal, different service: summer concert tickets, where |PED| = 1.80.",
+        options: ["Lower the price — demand is elastic, so quantity rises by a larger percentage than price falls",
+                  "Raise the price — people who really want to attend will pay it",
+                  "Lower the price — though revenue will fall either way",
+                  "Leave the price alone — elastic demand means revenue is fixed"], correct: 0,
+        explain: "|PED| = 1.80 > 1, so demand is elastic. Cut the price 10% and quantity rises about 18%: the quantity effect dominates, and total revenue rises. Elastic demand reverses the prescription you just gave for the pool passes — same goal, opposite move." },
+      { prompt: "The council raises the downtown parking rate by 10%. Parking demand is unit elastic, |PED| = 1.00. What happens to parking revenue?",
+        options: ["It stays the same — the price and quantity effects cancel exactly",
+                  "It rises by 10%", "It falls by 10%", "It rises, but by less than 10%"], correct: 0,
+        explain: "At |PED| = 1.00 quantity demanded falls by the same percentage that price rises, so P × Q is unchanged. This is also why the unit-elastic point on a demand curve is the revenue-maximizing point: revenue is flat right there, and falls away on both sides." },
+      { prompt: "Fairhaven also raised bus fares from $2.00 to $2.50, and weekday ridership fell from 10,000 to 9,500. What happened to fare revenue?",
+        options: ["$20,000 before and $23,750 after, so TR rises",
+                  "$20,000 before and $19,000 after, so TR falls",
+                  "$20,000 before and $25,000 after, so TR rises",
+                  "It is unchanged at $20,000"], correct: 0,
+        explain: "TR = P × Q. Before: $2.00 × 10,000 = $20,000. After: $2.50 × 9,500 = $23,750. ($25,000 is what you get by forgetting that ridership fell at all.)" },
+      { prompt: "Run the total revenue test in reverse. From that revenue change alone, what do you know about the elasticity of bus demand?",
+        options: ["Inelastic — price rose and total revenue rose with it",
+                  "Elastic — revenue rose, which means riders were responsive",
+                  "Unit elastic — revenue changed, so |PED| must be 1",
+                  "Nothing — the total revenue test only works for price cuts"], correct: 0,
+        explain: "Price up and revenue up means the price effect beat the quantity effect, and that only happens when |PED| < 1. Checking directly with the midpoint method: %ΔQ = −500 ÷ 9,750 = −5.13% and %ΔP = $0.50 ÷ $2.25 = +22.22%, so |PED| = 0.23 — inelastic, exactly as the test predicted." }
+    ]
+  },
+
+  /* ----------------------------------------------------------------- P10 */
+  {
+    id: "P10",
+    method: "Midpoint method · straight-line supply through the origin",
+    scenario: "Delmar Print Shop has a straight-line supply curve that passes through the origin: 0 posters at a price of $0, 1 poster at $0.50, 2 posters at $1.00, and 3 posters at $1.50.",
+    formula: "<b>PES</b> = %&Delta; quantity supplied &divide; %&Delta; price, both on midpoint bases.",
+    table: {
+      cols: ["Price per poster", "Posters supplied"],
+      colClass: ["p-cell", "q-cell"],
+      rows: [["$0.00", "0"], ["$0.50", "1"], ["$1.00", "2"], ["$1.50", "3"]]
+    },
+    graph: "SUPPLY",
+    steps: [
+      { prompt: "What is PES for a price increase from $0.50 to $1.00, where quantity supplied goes from 1 to 2?",
+        options: ["1.00", "2.00", "0.50", "1.50"], correct: 0,
+        explain: "Q_avg = 1.5, so %ΔQs = 1 ÷ 1.5 = +66.67%. P_avg = $0.75, so %ΔP = $0.50 ÷ $0.75 = +66.67%. PES = 66.67% ÷ 66.67% = 1.00 — unit elastic." },
+      { prompt: "Now move further up the same curve: $1.00 to $1.50, with quantity supplied going from 2 to 3. What is PES there?",
+        options: ["1.00", "0.40", "2.50", "0.83"], correct: 0,
+        explain: "%ΔQs = 1 ÷ 2.5 = +40% and %ΔP = $0.50 ÷ $1.25 = +40%, so PES = 1.00 again. Both percentages shrank compared with the first calculation, but they shrank by the same factor, so the ratio did not budge." },
+      { prompt: "What is the general result about straight-line supply curves that pass through the origin?",
+        options: ["Any straight-line supply curve through the origin is unit elastic at every point, whatever its slope",
+                  "Only a supply curve with a slope of 1 is unit elastic",
+                  "Supply through the origin grows more elastic as price rises",
+                  "PES on such a curve is equal to the slope of the curve"], correct: 0,
+        explain: "Through the origin, price and quantity are proportional — here Q = 2P — so any move along the curve changes both by the same percentage and PES = 1 everywhere. A steeper or flatter line through the origin gives exactly the same result." },
+      { prompt: "This curve rises by $0.50 for each additional poster, so its slope is 0.50, while PES = 1.00. What does that tell you?",
+        options: ["The slope is 0.50, but PES is 1.00 — they are not the same thing",
+                  "The PES calculation must contain an error, since it should match the slope",
+                  "The slope is always the reciprocal of PES",
+                  "Slope and elasticity are the same measure expressed in different units"], correct: 0,
+        explain: "Slope compares absolute changes (ΔP ÷ ΔQ); elasticity compares percentage changes. Two supply curves through the origin with wildly different slopes both have PES = 1.00. It is the same lesson as the straight-line demand curve, run the other way round: there, a constant slope produced a different elasticity at every single point." }
+    ]
+  }
+];
+
+/* ------------------------------------------------------------ state + helpers */
+let problemOrder = [];
+let problemIndex = 0;
+let stepIndex = 0;
+let answered = false;
+let optionOrder = [];               // display position -> index in step.options
+let score = { correct: 0, total: 0 };
+
+/* Fisher-Yates */
+function shuffledIndices(n){
+  const arr = [...Array(n).keys()];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function currentProblem(){ return PROBLEMS[problemOrder[problemIndex]]; }
+
+function init(){
+  problemOrder = shuffledIndices(PROBLEMS.length);
+  problemIndex = 0;
+  score = { correct: 0, total: 0 };
+  loadProblem();
+}
+
+function loadProblem(){
+  stepIndex = 0;
+  const problem = currentProblem();
+
+  document.getElementById('methodBadge').textContent = problem.method;
+  document.getElementById('scenarioText').textContent = problem.scenario;
+  document.getElementById('formulaNote').innerHTML = problem.formula;
+  document.getElementById('problemCount').textContent =
+    `Problem ${problemIndex + 1} of ${PROBLEMS.length}`;
+
+  const wrap = document.getElementById('tableWrap');
+  if(problem.table){
+    wrap.style.display = 'block';
+    document.getElementById('tableHead').innerHTML =
+      problem.table.cols.map(c => `<th>${c}</th>`).join('');
+    document.getElementById('tableBody').innerHTML = problem.table.rows
+      .map(r => '<tr>' + r.map((cell, i) =>
+        `<td class="${problem.table.colClass[i]}">${cell}</td>`).join('') + '</tr>')
+      .join('');
+  } else {
+    wrap.style.display = 'none';
+  }
+
+  const graphWrap = document.getElementById('graphWrap');
+  if(problem.graph === 'DEMAND'){
+    graphWrap.style.display = 'block';
+    graphWrap.innerHTML = DEMAND_GRAPH;
+  } else if(problem.graph === 'SUPPLY'){
+    graphWrap.style.display = 'block';
+    graphWrap.innerHTML = SUPPLY_GRAPH;
+  } else {
+    graphWrap.style.display = 'none';
+    graphWrap.innerHTML = '';
+  }
+
+  loadStep();
+}
+
+function loadStep(){
+  answered = false;
+  const problem = currentProblem();
+  const step = problem.steps[stepIndex];
+
+  document.getElementById('stepCount').textContent =
+    `Step ${stepIndex + 1} of ${problem.steps.length}`;
+  document.getElementById('scoreBadge').textContent =
+    `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('promptText').textContent = step.prompt;
+  document.getElementById('feedback').classList.remove('show');
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  nextBtn.textContent = (stepIndex === problem.steps.length - 1) ? 'Next problem' : 'Next step';
+
+  // Shuffle the answer choices too, so the correct option is never in a fixed slot.
+  optionOrder = shuffledIndices(step.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(origIndex => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = step.options[origIndex];
+    btn.addEventListener('click', () => handleAnswer(step, origIndex, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+function handleAnswer(step, chosenIndex, btnEl){
+  if(answered) return;
+  answered = true;
+
+  const isCorrect = chosenIndex === step.correct;
+  score.total++;
+  if(isCorrect) score.correct++;
+  document.getElementById('scoreBadge').textContent =
+    `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === step.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect
+    ? 'Correct.'
+    : `Not quite — the answer is "${step.options[step.correct]}."`;
+  verdict.className = 'feedback-verdict ' + (isCorrect ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = step.explain;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  const problem = currentProblem();
+  if(stepIndex < problem.steps.length - 1){
+    stepIndex++;
+    loadStep();
+  } else {
+    problemIndex = (problemIndex + 1) % PROBLEMS.length;
+    if(problemIndex === 0) problemOrder = shuffledIndices(PROBLEMS.length);
+    loadProblem();
+  }
+});
+
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
