@@ -272,6 +272,47 @@
   .btn-primary:hover{background:#453427;}
   .btn:disabled{opacity:.4;cursor:default;}
 
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{
+    font-size:34px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    margin-bottom:10px;
+  }
+  .results-note{
+    font-size:15px;
+    color:var(--ink-soft);
+    margin-bottom:20px;
+  }
+  table.data-table th.topic-head, table.data-table td.topic-cell{
+    text-align:left;
+    white-space:normal;
+  }
+  table.data-table td.topic-cell{font-weight:600;color:var(--ink);}
+  table.data-table td.topic-score{font-weight:700;}
+  table.data-table td.topic-score.full{color:var(--correct);}
+  table.data-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+    line-height:1.5;
+    border-top:1px solid var(--border);
+    padding-top:14px;
+    margin:18px 0 20px;
+  }
+
   footer.reset-row{
     margin-top:20px;
     display:flex;
@@ -294,7 +335,7 @@
     <p>Price elasticity of demand (PED), cross-price (XED), income (YED), and price elasticity of supply (PES) &mdash; simple vs. midpoint method, determinants, and the total revenue test</p>
   </header>
 
-  <div class="mode-row">
+  <div class="mode-row" id="modeRow">
     <span class="mode-label">Difficulty</span>
     <div class="segmented" role="group" aria-label="Difficulty level">
       <button type="button" id="modeReview" aria-pressed="true">Helpful Elasticity Review</button>
@@ -303,7 +344,7 @@
     <span class="mode-hint" id="modeHint"></span>
   </div>
 
-  <div class="meta-row">
+  <div class="meta-row" id="metaRow">
     <div class="count-group">
       <span class="card-count" id="problemCount">Problem 1 of 10</span>
       <span class="card-count" id="stepCount">Step 1 of 5</span>
@@ -311,7 +352,7 @@
     <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
   </div>
 
-  <div class="panel">
+  <div class="panel" id="quizPanel">
     <span class="method-badge" id="methodBadge"></span>
     <div class="scenario" id="scenarioText"></div>
     <div class="formula-note" id="formulaNote"></div>
@@ -339,7 +380,28 @@
     </div>
   </div>
 
-  <footer class="reset-row">
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">Topic</th><th>Score</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <p class="results-caveat">These bands say whether you have elasticity down &mdash; they are not an AP score
+    prediction. The exam covers every unit, counts free response for a third of the grade, and gives you no
+    feedback until it is over. Treat a strong result here as one topic secured, not as a score.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Start again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
     <button class="link-btn" id="resetBtn">Restart from problem 1</button>
   </footer>
 </div>
@@ -411,6 +473,7 @@ const PROBLEMS = [
   /* ----------------------------------------------------------------- P1 */
   {
     id: "P1",
+    topic: "Simple vs. midpoint method",
     method: "Simple method, then midpoint method",
     scenario: "Cedar Lane Bakery is looking at two points on the demand curve for its sourdough loaves. At $8 a loaf it sells 60 loaves a week; at $10 a loaf it sells 45.",
     terms: "<b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative. <b>%&Delta;</b> = percentage change.",
@@ -449,6 +512,7 @@ const PROBLEMS = [
   /* ----------------------------------------------------------------- P2 */
   {
     id: "P2",
+    topic: "PED and total revenue — inelastic demand",
     method: "Midpoint method",
     scenario: "Riverbend Pharmacy raises the price of a prescription asthma inhaler from $30 to $50. Inhalers dispensed per month fall from 800 to 700.",
     terms: "<b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative. <b>TR</b> = total revenue. <b>%&Delta;</b> = percentage change.",
@@ -484,6 +548,7 @@ const PROBLEMS = [
   /* ----------------------------------------------------------------- P3 */
   {
     id: "P3",
+    topic: "PED and total revenue — elastic demand",
     method: "Midpoint method",
     scenario: "Kwan's Cafe cuts the price of its large iced coffee from $5 to $3 for a summer promotion. Sales climb from 400 cups a week to 1,200.",
     terms: "<b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative. <b>TR</b> = total revenue. <b>%&Delta;</b> = percentage change.",
@@ -519,6 +584,7 @@ const PROBLEMS = [
   /* ----------------------------------------------------------------- P4 */
   {
     id: "P4",
+    topic: "Elasticity along a straight-line demand curve",
     method: "Midpoint method · straight-line demand curve",
     scenario: "Harborview Ferry sells day passes. Its demand curve is the straight line P = 16 − Q, where Q is measured in hundreds of passes per day. The slope of that line is identical at every point on it.",
     terms: "<b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative. <b>TR</b> = total revenue. <b>%&Delta;</b> = percentage change.",
@@ -563,6 +629,7 @@ const PROBLEMS = [
   /* ----------------------------------------------------------------- P5 */
   {
     id: "P5",
+    topic: "The five determinants of PED",
     method: "Interpretation — no calculation",
     scenario: "No arithmetic in this one. Each part gives you an elasticity comparison and asks which determinant of price elasticity of demand is doing the work.",
     terms: "<b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative.",
@@ -597,6 +664,7 @@ const PROBLEMS = [
   /* ----------------------------------------------------------------- P6 */
   {
     id: "P6",
+    topic: "Cross-price elasticity (XED)",
     method: "Simple method (base = starting values)",
     scenario: "Meridian Cinemas raises its ticket price from $12 to $15. An analyst tracks two other things over the same period: subscriptions to Streamly, an at-home streaming service, and buckets of popcorn sold at Meridian's own concession stand.",
     terms: "<b>XED</b> = cross-price elasticity of demand. <b>%&Delta;</b> = percentage change.",
@@ -636,6 +704,7 @@ const PROBLEMS = [
   /* ----------------------------------------------------------------- P7 */
   {
     id: "P7",
+    topic: "Income elasticity (YED)",
     method: "Simple method (base = starting values)",
     scenario: "A market-research panel follows one household as its monthly income rises from $4,000 to $5,000, recording how much of three different goods it buys each month.",
     terms: "<b>YED</b> = income elasticity of demand. <b>%&Delta;</b> = percentage change.",
@@ -678,6 +747,7 @@ const PROBLEMS = [
   /* ----------------------------------------------------------------- P8 */
   {
     id: "P8",
+    topic: "Price elasticity of supply (PES)",
     method: "Midpoint method",
     scenario: "The wholesale price of apples rises from $12 to $18 a crate. Sunrise Orchards responds by bringing 700 crates to market this season instead of 500.",
     terms: "<b>PES</b> = price elasticity of supply. <b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative. <b>%&Delta;</b> = percentage change.",
@@ -719,6 +789,7 @@ const PROBLEMS = [
   /* ----------------------------------------------------------------- P9 */
   {
     id: "P9",
+    topic: "The total revenue test",
     method: "Total revenue test",
     scenario: "The Fairhaven town council is setting prices for three services. Its economist has already supplied the elasticity in each case, and the council's goal is more revenue.",
     terms: "<b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative. <b>TR</b> = total revenue.",
@@ -765,6 +836,7 @@ const PROBLEMS = [
   /* ----------------------------------------------------------------- P10 */
   {
     id: "P10",
+    topic: "Straight-line supply through the origin",
     method: "Midpoint method · straight-line supply through the origin",
     scenario: "Delmar Print Shop has a straight-line supply curve that passes through the origin: 0 posters at a price of $0, 1 poster at $0.50, 2 posters at $1.00, and 3 posters at $1.50.",
     terms: "<b>PES</b> = price elasticity of supply. <b>%&Delta;</b> = percentage change.",
@@ -799,6 +871,24 @@ const PROBLEMS = [
 ];
 
 /* ------------------------------------------------------------ state + helpers */
+/* Results bands. Banding uses the ROUNDED percentage -- the same number shown
+   to the student -- so the label can never disagree with the figure beside it.
+   Raw-score ranges over this 54-question bank, checked in the scratch script:
+     Mastered 49-54 | Strong 43-48 | Developing 38-42 | Shaky 30-37 | below 30
+   Blind guessing on 4 options averages 14/54, which lands in the bottom band. */
+const BANDS = [
+  { min: 90, label: 'Mastered', tone: 'good',
+    note: 'You can run every elasticity calculation and say what the result means. Treat this topic as secure.' },
+  { min: 80, label: 'Strong', tone: 'good',
+    note: 'Solid command of the material. Work the topics below where you dropped marks, then run it again.' },
+  { min: 70, label: 'Developing', tone: 'mid',
+    note: 'The methods are there but execution is slipping. The breakdown below shows where to aim.' },
+  { min: 55, label: 'Shaky', tone: 'poor',
+    note: 'Some of it is landing, but the gaps are wide enough to cost you marks. Review the formulas before drilling again.' },
+  { min: 0, label: 'Needs Review', tone: 'poor',
+    note: 'Go back to the Unit 2 notes on elasticity first. More practice without review will not close a gap this size.' },
+];
+
 let helpMode = true;          // true = Helpful Elasticity Review, false = AP Exam Difficulty
 let problemOrder = [];
 let problemIndex = 0;
@@ -806,6 +896,7 @@ let stepIndex = 0;
 let answered = false;
 let optionOrder = [];               // display position -> index in step.options
 let score = { correct: 0, total: 0 };
+let perProblem = {};                // problem id -> { correct, total }, for the breakdown
 
 /* Fisher-Yates */
 function shuffledIndices(n){
@@ -823,6 +914,9 @@ function init(){
   problemOrder = shuffledIndices(PROBLEMS.length);
   problemIndex = 0;
   score = { correct: 0, total: 0 };
+  perProblem = {};
+  PROBLEMS.forEach(p => perProblem[p.id] = { correct: 0, total: 0 });
+  showQuiz();
   loadProblem();
 }
 
@@ -902,7 +996,11 @@ function loadStep(){
 
   const nextBtn = document.getElementById('nextBtn');
   nextBtn.disabled = true;
-  nextBtn.textContent = (stepIndex === problem.steps.length - 1) ? 'Next problem' : 'Next step';
+  const lastStep = stepIndex === problem.steps.length - 1;
+  const lastProblem = problemIndex === PROBLEMS.length - 1;
+  nextBtn.textContent = !lastStep ? 'Next step'
+                      : lastProblem ? 'See your results'
+                      : 'Next problem';
 
   // Shuffle the answer choices too, so the correct option is never in a fixed slot.
   optionOrder = shuffledIndices(step.options.length);
@@ -924,6 +1022,9 @@ function handleAnswer(step, chosenIndex, btnEl){
   const isCorrect = chosenIndex === step.correct;
   score.total++;
   if(isCorrect) score.correct++;
+  const tally = perProblem[currentProblem().id];
+  tally.total++;
+  if(isCorrect) tally.correct++;
   document.getElementById('scoreBadge').textContent =
     `Score: ${score.correct} / ${score.total}`;
 
@@ -950,13 +1051,53 @@ document.getElementById('nextBtn').addEventListener('click', () => {
   if(stepIndex < problem.steps.length - 1){
     stepIndex++;
     loadStep();
-  } else {
-    problemIndex = (problemIndex + 1) % PROBLEMS.length;
-    if(problemIndex === 0) problemOrder = shuffledIndices(PROBLEMS.length);
+  } else if(problemIndex < PROBLEMS.length - 1){
+    problemIndex++;
     loadProblem();
+  } else {
+    showResults();      // bank finished -- stop here rather than wrapping round
   }
 });
 
+function showQuiz(){
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('quizPanel').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+}
+
+function showResults(){
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('quizPanel').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(score.correct / score.total * 100);
+  const band = BANDS.find(b => pct >= b.min);
+
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  \u00b7  ${pct}%`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  // breakdown in the fixed teaching order, not the shuffled order they saw
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  PROBLEMS.forEach(p => {
+    const t = perProblem[p.id];
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${p.topic}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
 document.getElementById('resetBtn').addEventListener('click', init);
 
 init();
