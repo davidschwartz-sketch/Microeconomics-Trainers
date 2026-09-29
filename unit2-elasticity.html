@@ -246,7 +246,7 @@
 <div class="app">
   <header>
     <h1>Working Examples: Elasticity</h1>
-    <p>PED, XED, YED and PES &mdash; simple vs. midpoint method, determinants, and the total revenue test</p>
+    <p>Price elasticity of demand (PED), cross-price (XED), income (YED), and price elasticity of supply (PES) &mdash; simple vs. midpoint method, determinants, and the total revenue test</p>
   </header>
 
   <div class="meta-row">
@@ -301,51 +301,56 @@
 --------------------------------------------------------------------------- */
 
 const DEMAND_GRAPH = `
-<svg viewBox="0 0 360 250" role="img" aria-label="Straight-line demand curve P = 16 minus Q, elastic above the midpoint at P=8 Q=8 and inelastic below it">
+<svg viewBox="0 0 360 250" role="img" aria-label="A straight-line demand curve running from a price intercept of 16 down to a quantity intercept of 16, with the seven schedule points plotted on it">
   <line x1="48" y1="210" x2="340" y2="210" stroke="#6B5D4C" stroke-width="1.5"/>
   <line x1="48" y1="210" x2="48" y2="24" stroke="#6B5D4C" stroke-width="1.5"/>
-  <text x="340" y="232" text-anchor="end" font-size="10.5" fill="#6B5D4C">Q (hundreds of passes)</text>
+  <text x="340" y="240" text-anchor="end" font-size="10.5" fill="#6B5D4C">Q (hundreds of passes)</text>
   <text x="44" y="20" text-anchor="end" font-size="10.5" fill="#6B5D4C">P ($)</text>
   <line x1="48" y1="30" x2="328" y2="210" stroke="#2F6F62" stroke-width="2.5"/>
   <text x="333" y="200" font-size="11" font-weight="700" fill="#2F6F62">D</text>
-  <line x1="48" y1="120" x2="188" y2="120" stroke="#D9A441" stroke-width="1" stroke-dasharray="3 3"/>
-  <line x1="188" y1="120" x2="188" y2="210" stroke="#D9A441" stroke-width="1" stroke-dasharray="3 3"/>
-  <circle cx="118" cy="75"  r="3.5" fill="#2F6F62"/>
-  <circle cx="153" cy="98"  r="3.5" fill="#2F6F62"/>
-  <circle cx="171" cy="109" r="3"   fill="#2F6F62"/>
-  <circle cx="206" cy="131" r="3"   fill="#2F6F62"/>
-  <circle cx="223" cy="143" r="3.5" fill="#2F6F62"/>
-  <circle cx="258" cy="165" r="3.5" fill="#2F6F62"/>
-  <circle cx="188" cy="120" r="5.5" fill="#FFFFFF" stroke="#D9A441" stroke-width="2.5"/>
-  <text x="126" y="60"  font-size="10.5" font-weight="700" fill="#2F6F62">elastic  |PED| &gt; 1</text>
-  <text x="198" y="116" font-size="10.5" font-weight="700" fill="#D9A441">|PED| = 1 &middot; TR max</text>
-  <text x="200" y="192" font-size="10.5" font-weight="700" fill="#2F6F62">inelastic  |PED| &lt; 1</text>
-  <text x="44" y="124" text-anchor="end" font-size="10" fill="#6B5D4C">8</text>
-  <text x="44" y="34"  text-anchor="end" font-size="10" fill="#6B5D4C">16</text>
-  <text x="188" y="224" text-anchor="middle" font-size="10" fill="#6B5D4C">8</text>
-  <text x="328" y="224" text-anchor="middle" font-size="10" fill="#6B5D4C">16</text>
+  <g stroke="#6B5D4C" stroke-width="1">
+    <line x1="118" y1="210" x2="118" y2="214"/><line x1="188" y1="210" x2="188" y2="214"/>
+    <line x1="258" y1="210" x2="258" y2="214"/><line x1="328" y1="210" x2="328" y2="214"/>
+    <line x1="44" y1="165" x2="48" y2="165"/><line x1="44" y1="120" x2="48" y2="120"/>
+    <line x1="44" y1="75" x2="48" y2="75"/><line x1="44" y1="30" x2="48" y2="30"/>
+  </g>
+  <g font-size="10" fill="#6B5D4C">
+    <text x="118" y="226" text-anchor="middle">4</text><text x="188" y="226" text-anchor="middle">8</text>
+    <text x="258" y="226" text-anchor="middle">12</text><text x="328" y="226" text-anchor="middle">16</text>
+    <text x="41" y="169" text-anchor="end">4</text><text x="41" y="124" text-anchor="end">8</text>
+    <text x="41" y="79" text-anchor="end">12</text><text x="41" y="34" text-anchor="end">16</text>
+  </g>
+  <g fill="#2F6F62">
+    <circle cx="118" cy="75" r="3.5"/><circle cx="153" cy="98" r="3.5"/><circle cx="171" cy="109" r="3.5"/>
+    <circle cx="188" cy="120" r="3.5"/><circle cx="206" cy="131" r="3.5"/><circle cx="223" cy="143" r="3.5"/>
+    <circle cx="258" cy="165" r="3.5"/>
+  </g>
 </svg>`;
 
 const SUPPLY_GRAPH = `
-<svg viewBox="0 0 360 250" role="img" aria-label="Straight-line supply curve through the origin, unit elastic at every point">
+<svg viewBox="0 0 360 250" role="img" aria-label="A straight-line supply curve passing through the origin, with the four schedule points plotted on it">
   <line x1="48" y1="210" x2="340" y2="210" stroke="#6B5D4C" stroke-width="1.5"/>
   <line x1="48" y1="210" x2="48" y2="24" stroke="#6B5D4C" stroke-width="1.5"/>
-  <text x="340" y="232" text-anchor="end" font-size="10.5" fill="#6B5D4C">Q (posters)</text>
+  <text x="340" y="240" text-anchor="end" font-size="10.5" fill="#6B5D4C">Q (posters)</text>
   <text x="44" y="20" text-anchor="end" font-size="10.5" fill="#6B5D4C">P ($)</text>
   <line x1="48" y1="210" x2="286" y2="56" stroke="#C1542C" stroke-width="2.5"/>
   <text x="292" y="52" font-size="11" font-weight="700" fill="#C1542C">S</text>
-  <circle cx="48"  cy="210" r="3.5" fill="#C1542C"/>
-  <circle cx="116" cy="166" r="3.5" fill="#C1542C"/>
-  <circle cx="184" cy="122" r="3.5" fill="#C1542C"/>
-  <circle cx="252" cy="78"  r="3.5" fill="#C1542C"/>
-  <text x="126" y="182" font-size="10" fill="#6B5D4C">$0.50, 1</text>
-  <text x="194" y="138" font-size="10" fill="#6B5D4C">$1.00, 2</text>
-  <text x="262" y="94"  font-size="10" fill="#6B5D4C">$1.50, 3</text>
-  <text x="120" y="80"  text-anchor="middle" font-size="10.5" font-weight="700" fill="#C1542C">PES = 1.00 everywhere</text>
-  <text x="52"  y="226" font-size="10" fill="#6B5D4C">origin</text>
-  <text x="116" y="226" text-anchor="middle" font-size="10" fill="#6B5D4C">1</text>
-  <text x="184" y="226" text-anchor="middle" font-size="10" fill="#6B5D4C">2</text>
-  <text x="252" y="226" text-anchor="middle" font-size="10" fill="#6B5D4C">3</text>
+  <g stroke="#6B5D4C" stroke-width="1">
+    <line x1="116" y1="210" x2="116" y2="214"/><line x1="184" y1="210" x2="184" y2="214"/>
+    <line x1="252" y1="210" x2="252" y2="214"/>
+    <line x1="44" y1="166" x2="48" y2="166"/><line x1="44" y1="122" x2="48" y2="122"/>
+    <line x1="44" y1="78" x2="48" y2="78"/>
+  </g>
+  <g font-size="10" fill="#6B5D4C">
+    <text x="116" y="226" text-anchor="middle">1</text><text x="184" y="226" text-anchor="middle">2</text>
+    <text x="252" y="226" text-anchor="middle">3</text><text x="41" y="224" text-anchor="end">0</text>
+    <text x="41" y="170" text-anchor="end">$0.50</text><text x="41" y="126" text-anchor="end">$1.00</text>
+    <text x="41" y="82" text-anchor="end">$1.50</text>
+  </g>
+  <g fill="#C1542C">
+    <circle cx="48" cy="210" r="3.5"/><circle cx="116" cy="166" r="3.5"/>
+    <circle cx="184" cy="122" r="3.5"/><circle cx="252" cy="78" r="3.5"/>
+  </g>
 </svg>`;
 
 const PROBLEMS = [
@@ -354,7 +359,7 @@ const PROBLEMS = [
     id: "P1",
     method: "Simple method, then midpoint method",
     scenario: "Cedar Lane Bakery is looking at two points on the demand curve for its sourdough loaves. At $8 a loaf it sells 60 loaves a week; at $10 a loaf it sells 45.",
-    formula: "<b>Simple method:</b> %&Delta;X = (X&#8322; &minus; X&#8321;) &divide; X&#8321; &nbsp;&bull;&nbsp; <b>Midpoint method:</b> %&Delta;X = (X&#8322; &minus; X&#8321;) &divide; [(X&#8321; + X&#8322;) &divide; 2]",
+    formula: "<b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative. <b>%&Delta;</b> = percentage change.<br><b>Simple method:</b> %&Delta;X = (X&#8322; &minus; X&#8321;) &divide; X&#8321;, the starting value. <b>Midpoint method:</b> %&Delta;X = (X&#8322; &minus; X&#8321;) &divide; [(X&#8321; + X&#8322;) &divide; 2], the average of the two.",
     table: {
       cols: ["", "Price per loaf", "Loaves per week"],
       colClass: ["row-label", "p-cell", "q-cell"],
@@ -391,7 +396,7 @@ const PROBLEMS = [
     id: "P2",
     method: "Midpoint method",
     scenario: "Riverbend Pharmacy raises the price of a prescription asthma inhaler from $30 to $50. Inhalers dispensed per month fall from 800 to 700.",
-    formula: "<b>|PED|</b> = %&Delta; quantity demanded &divide; %&Delta; price, both on midpoint bases. <b>TR</b> = Price &times; Quantity.",
+    formula: "<b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative. <b>TR</b> = total revenue. <b>%&Delta;</b> = percentage change.<br>|PED| = %&Delta; quantity demanded &divide; %&Delta; price, each percentage change taken over the AVERAGE of the two values (the midpoint method). TR = Price &times; Quantity.",
     table: {
       cols: ["", "Price per inhaler", "Inhalers per month"],
       colClass: ["row-label", "p-cell", "q-cell"],
@@ -425,7 +430,7 @@ const PROBLEMS = [
     id: "P3",
     method: "Midpoint method",
     scenario: "Kwan's Cafe cuts the price of its large iced coffee from $5 to $3 for a summer promotion. Sales climb from 400 cups a week to 1,200.",
-    formula: "<b>|PED|</b> = %&Delta; quantity demanded &divide; %&Delta; price, both on midpoint bases. <b>TR</b> = Price &times; Quantity.",
+    formula: "<b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative. <b>TR</b> = total revenue. <b>%&Delta;</b> = percentage change.<br>|PED| = %&Delta; quantity demanded &divide; %&Delta; price, each percentage change taken over the AVERAGE of the two values (the midpoint method). TR = Price &times; Quantity.",
     table: {
       cols: ["", "Price per cup", "Cups per week"],
       colClass: ["row-label", "p-cell", "q-cell"],
@@ -459,7 +464,7 @@ const PROBLEMS = [
     id: "P4",
     method: "Midpoint method · straight-line demand curve",
     scenario: "Harborview Ferry sells day passes. Its demand curve is the straight line P = 16 − Q, where Q is measured in hundreds of passes per day. The slope of that line is identical at every point on it.",
-    formula: "<b>|PED|</b> = %&Delta; quantity demanded &divide; %&Delta; price, both on midpoint bases. <b>TR</b> = Price &times; Quantity.",
+    formula: "<b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative. <b>TR</b> = total revenue. <b>%&Delta;</b> = percentage change.<br>|PED| = %&Delta; quantity demanded &divide; %&Delta; price, each percentage change taken over the AVERAGE of the two values (the midpoint method). TR = Price &times; Quantity.",
     table: {
       cols: ["Price per pass", "Quantity (hundreds)"],
       colClass: ["p-cell", "q-cell"],
@@ -502,7 +507,7 @@ const PROBLEMS = [
     id: "P5",
     method: "Interpretation — no calculation",
     scenario: "No arithmetic in this one. Each part gives you an elasticity comparison and asks which determinant of price elasticity of demand is doing the work.",
-    formula: "<b>The five determinants:</b> availability of substitutes &nbsp;&bull;&nbsp; necessity vs. luxury &nbsp;&bull;&nbsp; share of income &nbsp;&bull;&nbsp; time horizon &nbsp;&bull;&nbsp; narrowness of market definition",
+    formula: "<b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative.<br><b>The five determinants:</b> availability of substitutes &nbsp;&bull;&nbsp; necessity vs. luxury &nbsp;&bull;&nbsp; share of income &nbsp;&bull;&nbsp; time horizon &nbsp;&bull;&nbsp; narrowness of market definition",
     steps: [
       { prompt: "Gasoline as a whole has |PED| of roughly 0.25. Petrolia-brand gasoline, sold at one of six stations on the same intersection, has |PED| of roughly 4. Which of the two has more elastic demand?",
         options: ["Petrolia-brand gasoline", "Gasoline as a whole",
@@ -535,7 +540,7 @@ const PROBLEMS = [
     id: "P6",
     method: "Simple method (base = starting values)",
     scenario: "Meridian Cinemas raises its ticket price from $12 to $15. An analyst tracks two other things over the same period: subscriptions to Streamly, an at-home streaming service, and buckets of popcorn sold at Meridian's own concession stand.",
-    formula: "<b>XED</b> = %&Delta; quantity demanded of Good B &divide; %&Delta; price of Good A. Positive &rarr; substitutes. Negative &rarr; complements.",
+    formula: "<b>XED</b> = cross-price elasticity of demand. <b>%&Delta;</b> = percentage change.<br>XED = %&Delta; quantity demanded of Good B &divide; %&Delta; price of Good A, each percentage change taken over the STARTING value (the simple method). Positive &rarr; substitutes. Negative &rarr; complements.",
     table: {
       cols: ["", "Meridian ticket price", "Streamly subscriptions", "Meridian popcorn buckets"],
       colClass: ["row-label", "p-cell", "q-cell", "q-cell"],
@@ -573,7 +578,7 @@ const PROBLEMS = [
     id: "P7",
     method: "Simple method (base = starting values)",
     scenario: "A market-research panel follows one household as its monthly income rises from $4,000 to $5,000, recording how much of three different goods it buys each month.",
-    formula: "<b>YED</b> = %&Delta; quantity demanded &divide; %&Delta; income. Positive &rarr; normal good (above 1, a luxury; between 0 and 1, a necessity). Negative &rarr; inferior good.",
+    formula: "<b>YED</b> = income elasticity of demand. <b>%&Delta;</b> = percentage change.<br>YED = %&Delta; quantity demanded &divide; %&Delta; income, each percentage change taken over the STARTING value (the simple method). Positive &rarr; normal good (above 1, a luxury; between 0 and 1, a necessity). Negative &rarr; inferior good.",
     table: {
       cols: ["", "Monthly income", "Restaurant meals", "Ramen (packs)", "Milk (gallons)"],
       colClass: ["row-label", "p-cell", "q-cell", "q-cell", "q-cell"],
@@ -614,7 +619,7 @@ const PROBLEMS = [
     id: "P8",
     method: "Midpoint method",
     scenario: "The wholesale price of apples rises from $12 to $18 a crate. Sunrise Orchards responds by bringing 700 crates to market this season instead of 500.",
-    formula: "<b>PES</b> = %&Delta; quantity supplied &divide; %&Delta; price, both on midpoint bases.",
+    formula: "<b>PES</b> = price elasticity of supply. <b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative. <b>%&Delta;</b> = percentage change.<br>PES = %&Delta; quantity supplied &divide; %&Delta; price, each percentage change taken over the AVERAGE of the two values (the midpoint method).",
     table: {
       cols: ["", "Price per crate", "Crates supplied"],
       colClass: ["row-label", "p-cell", "q-cell"],
@@ -654,7 +659,7 @@ const PROBLEMS = [
     id: "P9",
     method: "Total revenue test",
     scenario: "The Fairhaven town council is setting prices for three services. Its economist has already supplied the elasticity in each case, and the council's goal is more revenue.",
-    formula: "<b>TR</b> = Price &times; Quantity. Elastic &rarr; price and revenue move in OPPOSITE directions. Inelastic &rarr; they move TOGETHER. Unit elastic &rarr; revenue does not move at all.",
+    formula: "<b>PED</b> = price elasticity of demand; |PED| means its absolute value, since PED is always negative. <b>TR</b> = total revenue.<br>TR = Price &times; Quantity. Elastic &rarr; price and revenue move in OPPOSITE directions. Inelastic &rarr; they move TOGETHER. Unit elastic &rarr; revenue does not move at all.",
     table: {
       cols: ["Service", "|PED|", "Current price"],
       colClass: ["row-label", "q-cell", "p-cell"],
@@ -699,7 +704,7 @@ const PROBLEMS = [
     id: "P10",
     method: "Midpoint method · straight-line supply through the origin",
     scenario: "Delmar Print Shop has a straight-line supply curve that passes through the origin: 0 posters at a price of $0, 1 poster at $0.50, 2 posters at $1.00, and 3 posters at $1.50.",
-    formula: "<b>PES</b> = %&Delta; quantity supplied &divide; %&Delta; price, both on midpoint bases.",
+    formula: "<b>PES</b> = price elasticity of supply. <b>%&Delta;</b> = percentage change.<br>PES = %&Delta; quantity supplied &divide; %&Delta; price, each percentage change taken over the AVERAGE of the two values (the midpoint method).",
     table: {
       cols: ["Price per poster", "Posters supplied"],
       colClass: ["p-cell", "q-cell"],
