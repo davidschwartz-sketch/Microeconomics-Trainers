@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working Examples: Consumer and Producer Surplus</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+    --demand: #2F6F62;
+    --supply: #C1542C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:760px;margin:0 auto;}
+
+  header{
+    margin-bottom:20px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  header h1{
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+  }
+
+  .mode-row{
+    display:flex;
+    align-items:center;
+    gap:10px 12px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .mode-label{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+  }
+  .segmented{
+    display:inline-flex;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--surface);
+  }
+  .segmented button{
+    border:none;
+    background:transparent;
+    padding:7px 14px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .segmented button + button{border-left:1px solid var(--border);}
+  .segmented button:hover[aria-pressed="false"]{background:#FFFBF2;}
+  .segmented button[aria-pressed="true"]{
+    background:var(--accent);
+    color:var(--ink);
+  }
+  .mode-hint{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  @media (max-width:560px){
+    .segmented{width:100%;}
+    .segmented button{flex:1;padding:8px 6px;font-size:12px;}
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .count-group{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .card-count{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .score-badge{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px;
+  }
+
+  .method-badge{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:3px 9px;
+    border-radius:6px;
+    margin-bottom:12px;
+  }
+  .scenario{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .formula-note{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:10px 13px;
+    margin-bottom:18px;
+  }
+  .formula-note b{color:var(--ink);}
+
+  .table-wrap{overflow-x:auto;margin-bottom:20px;}
+  table.data-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.data-table th, table.data-table td{
+    border:1px solid var(--border);
+    padding:9px 11px;
+    text-align:center;
+    white-space:nowrap;
+  }
+  table.data-table th{
+    background:var(--surface-alt);
+    font-weight:700;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  table.data-table td.row-label{
+    font-weight:700;
+    text-align:left;
+    color:var(--ink-soft);
+  }
+  table.data-table td.p-cell{color:var(--supply); font-weight:700;}
+  table.data-table td.wrap-cell{
+    text-align:left;
+    white-space:normal;
+    font-weight:600;
+  }
+  table.data-table td.q-cell{color:var(--demand); font-weight:700;}
+
+  .graph-wrap{
+    margin-bottom:20px;
+    text-align:center;
+  }
+  .graph-wrap svg{width:100%;max-width:480px;height:auto;}
+
+  .prompt{
+    font-size:18px;
+    font-weight:600;
+    line-height:1.4;
+    color:var(--ink);
+    margin-bottom:18px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .choice-btn{
+    text-align:left;
+    padding:13px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){
+    border-color:var(--accent);
+    background:#FFFBF2;
+  }
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{
+    background:var(--correct-soft);
+    border-color:var(--correct);
+    color:var(--correct);
+  }
+  .choice-btn.incorrect{
+    background:var(--incorrect-soft);
+    border-color:var(--incorrect);
+    color:var(--incorrect);
+  }
+
+  .feedback{
+    display:none;
+    margin-bottom:16px;
+  }
+  .feedback.show{display:block;}
+  .feedback-verdict{
+    font-weight:800;
+    font-size:15px;
+    margin-bottom:6px;
+  }
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    padding:12px 14px;
+    border-radius:0 8px 8px 0;
+  }
+
+  .controls{
+    display:flex;
+    justify-content:flex-end;
+  }
+  .btn{
+    padding:11px 20px;
+    border-radius:10px;
+    border:none;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover{background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{
+    font-size:34px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    margin-bottom:10px;
+  }
+  .results-note{
+    font-size:15px;
+    color:var(--ink-soft);
+    margin-bottom:20px;
+  }
+  table.data-table th.topic-head, table.data-table td.topic-cell{
+    text-align:left;
+    white-space:normal;
+  }
+  table.data-table td.topic-cell{font-weight:600;color:var(--ink);}
+  table.data-table td.topic-score{font-weight:700;}
+  table.data-table td.topic-score.full{color:var(--correct);}
+  table.data-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+    line-height:1.5;
+    border-top:1px solid var(--border);
+    padding-top:14px;
+    margin:18px 0 20px;
+  }
+
+  footer.reset-row{
+    margin-top:20px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Working Examples: Surplus</h1>
+    <p>Consumer surplus, producer surplus and total surplus &mdash; computing the areas, deadweight loss away from Q*, and how shifts and elasticity divide the gains</p>
+  </header>
+
+  <div class="mode-row" id="modeRow">
+    <span class="mode-label">Difficulty</span>
+    <div class="segmented" role="group" aria-label="Difficulty level">
+      <button type="button" id="modeReview" aria-pressed="true">Helpful Surplus Review</button>
+      <button type="button" id="modeExam" aria-pressed="false">AP Exam Difficulty</button>
+    </div>
+    <span class="mode-hint" id="modeHint"></span>
+  </div>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="card-count" id="problemCount">Problem 1 of 10</span>
+      <span class="card-count" id="stepCount">Step 1 of 5</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="panel" id="quizPanel">
+    <span class="method-badge" id="methodBadge"></span>
+    <div class="scenario" id="scenarioText"></div>
+    <div class="formula-note" id="formulaNote"></div>
+
+    <div class="table-wrap" id="tableWrap">
+      <table class="data-table">
+        <thead><tr id="tableHead"></tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="graph-wrap" id="graphWrap"></div>
+
+    <div class="prompt" id="promptText">Loading&hellip;</div>
+
+    <div class="options" id="optionsWrap"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-verdict" id="feedbackVerdict"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn" disabled>Next step</button>
+    </div>
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">Topic</th><th>Score</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <p class="results-caveat">These bands say whether you have surplus down &mdash; they are not an AP score
+    prediction. The exam covers every unit, counts free response for a third of the grade, and gives you no
+    feedback until it is over. Treat a strong result here as one topic secured, not as a score.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Start again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Restart from problem 1</button>
+  </footer>
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Every number in this bank was solved and asserted in a scratch script before
+   being written here: each market is cleared exactly (linear equations, exact
+   fractions, no rounding anywhere), both sides are checked against each other,
+   and the off-equilibrium quantities and gaps are recomputed independently.
+   The shift outcomes are derived from the four single-shift cases rather than
+   recalled, and the script asserts that in every double-shift combination
+   exactly one of P* and Q* comes out ambiguous.
+--------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------
+   Every number in this bank was solved and asserted in a scratch script before
+   being written here. Linear curves throughout, worked with exact fractions,
+   so no area depends on rounding. Each market is cleared and the clearing
+   point checked against both curves; every surplus is computed twice, once as
+   a triangle and once by integrating the gap between the curves, and the two
+   must agree. The deadweight-loss cases are checked against a scan over every
+   quantity, which confirms total surplus peaks at Q* and nowhere else.
+--------------------------------------------------------------------------- */
+
+const SURPLUS_GRAPH = `
+<svg viewBox="0 0 360 250" role="img" aria-label="A supply and demand diagram with the equilibrium marked, and the two triangles either side of the price line labelled A and B">
+  <polygon points="48,40 48,120 188,120" fill="#E7DCC6" fill-opacity="0.6"/>
+  <polygon points="48,120 48,200 188,120" fill="#E7DCC6" fill-opacity="0.6"/>
+  <line x1="48" y1="210" x2="340" y2="210" stroke="#6B5D4C" stroke-width="1.5"/>
+  <line x1="48" y1="210" x2="48" y2="24" stroke="#6B5D4C" stroke-width="1.5"/>
+  <text x="340" y="240" text-anchor="end" font-size="10.5" fill="#6B5D4C">Quantity</text>
+  <text x="44" y="20" text-anchor="end" font-size="10.5" fill="#6B5D4C">Price</text>
+  <line x1="48" y1="40" x2="328" y2="200" stroke="#2F6F62" stroke-width="2.5"/>
+  <line x1="48" y1="200" x2="328" y2="40" stroke="#C1542C" stroke-width="2.5"/>
+  <text x="334" y="204" font-size="11" font-weight="700" fill="#2F6F62">D</text>
+  <text x="334" y="44" font-size="11" font-weight="700" fill="#C1542C">S</text>
+  <line x1="48" y1="120" x2="188" y2="120" stroke="#6B5D4C" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="188" y1="120" x2="188" y2="210" stroke="#6B5D4C" stroke-width="1" stroke-dasharray="3 3"/>
+  <circle cx="188" cy="120" r="4" fill="#2B2118"/>
+  <text x="43" y="124" text-anchor="end" font-size="10.5" fill="#6B5D4C">P*</text>
+  <text x="188" y="226" text-anchor="middle" font-size="10.5" fill="#6B5D4C">Q*</text>
+  <text x="92" y="97" font-size="13" font-weight="800" fill="#2B2118">A</text>
+  <text x="92" y="153" font-size="13" font-weight="800" fill="#2B2118">B</text>
+</svg>`;
+
+const MARKET_GRAPH = `
+<svg viewBox="0 0 360 250" role="img" aria-label="A supply and demand diagram showing the starting equilibrium">
+  <line x1="48" y1="210" x2="340" y2="210" stroke="#6B5D4C" stroke-width="1.5"/>
+  <line x1="48" y1="210" x2="48" y2="24" stroke="#6B5D4C" stroke-width="1.5"/>
+  <text x="340" y="240" text-anchor="end" font-size="10.5" fill="#6B5D4C">Quantity</text>
+  <text x="44" y="20" text-anchor="end" font-size="10.5" fill="#6B5D4C">Price</text>
+  <line x1="48" y1="40" x2="328" y2="200" stroke="#2F6F62" stroke-width="2.5"/>
+  <line x1="48" y1="200" x2="328" y2="40" stroke="#C1542C" stroke-width="2.5"/>
+  <text x="334" y="204" font-size="11" font-weight="700" fill="#2F6F62">D</text>
+  <text x="334" y="44" font-size="11" font-weight="700" fill="#C1542C">S</text>
+  <line x1="48" y1="120" x2="188" y2="120" stroke="#6B5D4C" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="188" y1="120" x2="188" y2="210" stroke="#6B5D4C" stroke-width="1" stroke-dasharray="3 3"/>
+  <circle cx="188" cy="120" r="4" fill="#2B2118"/>
+  <text x="43" y="124" text-anchor="end" font-size="10.5" fill="#6B5D4C">P*</text>
+  <text x="188" y="226" text-anchor="middle" font-size="10.5" fill="#6B5D4C">Q*</text>
+</svg>`;
+
+const TERMS = '<b>CS</b> = consumer surplus. <b>PS</b> = producer surplus. <b>TS</b> = total surplus. ' +
+              '<b>DWL</b> = deadweight loss. <b>P*</b> = equilibrium price. <b>Q*</b> = equilibrium quantity.';
+const REVIEW_CALC = 'CS is the triangle between the demand curve and the price, from 0 out to Q*. PS is the triangle between the price and the ' +
+  'supply curve over that same range. Area of a triangle is 1/2 &times; base &times; height, with Q* as the base in both. TS = CS + PS.';
+const REVIEW_DWL = 'TS = CS + PS, and it is largest exactly at Q*. Below Q*, units worth more to buyers than they cost to make go untraded; above Q*, ' +
+  'units get made that cost more than buyers value them. Either way the loss is a triangle: DWL = 1/2 &times; (distance from Q*) &times; (gap between the two curves there).';
+const REVIEW_SHIFT = 'Reason first about the curve that did NOT move. If supply shifted, demand is unchanged, so CS follows the price: lower price plus larger ' +
+  'quantity makes that triangle bigger, higher price plus smaller quantity makes it smaller. If demand shifted, supply is unchanged and PS follows the price the same way. ' +
+  'That settles one of the two immediately, with no arithmetic.';
+const REVIEW_ELASTIC = 'The less elastic side of a market cannot escape a price change by adjusting quantity, so it absorbs more of the change in price, and its ' +
+  'surplus moves more as a result. The more elastic side adjusts quantity instead, and its surplus moves less.';
+
+const PROBLEMS = [
+  {
+    id: "P1",
+    topic: "Computing CS, PS and total surplus",
+    method: "Areas · CS, PS and TS",
+    scenario: "Larkspur Ceramics sells glazed tiles. P is the price in dollars per tile and Q is tiles per hour. The diagram shows the general shape of such a market; work from the equations.",
+    terms: TERMS, review: REVIEW_CALC, graph: "SURPLUS",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 100 − 2Q"], ["Supply", "P = 10 + 3Q"]] },
+    steps: [
+      { prompt: "Where does this market clear?",
+        options: ["P* = $64, Q* = 18", "P* = $46, Q* = 27", "P* = $70, Q* = 15", "P* = $55, Q* = 22"], correct: 0,
+        explain: "Set the two equal: 100 − 2Q = 10 + 3Q, so 90 = 5Q and Q* = 18. Substituting back, P* = 100 − 2(18) = $64, and the supply side agrees: 10 + 3(18) = $64." },
+      { prompt: "On the diagram, which region is consumer surplus?",
+        options: ["Region A — between the demand curve and the price line, from 0 out to Q*",
+                  "Region B — between the price line and the supply curve, from 0 out to Q*",
+                  "Regions A and B together",
+                  "The rectangle formed by P* and Q*"], correct: 0,
+        explain: "Consumer surplus is what buyers gain: for each unit bought, the gap between what it is worth to them (the height of the demand curve) and what they actually pay (the price), added up across every unit. That is the region above the price and below demand. Region B is the sellers' side, A and B together are total surplus, and the rectangle is total spending, which is not a surplus at all." },
+      { prompt: "Compute consumer surplus in this market.",
+        options: ["$324", "$648", "$576", "$162"], correct: 0,
+        explain: "Set Q = 0 in the demand equation to find where it meets the price axis: $100. The triangle's height is $100 − $64 = $36 and its base is Q* = 18, so CS = 1/2 × 18 × 36 = $324. ($648 is the rectangle rather than the triangle — the halving is not optional.)" },
+      { prompt: "Compute producer surplus in this market.",
+        options: ["$486", "$972", "$324", "$243"], correct: 0,
+        explain: "Set Q = 0 in the supply equation: the curve starts at $10. The height is $64 − $10 = $54 over the same base of 18, so PS = 1/2 × 18 × 54 = $486." },
+      { prompt: "What is total surplus here, and what does it measure?",
+        options: ["$810 — the combined gain to buyers and sellers from trading in this market",
+                  "$810 — the total amount of money that changes hands in this market",
+                  "$1,476 — the total value buyers place on all 18 tiles",
+                  "$162 — the gap between producer and consumer surplus"], correct: 0,
+        explain: "TS = CS + PS = $324 + $486 = $810. It is the whole area between the demand and supply curves out to Q*, and it measures gain from trade, not money spent. Money spent is P* × Q* = $64 × 18 = $1,152, and the total value buyers place on the tiles is the area under the demand curve, $1,476 — three different quantities that are easy to confuse." }
+    ]
+  },
+  {
+    id: "P2",
+    topic: "A market where consumer surplus exceeds producer surplus",
+    method: "Areas · CS, PS and TS",
+    scenario: "Halden Instruments sells precision gauges. P is the price in dollars per gauge and Q is gauges per week.",
+    terms: TERMS, review: REVIEW_CALC, graph: "SURPLUS",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 140 − 4Q"], ["Supply", "P = 20 + 2Q"]] },
+    steps: [
+      { prompt: "Where does this market clear?",
+        options: ["P* = $60, Q* = 20", "P* = $80, Q* = 15", "P* = $40, Q* = 25", "P* = $100, Q* = 10"], correct: 0,
+        explain: "140 − 4Q = 20 + 2Q gives 120 = 6Q, so Q* = 20. Then P* = 140 − 4(20) = $60, and the supply side agrees: 20 + 2(20) = $60." },
+      { prompt: "Compute consumer surplus.",
+        options: ["$800", "$1,600", "$400", "$600"], correct: 0,
+        explain: "Demand meets the price axis at $140, so the height is $140 − $60 = $80 over a base of 20. CS = 1/2 × 20 × 80 = $800." },
+      { prompt: "Compute producer surplus.",
+        options: ["$400", "$800", "$200", "$600"], correct: 0,
+        explain: "Supply starts at $20, so the height is $60 − $20 = $40 over the same base of 20. PS = 1/2 × 20 × 40 = $400." },
+      { prompt: "Consumer surplus here is exactly twice producer surplus. What decides which of the two is larger in a given market?",
+        options: ["The relative steepness of the two curves — a steeper curve on your side means a taller triangle and a larger surplus",
+                  "Consumer surplus is always larger, because a market has more buyers than sellers",
+                  "Whichever side collects more total revenue",
+                  "It depends only on how high the equilibrium price is"], correct: 0,
+        explain: "Both triangles share the same base, Q*. All that differs is their heights. Demand runs from $140 down to the $60 price, a height of $80; supply runs from $20 up to $60, a height of $40. Exactly twice the height over the same base gives exactly twice the area. Nothing about the number of buyers or sellers enters the calculation." },
+      { prompt: "What is total surplus in this market?",
+        options: ["$1,200", "$400", "$2,400", "$1,000"], correct: 0,
+        explain: "TS = CS + PS = $800 + $400 = $1,200 — the entire area between the two curves from 0 out to Q* = 20." }
+    ]
+  },
+  {
+    id: "P3",
+    topic: "Total surplus is largest exactly at Q*",
+    method: "Deadweight loss · deviating from Q* in either direction",
+    scenario: "Brightwater Filters sells water filters. P is the price in dollars per filter and Q is filters per day.",
+    terms: TERMS, review: REVIEW_DWL, graph: "SURPLUS",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 100 − 2Q"], ["Supply", "P = 20 + 2Q"]] },
+    steps: [
+      { prompt: "Where does this market clear?",
+        options: ["P* = $60, Q* = 20", "P* = $50, Q* = 25", "P* = $40, Q* = 30", "P* = $70, Q* = 15"], correct: 0,
+        explain: "100 − 2Q = 20 + 2Q gives 80 = 4Q, so Q* = 20 and P* = $60, which both curves confirm." },
+      { prompt: "What is total surplus at that equilibrium?",
+        options: ["$800", "$400", "$1,200", "$1,600"], correct: 0,
+        explain: "Demand meets the axis at $100 and supply at $20. CS = 1/2 × 20 × ($100 − $60) = $400 and PS = 1/2 × 20 × ($60 − $20) = $400, so TS = $800." },
+      { prompt: "Suppose only 15 filters are traded. At Q = 15, what is the gap between what a buyer would pay for that filter and what it costs to supply?",
+        options: ["$20", "$10", "$40", "$5"], correct: 0,
+        explain: "Demand at Q = 15 is 100 − 2(15) = $70; supply at Q = 15 is 20 + 2(15) = $50. The gap is $20, meaning the 15th filter is worth $20 more to a buyer than it costs to make — a worthwhile trade that is not happening." },
+      { prompt: "What is the deadweight loss from stopping at 15 filters instead of 20?",
+        options: ["$50", "$100", "$25", "$300"], correct: 0,
+        explain: "The lost surplus is the triangle between the two curves from Q = 15 out to Q* = 20. Its base is the 5 untraded units and its height is the $20 gap at Q = 15, narrowing to zero at Q*. DWL = 1/2 × 5 × 20 = $50, so TS falls from $800 to $750." },
+      { prompt: "Now suppose 25 filters are traded — five MORE than Q*. What is the deadweight loss then?",
+        options: ["$50", "Zero, because producing more can only add surplus", "$100", "$25"], correct: 0,
+        explain: "At Q = 25 demand is 100 − 2(25) = $50 while supply is 20 + 2(25) = $70, so the 25th filter costs $20 more to make than any buyer thinks it is worth. Those five extra units destroy surplus rather than create it: DWL = 1/2 × 5 × 20 = $50 again, leaving TS at $750 — exactly where it was at 15 filters." },
+      { prompt: "What is the general principle these two cases illustrate?",
+        options: ["Total surplus is largest exactly at Q*, and moving away from it in either direction destroys surplus",
+                  "Total surplus rises with quantity, so more output is always better",
+                  "Total surplus is largest when consumer surplus equals producer surplus",
+                  "Total surplus is largest at the highest price buyers are willing to pay"], correct: 0,
+        explain: "Below Q*, valuable trades go unmade; above Q*, worthless trades get made. Both are losses, and both shrink to zero only at Q*, where the curves meet and the last unit traded is worth exactly what it costs. Watch the third option: CS and PS do happen to be equal in this market, but that is a coincidence of the slopes, not the reason Q* is best." }
+    ]
+  },
+  {
+    id: "P4",
+    topic: "Deadweight loss from restricted output",
+    method: "Deadweight loss · output held below Q*",
+    scenario: "Calder Textiles weaves bolts of cloth. P is the price in dollars per bolt and Q is bolts per day. A licensing rule then caps output at 6 bolts.",
+    terms: TERMS, review: REVIEW_DWL, graph: "SURPLUS",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 60 − Q"], ["Supply", "P = 10 + 4Q"]] },
+    steps: [
+      { prompt: "Where would this market clear if output were not capped?",
+        options: ["P* = $50, Q* = 10", "P* = $40, Q* = 20", "P* = $26, Q* = 4", "P* = $54, Q* = 6"], correct: 0,
+        explain: "60 − Q = 10 + 4Q gives 50 = 5Q, so Q* = 10 and P* = 60 − 10 = $50. The supply side agrees: 10 + 4(10) = $50." },
+      { prompt: "What is total surplus at that uncapped equilibrium?",
+        options: ["$250", "$500", "$200", "$125"], correct: 0,
+        explain: "CS = 1/2 × 10 × ($60 − $50) = $50 and PS = 1/2 × 10 × ($50 − $10) = $200, so TS = $250. Note how lopsided this market is — steep supply and flat demand hand most of the surplus to sellers." },
+      { prompt: "With output capped at 6 bolts, what is the gap between the demand and supply curves at Q = 6?",
+        options: ["$20", "$10", "$34", "$54"], correct: 0,
+        explain: "Demand at Q = 6 is 60 − 6 = $54; supply at Q = 6 is 10 + 4(6) = $34. The gap is $20: the 6th bolt is worth $54 to a buyer and costs $34 to make, and every bolt from there up to the 10th is worth more than it costs too." },
+      { prompt: "What is the deadweight loss caused by the cap?",
+        options: ["$40", "$80", "$20", "$120"], correct: 0,
+        explain: "The lost triangle runs from Q = 6 to Q* = 10: base 4 units, height the $20 gap at Q = 6, narrowing to zero at Q*. DWL = 1/2 × 4 × 20 = $40." },
+      { prompt: "What is total surplus under the cap?",
+        options: ["$210", "$250", "$290", "$190"], correct: 0,
+        explain: "TS falls by exactly the deadweight loss: $250 − $40 = $210. The cap does not merely move surplus from one side to the other — $40 of it stops existing, because the trades that would have created it never happen." }
+    ]
+  },
+  {
+    id: "P5",
+    topic: "A supply increase and what it does to CS and PS",
+    method: "Shifts · reason from the curve that did not move",
+    scenario: "Vela Coffee Roasters sells wholesale coffee. P is the price in dollars per kilo and Q is kilos per day. A cheaper roasting process then cuts costs, moving supply to P = 18 + 2Q.",
+    terms: TERMS, review: REVIEW_SHIFT, graph: "MARKET",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 90 − Q"], ["Supply, before", "P = 30 + 2Q"], ["Supply, after", "P = 18 + 2Q"]] },
+    steps: [
+      { prompt: "Where does this market clear before the cost saving?",
+        options: ["P* = $70, Q* = 20", "P* = $60, Q* = 30", "P* = $50, Q* = 40", "P* = $75, Q* = 15"], correct: 0,
+        explain: "90 − Q = 30 + 2Q gives 60 = 3Q, so Q* = 20 and P* = $70, confirmed by both curves." },
+      { prompt: "With supply now at P = 18 + 2Q, where does the market clear?",
+        options: ["P* = $66, Q* = 24", "P* = $70, Q* = 20", "P* = $58, Q* = 32", "P* = $62, Q* = 28"], correct: 0,
+        explain: "90 − Q = 18 + 2Q gives 72 = 3Q, so Q* = 24 and P* = $66. The price fell $4 and the quantity rose by 4 kilos." },
+      { prompt: "Before computing anything further: what must have happened to consumer surplus, and how can you tell?",
+        options: ["It must have risen — demand has not moved, and buyers now get more kilos at a lower price",
+                  "It must have fallen — a lower price means sellers bring less to each buyer",
+                  "It cannot be determined without computing both triangles",
+                  "It is unchanged, because the demand curve did not move"], correct: 0,
+        explain: "This is the shortcut worth having. Supply moved, so the demand curve is exactly where it was. The CS triangle sits under that unchanged curve and above the price, out to Q*. The price fell from $70 to $66 and the quantity rose from 20 to 24, so the triangle got both taller and wider. An unchanged curve is not the same as an unchanged surplus — the triangle drawn against it still changes when the price does." },
+      { prompt: "Now compute it. What is consumer surplus after the cost saving?",
+        options: ["$288", "$200", "$144", "$576"], correct: 0,
+        explain: "Demand meets the price axis at $90, so the height is $90 − $66 = $24 over a base of 24. CS = 1/2 × 24 × 24 = $288, up from $200 before. The shortcut said 'up', and the arithmetic agrees." },
+      { prompt: "What happened to producer surplus?",
+        options: ["It rose to $576, because the cost saving more than offsets the lower price",
+                  "It is unchanged at $400, because the price fell by exactly the cost saving",
+                  "It fell to $288, because sellers now receive a lower price",
+                  "It fell to $200, because a lower price must reduce the sellers' side"], correct: 0,
+        explain: "PS needs more care than CS here, because it is measured against the curve that MOVED. The new supply curve starts at $18, so the height is $66 − $18 = $48 over a base of 24: PS = 1/2 × 24 × 48 = $576, up from $400. Sellers receive $4 less per kilo but save $12 per kilo in costs and sell four more kilos." }
+    ]
+  },
+  {
+    id: "P6",
+    topic: "A supply decrease and what it does to CS and PS",
+    method: "Shifts · reason from the curve that did not move",
+    scenario: "Tamsin Glassworks sells hand-blown vases. P is the price in dollars per vase and Q is vases per week. A rise in furnace fuel costs then moves supply to P = 32 + Q.",
+    terms: TERMS, review: REVIEW_SHIFT, graph: "MARKET",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 80 − 2Q"], ["Supply, before", "P = 20 + Q"], ["Supply, after", "P = 32 + Q"]] },
+    steps: [
+      { prompt: "Where does this market clear before the cost increase?",
+        options: ["P* = $40, Q* = 20", "P* = $50, Q* = 15", "P* = $30, Q* = 25", "P* = $48, Q* = 16"], correct: 0,
+        explain: "80 − 2Q = 20 + Q gives 60 = 3Q, so Q* = 20 and P* = $40, confirmed by both curves." },
+      { prompt: "With supply now at P = 32 + Q, where does the market clear?",
+        options: ["P* = $48, Q* = 16", "P* = $40, Q* = 20", "P* = $52, Q* = 14", "P* = $44, Q* = 18"], correct: 0,
+        explain: "80 − 2Q = 32 + Q gives 48 = 3Q, so Q* = 16 and P* = $48. The price rose $8 and the quantity fell by 4 vases." },
+      { prompt: "Before computing: what must have happened to consumer surplus?",
+        options: ["It must have fallen — demand has not moved, and buyers now get fewer vases at a higher price",
+                  "It must have risen — a higher price signals that buyers value vases more",
+                  "It cannot be determined without computing both triangles",
+                  "It is unchanged, because the demand curve did not move"], correct: 0,
+        explain: "Supply moved, so demand is untouched and the CS triangle is drawn against the same curve as before. A higher price pushes its top edge down and a smaller quantity pulls its base in, so the triangle shrinks on both dimensions. No arithmetic required to sign it." },
+      { prompt: "Compute consumer surplus after the cost increase.",
+        options: ["$256", "$400", "$512", "$128"], correct: 0,
+        explain: "Demand meets the price axis at $80, so the height is $80 − $48 = $32 over a base of 16. CS = 1/2 × 16 × 32 = $256, down from $400." },
+      { prompt: "What happened to producer surplus?",
+        options: ["It fell to $128, because the cost increase more than offsets the higher price",
+                  "It rose to $384, because sellers now receive a higher price",
+                  "It is unchanged at $200, because the price rose by exactly the cost increase",
+                  "It fell to $64, because both price and quantity worked against sellers"], correct: 0,
+        explain: "Sellers do receive $8 more per vase, which is tempting, but their costs rose $12 per vase and they sell four fewer. Measured against the new supply curve, which starts at $32, the height is $48 − $32 = $16 over a base of 16: PS = 1/2 × 16 × 16 = $128, down from $200. A higher price is not the same thing as a better position." }
+    ]
+  },
+  {
+    id: "P7",
+    topic: "A demand increase and what it does to CS and PS",
+    method: "Shifts · reason from the curve that did not move",
+    scenario: "Orbit Athletic sells running shoes. P is the price in dollars per pair and Q is pairs per day. A popular race series then raises interest, moving demand to P = 114 − 2Q.",
+    terms: TERMS, review: REVIEW_SHIFT, graph: "MARKET",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand, before", "P = 96 − 2Q"], ["Demand, after", "P = 114 − 2Q"], ["Supply", "P = 24 + Q"]] },
+    steps: [
+      { prompt: "Where does this market clear before the race series?",
+        options: ["P* = $48, Q* = 24", "P* = $54, Q* = 30", "P* = $40, Q* = 28", "P* = $60, Q* = 18"], correct: 0,
+        explain: "96 − 2Q = 24 + Q gives 72 = 3Q, so Q* = 24 and P* = $48, confirmed by both curves." },
+      { prompt: "With demand now at P = 114 − 2Q, where does the market clear?",
+        options: ["P* = $54, Q* = 30", "P* = $48, Q* = 24", "P* = $66, Q* = 42", "P* = $58, Q* = 34"], correct: 0,
+        explain: "114 − 2Q = 24 + Q gives 90 = 3Q, so Q* = 30 and P* = $54. Both the price and the quantity rose." },
+      { prompt: "This time it is DEMAND that moved. Which surplus can you sign straight away, and which way does it go?",
+        options: ["Producer surplus — supply has not moved, and sellers now sell more pairs at a higher price, so PS must rise",
+                  "Consumer surplus — buyers value the shoes more, so CS must rise",
+                  "Neither — both triangles have to be recomputed from scratch",
+                  "Producer surplus — sellers face a higher price, so PS must fall"], correct: 0,
+        explain: "The rule does not change, only which curve it applies to. Demand shifted, so the supply curve is where it was, and the PS triangle sits above that unchanged curve and below the price. Price up and quantity up means the triangle grew on both dimensions. Consumer surplus rises here too, but signing it takes more care, because it is measured against the curve that moved." },
+      { prompt: "Compute producer surplus after the demand increase.",
+        options: ["$450", "$288", "$900", "$360"], correct: 0,
+        explain: "Supply starts at $24, so the height is $54 − $24 = $30 over a base of 30. PS = 1/2 × 30 × 30 = $450, up from $288." },
+      { prompt: "Compute consumer surplus after the demand increase.",
+        options: ["$900, measured against the NEW demand curve", "$576, unchanged from before",
+                  "$450, the same as producer surplus", "$720, measured against the old demand curve"], correct: 0,
+        explain: "The new demand curve meets the price axis at $114, so the height is $114 − $54 = $60 over a base of 30: CS = 1/2 × 30 × 60 = $900, up from $576. Note carefully what that comparison involves: surplus under the NEW demand curve set against surplus under the old one. When demand itself moves, the yardstick moves with it, which is exactly why producer surplus was the one to sign first." }
+    ]
+  },
+  {
+    id: "P8",
+    topic: "Elasticity of demand and who gains from a supply increase",
+    method: "Two markets · elasticity and the split of surplus",
+    scenario: "Two towns buy the same product. Both start at exactly the same equilibrium, P* = $60 and Q* = 30, and both receive the same supply increase. Only their demand curves differ.",
+    terms: TERMS, review: REVIEW_ELASTIC, graph: "MARKET",
+    table: { cols: ["", "Demand", "Supply, before", "Supply, after"],
+             colClass: ["row-label", "q-cell", "q-cell", "q-cell"],
+             rows: [["Market A", "P = 120 − 2Q", "P = 30 + Q", "P = 18 + Q"],
+                    ["Market B", "P = 75 − 0.5Q", "P = 30 + Q", "P = 18 + Q"]] },
+    steps: [
+      { prompt: "Both markets start at P* = $60 and Q* = 30. Whose demand is more elastic at that point?",
+        options: ["Market B — its demand curve is flatter, so quantity responds more to a given price change",
+                  "Market A — its demand curve is steeper, so it responds more",
+                  "They are equally elastic, since they share the same equilibrium point",
+                  "There is not enough information to tell"], correct: 0,
+        explain: "At the shared point Market A's |PED| is 1.00 and Market B's is 4.00. Flatter means more elastic: in Market B a $1 price change moves quantity by 2 units, against half a unit in Market A. Sharing an equilibrium point says nothing about the slopes through it." },
+      { prompt: "Supply rises to P = 18 + Q in both towns. Where does Market A now clear?",
+        options: ["P* = $52, Q* = 34", "P* = $56, Q* = 38", "P* = $48, Q* = 36", "P* = $54, Q* = 32"], correct: 0,
+        explain: "120 − 2Q = 18 + Q gives 102 = 3Q, so Q* = 34 and P* = $52. The price fell $8 and the quantity rose by 4." },
+      { prompt: "Where does Market B now clear?",
+        options: ["P* = $56, Q* = 38", "P* = $52, Q* = 34", "P* = $50, Q* = 40", "P* = $58, Q* = 36"], correct: 0,
+        explain: "75 − 0.5Q = 18 + Q gives 57 = 1.5Q, so Q* = 38 and P* = $56. The price fell only $4, while the quantity rose by 8." },
+      { prompt: "The same supply increase cut the price by $8 in Market A but only $4 in Market B. Why did the price fall less where demand is more elastic?",
+        options: ["Because elastic buyers absorb the extra output by buying a lot more, so less of the adjustment has to come through the price",
+                  "Because elastic demand means buyers are less willing to pay, which holds the price up",
+                  "Because the supply shift was effectively smaller in Market B",
+                  "Because a flatter demand curve starts from a lower intercept"], correct: 0,
+        explain: "The extra output has to be cleared one way or the other: either the price falls far enough to tempt buyers, or buyers soak it up with a large quantity response. Where demand is elastic the quantity does the work — Q rose by 8 in Market B against 4 in Market A — so the price barely has to move. Where demand is inelastic there is nowhere for the adjustment to go but into the price." },
+      { prompt: "Compute consumer surplus in Market A after the supply increase.",
+        options: ["$1,156", "$900", "$578", "$1,088"], correct: 0,
+        explain: "Demand meets the price axis at $120, so the height is $120 − $52 = $68 over a base of 34. CS = 1/2 × 34 × 68 = $1,156, up from $900 before the shift." },
+      { prompt: "In Market A consumer surplus rose $256 while producer surplus rose $128. In Market B consumer surplus rose $136 while producer surplus rose $272. What principle does that illustrate?",
+        options: ["The less elastic side of a market absorbs more of a price change, so its surplus moves more",
+                  "Consumers always gain more than producers when supply increases",
+                  "The more elastic side of a market always captures the larger gain",
+                  "The gains are split evenly whenever the shift is the same size"], correct: 0,
+        explain: "Supply is identical in both towns, with a PES of 2.00 at the shared starting point. In Market A demand (|PED| 1.00) is the LESS elastic side, and consumers captured twice what producers did. In Market B demand (|PED| 4.00) is the MORE elastic side, and producers captured twice what consumers did. The ratio flips exactly with which side is less elastic — and the same logic runs in reverse for a tax, where the less elastic side bears more of the burden." }
+    ]
+  },
+  {
+    id: "P9",
+    topic: "Elasticity of supply and who gains from a demand increase",
+    method: "Two markets · elasticity and the split of surplus",
+    scenario: "Two regions sell the same product. Both start at exactly the same equilibrium, P* = $60 and Q* = 30, and both receive the same demand increase. Only their supply curves differ.",
+    terms: TERMS, review: REVIEW_ELASTIC, graph: "MARKET",
+    table: { cols: ["", "Supply", "Demand, before", "Demand, after"],
+             colClass: ["row-label", "q-cell", "q-cell", "q-cell"],
+             rows: [["Region A", "P = 2Q", "P = 90 − Q", "P = 102 − Q"],
+                    ["Region B", "P = 45 + 0.5Q", "P = 90 − Q", "P = 102 − Q"]] },
+    steps: [
+      { prompt: "Both regions start at P* = $60 and Q* = 30. Whose supply is more elastic at that point?",
+        options: ["Region B — its supply curve is flatter, so quantity supplied responds more to a given price change",
+                  "Region A — its supply curve passes through the origin, which makes it the more responsive",
+                  "They are equally elastic, since they share the same equilibrium point",
+                  "Supply elasticity cannot be compared unless the curves are parallel"], correct: 0,
+        explain: "PES is 1.00 in Region A and 4.00 in Region B. Region A's supply runs through the origin, which makes it unit elastic at every point along it; Region B's is far flatter, and a $1 price change moves its quantity supplied by 2 units against half a unit in Region A." },
+      { prompt: "Demand rises to P = 102 − Q in both regions. Where does Region A now clear?",
+        options: ["P* = $68, Q* = 34", "P* = $64, Q* = 38", "P* = $72, Q* = 36", "P* = $66, Q* = 33"], correct: 0,
+        explain: "102 − Q = 2Q gives 102 = 3Q, so Q* = 34 and P* = $68. The price rose $8 and the quantity rose by 4." },
+      { prompt: "Where does Region B now clear?",
+        options: ["P* = $64, Q* = 38", "P* = $68, Q* = 34", "P* = $62, Q* = 40", "P* = $66, Q* = 36"], correct: 0,
+        explain: "102 − Q = 45 + 0.5Q gives 57 = 1.5Q, so Q* = 38 and P* = $64. The price rose only $4, while the quantity rose by 8." },
+      { prompt: "The same demand increase raised the price by $8 in Region A but only $4 in Region B. Why did the price rise less where supply is more elastic?",
+        options: ["Because elastic sellers meet the extra demand by producing a lot more, so less of the adjustment comes through the price",
+                  "Because elastic supply means sellers are reluctant to expand, which caps the price",
+                  "Because the demand shift was effectively smaller in Region B",
+                  "Because a flatter supply curve starts from a higher intercept"], correct: 0,
+        explain: "It is the same mechanism as on the demand side, viewed from the other end of the market. The extra demand is met either by a big price rise or by a big output rise. Where supply is elastic, output does the work — Q rose by 8 in Region B against 4 in Region A — so the price moves little. Where supply is inelastic, the price has to do all of it." },
+      { prompt: "Compute producer surplus in Region A after the demand increase.",
+        options: ["$1,156", "$900", "$578", "$1,088"], correct: 0,
+        explain: "Region A's supply runs through the origin, so it meets the price axis at $0 and the height is the full $68 over a base of 34. PS = 1/2 × 34 × 68 = $1,156, up from $900." },
+      { prompt: "In Region A producer surplus rose $256 while consumer surplus rose $128. In Region B producer surplus rose $136 while consumer surplus rose $272. What principle does that illustrate?",
+        options: ["The less elastic side of a market absorbs more of a price change, so its surplus moves more",
+                  "Producers always gain more than consumers when demand increases",
+                  "The more elastic side of a market always captures the larger gain",
+                  "The gains depend on the size of the shift rather than on the elasticities"], correct: 0,
+        explain: "Demand is identical in both regions, with |PED| of 2.00 at the shared starting point. In Region A supply (PES 1.00) is the LESS elastic side, and producers captured twice what consumers did. In Region B supply (PES 4.00) is the MORE elastic side, and consumers captured twice what producers did. Exactly the same rule as on the demand side, with the roles swapped: whoever is less elastic takes more of the price change, for better or for worse." }
+    ]
+  },
+  {
+    id: "P10",
+    topic: "Reading surplus from elasticity, and a look ahead to taxes",
+    method: "Interpretation — no calculation",
+    scenario: "No arithmetic in this one. Each part asks what the surplus results mean, and the last two look ahead to the next topic.",
+    terms: TERMS, review: REVIEW_ELASTIC,
+    steps: [
+      { prompt: "In one market a supply increase cut the price sharply and raised quantity only a little. In another, the same increase barely moved the price but raised quantity a lot. Which market has the more elastic demand?",
+        options: ["The second — quantity did the adjusting rather than the price",
+                  "The first — the large price change shows buyers are responsive",
+                  "They must be equally elastic, since the supply increase was the same",
+                  "Elasticity cannot be inferred from a price and quantity change"], correct: 0,
+        explain: "Elastic demand means buyers respond to price with large changes in quantity. So when something pushes extra output onto the market, elastic buyers absorb it by buying much more, and the price scarcely has to fall. A large price move with little quantity response is the signature of INelastic demand." },
+      { prompt: "Take the market where the price fell sharply while quantity moved only a little. Compared with the market where the price barely moved but quantity rose a lot, did its consumers capture more or less of the gain?",
+        options: ["More — consumer gains come mostly through paying less per unit, and that is the market where the price did the moving",
+                  "Less — the other market's buyers ended up with far more units",
+                  "The same — the supply increase was identical in both",
+                  "Impossible to say without the actual demand equations"], correct: 0,
+        explain: "Consumer surplus gains come mostly through paying less per unit on the units already being bought. Where demand is inelastic the whole adjustment lands on the price, so buyers capture most of the benefit. Where demand is elastic the adjustment lands on quantity instead, and producers keep more of it." },
+      { prompt: "State the rule in a single line.",
+        options: ["Whichever side of the market is less elastic absorbs more of any price change, and its surplus moves more",
+                  "Whichever side of the market is more elastic absorbs more of any price change",
+                  "Consumers absorb price falls and producers absorb price rises",
+                  "Surplus is always split evenly between the two sides"], correct: 0,
+        explain: "The less elastic side cannot escape by changing quantity, so it takes the adjustment in price. That cuts both ways: it captures more of a favourable price change and bears more of an unfavourable one." },
+      { prompt: "A tax drives a wedge between what buyers pay and what sellers receive. Based on that rule, which side ends up bearing more of the tax?",
+        options: ["The less elastic side, because it cannot escape by changing quantity",
+                  "The more elastic side, because it trades in larger volumes",
+                  "Always the buyers, since they are the ones who pay the listed price",
+                  "The two sides always split the burden equally"], correct: 0,
+        explain: "A tax is just another force pushing the buyer's price and the seller's price apart. Whichever side is less able to adjust quantity has to absorb more of that wedge. If demand is nearly vertical, buyers pay almost the whole tax; if supply is nearly vertical, sellers absorb almost all of it." },
+      { prompt: "Does it matter whether the law says the tax is collected from buyers or from sellers?",
+        options: ["No — the burden is decided by the relative elasticities, not by who hands over the money",
+                  "Yes — whoever legally pays the tax is the one who bears it",
+                  "Yes — a tax collected from sellers is always passed on to buyers in full",
+                  "No — because a tax changes only the quantity traded, never the price"], correct: 0,
+        explain: "This is one of the most reliably tested points in the course. Who writes the cheque (the statutory side) and who ends up worse off (the economic side) are different questions with different answers. Either way the tax opens the same wedge, and the side less able to adjust quantity absorbs more of it. A tax also pulls the quantity away from Q*, which creates deadweight loss on top of whatever revenue is collected." }
+    ]
+  }
+];
+
+/* ------------------------------------------------------------ state + helpers */
+/* Results bands. Banding uses the ROUNDED percentage -- the same number shown
+   to the student -- so the label can never disagree with the figure beside it.
+   Raw-score ranges over this 53-question bank, checked in the scratch script:
+     Mastered 48-53 | Strong 43-47 | Developing 37-42 | Shaky 29-36 | below 29
+   Blind guessing on 4 options averages 13/53, which lands in the bottom band. */
+const BANDS = [
+  { min: 90, label: 'Mastered', tone: 'good',
+    note: 'You can compute the surplus areas, size a deadweight loss, and say who gains from a shift. Treat this topic as secure.' },
+  { min: 80, label: 'Strong', tone: 'good',
+    note: 'Solid command of the material. Work the topics below where you dropped marks, then run it again.' },
+  { min: 70, label: 'Developing', tone: 'mid',
+    note: 'The method is there but execution is slipping. The breakdown below shows where to aim.' },
+  { min: 55, label: 'Shaky', tone: 'poor',
+    note: 'Some of it is landing, but the gaps are wide enough to cost you marks. Review how each triangle is built before drilling again.' },
+  { min: 0, label: 'Needs Review', tone: 'poor',
+    note: 'Go back to the Unit 2 notes on consumer and producer surplus first. More practice without review will not close a gap this size.' },
+];
+
+let helpMode = true;          // true = Helpful Surplus Review, false = AP Exam Difficulty
+let problemOrder = [];
+let problemIndex = 0;
+let stepIndex = 0;
+let answered = false;
+let optionOrder = [];               // display position -> index in step.options
+let score = { correct: 0, total: 0 };
+let perProblem = {};                // problem id -> { correct, total }, for the breakdown
+
+/* Fisher-Yates */
+function shuffledIndices(n){
+  const arr = [...Array(n).keys()];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function currentProblem(){ return PROBLEMS[problemOrder[problemIndex]]; }
+
+function init(){
+  problemOrder = shuffledIndices(PROBLEMS.length);
+  problemIndex = 0;
+  score = { correct: 0, total: 0 };
+  perProblem = {};
+  PROBLEMS.forEach(p => perProblem[p.id] = { correct: 0, total: 0 });
+  showQuiz();
+  loadProblem();
+}
+
+function loadProblem(){
+  stepIndex = 0;
+  const problem = currentProblem();
+
+  document.getElementById('methodBadge').textContent = problem.method;
+  document.getElementById('scenarioText').textContent = problem.scenario;
+  renderContext();
+  document.getElementById('problemCount').textContent =
+    `Problem ${problemIndex + 1} of ${PROBLEMS.length}`;
+
+  const wrap = document.getElementById('tableWrap');
+  if(problem.table){
+    wrap.style.display = 'block';
+    document.getElementById('tableHead').innerHTML =
+      problem.table.cols.map(c => `<th>${c}</th>`).join('');
+    document.getElementById('tableBody').innerHTML = problem.table.rows
+      .map(r => '<tr>' + r.map((cell, i) =>
+        `<td class="${problem.table.colClass[i]}">${cell}</td>`).join('') + '</tr>')
+      .join('');
+  } else {
+    wrap.style.display = 'none';
+  }
+
+  const graphWrap = document.getElementById('graphWrap');
+  if(problem.graph === 'SURPLUS'){
+    graphWrap.style.display = 'block';
+    graphWrap.innerHTML = SURPLUS_GRAPH;
+  } else if(problem.graph === 'MARKET'){
+    graphWrap.style.display = 'block';
+    graphWrap.innerHTML = MARKET_GRAPH;
+  } else {
+    graphWrap.style.display = 'none';
+    graphWrap.innerHTML = '';
+  }
+
+  loadStep();
+}
+
+// The terms line (what the abbreviations stand for) always shows: the exam
+// writes those out in full, so knowing the notation is not a hint. The review
+// line -- formulas, method definitions, and the sign/classification rules --
+// is what "AP Exam Difficulty" takes away.
+function renderContext(){
+  const problem = currentProblem();
+  document.getElementById('formulaNote').innerHTML =
+    helpMode ? problem.terms + '<br>' + problem.review : problem.terms;
+  document.getElementById('modeHint').textContent = helpMode
+    ? 'Formulas and method reminders stay on screen.'
+    : 'Formulas and method reminders hidden, as on the exam.';
+  document.getElementById('modeReview').setAttribute('aria-pressed', String(helpMode));
+  document.getElementById('modeExam').setAttribute('aria-pressed', String(!helpMode));
+}
+
+function setMode(wantHelp){
+  if(helpMode === wantHelp) return;
+  helpMode = wantHelp;
+  renderContext();          // switches mid-problem without disturbing your place
+}
+
+document.getElementById('modeReview').addEventListener('click', () => setMode(true));
+document.getElementById('modeExam').addEventListener('click', () => setMode(false));
+
+function loadStep(){
+  answered = false;
+  const problem = currentProblem();
+  const step = problem.steps[stepIndex];
+
+  document.getElementById('stepCount').textContent =
+    `Step ${stepIndex + 1} of ${problem.steps.length}`;
+  document.getElementById('scoreBadge').textContent =
+    `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('promptText').textContent = step.prompt;
+  document.getElementById('feedback').classList.remove('show');
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  const lastStep = stepIndex === problem.steps.length - 1;
+  const lastProblem = problemIndex === PROBLEMS.length - 1;
+  nextBtn.textContent = !lastStep ? 'Next step'
+                      : lastProblem ? 'See your results'
+                      : 'Next problem';
+
+  // Shuffle the answer choices too, so the correct option is never in a fixed slot.
+  optionOrder = shuffledIndices(step.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(origIndex => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = step.options[origIndex];
+    btn.addEventListener('click', () => handleAnswer(step, origIndex, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+function handleAnswer(step, chosenIndex, btnEl){
+  if(answered) return;
+  answered = true;
+
+  const isCorrect = chosenIndex === step.correct;
+  score.total++;
+  if(isCorrect) score.correct++;
+  const tally = perProblem[currentProblem().id];
+  tally.total++;
+  if(isCorrect) tally.correct++;
+  document.getElementById('scoreBadge').textContent =
+    `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === step.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect
+    ? 'Correct.'
+    : `Not quite — the answer is "${step.options[step.correct]}."`;
+  verdict.className = 'feedback-verdict ' + (isCorrect ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = step.explain;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  const problem = currentProblem();
+  if(stepIndex < problem.steps.length - 1){
+    stepIndex++;
+    loadStep();
+  } else if(problemIndex < PROBLEMS.length - 1){
+    problemIndex++;
+    loadProblem();
+  } else {
+    showResults();      // bank finished -- stop here rather than wrapping round
+  }
+});
+
+function showQuiz(){
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('quizPanel').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+}
+
+function showResults(){
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('quizPanel').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(score.correct / score.total * 100);
+  const band = BANDS.find(b => pct >= b.min);
+
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  \u00b7  ${pct}%`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  // breakdown in the fixed teaching order, not the shuffled order they saw
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  PROBLEMS.forEach(p => {
+    const t = perProblem[p.id];
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${p.topic}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
