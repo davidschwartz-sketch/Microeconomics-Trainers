@@ -639,27 +639,28 @@ const PROBLEMS = [
     scenario: "The market for cable television subscriptions sits at the equilibrium in the diagram. Streaming services then get cheaper and better, and households increasingly use them instead.",
     terms: TERMS, review: REVIEW_ONE, graph: "SHIFT",
     table: { cols: ["", "What happened"], colClass: ["row-label", "wrap-cell"],
-             rows: [["Event", "Streaming services get cheaper and better, and households use them instead of cable"]] },
+             rows: [["Market", "Cable television subscriptions"],
+                    ["Event", "Streaming services get cheaper and better, and households use them instead of cable"]] },
     steps: [
-      { prompt: "Cheaper, better streaming changes the market for cable subscriptions. Which curve moves?",
+      { prompt: "Cheaper, better streaming changes the market for CABLE subscriptions. Which curve moves in the cable market?",
         options: ["Demand", "Supply", "Both curves at once", "Neither — the price of cable has not changed"], correct: 0,
         explain: "Streaming is a substitute for cable. A cheaper, better substitute means fewer households want cable at every price — a buyer-side factor, so demand moves." },
-      { prompt: "Which way does the demand curve move?",
+      { prompt: "Which way does the demand curve for cable subscriptions move?",
         options: ["Shifts left (a decrease in demand)", "Shifts right (an increase in demand)",
                   "Down along the existing demand curve", "Up along the existing demand curve"], correct: 0,
         explain: "Fewer subscriptions wanted at every possible price is a decrease in demand, so the whole curve moves left." },
-      { prompt: "Demand shifts left and supply does not move. What happens to the equilibrium price P*?",
+      { prompt: "Demand for cable shifts left, and the supply of cable does not move. What happens to the equilibrium price of a cable subscription?",
         options: ["It falls", "It rises", "It is unchanged", "It cannot be determined"], correct: 0,
         explain: "Demand slides left along a fixed supply curve, so the two now cross lower down. At the old price there would be a surplus of subscriptions, which pushes the price down." },
-      { prompt: "Demand shifts left and supply does not move. What happens to the equilibrium quantity Q*?",
+      { prompt: "Demand for cable shifts left, and the supply of cable does not move. What happens to the equilibrium quantity of cable subscriptions?",
         options: ["It falls", "It rises", "It is unchanged", "It cannot be determined"], correct: 0,
         explain: "Lower and further left: fewer subscriptions, at a lower price. A decrease in demand moves P* and Q* the same way, both down." },
-      { prompt: "Now a different market entirely: a new technology sharply cuts producers' costs. Which curve moves, and what happens to P* and Q*?",
+      { prompt: "Now change the story: suppose that instead of streaming improving, a new technology sharply cuts the costs of the CABLE providers themselves. Which curve moves, and what happens to P* and Q* in the cable market?",
         options: ["Supply shifts right; P* falls and Q* rises",
                   "Supply shifts right; P* rises and Q* rises",
                   "Demand shifts right; P* rises and Q* rises",
                   "Supply shifts left; P* rises and Q* falls"], correct: 0,
-        explain: "Lower costs make production more attractive at every price, so supply shifts right. Sliding right along a fixed demand curve, the curves cross lower and further out: P* falls while Q* rises. That is the fourth of the four cases, and the only one in which the price falls while the quantity rises." }
+        explain: "Lower costs make supplying cable more attractive at every price, so the supply of cable shifts right while demand stays where it is. Sliding right along a fixed demand curve, the curves cross lower and further out: P* falls while Q* rises. Of the four cases this is the only one in which the price falls and the quantity rises at the same time." }
     ]
   },
   {
@@ -725,7 +726,7 @@ const PROBLEMS = [
                   "Because quantity cannot be measured when two curves move at once",
                   "Because the rise in price cancels out both shifts",
                   "Because demand and supply shifts always offset each other in quantity"], correct: 0,
-        explain: "Less lumber available pushes the quantity traded down; more building pushes it up. Nothing in the question compares the two shifts, so the change in quantity cannot be signed. Notice this is the mirror image of the avocado case: there the price was ambiguous and the quantity determinate, here it is the other way round." },
+        explain: "Less lumber available pushes the quantity traded down; more building pushes it up. Nothing in the question compares the two shifts, so the change in quantity cannot be signed. Notice which way round it falls here: the two curves moved in OPPOSITE directions, and that is the case in which price is determinate and quantity is ambiguous." },
       { prompt: "You then learn that the hurricane's damage was far larger than the extra demand from the housing boom. What happens to Q*?",
         options: ["It falls, because the larger supply decrease decides the outcome",
                   "It rises, because demand increased as well",
@@ -762,10 +763,10 @@ const PROBLEMS = [
                   "Because the fall in price cancels out both shifts",
                   "Because quantity is always ambiguous whenever demand falls"], correct: 0,
         explain: "Fewer households wanting tickets pushes the quantity traded down; more screens available pushes it up. Without knowing which shift is larger, the change in quantity cannot be signed." },
-      { prompt: "One combination is left. In a different market, demand DECREASES and supply also DECREASES. Which variable is determinate?",
+      { prompt: "In a different market, demand DECREASES and supply also DECREASES. Which variable is determinate?",
         options: ["Q* falls, and P* is ambiguous", "P* falls, and Q* is ambiguous",
                   "Both P* and Q* are determinate", "Both P* and Q* are ambiguous"], correct: 0,
-        explain: "A demand decrease lowers both P* and Q*. A supply decrease raises P* but lowers Q*. They agree on quantity — both push it down, so Q* definitely falls — and disagree on price, so P* is ambiguous. That completes all four combinations, and the pattern is worth memorising: when the curves move in the SAME direction, quantity is determinate and price is ambiguous; when they move in OPPOSITE directions, price is determinate and quantity is ambiguous." }
+        explain: "A demand decrease lowers both P* and Q*. A supply decrease raises P* but lowers Q*. They agree on quantity — both push it down, so Q* definitely falls — and disagree on price, so P* is ambiguous. The pattern is worth holding on to: when the curves move in the SAME direction, quantity is determinate and price is ambiguous; when they move in OPPOSITE directions, price is determinate and quantity is ambiguous." }
     ]
   }
 ];
