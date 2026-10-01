@@ -627,11 +627,11 @@ const PROBLEMS = [
         options: ["$288", "$200", "$144", "$576"], correct: 0,
         explain: "Demand meets the price axis at $90, so the height is $90 − $66 = $24 over a base of 24. CS = 1/2 × 24 × 24 = $288, up from $200 before. The shortcut said 'up', and the arithmetic agrees." },
       { prompt: "What happened to producer surplus?",
-        options: ["It rose to $576, because the cost saving more than offsets the lower price",
-                  "It is unchanged at $400, because the price fell by exactly the cost saving",
-                  "It fell to $288, because sellers now receive a lower price",
-                  "It fell to $200, because a lower price must reduce the sellers' side"], correct: 0,
-        explain: "PS needs more care than CS here, because it is measured against the curve that MOVED. The new supply curve starts at $18, so the height is $66 − $18 = $48 over a base of 24: PS = 1/2 × 24 × 48 = $576, up from $400. Sellers receive $4 less per kilo but save $12 per kilo in costs and sell four more kilos. Note too that this shift was parallel — the supply slope is 2 before and after — which fixes both triangles by the quantity alone, so both had to rise once Q rose from 20 to 24." }
+        options: ["It rose to $576, primarily because the cost saving more than offsets the lower price",
+                  "It is unchanged at $400, primarily because the price fell by exactly the cost saving",
+                  "It fell to $288, primarily because sellers now receive a lower price",
+                  "It fell to $200, primarily because a lower price must reduce the sellers' side"], correct: 0,
+        explain: "PS needs more care than CS here, because it is measured against the curve that MOVED. The new supply curve starts at $18, so the height is $66 − $18 = $48 over a base of 24: PS = 1/2 × 24 × 48 = $576, up from $400. It is worth seeing where that $176 comes from. On each of the 20 kilos they were already selling the margin improves by $8 — the $12 cost saving less the $4 price cut — which is $160. The four extra kilos add the remaining $16, since each is worth less to a seller than the one before it. So the cost saving does most of the work, but the extra volume is a real part of it. The shift was also parallel, with a supply slope of 2 before and after, so the quantity alone fixes this triangle: 1/2 × 2 × 20² = $400 and 1/2 × 2 × 24² = $576." }
     ]
   },
   {
@@ -659,11 +659,11 @@ const PROBLEMS = [
         options: ["$256", "$400", "$512", "$128"], correct: 0,
         explain: "Demand meets the price axis at $80, so the height is $80 − $48 = $32 over a base of 16. CS = 1/2 × 16 × 32 = $256, down from $400." },
       { prompt: "What happened to producer surplus?",
-        options: ["It fell to $128, because the cost increase more than offsets the higher price",
-                  "It rose to $384, because sellers now receive a higher price",
-                  "It is unchanged at $200, because the price rose by exactly the cost increase",
-                  "It fell to $64, because both price and quantity worked against sellers"], correct: 0,
-        explain: "Sellers do receive $8 more per vase, which is tempting, but their costs rose $12 per vase and they sell four fewer. Measured against the new supply curve, which starts at $32, the height is $48 − $32 = $16 over a base of 16: PS = 1/2 × 16 × 16 = $128, down from $200. A higher price is not the same thing as a better position. The shift was parallel, with a supply slope of 1 before and after, which fixes both triangles by the quantity alone: once Q fell from 20 to 16, both surpluses had to fall." }
+        options: ["It fell to $128, primarily because the cost increase more than offsets the higher price",
+                  "It rose to $384, primarily because sellers now receive a higher price",
+                  "It is unchanged at $200, primarily because the price rose by exactly the cost increase",
+                  "It fell to $64, primarily because both price and quantity worked against sellers"], correct: 0,
+        explain: "Sellers do receive $8 more per vase, which is tempting, but their costs rose $12 per vase and they sell four fewer. Measured against the new supply curve, which starts at $32, the height is $48 − $32 = $16 over a base of 16: PS = 1/2 × 16 × 16 = $128, down from $200. Of that $72 loss, $64 is the margin on the 16 vases still being sold falling by $4 each — the $12 cost increase less the $8 price rise — and the remaining $8 is the four vases no longer made at all. A higher price is not the same thing as a better position. The shift was also parallel, with a supply slope of 1 before and after, so the quantity alone fixes this triangle: 1/2 × 1 × 20² = $200 and 1/2 × 1 × 16² = $128." }
     ]
   },
   {
