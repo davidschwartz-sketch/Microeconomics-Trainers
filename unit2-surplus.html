@@ -631,7 +631,7 @@ const PROBLEMS = [
                   "It is unchanged at $400, because the price fell by exactly the cost saving",
                   "It fell to $288, because sellers now receive a lower price",
                   "It fell to $200, because a lower price must reduce the sellers' side"], correct: 0,
-        explain: "PS needs more care than CS here, because it is measured against the curve that MOVED. The new supply curve starts at $18, so the height is $66 − $18 = $48 over a base of 24: PS = 1/2 × 24 × 48 = $576, up from $400. Sellers receive $4 less per kilo but save $12 per kilo in costs and sell four more kilos." }
+        explain: "PS needs more care than CS here, because it is measured against the curve that MOVED. The new supply curve starts at $18, so the height is $66 − $18 = $48 over a base of 24: PS = 1/2 × 24 × 48 = $576, up from $400. Sellers receive $4 less per kilo but save $12 per kilo in costs and sell four more kilos. Note too that this shift was parallel — the supply slope is 2 before and after — which fixes both triangles by the quantity alone, so both had to rise once Q rose from 20 to 24." }
     ]
   },
   {
@@ -663,7 +663,7 @@ const PROBLEMS = [
                   "It rose to $384, because sellers now receive a higher price",
                   "It is unchanged at $200, because the price rose by exactly the cost increase",
                   "It fell to $64, because both price and quantity worked against sellers"], correct: 0,
-        explain: "Sellers do receive $8 more per vase, which is tempting, but their costs rose $12 per vase and they sell four fewer. Measured against the new supply curve, which starts at $32, the height is $48 − $32 = $16 over a base of 16: PS = 1/2 × 16 × 16 = $128, down from $200. A higher price is not the same thing as a better position." }
+        explain: "Sellers do receive $8 more per vase, which is tempting, but their costs rose $12 per vase and they sell four fewer. Measured against the new supply curve, which starts at $32, the height is $48 − $32 = $16 over a base of 16: PS = 1/2 × 16 × 16 = $128, down from $200. A higher price is not the same thing as a better position. The shift was parallel, with a supply slope of 1 before and after, which fixes both triangles by the quantity alone: once Q fell from 20 to 16, both surpluses had to fall." }
     ]
   },
   {
@@ -683,17 +683,23 @@ const PROBLEMS = [
         explain: "114 − 2Q = 24 + Q gives 90 = 3Q, so Q* = 30 and P* = $54. Both the price and the quantity rose." },
       { prompt: "This time it is DEMAND that moved. Which surplus can you sign straight away, and which way does it go?",
         options: ["Producer surplus — supply has not moved, and sellers now sell more pairs at a higher price, so PS must rise",
-                  "Consumer surplus — buyers value the shoes more, so CS must rise",
+                  "Consumer surplus — buyers now pay a higher price, so CS must fall",
                   "Neither — both triangles have to be recomputed from scratch",
                   "Producer surplus — sellers face a higher price, so PS must fall"], correct: 0,
-        explain: "The rule does not change, only which curve it applies to. Demand shifted, so the supply curve is where it was, and the PS triangle sits above that unchanged curve and below the price. Price up and quantity up means the triangle grew on both dimensions. Consumer surplus rises here too, but signing it takes more care, because it is measured against the curve that moved." },
+        explain: "The rule does not change, only which curve it applies to. Demand shifted, so the supply curve is where it was, and the PS triangle sits above that unchanged curve and below the price. Price up and quantity up means the triangle grew on both dimensions. Consumer surplus rises here as well — a higher price does not by itself shrink it, because the demand curve moved up too — but establishing that takes an extra step, which is what the last part of this problem does." },
       { prompt: "Compute producer surplus after the demand increase.",
         options: ["$450", "$288", "$900", "$360"], correct: 0,
         explain: "Supply starts at $24, so the height is $54 − $24 = $30 over a base of 30. PS = 1/2 × 30 × 30 = $450, up from $288." },
       { prompt: "Compute consumer surplus after the demand increase.",
         options: ["$900, measured against the NEW demand curve", "$576, unchanged from before",
                   "$450, the same as producer surplus", "$720, measured against the old demand curve"], correct: 0,
-        explain: "The new demand curve meets the price axis at $114, so the height is $114 − $54 = $60 over a base of 30: CS = 1/2 × 30 × 60 = $900, up from $576. Note carefully what that comparison involves: surplus under the NEW demand curve set against surplus under the old one. When demand itself moves, the yardstick moves with it, which is exactly why producer surplus was the one to sign first." }
+        explain: "The new demand curve meets the price axis at $114, so the height is $114 − $54 = $60 over a base of 30: CS = 1/2 × 30 × 60 = $900, up from $576. Note carefully what that comparison involves: surplus under the NEW demand curve set against surplus under the old one — when demand moves, the yardstick moves with it." },
+      { prompt: "Both surpluses rose here. With straight-line curves, and a shift that leaves the slopes alone, was that guaranteed or a coincidence of these particular numbers?",
+        options: ["Guaranteed — on straight lines CS = 1/2 × (demand slope) × Q² and PS = 1/2 × (supply slope) × Q², so with the slopes unchanged both are decided by Q alone",
+                  "A coincidence — after a shift, CS and PS can easily move in opposite directions",
+                  "Guaranteed for a demand increase, but a supply increase can move the two in opposite directions",
+                  "It depends on which of the two curves is the steeper one"], correct: 0,
+        explain: "At quantity Q the CS triangle's height is the demand intercept minus the price, and on the line P = a − bQ that difference is exactly bQ. So CS = 1/2 × Q × bQ = 1/2 × b × Q². The same argument on the supply side gives PS = 1/2 × d × Q². A parallel shift changes neither slope, so both surpluses depend on nothing but Q — and Q rose from 24 to 30. Check it against what you just computed: CS = 1/2 × 2 × 24² = $576 then 1/2 × 2 × 30² = $900; PS = 1/2 × 1 × 24² = $288 then 1/2 × 1 × 30² = $450. Keep reasoning from the curve that did not move all the same: that rule survives a shift which also changes a slope, where this shortcut does not." }
     ]
   },
   {
@@ -820,9 +826,9 @@ const PROBLEMS = [
 /* ------------------------------------------------------------ state + helpers */
 /* Results bands. Banding uses the ROUNDED percentage -- the same number shown
    to the student -- so the label can never disagree with the figure beside it.
-   Raw-score ranges over this 53-question bank, checked in the scratch script:
-     Mastered 48-53 | Strong 43-47 | Developing 37-42 | Shaky 29-36 | below 29
-   Blind guessing on 4 options averages 13/53, which lands in the bottom band. */
+   Raw-score ranges over this 54-question bank, checked in the scratch script:
+     Mastered 49-54 | Strong 43-48 | Developing 38-42 | Shaky 30-37 | below 30
+   Blind guessing on 4 options averages 14/54, which lands in the bottom band. */
 const BANDS = [
   { min: 90, label: 'Mastered', tone: 'good',
     note: 'You can compute the surplus areas, size a deadweight loss, and say who gains from a shift. Treat this topic as secure.' },
