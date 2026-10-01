@@ -473,6 +473,7 @@ const PROBLEMS = [
   /* ----------------------------------------------------------------- P1 */
   {
     id: "P1",
+    pin: "first",
     topic: "Simple vs. midpoint method",
     method: "Simple method, then midpoint method",
     scenario: "Cedar Lane Bakery is looking at two points on the demand curve for its sourdough loaves. At $8 a loaf it sells 60 loaves a week; at $10 a loaf it sells 45.",
@@ -584,6 +585,7 @@ const PROBLEMS = [
   /* ----------------------------------------------------------------- P4 */
   {
     id: "P4",
+    pin: "last",
     topic: "Elasticity along a straight-line demand curve",
     method: "Midpoint method · straight-line demand curve",
     scenario: "Harborview Ferry sells day passes. Its demand curve is the straight line P = 16 − Q, where Q is measured in hundreds of passes per day. The slope of that line is identical at every point on it.",
@@ -908,10 +910,24 @@ function shuffledIndices(n){
   return arr;
 }
 
+/* Most problems shuffle, but a couple have a natural place in the sequence.
+   A problem marked pin:"first" always opens the bank -- the one that
+   establishes what the terms mean before anything is computed -- and
+   pin:"last" always closes it, for the problem that pulls the rest together
+   or reaches furthest. Everything between them shuffles exactly as before,
+   and the answer options still shuffle on every step regardless. */
+function buildProblemOrder(){
+  const first = [], middle = [], last = [];
+  PROBLEMS.forEach((p, i) => {
+    (p.pin === 'first' ? first : p.pin === 'last' ? last : middle).push(i);
+  });
+  return [...first, ...shuffledIndices(middle.length).map(k => middle[k]), ...last];
+}
+
 function currentProblem(){ return PROBLEMS[problemOrder[problemIndex]]; }
 
 function init(){
-  problemOrder = shuffledIndices(PROBLEMS.length);
+  problemOrder = buildProblemOrder();
   problemIndex = 0;
   score = { correct: 0, total: 0 };
   perProblem = {};

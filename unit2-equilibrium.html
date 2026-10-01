@@ -453,6 +453,7 @@ const REVIEW_TWO = '<b>When both curves move,</b> work out what each shift alone
 const PROBLEMS = [
   {
     id: "P1",
+    pin: "first",
     topic: "Solving for P* and Q* algebraically",
     method: "Algebra · set Qd = Qs",
     scenario: "Hollis Bagels faces the daily demand and supply equations below. P is the price in dollars per bagel and Q is the number of bagels.",
@@ -737,6 +738,7 @@ const PROBLEMS = [
   },
   {
     id: "P10",
+    pin: "last",
     topic: "Both curves shift — demand falls while supply rises",
     method: "Both curves shift · determinate vs. ambiguous",
     scenario: "The market for cinema tickets in one town sits at the equilibrium in the diagram. Two things then happen over the same year.",
@@ -809,10 +811,24 @@ function shuffledIndices(n){
   return arr;
 }
 
+/* Most problems shuffle, but a couple have a natural place in the sequence.
+   A problem marked pin:"first" always opens the bank -- the one that
+   establishes what the terms mean before anything is computed -- and
+   pin:"last" always closes it, for the problem that pulls the rest together
+   or reaches furthest. Everything between them shuffles exactly as before,
+   and the answer options still shuffle on every step regardless. */
+function buildProblemOrder(){
+  const first = [], middle = [], last = [];
+  PROBLEMS.forEach((p, i) => {
+    (p.pin === 'first' ? first : p.pin === 'last' ? last : middle).push(i);
+  });
+  return [...first, ...shuffledIndices(middle.length).map(k => middle[k]), ...last];
+}
+
 function currentProblem(){ return PROBLEMS[problemOrder[problemIndex]]; }
 
 function init(){
-  problemOrder = shuffledIndices(PROBLEMS.length);
+  problemOrder = buildProblemOrder();
   problemIndex = 0;
   score = { correct: 0, total: 0 };
   perProblem = {};
