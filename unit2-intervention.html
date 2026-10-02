@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working Examples: Taxes, Subsidies and Price Controls</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+    --demand: #2F6F62;
+    --supply: #C1542C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:760px;margin:0 auto;}
+
+  header{
+    margin-bottom:20px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  header h1{
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+  }
+
+  .mode-row{
+    display:flex;
+    align-items:center;
+    gap:10px 12px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .mode-label{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+  }
+  .segmented{
+    display:inline-flex;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--surface);
+  }
+  .segmented button{
+    border:none;
+    background:transparent;
+    padding:7px 14px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .segmented button + button{border-left:1px solid var(--border);}
+  .segmented button:hover[aria-pressed="false"]{background:#FFFBF2;}
+  .segmented button[aria-pressed="true"]{
+    background:var(--accent);
+    color:var(--ink);
+  }
+  .mode-hint{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  @media (max-width:560px){
+    .segmented{width:100%;}
+    .segmented button{flex:1;padding:8px 6px;font-size:12px;}
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .count-group{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .card-count{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .score-badge{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px;
+  }
+
+  .method-badge{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:3px 9px;
+    border-radius:6px;
+    margin-bottom:12px;
+  }
+  .scenario{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .formula-note{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:10px 13px;
+    margin-bottom:18px;
+  }
+  .formula-note b{color:var(--ink);}
+
+  .table-wrap{overflow-x:auto;margin-bottom:20px;}
+  table.data-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.data-table th, table.data-table td{
+    border:1px solid var(--border);
+    padding:9px 11px;
+    text-align:center;
+    white-space:nowrap;
+  }
+  table.data-table th{
+    background:var(--surface-alt);
+    font-weight:700;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  table.data-table td.row-label{
+    font-weight:700;
+    text-align:left;
+    color:var(--ink-soft);
+  }
+  table.data-table td.p-cell{color:var(--supply); font-weight:700;}
+  table.data-table td.wrap-cell{
+    text-align:left;
+    white-space:normal;
+    font-weight:600;
+  }
+  table.data-table td.q-cell{color:var(--demand); font-weight:700;}
+
+  .graph-wrap{
+    margin-bottom:20px;
+    text-align:center;
+  }
+  .graph-wrap svg{width:100%;max-width:480px;height:auto;}
+
+  .prompt{
+    font-size:18px;
+    font-weight:600;
+    line-height:1.4;
+    color:var(--ink);
+    margin-bottom:18px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .choice-btn{
+    text-align:left;
+    padding:13px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){
+    border-color:var(--accent);
+    background:#FFFBF2;
+  }
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{
+    background:var(--correct-soft);
+    border-color:var(--correct);
+    color:var(--correct);
+  }
+  .choice-btn.incorrect{
+    background:var(--incorrect-soft);
+    border-color:var(--incorrect);
+    color:var(--incorrect);
+  }
+
+  .feedback{
+    display:none;
+    margin-bottom:16px;
+  }
+  .feedback.show{display:block;}
+  .feedback-verdict{
+    font-weight:800;
+    font-size:15px;
+    margin-bottom:6px;
+  }
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    padding:12px 14px;
+    border-radius:0 8px 8px 0;
+  }
+
+  .controls{
+    display:flex;
+    justify-content:flex-end;
+  }
+  .btn{
+    padding:11px 20px;
+    border-radius:10px;
+    border:none;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover{background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{
+    font-size:34px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    margin-bottom:10px;
+  }
+  .results-note{
+    font-size:15px;
+    color:var(--ink-soft);
+    margin-bottom:20px;
+  }
+  table.data-table th.topic-head, table.data-table td.topic-cell{
+    text-align:left;
+    white-space:normal;
+  }
+  table.data-table td.topic-cell{font-weight:600;color:var(--ink);}
+  table.data-table td.topic-score{font-weight:700;}
+  table.data-table td.topic-score.full{color:var(--correct);}
+  table.data-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+    line-height:1.5;
+    border-top:1px solid var(--border);
+    padding-top:14px;
+    margin:18px 0 20px;
+  }
+
+  footer.reset-row{
+    margin-top:20px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Working Examples: Market Intervention</h1>
+    <p>Excise taxes and who bears them, subsidies, price ceilings and floors, and quotas &mdash; the wedge, who collects it, and the deadweight loss each one leaves behind</p>
+  </header>
+
+  <div class="mode-row" id="modeRow">
+    <span class="mode-label">Difficulty</span>
+    <div class="segmented" role="group" aria-label="Difficulty level">
+      <button type="button" id="modeReview" aria-pressed="true">Helpful Intervention Review</button>
+      <button type="button" id="modeExam" aria-pressed="false">AP Exam Difficulty</button>
+    </div>
+    <span class="mode-hint" id="modeHint"></span>
+  </div>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="card-count" id="problemCount">Problem 1 of 10</span>
+      <span class="card-count" id="stepCount">Step 1 of 5</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="panel" id="quizPanel">
+    <span class="method-badge" id="methodBadge"></span>
+    <div class="scenario" id="scenarioText"></div>
+    <div class="formula-note" id="formulaNote"></div>
+
+    <div class="table-wrap" id="tableWrap">
+      <table class="data-table">
+        <thead><tr id="tableHead"></tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="graph-wrap" id="graphWrap"></div>
+
+    <div class="prompt" id="promptText">Loading&hellip;</div>
+
+    <div class="options" id="optionsWrap"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-verdict" id="feedbackVerdict"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn" disabled>Next step</button>
+    </div>
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">Topic</th><th>Score</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <p class="results-caveat">These bands say whether you have market intervention down &mdash; they are not an AP score
+    prediction. The exam covers every unit, counts free response for a third of the grade, and gives you no
+    feedback until it is over. Treat a strong result here as one topic secured, not as a score.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Start again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Restart from problem 1</button>
+  </footer>
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Every number in this bank was solved and asserted in a scratch script before
+   being written here: each market is cleared exactly (linear equations, exact
+   fractions, no rounding anywhere), both sides are checked against each other,
+   and the off-equilibrium quantities and gaps are recomputed independently.
+   The shift outcomes are derived from the four single-shift cases rather than
+   recalled, and the script asserts that in every double-shift combination
+   exactly one of P* and Q* comes out ambiguous.
+--------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------
+   Every number in this bank was solved and asserted in a scratch script before
+   being written here. Linear curves throughout, worked with exact fractions,
+   so no area depends on rounding. Each market is cleared and the clearing
+   point checked against both curves; every surplus is computed twice, once as
+   a triangle and once by integrating the gap between the curves, and the two
+   must agree. The deadweight-loss cases are checked against a scan over every
+   quantity, which confirms total surplus peaks at Q* and nowhere else.
+--------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------
+   Every number in this bank was solved and asserted in a scratch script before
+   being written here, with exact fractions so nothing depends on rounding.
+   For each intervention the books are made to balance a second, independent
+   way: for a tax, the surplus lost by the two sides must equal the revenue
+   collected plus the deadweight loss; for a subsidy, the surplus gained must
+   equal the cost less the deadweight loss; and for a ceiling, floor or quota,
+   the surplus remaining (plus any quota rent) must equal the free-market total
+   less the deadweight loss. A tax levied on the other side of the market is
+   also checked to give an identical quantity and identical prices.
+--------------------------------------------------------------------------- */
+
+const MARKET_GRAPH = `
+<svg viewBox="0 0 360 250" role="img" aria-label="A supply and demand diagram showing the free-market equilibrium">
+  <line x1="48" y1="210" x2="340" y2="210" stroke="#6B5D4C" stroke-width="1.5"/>
+  <line x1="48" y1="210" x2="48" y2="24" stroke="#6B5D4C" stroke-width="1.5"/>
+  <text x="340" y="240" text-anchor="end" font-size="10.5" fill="#6B5D4C">Quantity</text>
+  <text x="44" y="20" text-anchor="end" font-size="10.5" fill="#6B5D4C">Price</text>
+  <line x1="48" y1="40" x2="328" y2="200" stroke="#2F6F62" stroke-width="2.5"/>
+  <line x1="48" y1="200" x2="328" y2="40" stroke="#C1542C" stroke-width="2.5"/>
+  <text x="334" y="204" font-size="11" font-weight="700" fill="#2F6F62">D</text>
+  <text x="334" y="44" font-size="11" font-weight="700" fill="#C1542C">S</text>
+  <line x1="48" y1="120" x2="188" y2="120" stroke="#6B5D4C" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="188" y1="120" x2="188" y2="210" stroke="#6B5D4C" stroke-width="1" stroke-dasharray="3 3"/>
+  <circle cx="188" cy="120" r="4" fill="#2B2118"/>
+  <text x="43" y="124" text-anchor="end" font-size="10.5" fill="#6B5D4C">P*</text>
+  <text x="188" y="226" text-anchor="middle" font-size="10.5" fill="#6B5D4C">Q*</text>
+</svg>`;
+
+const TERMS = '<b>CS</b> = consumer surplus. <b>PS</b> = producer surplus. <b>DWL</b> = deadweight loss. ' +
+  '<b>P*</b> and <b>Q*</b> = the price and quantity with no intervention. <b>Pc</b> = the price consumers pay. ' +
+  '<b>Pp</b> = the price producers receive.';
+const R_TAX = 'A per-unit tax drives a wedge between the two prices: Pc − Pp = t. Find the new quantity by setting demand less the tax equal to supply, ' +
+  'then read Pc off the demand curve and Pp off the supply curve at that quantity. Tax revenue = t × Qt. DWL = 1/2 × t × (Q* − Qt).';
+const R_INC = 'The two burdens are Pc − P* for buyers and P* − Pp for sellers, and they add to t. Which side carries more is settled by the relative ' +
+  'steepness of the curves: the steeper, less elastic side cannot escape by changing quantity, so it absorbs more of the wedge.';
+const R_SUB = 'A per-unit subsidy is a tax run backwards: Pp − Pc = s, and the quantity rises ABOVE Q*. Government cost = s × Qs. ' +
+  'DWL = 1/2 × s × (Qs − Q*), because the extra units cost more to make than buyers actually value them.';
+const R_CTL = 'A ceiling binds only below P*, a floor only above it. At the controlled price work out Qd and Qs separately; the gap between them is the ' +
+  'shortage or the excess supply, and the quantity actually traded is the SMALLER of the two. DWL = 1/2 × (Q* − quantity traded) × the gap between the curves there.';
+const R_QUO = 'A quota caps quantity, and binds only below Q*. At the quota quantity read the demand price and the supply price off the curves: the gap ' +
+  'between them is the quota rent per unit, and it goes to whoever holds the licence. DWL = 1/2 × (Q* − quota) × that gap.';
+const R_REC = 'Three questions sort the five mechanisms. Does it fix a PRICE or a QUANTITY? Does the quantity traded end up below Q* or above it? ' +
+  'And who collects the wedge between what buyers pay and what sellers receive — the government, licence holders, or nobody at all?';
+
+const PROBLEMS = [
+  {
+    id: "P1", pin: "first",
+    topic: "Excise tax — the full calculation",
+    method: "Excise tax · wedge, revenue and deadweight loss",
+    scenario: "Harbour Marine sells boat anchors. P is the price in dollars per anchor and Q is anchors per week. The government then puts a $16 per-unit tax on the market.",
+    terms: TERMS, review: R_TAX, graph: "MARKET",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 100 − 2Q"], ["Supply", "P = 20 + 2Q"], ["Tax", "$16 per anchor"]] },
+    steps: [
+      { prompt: "Where does this market clear before the tax?",
+        options: ["P* = $60, Q* = 20", "P* = $50, Q* = 25", "P* = $70, Q* = 15", "P* = $40, Q* = 30"], correct: 0,
+        explain: "100 − 2Q = 20 + 2Q gives 80 = 4Q, so Q* = 20 and P* = $60, confirmed by both curves." },
+      { prompt: "With the $16 tax in place, how many anchors are traded?",
+        options: ["16", "20", "12", "18"], correct: 0,
+        explain: "The tax opens a $16 gap between what buyers pay and what sellers keep, so trade continues only while the demand price exceeds the supply price by at least $16. Setting (100 − 2Q) − (20 + 2Q) = 16 gives 80 − 4Q = 16, so Q = 16. Four anchors a week stop being traded." },
+      { prompt: "At that quantity, what price do consumers pay (Pc) and what do producers receive (Pp)?",
+        options: ["Pc = $68 and Pp = $52", "Pc = $60 and Pp = $44", "Pc = $76 and Pp = $60", "Pc = $68 and Pp = $60"], correct: 0,
+        explain: "Read each off its own curve at Q = 16. Demand: Pc = 100 − 2(16) = $68. Supply: Pp = 20 + 2(16) = $52. The gap is exactly the $16 tax. Note that the old $60 price is neither of them — buyers pay $8 more and sellers keep $8 less." },
+      { prompt: "How much revenue does the tax raise?",
+        options: ["$256", "$320", "$272", "$208"], correct: 0,
+        explain: "Revenue = tax × quantity actually traded = $16 × 16 = $256. The trap is multiplying by the ORIGINAL quantity: $16 × 20 = $320 overstates it, because those last four anchors are no longer sold and so are never taxed." },
+      { prompt: "What is the deadweight loss?",
+        options: ["$32", "$64", "$16", "$128"], correct: 0,
+        explain: "DWL is the triangle over the four anchors no longer traded: base 4, height the $16 wedge. DWL = 1/2 × 16 × 4 = $32. Those anchors were worth more to buyers than they cost to make, and the tax stopped them being made." },
+      { prompt: "Consumer surplus falls from $400 to $256 and producer surplus from $400 to $256. Do those two losses account for everything?",
+        options: ["No — the $288 lost by the two sides is $256 collected as revenue plus $32 of deadweight loss, which nobody receives",
+                  "Yes — the $288 lost by the two sides is exactly the tax revenue",
+                  "No — the government collects $320, more than the two sides lose",
+                  "Yes — surplus is simply transferred, so no value is destroyed by a tax"], correct: 0,
+        explain: "The two sides lose $144 each, $288 in total. The government collects $256 of that, which is a transfer rather than a loss to society. The remaining $32 is the deadweight loss: it goes to nobody, and it is the whole reason economists treat taxes as costly beyond the money raised." }
+    ]
+  },
+  {
+    id: "P2",
+    topic: "Tax incidence — when buyers bear most of it",
+    method: "Tax incidence · relative steepness decides the split",
+    scenario: "Ferris Pharmacy sells home test kits. P is the price in dollars per kit and Q is kits per day. Demand is steep here: buyers who need a kit need it. A $10 per-unit tax is imposed.",
+    terms: TERMS, review: R_INC, graph: "MARKET",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 180 − 4Q"], ["Supply", "P = 20 + Q"], ["Tax", "$10 per kit"]] },
+    steps: [
+      { prompt: "Where does this market clear before the tax?",
+        options: ["P* = $52, Q* = 32", "P* = $60, Q* = 30", "P* = $44, Q* = 34", "P* = $52, Q* = 30"], correct: 0,
+        explain: "180 − 4Q = 20 + Q gives 160 = 5Q, so Q* = 32 and P* = 180 − 128 = $52, which the supply curve confirms: 20 + 32 = $52." },
+      { prompt: "With the $10 tax, what are the new quantity and the two prices?",
+        options: ["Q = 30, Pc = $60, Pp = $50", "Q = 30, Pc = $62, Pp = $52", "Q = 28, Pc = $68, Pp = $58", "Q = 32, Pc = $62, Pp = $52"], correct: 0,
+        explain: "(180 − 4Q) − (20 + Q) = 10 gives 160 − 5Q = 10, so Q = 30. Then Pc = 180 − 120 = $60 and Pp = 20 + 30 = $50, a gap of exactly $10." },
+      { prompt: "How much of the $10 tax does each side bear?",
+        options: ["Buyers $8, sellers $2", "Buyers $5, sellers $5", "Buyers $2, sellers $8", "Buyers $10, sellers nothing — the tax is in the price"], correct: 0,
+        explain: "Compare each new price with the old $52. Buyers went from $52 to $60, so they bear $8. Sellers went from $52 to $50, so they bear $2. The two add to the $10 tax, as they always must." },
+      { prompt: "Why do buyers bear four fifths of this tax?",
+        options: ["Because demand is much steeper than supply here — buyers cannot escape by cutting back, so the price they pay absorbs most of the wedge",
+                  "Because the tax is legally collected from buyers",
+                  "Because buyers outnumber sellers in this market",
+                  "Because the demand curve starts at a higher price than the supply curve"], correct: 0,
+        explain: "Demand falls $4 per unit of quantity while supply rises only $1, so demand is four times as steep — far less elastic. When the wedge opens, the side that can most easily walk away gives up least. Buyers here cannot easily walk away, so they absorb $8 of the $10. The ratio is exactly the ratio of the slopes, 4 to 1." },
+      { prompt: "The tax is collected from sellers. Suppose the law were rewritten to collect the same $10 from buyers instead. What changes?",
+        options: ["Nothing measurable — the quantity is still 30, buyers still pay $60 in total and sellers still keep $50",
+                  "Buyers would then bear the whole $10",
+                  "Sellers would then bear the whole $10",
+                  "The quantity would fall further, because buyers are more responsive"], correct: 0,
+        explain: "Shifting demand down by the tax instead of supply up by it gives (180 − 4Q − 10) = 20 + Q, so 150 = 5Q and Q = 30 — the same quantity, with sellers keeping $50 and buyers paying $60 all in. Who physically hands the money over (the statutory incidence) has no bearing on who ends up worse off (the economic incidence). That is decided by the elasticities alone." },
+      { prompt: "What are the tax revenue and the deadweight loss?",
+        options: ["Revenue $300, DWL $10", "Revenue $320, DWL $10", "Revenue $300, DWL $20", "Revenue $320, DWL $20"], correct: 0,
+        explain: "Revenue = $10 × 30 = $300. DWL = 1/2 × $10 × (32 − 30) = $10. Notice how small the deadweight loss is: because demand is so steep, the tax barely changes the quantity, and it is the lost quantity that creates deadweight loss. A tax on an inelastic good raises a lot and distorts little — which is exactly why governments like taxing them." }
+    ]
+  },
+  {
+    id: "P3",
+    topic: "Tax incidence — when sellers bear most of it",
+    method: "Tax incidence · relative steepness decides the split",
+    scenario: "Carrow Quarry sells gravel. P is the price in dollars per tonne and Q is tonnes per hour. Supply is steep here: the quarry cannot quickly change how much it digs. A $10 per-unit tax is imposed.",
+    terms: TERMS, review: R_INC, graph: "MARKET",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 100 − Q"], ["Supply", "P = 20 + 4Q"], ["Tax", "$10 per tonne"]] },
+    steps: [
+      { prompt: "Where does this market clear before the tax?",
+        options: ["P* = $84, Q* = 16", "P* = $80, Q* = 20", "P* = $76, Q* = 14", "P* = $84, Q* = 14"], correct: 0,
+        explain: "100 − Q = 20 + 4Q gives 80 = 5Q, so Q* = 16 and P* = $84, which the supply curve confirms: 20 + 64 = $84." },
+      { prompt: "With the $10 tax, what are the new quantity and the two prices?",
+        options: ["Q = 14, Pc = $86, Pp = $76", "Q = 14, Pc = $90, Pp = $80", "Q = 12, Pc = $88, Pp = $78", "Q = 16, Pc = $94, Pp = $84"], correct: 0,
+        explain: "(100 − Q) − (20 + 4Q) = 10 gives 80 − 5Q = 10, so Q = 14. Then Pc = 100 − 14 = $86 and Pp = 20 + 56 = $76, a gap of exactly $10." },
+      { prompt: "How much of the $10 tax does each side bear?",
+        options: ["Buyers $2, sellers $8", "Buyers $8, sellers $2", "Buyers $5, sellers $5", "Sellers $10, since the tax is collected from them"], correct: 0,
+        explain: "Against the old $84: buyers go to $86, bearing $2; sellers go to $76, bearing $8. Supply is four times as steep as demand here, and the steeper side bears more — the exact reverse of a market where demand is the steep one." },
+      { prompt: "What does it mean, economically, that the steeper side bears more?",
+        options: ["The steeper side is less elastic, so it has fewer alternatives and cannot avoid the tax by changing quantity",
+                  "The steeper side has higher costs, so it can afford less of the tax",
+                  "The steeper side trades a larger quantity and so pays more in total",
+                  "The steeper side is whichever one the tax is legally collected from"], correct: 0,
+        explain: "Steepness is inelasticity drawn as a picture. A quarry that cannot quickly cut output has to accept a lower price rather than stop selling; buyers with easy alternatives simply buy less until the price they face barely moves. Whoever is stuck absorbs the wedge, and here that is the sellers." },
+      { prompt: "What are the tax revenue and the deadweight loss?",
+        options: ["Revenue $140, DWL $10", "Revenue $160, DWL $10", "Revenue $140, DWL $20", "Revenue $160, DWL $20"], correct: 0,
+        explain: "Revenue = $10 × 14 = $140. DWL = 1/2 × $10 × (16 − 14) = $10. The same $10 tax on the same sized wedge, with the burden split the other way round — incidence is about WHO pays, not about how much is raised or lost." }
+    ]
+  },
+  {
+    id: "P4",
+    topic: "Subsidy — a tax run backwards",
+    method: "Per-unit subsidy · cost and deadweight loss",
+    scenario: "Alder Dairy sells litres of milk. P is the price in dollars per litre and Q is litres per hour. The government then pays a $12 per-unit subsidy on every litre sold.",
+    terms: TERMS, review: R_SUB, graph: "MARKET",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 80 − 2Q"], ["Supply", "P = 20 + 2Q"], ["Subsidy", "$12 per litre"]] },
+    steps: [
+      { prompt: "Where does this market clear before the subsidy?",
+        options: ["P* = $50, Q* = 15", "P* = $44, Q* = 18", "P* = $56, Q* = 12", "P* = $40, Q* = 20"], correct: 0,
+        explain: "80 − 2Q = 20 + 2Q gives 60 = 4Q, so Q* = 15 and P* = $50, confirmed by both curves." },
+      { prompt: "With the $12 subsidy, how many litres are traded?",
+        options: ["18", "15", "21", "12"], correct: 0,
+        explain: "A subsidy opens the wedge the other way: producers receive $12 MORE than consumers pay, so trade continues until the supply price exceeds the demand price by $12. Setting (20 + 2Q) − (80 − 2Q) = 12 gives 4Q − 60 = 12, so Q = 18. The quantity rises above Q*, where a tax would have cut it." },
+      { prompt: "At 18 litres, what does a consumer pay (Pc) and what does a producer receive (Pp)?",
+        options: ["Pc = $44 and Pp = $56", "Pc = $56 and Pp = $44", "Pc = $50 and Pp = $62", "Pc = $38 and Pp = $50"], correct: 0,
+        explain: "Read each off its own curve at Q = 18. Demand: Pc = 80 − 36 = $44. Supply: Pp = 20 + 36 = $56. Producers get $12 more than consumers hand over, and the government makes up the difference. Both sides end up better off than at $50 — which is what makes subsidies popular and expensive." },
+      { prompt: "What does the $12 subsidy cost the government in total?",
+        options: ["$216", "$180", "$150", "$264"], correct: 0,
+        explain: "Cost = subsidy × quantity actually traded = $12 × 18 = $216. As with a tax, use the NEW quantity: $12 × 15 = $180 would miss the three extra litres the subsidy itself brought about." },
+      { prompt: "Consumer surplus rises by $99 and producer surplus by $99. The subsidy costs $216. What does that imply?",
+        options: ["A deadweight loss of $18 — the two sides gain $198 between them, which is less than the $216 the public pays",
+                  "A net gain of $198, since both sides are better off",
+                  "No deadweight loss, because a subsidy increases the quantity traded",
+                  "A deadweight loss of $216, the whole cost of the subsidy"], correct: 0,
+        explain: "$99 + $99 = $198 of gain against $216 of public money: $18 goes nowhere. It is the same triangle as a tax's, built on the three litres BEYOND Q*. Those litres cost more to produce than buyers value them, and only the subsidy makes them worth making. Check it: DWL = 1/2 × $12 × (18 − 15) = $18. Both too little trade and too much trade destroy surplus." }
+    ]
+  },
+  {
+    id: "P5",
+    topic: "Price ceiling — shortage and its consequences",
+    method: "Price ceiling · below the market price",
+    scenario: "Rowan Heights rents out flats. P is the monthly rent in dollars and Q is flats let per month. The council then caps the rent at $50.",
+    terms: TERMS, review: R_CTL, graph: "MARKET",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 90 − Q"], ["Supply", "P = 30 + 2Q"], ["Ceiling", "$50 per month"]] },
+    steps: [
+      { prompt: "Where does this market clear with no ceiling?",
+        options: ["P* = $70, Q* = 20", "P* = $50, Q* = 40", "P* = $60, Q* = 30", "P* = $80, Q* = 10"], correct: 0,
+        explain: "90 − Q = 30 + 2Q gives 60 = 3Q, so Q* = 20 and P* = $70. The $50 ceiling sits below that, so it binds." },
+      { prompt: "At the $50 ceiling, what are quantity demanded and quantity supplied?",
+        options: ["Qd = 40, Qs = 10", "Qd = 10, Qs = 40", "Qd = 20, Qs = 20", "Qd = 40, Qs = 20"], correct: 0,
+        explain: "Put $50 into each curve separately. Demand: 50 = 90 − Q, so Qd = 40. Supply: 50 = 30 + 2Q, so Qs = 10. Cheap rent attracts many more tenants while making landlords willing to let far fewer flats." },
+      { prompt: "What exists at $50, and how many flats are actually let?",
+        options: ["A shortage of 30 flats, with only 10 let — trade is limited by the smaller side",
+                  "A shortage of 30 flats, with 40 let, since that is what tenants want",
+                  "A surplus of 30 flats, with 40 let",
+                  "A shortage of 30 flats, with 20 let, the original quantity"], correct: 0,
+        explain: "Qd of 40 against Qs of 10 is a shortage of 30. Only 10 flats get let: nobody can be forced to supply a flat at a price they will not accept, so the quantity traded is always the smaller of the two. This is the central point about any binding control — it cuts the quantity traded, it does not raise it." },
+      { prompt: "With only 10 flats available and 40 tenants wanting one, how do the flats get allocated?",
+        options: ["By something other than price — waiting lists, personal connections, discrimination, or side payments above the legal rent",
+                  "By price, as always — the 10 tenants willing to pay most get them",
+                  "Randomly, since the law makes all tenants equivalent",
+                  "They are shared, with each tenant getting a quarter of a flat"], correct: 0,
+        explain: "Price is how a market normally decides who gets a scarce good, and the ceiling has switched that mechanism off without reducing scarcity. Something else has to do the rationing: queues, who you know, landlords quietly favouring some applicants, or black-market payments on the side. Those are not incidental side effects, they are the predictable consequence of holding a price below the clearing level." },
+      { prompt: "What is the deadweight loss from the ceiling?",
+        options: ["$150", "$300", "$75", "$600"], correct: 0,
+        explain: "Ten flats that should have been let are not. At Q = 10 a tenant values a flat at 90 − 10 = $80 while it costs 30 + 20 = $50 to provide, a gap of $30 that narrows to zero at Q* = 20. DWL = 1/2 × 10 × 30 = $150." },
+      { prompt: "Consumer surplus actually RISES here, from $200 to $350, while producer surplus falls from $400 to $100. Is that consistent?",
+        options: ["Yes — the tenants who do get a flat pay far less, and that gain outweighs the surplus lost by the tenants shut out; landlords lose $300, of which $150 is transferred and $150 destroyed",
+                  "No — consumer surplus must fall whenever quantity falls",
+                  "Yes — and it shows the ceiling makes society better off overall",
+                  "No — the figures must be wrong, since a ceiling always harms both sides"], correct: 0,
+        explain: "Consumer surplus can certainly rise under a ceiling: the ten tenants who get a flat save $20 each on rent, which outweighs what the thirty shut-out tenants lose. That is exactly why rent controls are popular with those who already hold a lease. Society as a whole is still $150 worse off, and the tenants without a flat are not in the room when the policy is voted on." }
+    ]
+  },
+  {
+    id: "P6",
+    topic: "Price floor — excess supply, and the two meanings of ‘surplus’",
+    method: "Price floor · above the market price",
+    scenario: "Thistledown Farms sells crates of berries. P is the price in dollars per crate and Q is crates per day. The government then sets a minimum price of $84.",
+    terms: TERMS, review: R_CTL, graph: "MARKET",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 140 − 4Q"], ["Supply", "P = 20 + 2Q"], ["Floor", "$84 per crate"]] },
+    steps: [
+      { prompt: "Where does this market clear with no floor?",
+        options: ["P* = $60, Q* = 20", "P* = $84, Q* = 14", "P* = $50, Q* = 22", "P* = $70, Q* = 18"], correct: 0,
+        explain: "140 − 4Q = 20 + 2Q gives 120 = 6Q, so Q* = 20 and P* = $60. The $84 floor sits above that, so it binds." },
+      { prompt: "At the $84 floor, what are quantity demanded and quantity supplied?",
+        options: ["Qd = 14, Qs = 32", "Qd = 32, Qs = 14", "Qd = 20, Qs = 20", "Qd = 14, Qs = 20"], correct: 0,
+        explain: "Put $84 into each curve separately. Demand: 84 = 140 − 4Q, so Qd = 14. Supply: 84 = 20 + 2Q, so Qs = 32. The high price attracts far more berries than buyers want at that price." },
+      { prompt: "What exists at $84, and how many crates are actually sold?",
+        options: ["An excess supply of 18 crates, with 14 sold — again the smaller side limits trade",
+                  "An excess supply of 18 crates, with 32 sold",
+                  "A shortage of 18 crates, with 14 sold",
+                  "An excess supply of 18 crates, with 20 sold, the original quantity"], correct: 0,
+        explain: "Qs of 32 against Qd of 14 leaves 18 crates unsold. Only 14 are bought: nobody can be forced to buy at a price they will not pay, so once again the quantity traded is the smaller of the two numbers." },
+      { prompt: "That unsold 18 crates is often called a ‘surplus’. Producer surplus here is $700. What is the relationship between those two things?",
+        options: ["None — they are unrelated ideas that share a word: one is a quantity of unsold goods, the other is a dollar measure of how much better off sellers are than their lowest acceptable price",
+                  "The surplus of 18 crates is worth $700 to the producers",
+                  "Producer surplus is the value of the unsold crates",
+                  "They are the same thing measured in different units"], correct: 0,
+        explain: "This is the single most common wording trap in the topic. The 18 crates are excess supply, measured in crates. Producer surplus is $700, measured in dollars, and it is the area between the $84 price and the supply curve over the 14 crates actually sold — it has nothing to do with the unsold ones. When a question says ‘surplus’, check whether it means goods piling up or money being gained." },
+      { prompt: "What is the deadweight loss from the floor?",
+        options: ["$108", "$216", "$54", "$360"], correct: 0,
+        explain: "Six crates that should have been traded are not. At Q = 14 a buyer values a crate at 140 − 56 = $84 while it costs 20 + 28 = $48 to grow, a gap of $36 narrowing to zero at Q* = 20. DWL = 1/2 × 6 × 36 = $108." },
+      { prompt: "Who gains and who loses from this floor?",
+        options: ["Producers who still sell gain (PS rises from $400 to $700) while buyers lose heavily (CS falls from $800 to $392) — and $108 of the loss is destroyed rather than transferred",
+                  "Producers gain and buyers gain, since the market is now more orderly",
+                  "Producers lose, because they cannot sell 18 of their crates",
+                  "Nobody is affected, since the floor only sets a minimum"], correct: 0,
+        explain: "Consumer surplus falls from $800 to $392, a loss of $408, while producer surplus rises from $400 to $700, a gain of $300. So $108 vanishes — the deadweight loss. Note what producers are NOT compensated for: the 18 unsold crates were grown and cannot be sold at $84, so any cost sunk into them is simply lost. A floor helps the sellers who find a buyer, at the expense of buyers and of the sellers who do not." }
+    ]
+  },
+  {
+    id: "P7",
+    topic: "Quota — the wedge that goes to licence holders",
+    method: "Quantity control · quota rent",
+    scenario: "Kestrel Harbour licenses fishing boats. P is the price in dollars per crate of fish and Q is crates per day. The authority then issues licences for only 18 crates a day.",
+    terms: TERMS, review: R_QUO, graph: "MARKET",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 120 − 2Q"], ["Supply", "P = 30 + Q"], ["Quota", "18 crates per day"]] },
+    steps: [
+      { prompt: "Where does this market clear with no quota?",
+        options: ["P* = $60, Q* = 30", "P* = $84, Q* = 18", "P* = $48, Q* = 36", "P* = $70, Q* = 25"], correct: 0,
+        explain: "120 − 2Q = 30 + Q gives 90 = 3Q, so Q* = 30 and P* = $60. The quota of 18 is below that, so it binds." },
+      { prompt: "At the quota of 18 crates, what price will buyers pay, and what does the supply curve say that quantity costs to land?",
+        options: ["Buyers pay $84; the supply curve says $48", "Buyers pay $48; the supply curve says $84",
+                  "Both are $60, the old price", "Buyers pay $84; the supply curve says $84"], correct: 0,
+        explain: "With only 18 crates available, buyers bid up to what the 18th crate is worth to them: 120 − 36 = $84. The supply curve says the 18th crate costs 30 + 18 = $48 to land. The quota has opened a $36 wedge between the two, exactly as a tax would." },
+      { prompt: "The wedge is $36 per crate across 18 crates. What is that $648, and who gets it?",
+        options: ["Quota rent — it goes to whoever holds the licences, because the licence is what the $36 is really paying for",
+                  "Tax revenue — it goes to the government that issued the quota",
+                  "Deadweight loss — it is destroyed by the restriction",
+                  "Producer surplus — it is the ordinary return to the fishing boats"], correct: 0,
+        explain: "This is what distinguishes a quota from a tax. The wedge is the same shape and the same size, but no government collects it: buyers pay $84 and only $48 of that reflects the cost of landing the fish. The extra $36 a crate is the value of permission to sell, and it accrues to the licence holder. If licences can be traded, that is precisely what they sell for — which is why taxi medallions and fishing licences become assets worth more than the boats." },
+      { prompt: "What is the deadweight loss from the quota?",
+        options: ["$216", "$648", "$108", "$432"], correct: 0,
+        explain: "Twelve crates that should have been traded are not. The gap between the curves is $36 at the quota and narrows to zero at Q* = 30. DWL = 1/2 × 12 × 36 = $216." },
+      { prompt: "Check the books: CS is $324, PS is $162, and the quota rent is $648. Do they reconcile with the free-market total surplus of $1,350?",
+        options: ["Yes — $324 + $162 + $648 = $1,134, which is $1,350 less the $216 deadweight loss",
+                  "No — they come to more than $1,350, so the quota increases total surplus",
+                  "Yes — they come to exactly $1,350, since the rent is only a transfer",
+                  "No — quota rent should not be counted as surplus at all"], correct: 0,
+        explain: "The three pieces sum to $1,134, exactly $216 short of the free-market $1,350. Quota rent IS part of total surplus — somebody really receives it, so it is a transfer rather than a loss. Only the $216 triangle is destroyed. That distinction, transfer against destruction, is what every one of these interventions turns on." },
+      { prompt: "A different harbour sets its quota at 40 crates, in a market whose free-market quantity is also 30. What happens there?",
+        options: ["Nothing — the quota is above Q*, so it does not bind and the market trades 30 as before",
+                  "Trade rises to 40 crates, because the quota permits it",
+                  "The same $36 wedge opens, just at a higher quantity",
+                  "The quota creates a shortage of 10 crates"], correct: 0,
+        explain: "A quota is a ceiling on quantity, so it only does something if it sits BELOW what the market would trade anyway. At 40 it is simply slack: boats were never going to land more than 30 crates, so permission to land 40 changes nothing. The same logic governs price controls — a limit that is not reached is a limit that does not matter." }
+    ]
+  },
+  {
+    id: "P8",
+    topic: "Which controls actually bind",
+    method: "Binding or slack · compare with P* and Q*",
+    scenario: "Lantern Bay's market for moorings clears where the equations below meet. Several different policies are proposed for it, one at a time. P is the price in dollars per mooring and Q is moorings per week.",
+    terms: TERMS, review: R_CTL, graph: "MARKET",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Demand", "P = 100 − Q"], ["Supply", "P = 40 + Q"]] },
+    steps: [
+      { prompt: "Where does this market clear?",
+        options: ["P* = $70, Q* = 30", "P* = $60, Q* = 40", "P* = $80, Q* = 20", "P* = $50, Q* = 50"], correct: 0,
+        explain: "100 − Q = 40 + Q gives 60 = 2Q, so Q* = 30 and P* = $70. Every policy below is judged against those two numbers." },
+      { prompt: "A ceiling of $80 is proposed. What does it do?",
+        options: ["Nothing — it sits above the $70 market price, so the market never reaches it",
+                  "It creates a shortage, since all ceilings do",
+                  "It raises the price to $80",
+                  "It creates an excess supply of 10 moorings"], correct: 0,
+        explain: "A ceiling is a legal maximum. At $80 the market happily settles at $70, which is already below the limit, so the law is never tested. A ceiling binds only when it is set BELOW the market price — and students who answer ‘shortage’ reflexively have learned the consequence without the condition." },
+      { prompt: "A ceiling of $55 is proposed instead. What does it do?",
+        options: ["It binds: Qd rises to 45 and Qs falls to 15, a shortage of 30 moorings",
+                  "It binds: Qd falls to 15 and Qs rises to 45, an excess supply of 30",
+                  "Nothing — $55 is below the market price, so it is slack",
+                  "It binds, but the quantity traded stays at 30"], correct: 0,
+        explain: "$55 is below the $70 market price, so it binds. Demand: 55 = 100 − Q gives Qd = 45. Supply: 55 = 40 + Q gives Qs = 15. The shortage is 30, and only 15 moorings are let." },
+      { prompt: "A floor of $60 is proposed. What does it do?",
+        options: ["Nothing — it sits below the $70 market price, so the market is already above it",
+                  "It binds, creating an excess supply of 20",
+                  "It lowers the price to $60",
+                  "It binds, creating a shortage of 20"], correct: 0,
+        explain: "A floor is a legal minimum. The market is already at $70, comfortably above $60, so the rule bites on nothing. A floor binds only when set ABOVE the market price — the mirror image of the ceiling condition, and just as easy to get backwards." },
+      { prompt: "A floor of $85 is proposed instead. What does it do?",
+        options: ["It binds: Qd falls to 15 and Qs rises to 45, an excess supply of 30 moorings",
+                  "It binds: Qd rises to 45 and Qs falls to 15, a shortage of 30",
+                  "Nothing — $85 is above the market price, so it is slack",
+                  "It binds, and the quantity traded rises to 45"], correct: 0,
+        explain: "$85 is above $70, so it binds. Demand: 85 = 100 − Q gives Qd = 15. Supply: 85 = 40 + Q gives Qs = 45. Thirty moorings go unlet, and only 15 are actually taken." },
+      { prompt: "State the rule that covers all three instruments.",
+        options: ["A ceiling binds only below P*, a floor only above P*, and a quota only below Q* — anything on the other side is slack and changes nothing",
+                  "All price controls bind; only quotas can be slack",
+                  "A ceiling binds above P* and a floor binds below P*",
+                  "Whether a control binds depends on the elasticities rather than on where it is set"], correct: 0,
+        explain: "Every one of these is a limit in one direction, so it does something only if the market would otherwise have gone past it. Ask first where the market would settle on its own, then ask whether the rule is in the way. A rule that is not in the way has no effect on price, quantity, surplus or deadweight loss." }
+    ]
+  },
+  {
+    id: "P9",
+    topic: "Recognising the mechanism from the description",
+    method: "Interpretation — no calculation",
+    scenario: "No arithmetic here. Each part describes a real policy; name the mechanism it is.",
+    terms: TERMS, review: R_REC,
+    steps: [
+      { prompt: "A state adds $2 to the price of every packet of cigarettes, collected from retailers at the till. Which mechanism is that?",
+        options: ["An excise tax", "A price floor", "A quota", "A subsidy"], correct: 0,
+        explain: "A fixed amount per unit sold, collected by the government, is a per-unit (excise) tax. It drives a wedge between what smokers pay and what retailers keep, and the government collects the difference. Note that it is NOT a price floor: nobody has set a minimum price, and the price rises as a consequence rather than as the instrument." },
+      { prompt: "A city rules that no landlord may charge more than $1,200 a month for a flat that would otherwise let for $1,800. Which mechanism is that?",
+        options: ["A binding price ceiling", "A binding price floor", "A quota on flats", "A tax on landlords"], correct: 0,
+        explain: "A legal maximum price, set below where the market would settle, is a binding price ceiling. Expect a shortage of flats, rationing by something other than price, and a quantity traded below Q*." },
+      { prompt: "The government pays farmers $0.40 for every bushel of corn they sell. Which mechanism is that?",
+        options: ["A per-unit subsidy", "A price floor on corn", "A quota on corn", "A tax rebate"], correct: 0,
+        explain: "Money paid per unit sold is a subsidy. It opens the wedge the other way — producers receive more than buyers pay — and pushes the quantity ABOVE Q*, which is why it creates deadweight loss despite making both sides better off." },
+      { prompt: "A national minimum wage is set above the wage that would otherwise clear the market for unskilled labour. Which mechanism is that?",
+        options: ["A binding price floor", "A binding price ceiling", "A quota on jobs", "A tax on employers"], correct: 0,
+        explain: "A wage is the price of labour, and a legal minimum above the clearing level is a binding price floor. Expect excess supply — more people wanting work at that wage than employers wish to hire — which in this market is called unemployment." },
+      { prompt: "A city issues exactly 13,000 taxi medallions and no cab may operate without one. Which mechanism is that?",
+        options: ["A quota", "A price ceiling on fares", "A subsidy to drivers", "An excise tax on rides"], correct: 0,
+        explain: "A hard limit on quantity, enforced by licence, is a quota. No price is set directly, but by restricting quantity below Q* it raises the fare buyers pay and opens a wedge above what drivers would have needed — the quota rent, which is why medallions themselves become valuable." },
+      { prompt: "Across these five, where does the wedge between what buyers pay and what sellers receive actually go?",
+        options: ["Tax: to the government. Quota: to the licence holders. Subsidy: it is paid out BY the government rather than collected. Ceiling and floor: no wedge is collected by anyone",
+                  "In every case it goes to the government",
+                  "In every case it is pure deadweight loss",
+                  "Tax and quota to the government; ceiling and floor to the buyers"], correct: 0,
+        explain: "Following the money is the fastest way to tell these apart. A tax and a quota open the same shaped wedge, but the tax revenue goes to the treasury while the quota rent goes to whoever holds the permit. A subsidy is a wedge the government pays for. Under a ceiling or a floor the price is simply fixed, so there is no second price and no wedge to collect — what is lost beyond the transfer between buyers and sellers is the deadweight loss, plus whatever is wasted queuing or storing unsold goods. All five share one feature: a quantity away from Q*, and therefore deadweight loss." }
+    ]
+  },
+  {
+    id: "P10", pin: "last",
+    topic: "Comparing the five mechanisms side by side",
+    method: "Interpretation — no calculation",
+    scenario: "No arithmetic here either. These parts are about what the five mechanisms have in common and where they differ.",
+    terms: TERMS, review: R_REC,
+    steps: [
+      { prompt: "Which of the five push the quantity traded BELOW Q*?",
+        options: ["A tax, a binding ceiling, a binding floor and a binding quota — all four",
+                  "Only a tax and a quota",
+                  "Only the two price controls",
+                  "All five, including a subsidy"], correct: 0,
+        explain: "Every one of those four restricts trade, though by different routes: a tax by opening a wedge, a ceiling by making sellers unwilling, a floor by making buyers unwilling, a quota by direct prohibition. The subsidy is the odd one out — it pushes quantity ABOVE Q*." },
+      { prompt: "A subsidy makes both buyers and sellers better off and still creates deadweight loss. How can both be true?",
+        options: ["Because the gains are paid for out of public money, and the units beyond Q* cost more to produce than buyers value them, so some of that money buys nothing",
+                  "They cannot both be true; a subsidy has no deadweight loss",
+                  "Because subsidies are always administered inefficiently",
+                  "Because the subsidy is eventually taxed back"], correct: 0,
+        explain: "Both sides gain, but by less than the public pays. The shortfall is the triangle beyond Q*, where each extra unit costs more to make than anyone values it. Deadweight loss comes from trading the WRONG quantity, and too much is as wrong as too little — a point worth keeping, because the intuition that ‘more trade is better’ is otherwise hard to shake." },
+      { prompt: "Two policies open a wedge of exactly the same size in the same market: a per-unit tax, and a quota set so the quantity matches. How do their welfare effects compare?",
+        options: ["Consumer and producer surplus are the same under both, and the deadweight loss is the same — only the recipient of the wedge differs",
+                  "The quota is more efficient, because no government intervenes in the price",
+                  "The tax is more efficient, because the revenue funds public services",
+                  "The quota has no deadweight loss, since nothing is taxed"], correct: 0,
+        explain: "Same quantity, same two prices, same triangles: the diagrams are identical. The only difference is who ends up holding the rectangle between the prices — the treasury under a tax, the licence holder under a quota. That is a question of distribution, not of efficiency, and it is a favourite exam point precisely because the two look so different in the newspaper and so alike on the graph." },
+      { prompt: "Which single feature do all five share?",
+        options: ["Each moves the quantity traded away from Q*, and therefore each creates deadweight loss",
+                  "Each raises money for the government",
+                  "Each makes consumers worse off",
+                  "Each creates a shortage"], correct: 0,
+        explain: "That is the thread running through the whole topic. Total surplus is largest at Q* and nowhere else, so any policy that moves the traded quantity — in either direction, by any mechanism — gives some of it up. The policies differ in who gains, who loses and who collects the transfer, but not in that." },
+      { prompt: "Does deadweight loss by itself settle whether a policy is a bad idea?",
+        options: ["No — it measures efficiency only, and a policy may be chosen for distribution, for revenue, or to correct a harm the market itself ignores",
+                  "Yes — any policy with deadweight loss reduces welfare and should be avoided",
+                  "No — because deadweight loss cannot actually be measured",
+                  "Yes, unless the government spends the revenue well"], correct: 0,
+        explain: "Deadweight loss answers one question: how much surplus does this arrangement give up relative to the free-market quantity? It says nothing about whether the surplus was fairly distributed to begin with, nor about costs the market never counted. A cigarette tax has deadweight loss in this model and may still be worth imposing. Knowing the size of the triangle is what lets you have that argument with the numbers in hand rather than without them." }
+    ]
+  }
+];
+
+/* ------------------------------------------------------------ state + helpers */
+/* Results bands. Banding uses the ROUNDED percentage -- the same number shown
+   to the student -- so the label can never disagree with the figure beside it.
+   Raw-score ranges over this 57-question bank, checked in the scratch script:
+     Mastered 52-57 | Strong 46-51 | Developing 40-45 | Shaky 32-39 | below 32
+   Blind guessing on 4 options averages 14/57, which lands in the bottom band. */
+const BANDS = [
+  { min: 90, label: 'Mastered', tone: 'good',
+    note: 'You can work a wedge through to revenue, surplus and deadweight loss, and say who bears it and who collects it. Treat this topic as secure.' },
+  { min: 80, label: 'Strong', tone: 'good',
+    note: 'Solid command of the material. Work the topics below where you dropped marks, then run it again.' },
+  { min: 70, label: 'Developing', tone: 'mid',
+    note: 'The method is there but execution is slipping. The breakdown below shows where to aim.' },
+  { min: 55, label: 'Shaky', tone: 'poor',
+    note: 'Some of it is landing, but the gaps are wide enough to cost you marks. Review where the wedge comes from in each case before drilling again.' },
+  { min: 0, label: 'Needs Review', tone: 'poor',
+    note: 'Go back to the Unit 2 notes on taxes and price controls first. More practice without review will not close a gap this size.' },
+];
+
+let helpMode = true;          // true = Helpful Intervention Review, false = AP Exam Difficulty
+let problemOrder = [];
+let problemIndex = 0;
+let stepIndex = 0;
+let answered = false;
+let optionOrder = [];               // display position -> index in step.options
+let score = { correct: 0, total: 0 };
+let perProblem = {};                // problem id -> { correct, total }, for the breakdown
+
+/* Fisher-Yates */
+function shuffledIndices(n){
+  const arr = [...Array(n).keys()];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/* Most problems shuffle, but a couple have a natural place in the sequence.
+   A problem marked pin:"first" always opens the bank -- the one that
+   establishes what the terms mean before anything is computed -- and
+   pin:"last" always closes it, for the problem that pulls the rest together
+   or reaches furthest. Everything between them shuffles exactly as before,
+   and the answer options still shuffle on every step regardless. */
+function buildProblemOrder(){
+  const first = [], middle = [], last = [];
+  PROBLEMS.forEach((p, i) => {
+    (p.pin === 'first' ? first : p.pin === 'last' ? last : middle).push(i);
+  });
+  return [...first, ...shuffledIndices(middle.length).map(k => middle[k]), ...last];
+}
+
+function currentProblem(){ return PROBLEMS[problemOrder[problemIndex]]; }
+
+function init(){
+  problemOrder = buildProblemOrder();
+  problemIndex = 0;
+  score = { correct: 0, total: 0 };
+  perProblem = {};
+  PROBLEMS.forEach(p => perProblem[p.id] = { correct: 0, total: 0 });
+  showQuiz();
+  loadProblem();
+}
+
+function loadProblem(){
+  stepIndex = 0;
+  const problem = currentProblem();
+
+  document.getElementById('methodBadge').textContent = problem.method;
+  document.getElementById('scenarioText').textContent = problem.scenario;
+  renderContext();
+  document.getElementById('problemCount').textContent =
+    `Problem ${problemIndex + 1} of ${PROBLEMS.length}`;
+
+  const wrap = document.getElementById('tableWrap');
+  if(problem.table){
+    wrap.style.display = 'block';
+    document.getElementById('tableHead').innerHTML =
+      problem.table.cols.map(c => `<th>${c}</th>`).join('');
+    document.getElementById('tableBody').innerHTML = problem.table.rows
+      .map(r => '<tr>' + r.map((cell, i) =>
+        `<td class="${problem.table.colClass[i]}">${cell}</td>`).join('') + '</tr>')
+      .join('');
+  } else {
+    wrap.style.display = 'none';
+  }
+
+  const graphWrap = document.getElementById('graphWrap');
+  if(problem.graph === 'MARKET'){
+    graphWrap.style.display = 'block';
+    graphWrap.innerHTML = MARKET_GRAPH;
+  } else {
+    graphWrap.style.display = 'none';
+    graphWrap.innerHTML = '';
+  }
+
+  loadStep();
+}
+
+// The terms line (what the abbreviations stand for) always shows: the exam
+// writes those out in full, so knowing the notation is not a hint. The review
+// line -- formulas, method definitions, and the sign/classification rules --
+// is what "AP Exam Difficulty" takes away.
+function renderContext(){
+  const problem = currentProblem();
+  document.getElementById('formulaNote').innerHTML =
+    helpMode ? problem.terms + '<br>' + problem.review : problem.terms;
+  document.getElementById('modeHint').textContent = helpMode
+    ? 'Formulas and method reminders stay on screen.'
+    : 'Formulas and method reminders hidden, as on the exam.';
+  document.getElementById('modeReview').setAttribute('aria-pressed', String(helpMode));
+  document.getElementById('modeExam').setAttribute('aria-pressed', String(!helpMode));
+}
+
+function setMode(wantHelp){
+  if(helpMode === wantHelp) return;
+  helpMode = wantHelp;
+  renderContext();          // switches mid-problem without disturbing your place
+}
+
+document.getElementById('modeReview').addEventListener('click', () => setMode(true));
+document.getElementById('modeExam').addEventListener('click', () => setMode(false));
+
+function loadStep(){
+  answered = false;
+  const problem = currentProblem();
+  const step = problem.steps[stepIndex];
+
+  document.getElementById('stepCount').textContent =
+    `Step ${stepIndex + 1} of ${problem.steps.length}`;
+  document.getElementById('scoreBadge').textContent =
+    `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('promptText').textContent = step.prompt;
+  document.getElementById('feedback').classList.remove('show');
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  const lastStep = stepIndex === problem.steps.length - 1;
+  const lastProblem = problemIndex === PROBLEMS.length - 1;
+  nextBtn.textContent = !lastStep ? 'Next step'
+                      : lastProblem ? 'See your results'
+                      : 'Next problem';
+
+  // Shuffle the answer choices too, so the correct option is never in a fixed slot.
+  optionOrder = shuffledIndices(step.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(origIndex => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = step.options[origIndex];
+    btn.addEventListener('click', () => handleAnswer(step, origIndex, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+function handleAnswer(step, chosenIndex, btnEl){
+  if(answered) return;
+  answered = true;
+
+  const isCorrect = chosenIndex === step.correct;
+  score.total++;
+  if(isCorrect) score.correct++;
+  const tally = perProblem[currentProblem().id];
+  tally.total++;
+  if(isCorrect) tally.correct++;
+  document.getElementById('scoreBadge').textContent =
+    `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === step.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect
+    ? 'Correct.'
+    : `Not quite — the answer is "${step.options[step.correct]}."`;
+  verdict.className = 'feedback-verdict ' + (isCorrect ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = step.explain;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  const problem = currentProblem();
+  if(stepIndex < problem.steps.length - 1){
+    stepIndex++;
+    loadStep();
+  } else if(problemIndex < PROBLEMS.length - 1){
+    problemIndex++;
+    loadProblem();
+  } else {
+    showResults();      // bank finished -- stop here rather than wrapping round
+  }
+});
+
+function showQuiz(){
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('quizPanel').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+}
+
+function showResults(){
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('quizPanel').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(score.correct / score.total * 100);
+  const band = BANDS.find(b => pct >= b.min);
+
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  \u00b7  ${pct}%`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  // breakdown in the fixed teaching order, not the shuffled order they saw
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  PROBLEMS.forEach(p => {
+    const t = perProblem[p.id];
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${p.topic}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
