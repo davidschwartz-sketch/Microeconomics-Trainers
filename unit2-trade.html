@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working Examples: Trade and Tariffs</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+    --demand: #2F6F62;
+    --supply: #C1542C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:760px;margin:0 auto;}
+
+  header{
+    margin-bottom:20px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  header h1{
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+  }
+
+  .mode-row{
+    display:flex;
+    align-items:center;
+    gap:10px 12px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .mode-label{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+  }
+  .segmented{
+    display:inline-flex;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--surface);
+  }
+  .segmented button{
+    border:none;
+    background:transparent;
+    padding:7px 14px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .segmented button + button{border-left:1px solid var(--border);}
+  .segmented button:hover[aria-pressed="false"]{background:#FFFBF2;}
+  .segmented button[aria-pressed="true"]{
+    background:var(--accent);
+    color:var(--ink);
+  }
+  .mode-hint{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  @media (max-width:560px){
+    .segmented{width:100%;}
+    .segmented button{flex:1;padding:8px 6px;font-size:12px;}
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .count-group{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .card-count{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .score-badge{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px;
+  }
+
+  .method-badge{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:3px 9px;
+    border-radius:6px;
+    margin-bottom:12px;
+  }
+  .scenario{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .formula-note{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:10px 13px;
+    margin-bottom:18px;
+  }
+  .formula-note b{color:var(--ink);}
+
+  .table-wrap{overflow-x:auto;margin-bottom:20px;}
+  table.data-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.data-table th, table.data-table td{
+    border:1px solid var(--border);
+    padding:9px 11px;
+    text-align:center;
+    white-space:nowrap;
+  }
+  table.data-table th{
+    background:var(--surface-alt);
+    font-weight:700;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  table.data-table td.row-label{
+    font-weight:700;
+    text-align:left;
+    color:var(--ink-soft);
+  }
+  table.data-table td.p-cell{color:var(--supply); font-weight:700;}
+  table.data-table td.wrap-cell{
+    text-align:left;
+    white-space:normal;
+    font-weight:600;
+  }
+  table.data-table td.q-cell{color:var(--demand); font-weight:700;}
+
+  .graph-wrap{
+    margin-bottom:20px;
+    text-align:center;
+  }
+  .graph-wrap svg{width:100%;max-width:480px;height:auto;}
+
+  .prompt{
+    font-size:18px;
+    font-weight:600;
+    line-height:1.4;
+    color:var(--ink);
+    margin-bottom:18px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .choice-btn{
+    text-align:left;
+    padding:13px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){
+    border-color:var(--accent);
+    background:#FFFBF2;
+  }
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{
+    background:var(--correct-soft);
+    border-color:var(--correct);
+    color:var(--correct);
+  }
+  .choice-btn.incorrect{
+    background:var(--incorrect-soft);
+    border-color:var(--incorrect);
+    color:var(--incorrect);
+  }
+
+  .feedback{
+    display:none;
+    margin-bottom:16px;
+  }
+  .feedback.show{display:block;}
+  .feedback-verdict{
+    font-weight:800;
+    font-size:15px;
+    margin-bottom:6px;
+  }
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    padding:12px 14px;
+    border-radius:0 8px 8px 0;
+  }
+
+  .controls{
+    display:flex;
+    justify-content:flex-end;
+  }
+  .btn{
+    padding:11px 20px;
+    border-radius:10px;
+    border:none;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover{background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{
+    font-size:34px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    margin-bottom:10px;
+  }
+  .results-note{
+    font-size:15px;
+    color:var(--ink-soft);
+    margin-bottom:20px;
+  }
+  table.data-table th.topic-head, table.data-table td.topic-cell{
+    text-align:left;
+    white-space:normal;
+  }
+  table.data-table td.topic-cell{font-weight:600;color:var(--ink);}
+  table.data-table td.topic-score{font-weight:700;}
+  table.data-table td.topic-score.full{color:var(--correct);}
+  table.data-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+    line-height:1.5;
+    border-top:1px solid var(--border);
+    padding-top:14px;
+    margin:18px 0 20px;
+  }
+
+  footer.reset-row{
+    margin-top:20px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Working Examples: Trade and Tariffs</h1>
+    <p>Autarky, imports and exports, who wins and who loses when a country opens up, and what a tariff or an import quota does to price, quantity and surplus</p>
+  </header>
+
+  <div class="mode-row" id="modeRow">
+    <span class="mode-label">Difficulty</span>
+    <div class="segmented" role="group" aria-label="Difficulty level">
+      <button type="button" id="modeReview" aria-pressed="true">Helpful Trade Review</button>
+      <button type="button" id="modeExam" aria-pressed="false">AP Exam Difficulty</button>
+    </div>
+    <span class="mode-hint" id="modeHint"></span>
+  </div>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="card-count" id="problemCount">Problem 1 of 10</span>
+      <span class="card-count" id="stepCount">Step 1 of 5</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="panel" id="quizPanel">
+    <span class="method-badge" id="methodBadge"></span>
+    <div class="scenario" id="scenarioText"></div>
+    <div class="formula-note" id="formulaNote"></div>
+
+    <div class="table-wrap" id="tableWrap">
+      <table class="data-table">
+        <thead><tr id="tableHead"></tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="graph-wrap" id="graphWrap"></div>
+
+    <div class="prompt" id="promptText">Loading&hellip;</div>
+
+    <div class="options" id="optionsWrap"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-verdict" id="feedbackVerdict"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn" disabled>Next step</button>
+    </div>
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">Topic</th><th>Score</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <p class="results-caveat">These bands say whether you have trade and tariffs down &mdash; they are not an AP score
+    prediction. The exam covers every unit, counts free response for a third of the grade, and gives you no
+    feedback until it is over. Treat a strong result here as one topic secured, not as a score.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Start again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Restart from problem 1</button>
+  </footer>
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Every number in this bank was solved and asserted in a scratch script before
+   being written here, with exact fractions so no area depends on rounding.
+   Each domestic market is cleared and the autarky point checked against both
+   curves; every surplus is computed twice, once as a triangle and once by
+   summing the gap between the curve and the price, and the two must agree.
+   Each trade case is then made to balance a second, independent way: opening
+   to trade must raise total surplus by exactly 1/2 x (trade volume) x (the gap
+   between the world price and the autarky price); under a tariff the surplus
+   the two sides lose must equal the revenue collected plus the deadweight
+   loss; and under a quota it must equal the quota rent plus the deadweight
+   loss. The quota cases additionally assert that a tariff equal to the price
+   rise reproduces the quota's price, quantities and deadweight loss exactly.
+--------------------------------------------------------------------------- */
+
+const MARKET_GRAPH = `
+<svg viewBox="0 0 360 250" role="img" aria-label="A domestic supply and demand diagram showing the no-trade equilibrium">
+  <line x1="48" y1="210" x2="340" y2="210" stroke="#6B5D4C" stroke-width="1.5"/>
+  <line x1="48" y1="210" x2="48" y2="24" stroke="#6B5D4C" stroke-width="1.5"/>
+  <text x="340" y="240" text-anchor="end" font-size="10.5" fill="#6B5D4C">Quantity</text>
+  <text x="44" y="20" text-anchor="end" font-size="10.5" fill="#6B5D4C">Price</text>
+  <line x1="48" y1="40" x2="328" y2="200" stroke="#2F6F62" stroke-width="2.5"/>
+  <line x1="48" y1="200" x2="328" y2="40" stroke="#C1542C" stroke-width="2.5"/>
+  <text x="334" y="204" font-size="11" font-weight="700" fill="#2F6F62">D</text>
+  <text x="334" y="44" font-size="11" font-weight="700" fill="#C1542C">S</text>
+  <line x1="48" y1="120" x2="188" y2="120" stroke="#6B5D4C" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="188" y1="120" x2="188" y2="210" stroke="#6B5D4C" stroke-width="1" stroke-dasharray="3 3"/>
+  <circle cx="188" cy="120" r="4" fill="#2B2118"/>
+  <text x="43" y="124" text-anchor="end" font-size="10.5" fill="#6B5D4C">P*</text>
+  <text x="188" y="226" text-anchor="middle" font-size="10.5" fill="#6B5D4C">Q*</text>
+</svg>`;
+
+/* The two trade diagrams are schematics: they show where the world price sits
+   relative to the no-trade price, and nothing else. No quantity at the world
+   price is marked, because reading those off the curves is the exercise. */
+const TRADEIN_GRAPH = `
+<svg viewBox="0 0 360 250" role="img" aria-label="A domestic supply and demand diagram with a world price line drawn below the no-trade price">
+  <line x1="48" y1="210" x2="340" y2="210" stroke="#6B5D4C" stroke-width="1.5"/>
+  <line x1="48" y1="210" x2="48" y2="24" stroke="#6B5D4C" stroke-width="1.5"/>
+  <text x="340" y="240" text-anchor="end" font-size="10.5" fill="#6B5D4C">Quantity</text>
+  <text x="44" y="20" text-anchor="end" font-size="10.5" fill="#6B5D4C">Price</text>
+  <line x1="48" y1="40" x2="328" y2="200" stroke="#2F6F62" stroke-width="2.5"/>
+  <line x1="48" y1="200" x2="328" y2="40" stroke="#C1542C" stroke-width="2.5"/>
+  <text x="334" y="204" font-size="11" font-weight="700" fill="#2F6F62">D</text>
+  <text x="334" y="44" font-size="11" font-weight="700" fill="#C1542C">S</text>
+  <line x1="48" y1="120" x2="188" y2="120" stroke="#6B5D4C" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="188" y1="120" x2="188" y2="210" stroke="#6B5D4C" stroke-width="1" stroke-dasharray="3 3"/>
+  <circle cx="188" cy="120" r="4" fill="#2B2118"/>
+  <text x="43" y="124" text-anchor="end" font-size="10.5" fill="#6B5D4C">P*</text>
+  <text x="188" y="226" text-anchor="middle" font-size="10.5" fill="#6B5D4C">Q*</text>
+  <line x1="48" y1="166" x2="328" y2="166" stroke="#2B2118" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <text x="43" y="170" text-anchor="end" font-size="10.5" fill="#2B2118">Pw</text>
+</svg>`;
+
+const TRADEOUT_GRAPH = `
+<svg viewBox="0 0 360 250" role="img" aria-label="A domestic supply and demand diagram with a world price line drawn above the no-trade price">
+  <line x1="48" y1="210" x2="340" y2="210" stroke="#6B5D4C" stroke-width="1.5"/>
+  <line x1="48" y1="210" x2="48" y2="24" stroke="#6B5D4C" stroke-width="1.5"/>
+  <text x="340" y="240" text-anchor="end" font-size="10.5" fill="#6B5D4C">Quantity</text>
+  <text x="44" y="20" text-anchor="end" font-size="10.5" fill="#6B5D4C">Price</text>
+  <line x1="48" y1="40" x2="328" y2="200" stroke="#2F6F62" stroke-width="2.5"/>
+  <line x1="48" y1="200" x2="328" y2="40" stroke="#C1542C" stroke-width="2.5"/>
+  <text x="334" y="204" font-size="11" font-weight="700" fill="#2F6F62">D</text>
+  <text x="334" y="44" font-size="11" font-weight="700" fill="#C1542C">S</text>
+  <line x1="48" y1="120" x2="188" y2="120" stroke="#6B5D4C" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="188" y1="120" x2="188" y2="210" stroke="#6B5D4C" stroke-width="1" stroke-dasharray="3 3"/>
+  <circle cx="188" cy="120" r="4" fill="#2B2118"/>
+  <text x="43" y="124" text-anchor="end" font-size="10.5" fill="#6B5D4C">P*</text>
+  <text x="188" y="226" text-anchor="middle" font-size="10.5" fill="#6B5D4C">Q*</text>
+  <line x1="48" y1="74" x2="328" y2="74" stroke="#2B2118" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <text x="43" y="78" text-anchor="end" font-size="10.5" fill="#2B2118">Pw</text>
+</svg>`;
+
+const TERMS = '<b>CS</b> = consumer surplus. <b>PS</b> = producer surplus. <b>DWL</b> = deadweight loss. ' +
+  '<b>P*</b> and <b>Q*</b> = the price and quantity with no trade. <b>Pw</b> = the world price. ' +
+  '<b>Qd</b> = quantity demanded. <b>Qs</b> = quantity supplied.';
+const R_AUT = 'With no trade the domestic market clears on its own: set the demand price equal to the supply price and solve for Q, then put Q back into either curve for P. ' +
+  'The surpluses are the usual pair of triangles meeting at that price.';
+const R_IMP = 'A world price BELOW the no-trade price pulls the domestic price down to it, and the country imports. At that price read Qs off supply and Qd off demand separately; ' +
+  'imports are the gap, Qd − Qs. Buyers gain more than domestic sellers lose, and the net gain is 1/2 × imports × (the price fall).';
+const R_EXP = 'A world price ABOVE the no-trade price pulls the domestic price up to it, and the country exports. At that price read Qs off supply and Qd off demand separately; ' +
+  'exports are the gap, Qs − Qd. Domestic sellers gain more than buyers lose, and the net gain is 1/2 × exports × (the price rise).';
+const R_WIN = 'Opening to trade moves the domestic price to the world price, and that move alone decides the winners. Imports push the price down, which helps buyers and hurts domestic sellers; ' +
+  'exports push it up, which does the reverse. The gain to the favoured side is always larger than the loss to the other.';
+const R_TAR = 'A tariff lifts the domestic price to Pw + t, so recompute Qs and Qd at that higher price. Revenue = t × the imports that remain AFTER the tariff, never the free-trade imports. ' +
+  'The loss comes as TWO triangles: 1/2 × (the rise in Qs) × t on the production side, and 1/2 × (the fall in Qd) × t on the consumption side.';
+const R_QUO = 'An import quota caps imports at a fixed number, and the domestic price climbs until Qd − Qs equals exactly that number. The gap between the new domestic price and the world price, ' +
+  'times the quota, is the quota rent, and it goes to whoever holds the import licenses. The two deadweight-loss triangles are measured just as they are for a tariff.';
+const R_SYN = 'Three questions sort any trade problem. Is the world price below the no-trade price, so the country imports, or above it, so the country exports? Which domestic side does that price move help, and which does it hurt? ' +
+  'And where there is a barrier, who ends up collecting the rectangle between the world price and the domestic price?';
+
+const PROBLEMS = [
+  {
+    id: "P1", pin: "first",
+    topic: "Autarky — the no-trade benchmark",
+    method: "Autarky · no trade allowed",
+    scenario: "Narvia produces steel rods and currently allows no trade in them at all. P is the price in dollars per rod and Q is rods per day.",
+    terms: TERMS, review: R_AUT, graph: "MARKET",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Domestic demand", "P = 120 − 2Q"], ["Domestic supply", "P = 30 + Q"]] },
+    steps: [
+      { prompt: "With no trade allowed, where does Narvia's market for steel rods clear?",
+        options: ["P* = $60, Q* = 30", "P* = $75, Q* = 45", "P* = $20, Q* = 50", "P* = $90, Q* = 15"], correct: 0,
+        explain: "Set the two prices equal: 120 − 2Q = 30 + Q gives 90 = 3Q, so Q* = 30. Put that back into either curve: 120 − 60 = $60, and 30 + 30 = $60 as well. Checking against both curves is worth the extra line, because it catches a sign slip immediately." },
+      { prompt: "What is consumer surplus at that no-trade equilibrium?",
+        options: ["$900", "$450", "$1,350", "$1,800"], correct: 0,
+        explain: "Demand meets the price axis at $120, so the triangle has height $120 − $60 = $60 over a base of 30. CS = 1/2 × 30 × 60 = $900." },
+      { prompt: "What is producer surplus at that same no-trade equilibrium?",
+        options: ["$450", "$900", "$1,350", "$225"], correct: 0,
+        explain: "Supply meets the price axis at $30, so the height is $60 − $30 = $30 over the same base of 30. PS = 1/2 × 30 × 30 = $450. It is smaller than consumer surplus here because demand is the steeper curve." },
+      { prompt: "What is total surplus in Narvia with no trade, and what makes this figure the one to remember?",
+        options: ["$1,350 — it is the benchmark every trade outcome gets measured against",
+                  "$1,350 — it is the largest total surplus this market could ever reach under any policy",
+                  "$450 — total surplus counts only the producers, since they are the ones who make the rods",
+                  "$2,250 — add the two triangles and the rectangle of money that changes hands between them"], correct: 0,
+        explain: "CS + PS = $900 + $450 = $1,350. Autarky is not the best this market can do — it is simply the starting point. Opening to trade will change the price, change both triangles, and raise the total; the whole point of computing $1,350 now is to have something to compare that against." },
+      { prompt: "Suppose identical steel rods trade on the world market at $45. Once Narvia opens to trade, which way will rods move, and why?",
+        options: ["Narvia will import — the world price is below its no-trade price, so buyers can get rods more cheaply abroad",
+                  "Narvia will export — a lower world price means foreign buyers will pay more for Narvian rods than locals do",
+                  "Nothing will move — $45 is close enough to $60 that the two markets are already in balance",
+                  "Narvia will import and export at once — some firms will buy abroad while others sell abroad"], correct: 0,
+        explain: "Compare the two prices and nothing else. At $45 the world will sell rods for less than Narvia's own producers need to supply them, so Narvian buyers turn abroad and the domestic price is pulled down to $45. The rule is simply that a world price below the no-trade price means imports, and a world price above it means exports." }
+    ]
+  },
+  {
+    id: "P2",
+    topic: "Importing — quantities, the import gap, and the surpluses",
+    method: "World price below the no-trade price",
+    scenario: "Ostmark makes coffee grinders. P is the price in dollars per grinder and Q is grinders per hour. Ostmark then opens to trade at a world price of $30.",
+    terms: TERMS, review: R_IMP, graph: "TRADEIN",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Domestic demand", "P = 100 − Q"], ["Domestic supply", "P = 20 + Q"], ["World price", "$30 per grinder"]] },
+    steps: [
+      { prompt: "Before trade opens, where does Ostmark's grinder market clear on its own?",
+        options: ["P* = $60, Q* = 40", "P* = $50, Q* = 50", "P* = $40, Q* = 60", "P* = $80, Q* = 20"], correct: 0,
+        explain: "100 − Q = 20 + Q gives 80 = 2Q, so Q* = 40 and P* = 100 − 40 = $60. The world price of $30 sits below that, so Ostmark will be an importer." },
+      { prompt: "At the world price of $30, how many grinders will Ostmark's own producers supply?",
+        options: ["10", "70", "30", "40"], correct: 0,
+        explain: "Read it off the SUPPLY curve alone: 30 = 20 + Q, so Qs = 10. Domestic output collapses from 40 to 10, because at $30 most domestic producers cannot cover their costs." },
+      { prompt: "At that same world price of $30, how many grinders will Ostmark's buyers want?",
+        options: ["70", "10", "40", "50"], correct: 0,
+        explain: "Now read the DEMAND curve alone: 30 = 100 − Q, so Qd = 70. The cheaper price pulls domestic buyers from 40 up to 70. The two curves must be used separately here — there is no single quantity that clears the domestic market any more." },
+      { prompt: "How many grinders does Ostmark import at the world price?",
+        options: ["60", "30", "70", "10"], correct: 0,
+        explain: "Imports fill the gap between what buyers want and what domestic producers will supply: Qd − Qs = 70 − 10 = 60. That gap is the whole point of the diagram — the domestic market no longer has to balance by itself, because the rest of the world makes up the difference at $30." },
+      { prompt: "What are consumer surplus and producer surplus at the world price of $30?",
+        options: ["CS = $2,450 and PS = $50", "CS = $800 and PS = $800", "CS = $2,450 and PS = $800", "CS = $1,250 and PS = $450"], correct: 0,
+        explain: "Both triangles are measured at the new price and the new quantities. CS = 1/2 × 70 × ($100 − $30) = 1/2 × 70 × 70 = $2,450, up from $800. PS = 1/2 × 10 × ($30 − $20) = 1/2 × 10 × 10 = $50, down from $800. Buyers are hugely better off and domestic producers are nearly wiped out." },
+      { prompt: "Total surplus with no trade was $1,600. What is it at the world price, and how can the change be checked?",
+        options: ["$2,500 — a gain of $900, which is 1/2 × 60 imported units × the $30 the price fell",
+                  "$2,500 — a gain of $900, which is simply the $900 that domestic producers gave up",
+                  "$2,450 — consumer surplus alone, since domestic producers no longer matter once trade opens",
+                  "$1,600 — unchanged, because what buyers gain the domestic producers lose exactly"], correct: 0,
+        explain: "CS + PS = $2,450 + $50 = $2,500, against $1,600 before: a gain of $900. The check is the gains-from-trade triangle, 1/2 × 60 × $30 = $900, and it agrees. Buyers gained $1,650 while domestic producers lost $750; the difference is the $900 that trade creates rather than moves." }
+    ]
+  },
+  {
+    id: "P3",
+    topic: "Exporting — quantities, the export gap, and the surpluses",
+    method: "World price above the no-trade price",
+    scenario: "Pelagia grows wheat. P is the price in dollars per bushel and Q is bushels per hour. Pelagia then opens to trade at a world price of $70.",
+    terms: TERMS, review: R_EXP, graph: "TRADEOUT",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Domestic demand", "P = 90 − Q"], ["Domestic supply", "P = 10 + Q"], ["World price", "$70 per bushel"]] },
+    steps: [
+      { prompt: "Before trade opens, where does Pelagia's wheat market clear on its own?",
+        options: ["P* = $50, Q* = 40", "P* = $40, Q* = 50", "P* = $70, Q* = 20", "P* = $30, Q* = 60"], correct: 0,
+        explain: "90 − Q = 10 + Q gives 80 = 2Q, so Q* = 40 and P* = 90 − 40 = $50. The world price of $70 sits above that, so Pelagia will be an exporter." },
+      { prompt: "At the world price of $70, how many bushels will Pelagian farmers supply?",
+        options: ["60", "20", "40", "70"], correct: 0,
+        explain: "Read the SUPPLY curve alone: 70 = 10 + Q, so Qs = 60. The higher price pulls domestic output up from 40 to 60." },
+      { prompt: "At that same world price of $70, how many bushels will Pelagian buyers want?",
+        options: ["20", "60", "40", "30"], correct: 0,
+        explain: "Read the DEMAND curve alone: 70 = 90 − Q, so Qd = 20. Domestic buyers cut back from 40 to 20, because they now have to match what foreigners are willing to pay." },
+      { prompt: "How many bushels does Pelagia export at the world price?",
+        options: ["40", "20", "60", "80"], correct: 0,
+        explain: "Exports are the surplus the domestic market cannot absorb: Qs − Qd = 60 − 20 = 40. Note the gap runs the other way from an importing country's — here domestic production exceeds domestic consumption, and the difference is shipped out." },
+      { prompt: "What are consumer surplus and producer surplus at the world price of $70?",
+        options: ["CS = $200 and PS = $1,800", "CS = $800 and PS = $800", "CS = $1,800 and PS = $200", "CS = $200 and PS = $800"], correct: 0,
+        explain: "CS = 1/2 × 20 × ($90 − $70) = 1/2 × 20 × 20 = $200, down from $800. PS = 1/2 × 60 × ($70 − $10) = 1/2 × 60 × 60 = $1,800, up from $800. Exporting is the mirror image of importing: the producers are the ones who do well." },
+      { prompt: "Total surplus with no trade was $1,600. What is it at the world price, and how can the change be checked?",
+        options: ["$2,000 — a gain of $400, which is 1/2 × 40 exported units × the $20 the price rose",
+                  "$2,000 — a gain of $400, which is just the $400 that domestic buyers gave up",
+                  "$1,800 — producer surplus alone, since domestic buyers are priced out of their own market",
+                  "$1,600 — unchanged, because exporting moves wheat abroad without creating any new value"], correct: 0,
+        explain: "CS + PS = $200 + $1,800 = $2,000, against $1,600 before: a gain of $400. The check is 1/2 × 40 × $20 = $400, and it agrees. Trade raises total surplus whichever direction it runs — the only thing that changes is which domestic group collects the gain." }
+    ]
+  },
+  {
+    id: "P4",
+    topic: "Winners and losers when a country imports",
+    method: "Distribution · who gains and who loses",
+    scenario: "Quillon welds bicycle frames. P is the price in dollars per frame and Q is frames per hour. Quillon then opens to trade at a world price of $30.",
+    terms: TERMS, review: R_WIN, graph: "TRADEIN",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Domestic demand", "P = 80 − Q"], ["Domestic supply", "P = 20 + Q"], ["World price", "$30 per frame"]] },
+    steps: [
+      { prompt: "Quillon's market clears at P* = $50 and Q* = 30 with no trade. What happens to the domestic price once trade opens at $30, and which way do frames move?",
+        options: ["The domestic price falls to $30 and Quillon imports frames",
+                  "The domestic price stays at $50 and Quillon imports frames",
+                  "The domestic price rises to $50 and Quillon exports frames",
+                  "The domestic price settles at $40, halfway between the two"], correct: 0,
+        explain: "No Quillon buyer will pay more than $30 for a frame they can get abroad at that price, so the domestic price is dragged all the way down to the world price. It does not meet in the middle: a country small enough to take the world price as given simply adopts it." },
+      { prompt: "At the world price of $30, what happens to consumer surplus in Quillon?",
+        options: ["It rises from $450 to $1,250, a gain of $800", "It rises from $450 to $800, a gain of $350",
+                  "It falls from $1,250 to $450, a loss of $800", "It is unchanged at $450, since demand itself never moved"], correct: 0,
+        explain: "Before: 1/2 × 30 × ($80 − $50) = $450. After: at $30, Qd = 80 − 30 = 50, so CS = 1/2 × 50 × ($80 − $30) = 1/2 × 50 × 50 = $1,250. Buyers gain $800 — partly from paying $20 less on frames they were already buying, partly from the 20 extra frames they now buy." },
+      { prompt: "At the same world price, what happens to producer surplus in Quillon?",
+        options: ["It falls from $450 to $50, a loss of $400", "It falls from $450 to $250, a loss of $200",
+                  "It rises from $50 to $450, a gain of $400", "It is unchanged at $450, since domestic supply never moved"], correct: 0,
+        explain: "Before: 1/2 × 30 × ($50 − $20) = $450. After: at $30, Qs = 30 − 20 = 10, so PS = 1/2 × 10 × ($30 − $20) = $50. Domestic welders lose $400 — they sell fewer frames and get less for each one." },
+      { prompt: "Putting the two together, is Quillon better off overall, and by how much?",
+        options: ["Yes — buyers gain $800 and domestic welders lose $400, so the country is $400 better off",
+                  "No — $800 of gain against $400 of loss nets out to a $400 loss once both sides are counted",
+                  "Yes — the country gains the full $800, because a producer loss is only a transfer and not a real cost",
+                  "It cannot be said — gains to buyers and losses to producers are not measured in comparable units"], correct: 0,
+        explain: "ΔCS + ΔPS = +$800 − $400 = +$400. The check is the gains-from-trade triangle: imports are Qd − Qs = 50 − 10 = 40, the price fell $20, and 1/2 × 40 × $20 = $400. Both the producer loss and the consumer gain are real and both are in dollars of surplus, so they can be netted." },
+      { prompt: "Quillon's welders lobby for protection, pointing out that they lose $400. What is the strongest economic reply?",
+        options: ["Buyers gain $800, which is more than the welders lose, so the winners could in principle compensate them and still come out ahead",
+                  "The welders' $400 is not a real loss, because the frames they no longer make were never worth making in the first place",
+                  "Protection is always the wrong answer, since any restriction on trade must leave every group in the country worse off",
+                  "The welders have misread the figures, because domestic producers cannot lose when the quantity of frames sold goes up"], correct: 0,
+        explain: "The honest case for trade is not that nobody is hurt — the welders really do lose $400. It is that the gain is larger than the loss, so there is enough to go round. Whether compensation is actually paid is a political question, not an economic one, and that gap between 'could be compensated' and 'was compensated' is where most real arguments about trade policy live." }
+    ]
+  },
+  {
+    id: "P5",
+    topic: "Winners and losers when a country exports",
+    method: "Distribution · who gains and who loses",
+    scenario: "Rhodin mills timber. P is the price in dollars per beam and Q is beams per hour. Rhodin then opens to trade at a world price of $80.",
+    terms: TERMS, review: R_WIN, graph: "TRADEOUT",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Domestic demand", "P = 100 − 2Q"], ["Domestic supply", "P = 20 + 2Q"], ["World price", "$80 per beam"]] },
+    steps: [
+      { prompt: "Rhodin's market clears at P* = $60 and Q* = 20 with no trade. What happens to the domestic price once trade opens at $80, and which way do beams move?",
+        options: ["The domestic price rises to $80 and Rhodin exports beams",
+                  "The domestic price falls to $60 and Rhodin exports beams",
+                  "The domestic price rises to $80 and Rhodin imports beams",
+                  "The domestic price stays at $60 at home while mills charge $80 abroad"], correct: 0,
+        explain: "No Rhodin mill will sell at home for $60 when the world will pay $80, so domestic buyers have to match the world price or go without. One price rules the market: a mill cannot be made to charge locals less when it can ship the beam out instead." },
+      { prompt: "At the world price of $80, what happens to consumer surplus in Rhodin?",
+        options: ["It falls from $400 to $100, a loss of $300", "It falls from $400 to $200, a loss of $200",
+                  "It rises from $100 to $400, a gain of $300", "It is unchanged at $400, since domestic demand never moved"], correct: 0,
+        explain: "Before: 1/2 × 20 × ($100 − $60) = $400. After: at $80, 80 = 100 − 2Q gives Qd = 10, so CS = 1/2 × 10 × ($100 − $80) = $100. Rhodin's households lose $300 — exporting makes a good dearer at home, not cheaper." },
+      { prompt: "At the same world price, what happens to producer surplus in Rhodin?",
+        options: ["It rises from $400 to $900, a gain of $500", "It rises from $400 to $600, a gain of $200",
+                  "It falls from $900 to $400, a loss of $500", "It is unchanged at $400, since the mills' costs did not change"], correct: 0,
+        explain: "Before: 1/2 × 20 × ($60 − $20) = $400. After: at $80, 80 = 20 + 2Q gives Qs = 30, so PS = 1/2 × 30 × ($80 − $20) = 1/2 × 30 × 60 = $900. The mills gain $500, selling more beams and getting more for each." },
+      { prompt: "Putting the two together, is Rhodin better off overall, and by how much?",
+        options: ["Yes — mills gain $500 and buyers lose $300, so the country is $200 better off",
+                  "No — a country that ships its timber abroad has less of it left, so it must end up worse off",
+                  "Yes — the country gains the full $500, because a loss to domestic buyers is only a transfer",
+                  "Yes by $200, but only because the mills happen to outnumber the households in this market"], correct: 0,
+        explain: "ΔPS + ΔCS = +$500 − $300 = +$200. Check it against the triangle: exports are Qs − Qd = 30 − 10 = 20, the price rose $20, and 1/2 × 20 × $20 = $200. Trade raises total surplus here exactly as it did for the importing case, but this time it is the producers who collect the gain." },
+      { prompt: "Rhodin's households complain that opening to trade made timber more expensive at home. Are they mistaken?",
+        options: ["No — they really are worse off by $300, and the country's overall gain does not change that fact",
+                  "Yes — the price they pay is higher, but they buy more beams than before, so they come out ahead",
+                  "Yes — a domestic price rise is only nominal, since the extra dollars stay inside the country",
+                  "No — and because they lose, Rhodin should be counted as worse off from trade on the whole"], correct: 0,
+        explain: "They are right about their own position and wrong only if they conclude the country should not trade. This is the step people find hardest: 'trade raises total surplus' is a statement about the sum, and a sum can rise while one of its parts falls. For an exported good it is domestic buyers who pay; for an imported good it is domestic producers." }
+    ]
+  },
+  {
+    id: "P6",
+    topic: "Tariffs — the new price, the new quantities, revenue and the loss",
+    method: "Tariff · a per-unit charge on imports",
+    scenario: "Sarnia imports solar panels at a world price of $40. P is the price in dollars per panel and Q is panels per hour. Sarnia then puts a $20 tariff on each imported panel.",
+    terms: TERMS, review: R_TAR, graph: "TRADEIN",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Domestic demand", "P = 140 − 2Q"], ["Domestic supply", "P = 20 + 2Q"], ["World price", "$40 per panel"], ["Tariff", "$20 per imported panel"]] },
+    steps: [
+      { prompt: "Under free trade at $40, what are Sarnia's domestic quantity supplied, quantity demanded, and imports?",
+        options: ["Qs = 10, Qd = 50, imports = 40", "Qs = 50, Qd = 10, imports = 40",
+                  "Qs = 20, Qd = 40, imports = 20", "Qs = 10, Qd = 50, imports = 60"], correct: 0,
+        explain: "Supply: 40 = 20 + 2Q gives Qs = 10. Demand: 40 = 140 − 2Q gives 2Q = 100, so Qd = 50. Imports = 50 − 10 = 40. (With no trade this market would clear at Q* = 30 and P* = $80, so $40 is well below the no-trade price and Sarnia is indeed an importer.)" },
+      { prompt: "With the $20 tariff in place, what is the new domestic price of a panel in Sarnia?",
+        options: ["$60", "$40", "$80", "$20"], correct: 0,
+        explain: "A tariff is added to the world price: $40 + $20 = $60. Foreign sellers still net $40 — the extra $20 goes to Sarnia's treasury — but anyone buying a panel in Sarnia, imported or domestic, now pays $60. Domestic producers get to charge the higher price too, which is the whole attraction of a tariff for them." },
+      { prompt: "At the new domestic price of $60, what are quantity supplied, quantity demanded, and imports?",
+        options: ["Qs = 20, Qd = 40, imports = 20", "Qs = 10, Qd = 50, imports = 40",
+                  "Qs = 20, Qd = 40, imports = 40", "Qs = 30, Qd = 30, imports = 0"], correct: 0,
+        explain: "Supply: 60 = 20 + 2Q gives Qs = 20. Demand: 60 = 140 − 2Q gives 2Q = 80, so Qd = 40. Imports = 40 − 20 = 20. The tariff squeezes imports from both ends at once: domestic output rises from 10 to 20 while domestic buying falls from 50 to 40." },
+      { prompt: "How much tariff revenue does Sarnia's government collect?",
+        options: ["$400", "$800", "$1,200", "$200"], correct: 0,
+        explain: "Revenue = the tariff × the imports that ACTUALLY cross the border afterwards = $20 × 20 = $400. The standard trap is $20 × 40 = $800, using the free-trade import figure. Half of those imports no longer exist — the tariff is precisely what drove them away — and a government cannot collect a tariff on a panel nobody ships." },
+      { prompt: "What is the total deadweight loss from Sarnia's tariff?",
+        options: ["$200", "$400", "$100", "$600"], correct: 0,
+        explain: "Two triangles, each 1/2 × base × the $20 tariff. Production side: domestic output rose from 10 to 20, so 1/2 × 10 × 20 = $100. Consumption side: domestic buying fell from 50 to 40, so 1/2 × 10 × 20 = $100. Total $200." },
+      { prompt: "What happens to consumer surplus and producer surplus in Sarnia under the tariff?",
+        options: ["CS falls by $900 and PS rises by $300", "CS falls by $900 and PS rises by $900",
+                  "CS falls by $400 and PS rises by $400", "CS rises by $300 and PS falls by $900"], correct: 0,
+        explain: "CS: 1/2 × 50 × ($140 − $40) = $2,500 before, 1/2 × 40 × ($140 − $60) = $1,600 after, so −$900. PS: 1/2 × 10 × ($40 − $20) = $100 before, 1/2 × 20 × ($60 − $20) = $400 after, so +$300. A tariff is mostly a transfer from buyers, and domestic producers collect only a part of it." },
+      { prompt: "Account for the whole $900 that Sarnia's buyers lose. Where does it go?",
+        options: ["$300 to domestic producers, $400 to the treasury as revenue, and $200 destroyed as deadweight loss",
+                  "$400 to domestic producers, $300 to the treasury as revenue, and $200 destroyed as deadweight loss",
+                  "$300 to domestic producers and $600 to the treasury, with nothing destroyed at all",
+                  "All $900 to the treasury, since a tariff is collected by the government on every panel sold"], correct: 0,
+        explain: "−$900 + $300 + $400 = −$200, and that $200 is exactly the deadweight loss computed from the two triangles. Reaching the same figure by two independent routes is the check worth doing: if the books do not balance, one of the earlier numbers is wrong." }
+    ]
+  },
+  {
+    id: "P7",
+    topic: "Tariffs — the revenue trap and two triangles that need not match",
+    method: "Tariff · a per-unit charge on imports",
+    scenario: "Thane imports olive oil at a world price of $40. P is the price in dollars per case and Q is cases per hour. Thane then puts a $10 tariff on each imported case.",
+    terms: TERMS, review: R_TAR, graph: "TRADEIN",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Domestic demand", "P = 90 − Q"], ["Domestic supply", "P = 30 + 2Q"], ["World price", "$40 per case"], ["Tariff", "$10 per imported case"]] },
+    steps: [
+      { prompt: "Under free trade at $40, what are Thane's quantity supplied, quantity demanded, and imports?",
+        options: ["Qs = 5, Qd = 50, imports = 45", "Qs = 10, Qd = 40, imports = 30",
+                  "Qs = 5, Qd = 50, imports = 55", "Qs = 50, Qd = 5, imports = 45"], correct: 0,
+        explain: "Supply: 40 = 30 + 2Q gives 2Q = 10, so Qs = 5. Demand: 40 = 90 − Q gives Qd = 50. Imports = 50 − 5 = 45. Thane's own producers cover very little of the market at the world price." },
+      { prompt: "With the $10 tariff, what is the new domestic price, and what are the new quantities and imports?",
+        options: ["Price $50, Qs = 10, Qd = 40, imports = 30", "Price $50, Qs = 10, Qd = 40, imports = 45",
+                  "Price $40, Qs = 5, Qd = 50, imports = 45", "Price $50, Qs = 20, Qd = 40, imports = 20"], correct: 0,
+        explain: "The price is $40 + $10 = $50. Supply: 50 = 30 + 2Q gives Qs = 10. Demand: 50 = 90 − Q gives Qd = 40. Imports = 40 − 10 = 30, down from 45." },
+      { prompt: "How much tariff revenue does Thane collect?",
+        options: ["$300", "$450", "$400", "$100"], correct: 0,
+        explain: "Revenue = $10 × 30 = $300, using the 30 cases that still cross the border. Using the free-trade figure of 45 would give $450, and that is the single most common error on this question. The tariff destroyed 15 of those imports, and no revenue is collected on a case that is never shipped." },
+      { prompt: "What is the production-side deadweight loss — the triangle from domestic output expanding?",
+        options: ["$25", "$50", "$75", "$100"], correct: 0,
+        explain: "Domestic supply rose from 5 to 10, so the base is 5 and the height is the $10 tariff: 1/2 × 5 × 10 = $25. This is the waste from making 5 cases at home that could have been bought abroad for less — resources pulled into a use the rest of the world does more cheaply." },
+      { prompt: "What is the consumption-side deadweight loss — the triangle from domestic buying contracting?",
+        options: ["$50", "$25", "$75", "$150"], correct: 0,
+        explain: "Domestic demand fell from 50 to 40, so the base is 10 and the height is again the $10 tariff: 1/2 × 10 × 10 = $50. This is the waste from 10 cases that buyers valued above the world price but no longer buy. Total deadweight loss is $25 + $50 = $75." },
+      { prompt: "Thane's two deadweight-loss triangles come to $25 and $50. Is a tariff's loss always split evenly between them?",
+        options: ["No — the two are equal only when supply expands by as much as demand contracts, which depends on the slopes of the two curves",
+                  "Yes — both triangles share the same height, so a tariff always splits its loss into two equal halves",
+                  "No — the consumption-side triangle is always the larger of the two, whatever the curves happen to look like",
+                  "Yes — and the $25 against $50 here simply means one of the two triangles has been computed wrongly"], correct: 0,
+        explain: "Both triangles have the same height, the tariff itself, but their bases are different things: how far domestic supply expands and how far domestic demand contracts. Here supply moved 5 while demand moved 10, so the consumption triangle is twice the production one and the total comes to $25 + $50 = $75. Had the curves been mirror images, the two would have matched — which is why working a single symmetric example can leave the wrong impression." }
+    ]
+  },
+  {
+    id: "P8",
+    topic: "Import quotas — the price they force, and who collects the rent",
+    method: "Import quota · a cap on the quantity imported",
+    scenario: "Umbra imports sugar at a world price of $30. P is the price in dollars per sack and Q is sacks per hour. Umbra then caps imports at 40 sacks per hour.",
+    terms: TERMS, review: R_QUO, graph: "TRADEIN",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Domestic demand", "P = 120 − Q"], ["Domestic supply", "P = 20 + Q"], ["World price", "$30 per sack"], ["Import quota", "40 sacks per hour"]] },
+    steps: [
+      { prompt: "Under free trade at $30, what are Umbra's quantity supplied, quantity demanded, and imports?",
+        options: ["Qs = 10, Qd = 90, imports = 80", "Qs = 90, Qd = 10, imports = 80",
+                  "Qs = 30, Qd = 70, imports = 40", "Qs = 10, Qd = 90, imports = 100"], correct: 0,
+        explain: "Supply: 30 = 20 + Q gives Qs = 10. Demand: 30 = 120 − Q gives Qd = 90. Imports = 80. The quota of 40 is well below that, so it will bind — a cap set above 80 would have changed nothing at all." },
+      { prompt: "With imports capped at 40, what domestic price will clear Umbra's sugar market?",
+        options: ["$50", "$30", "$70", "$40"], correct: 0,
+        explain: "The price has to rise until the gap the domestic market cannot fill is exactly 40. Set Qd − Qs = 40: (120 − P) − (P − 20) = 40, so 140 − 2P = 40 and P = $50. Note the direction of the reasoning — with a quota the quantity is fixed first and the price adjusts, which is the reverse of a tariff." },
+      { prompt: "At that new domestic price, what are quantity supplied and quantity demanded?",
+        options: ["Qs = 30 and Qd = 70", "Qs = 10 and Qd = 90", "Qs = 70 and Qd = 30", "Qs = 40 and Qd = 80"], correct: 0,
+        explain: "Supply: 50 = 20 + Q gives Qs = 30. Demand: 50 = 120 − Q gives Qd = 70. The gap is 70 − 30 = 40, exactly the quota, which confirms the $50 price." },
+      { prompt: "Importers buy sugar abroad at $30 and sell it in Umbra at $50. What is that $20 per sack across 40 sacks, and who ends up with it?",
+        options: ["$800 of quota rent, and it goes to whoever holds the import licenses",
+                  "$800 of tariff revenue, and it goes to Umbra's government as the issuer of the quota",
+                  "$800 of producer surplus, and it goes to Umbra's own sugar growers",
+                  "$800 of deadweight loss, and it is destroyed rather than received by anyone"], correct: 0,
+        explain: "It is quota rent: $20 × 40 = $800. A quota creates the same gap a tariff does, but nobody collects it at the border, so it accrues to whoever is permitted to import. If Umbra auctioned the licenses it could capture that $800 itself; if it hands them out free, the holders keep it, and if the licenses go to foreign exporters the money leaves Umbra altogether." },
+      { prompt: "What is the total deadweight loss from Umbra's quota?",
+        options: ["$400", "$800", "$200", "$1,200"], correct: 0,
+        explain: "The same two triangles as a tariff, each with height $50 − $30 = $20. Production side: domestic supply rose from 10 to 30, so 1/2 × 20 × 20 = $200. Consumption side: demand fell from 90 to 70, so 1/2 × 20 × 20 = $200. Total $400. Check the books: CS falls $1,600, PS rises $400, rent is $800, and −1,600 + 400 + 800 = −$400." },
+      { prompt: "What single tariff would have produced exactly this same outcome in Umbra?",
+        options: ["A tariff of $20 per sack", "A tariff of $40 per sack", "A tariff of $50 per sack", "A tariff of $30 per sack"], correct: 0,
+        explain: "A $20 tariff puts the domestic price at $30 + $20 = $50, giving Qs = 30, Qd = 70 and imports of 40 — the quota's outcome exactly. The two instruments are interchangeable in everything the diagram shows. What differs is where the $800 lands: the treasury under the tariff, the license holders under the quota." }
+    ]
+  },
+  {
+    id: "P9",
+    topic: "Tariff against quota — identical on the diagram, different in whose pocket",
+    method: "Comparing the two barriers",
+    scenario: "Verdant imports cement at a world price of $50. P is the price in dollars per tonne and Q is tonnes per hour. Verdant is weighing a 30-tonne import quota against a tariff.",
+    terms: TERMS, review: R_QUO, graph: "TRADEIN",
+    table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
+             rows: [["Domestic demand", "P = 150 − Q"], ["Domestic supply", "P = 30 + 2Q"], ["World price", "$50 per tonne"], ["Proposed quota", "30 tonnes per hour"]] },
+    steps: [
+      { prompt: "Under free trade at $50, what are Verdant's quantity supplied, quantity demanded, and imports?",
+        options: ["Qs = 10, Qd = 100, imports = 90", "Qs = 10, Qd = 100, imports = 110",
+                  "Qs = 30, Qd = 60, imports = 30", "Qs = 100, Qd = 10, imports = 90"], correct: 0,
+        explain: "Supply: 50 = 30 + 2Q gives 2Q = 20, so Qs = 10. Demand: 50 = 150 − Q gives Qd = 100. Imports = 90, so a 30-tonne cap bites hard." },
+      { prompt: "If Verdant caps imports at 30 tonnes, what domestic price results?",
+        options: ["$90", "$80", "$70", "$110"], correct: 0,
+        explain: "Set Qd − Qs = 30: (150 − P) − (P − 30)/2 = 30. Multiplying through by 2 gives 300 − 2P − P + 30 = 60, so 3P = 270 and P = $90. At $90, Qs = 30 and Qd = 60, a gap of exactly 30." },
+      { prompt: "What tariff would give Verdant exactly the same domestic price as that 30-tonne quota?",
+        options: ["$40 per tonne", "$30 per tonne", "$60 per tonne", "$90 per tonne"], correct: 0,
+        explain: "The quota pushed the price from $50 to $90, a rise of $40, so a $40 tariff does the same job: $50 + $40 = $90. Check it against the curves: at $90, Qs = 30, Qd = 60, imports = 30, which is the quota figure. The tariff is named in dollars and the quota in tonnes, but here they are the same policy." },
+      { prompt: "Compare consumer surplus, domestic producer surplus and deadweight loss under the $40 tariff and under the 30-tonne quota. How do they differ?",
+        options: ["They do not differ at all — the price, both quantities, both surpluses and the $1,200 of deadweight loss are identical",
+                  "Consumer surplus is the same, but the quota leaves domestic producers better off because the rent accrues to them",
+                  "The quota's deadweight loss is smaller, because a quota raises no tax and so distorts the market less",
+                  "The tariff's deadweight loss is smaller, because the revenue it raises comes back to the country"], correct: 0,
+        explain: "Both put the domestic price at $90, so Qs = 30, Qd = 60 and imports = 30 either way. CS = 1/2 × 60 × ($150 − $90) = $1,800 under both, and domestic PS = 1/2 × 30 × ($90 − $30) = $900 under both. The deadweight loss is the same two triangles: 1/2 × 20 × $40 = $400 on the production side and 1/2 × 40 × $40 = $800 on the consumption side, so $1,200. Note that the rent does NOT raise domestic producer surplus — it is collected by whoever imports the 30 tonnes, not by Verdant's cement works." },
+      { prompt: "If the two are identical on the diagram, what is the real difference between them?",
+        options: ["Who receives the $1,200 between the world price and the domestic price — Verdant's treasury under the tariff, the license holders under the quota",
+                  "Nothing of any consequence, which is why economists treat the choice between them as purely a matter of labelling",
+                  "The quota raises $1,200 for Verdant's treasury as well, so it is the better deal for the government of the two",
+                  "The tariff is paid by foreign exporters while the quota is paid by Verdant's buyers, so the burden sits abroad"], correct: 0,
+        explain: "$40 × 30 tonnes = $1,200 either way. Under the tariff it is revenue and Verdant keeps it. Under the quota it is rent, and where it ends up depends entirely on who holds the licenses: auction them and Verdant captures the same $1,200; hand them to domestic importers and it stays in the country but in private hands; let foreign exporters have them and the $1,200 leaves Verdant for good, which makes the quota strictly worse for the country than the tariff even though the two diagrams are the same." }
+    ]
+  },
+  {
+    id: "P10", pin: "last",
+    topic: "Putting the trade results together",
+    method: "Interpretation — no calculation",
+    scenario: "No arithmetic in this one. These parts are about the patterns that hold across every trade problem, whichever direction the goods move.",
+    terms: TERMS, review: R_SYN,
+    steps: [
+      { prompt: "A country's no-trade price is ABOVE the world price. Which way does trade run once it opens, and which domestic group gains?",
+        options: ["It imports, and domestic consumers gain while domestic producers lose",
+                  "It imports, and domestic producers gain while domestic consumers lose",
+                  "It exports, and domestic producers gain while domestic consumers lose",
+                  "It imports, and both domestic groups gain because the total surplus rises"], correct: 0,
+        explain: "A no-trade price above the world price means the country is an expensive place to make the good, so it buys abroad. The domestic price falls to the world price, and a falling price is good news for buyers and bad news for domestic sellers." },
+      { prompt: "A country's no-trade price is BELOW the world price. Which way does trade run, and which domestic group gains?",
+        options: ["It exports, and domestic producers gain while domestic consumers lose",
+                  "It exports, and domestic consumers gain while domestic producers lose",
+                  "It imports, and domestic consumers gain while domestic producers lose",
+                  "It exports, and domestic consumers are unaffected since they still buy at home"], correct: 0,
+        explain: "A no-trade price below the world price means the country is a cheap place to make the good, so it sells abroad. The domestic price rises to the world price, which favours domestic sellers and hurts domestic buyers. Everything is decided by which way the price moves." },
+      { prompt: "What is true of total surplus in BOTH the importing and the exporting case?",
+        options: ["It rises in both, because the gain to the favoured side always exceeds the loss to the other",
+                  "It rises when a country imports and falls when it exports, since exporting sends goods away",
+                  "It is unchanged in both, because one domestic group's gain is the other's loss",
+                  "It rises in both, and in both cases every domestic group ends up better off than before"], correct: 0,
+        explain: "Opening to trade raises total surplus whichever way the goods move, and the gain is 1/2 × the volume traded × the gap between the world price and the no-trade price. What changes between the two cases is only who collects the gain and who pays." },
+      { prompt: "Tariff revenue must be computed using which import quantity?",
+        options: ["The imports left AFTER the tariff, since no revenue is collected on trade the tariff prevented",
+                  "The imports there would have been under free trade, since the tariff is a charge on that whole flow",
+                  "The average of the free-trade imports and the after-tariff imports",
+                  "The whole domestic quantity demanded, since the tariff raises the price on every unit sold"], correct: 0,
+        explain: "This is the most commonly dropped mark in the topic. A tariff shrinks imports, and the government collects only on what still crosses the border. Using the free-trade figure overstates the revenue every time — and by a lot, since a tariff big enough to matter cuts imports substantially." },
+      { prompt: "Why does a tariff create TWO deadweight-loss triangles rather than one?",
+        options: ["Because it distorts both sides at once: domestic production expands past the efficient point while domestic consumption contracts below it",
+                  "Because one triangle measures the loss to buyers and the other measures the loss to domestic sellers",
+                  "Because one triangle is the revenue collected and the other is the surplus genuinely destroyed",
+                  "Because the tariff is paid twice over, once by importers at the border and once by buyers in the shops"], correct: 0,
+        explain: "The higher domestic price pulls in two directions. On the production side, domestic firms make units that the rest of the world could have supplied for less, wasting the difference. On the consumption side, buyers who valued the good above the world price stop buying it. Neither waste is a transfer to anyone, which is what makes both of them deadweight loss." },
+      { prompt: "Does the finding that trade raises total surplus mean nobody in the country is harmed by it?",
+        options: ["No — one domestic group loses in every case, and the result says only that the other group's gain is larger",
+                  "Yes — a rise in total surplus means every group must be at least as well off as before",
+                  "No — and because somebody always loses, the total-surplus result tells us nothing useful",
+                  "Yes for imports, where buyers gain, but no for exports, where buyers are made worse off"], correct: 0,
+        explain: "Total surplus is a sum, and a sum can rise while one of its parts falls. Importing hurts domestic producers; exporting hurts domestic consumers. The result is still worth having — it says the winners gain enough to compensate the losers in principle — but it is a statement about the total, and treating it as a promise that nobody is hurt is how the argument gets lost." }
+    ]
+  }
+];
+
+/* ------------------------------------------------------------ state + helpers */
+/* Results bands. Banding uses the ROUNDED percentage -- the same number shown
+   to the student -- so the label can never disagree with the figure beside it.
+   Raw-score ranges over this 57-question bank, checked in the scratch script:
+     Mastered 52-57 | Strong 46-51 | Developing 40-45 | Shaky 32-39 | below 32
+   Blind guessing on 4 options averages 14/57, which lands in the bottom band. */
+const BANDS = [
+  { min: 90, label: 'Mastered', tone: 'good',
+    note: 'You can place the world price, read both quantities off the curves, and carry a tariff or a quota through to revenue, rent and deadweight loss. Treat this topic as secure.' },
+  { min: 80, label: 'Strong', tone: 'good',
+    note: 'Solid command of the material. Work the topics below where you dropped marks, then run it again.' },
+  { min: 70, label: 'Developing', tone: 'mid',
+    note: 'The method is there but execution is slipping. The breakdown below shows where to aim.' },
+  { min: 55, label: 'Shaky', tone: 'poor',
+    note: 'Some of it is landing, but the gaps are wide enough to cost you marks. Review how the world price sets the domestic price before drilling again.' },
+  { min: 0, label: 'Needs Review', tone: 'poor',
+    note: 'Go back to the Unit 2 notes on international trade first. More practice without review will not close a gap this size.' },
+];
+
+let helpMode = true;          // true = Helpful Trade Review, false = AP Exam Difficulty
+let problemOrder = [];
+let problemIndex = 0;
+let stepIndex = 0;
+let answered = false;
+let optionOrder = [];               // display position -> index in step.options
+let score = { correct: 0, total: 0 };
+let perProblem = {};                // problem id -> { correct, total }, for the breakdown
+
+/* Fisher-Yates */
+function shuffledIndices(n){
+  const arr = [...Array(n).keys()];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/* Most problems shuffle, but a couple have a natural place in the sequence.
+   A problem marked pin:"first" always opens the bank -- the one that
+   establishes what the terms mean before anything is computed -- and
+   pin:"last" always closes it, for the problem that pulls the rest together
+   or reaches furthest. Everything between them shuffles exactly as before,
+   and the answer options still shuffle on every step regardless. */
+function buildProblemOrder(){
+  const first = [], middle = [], last = [];
+  PROBLEMS.forEach((p, i) => {
+    (p.pin === 'first' ? first : p.pin === 'last' ? last : middle).push(i);
+  });
+  return [...first, ...shuffledIndices(middle.length).map(k => middle[k]), ...last];
+}
+
+function currentProblem(){ return PROBLEMS[problemOrder[problemIndex]]; }
+
+function init(){
+  problemOrder = buildProblemOrder();
+  problemIndex = 0;
+  score = { correct: 0, total: 0 };
+  perProblem = {};
+  PROBLEMS.forEach(p => perProblem[p.id] = { correct: 0, total: 0 });
+  showQuiz();
+  loadProblem();
+}
+
+function loadProblem(){
+  stepIndex = 0;
+  const problem = currentProblem();
+
+  document.getElementById('methodBadge').textContent = problem.method;
+  document.getElementById('scenarioText').textContent = problem.scenario;
+  renderContext();
+  document.getElementById('problemCount').textContent =
+    `Problem ${problemIndex + 1} of ${PROBLEMS.length}`;
+
+  const wrap = document.getElementById('tableWrap');
+  if(problem.table){
+    wrap.style.display = 'block';
+    document.getElementById('tableHead').innerHTML =
+      problem.table.cols.map(c => `<th>${c}</th>`).join('');
+    document.getElementById('tableBody').innerHTML = problem.table.rows
+      .map(r => '<tr>' + r.map((cell, i) =>
+        `<td class="${problem.table.colClass[i]}">${cell}</td>`).join('') + '</tr>')
+      .join('');
+  } else {
+    wrap.style.display = 'none';
+  }
+
+  /* This bank uses three diagrams, so the key is looked up rather than
+     compared against one name. An unknown key draws nothing instead of
+     silently falling back to the wrong picture. */
+  const GRAPHS = { MARKET: MARKET_GRAPH, TRADEIN: TRADEIN_GRAPH, TRADEOUT: TRADEOUT_GRAPH };
+  const graphWrap = document.getElementById('graphWrap');
+  const svg = problem.graph ? GRAPHS[problem.graph] : null;
+  if(svg){
+    graphWrap.style.display = 'block';
+    graphWrap.innerHTML = svg;
+  } else {
+    graphWrap.style.display = 'none';
+    graphWrap.innerHTML = '';
+  }
+
+  loadStep();
+}
+
+// The terms line (what the abbreviations stand for) always shows: the exam
+// writes those out in full, so knowing the notation is not a hint. The review
+// line -- formulas, method definitions, and the sign/classification rules --
+// is what "AP Exam Difficulty" takes away.
+function renderContext(){
+  const problem = currentProblem();
+  document.getElementById('formulaNote').innerHTML =
+    helpMode ? problem.terms + '<br>' + problem.review : problem.terms;
+  document.getElementById('modeHint').textContent = helpMode
+    ? 'Formulas and method reminders stay on screen.'
+    : 'Formulas and method reminders hidden, as on the exam.';
+  document.getElementById('modeReview').setAttribute('aria-pressed', String(helpMode));
+  document.getElementById('modeExam').setAttribute('aria-pressed', String(!helpMode));
+}
+
+function setMode(wantHelp){
+  if(helpMode === wantHelp) return;
+  helpMode = wantHelp;
+  renderContext();          // switches mid-problem without disturbing your place
+}
+
+document.getElementById('modeReview').addEventListener('click', () => setMode(true));
+document.getElementById('modeExam').addEventListener('click', () => setMode(false));
+
+function loadStep(){
+  answered = false;
+  const problem = currentProblem();
+  const step = problem.steps[stepIndex];
+
+  document.getElementById('stepCount').textContent =
+    `Step ${stepIndex + 1} of ${problem.steps.length}`;
+  document.getElementById('scoreBadge').textContent =
+    `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('promptText').textContent = step.prompt;
+  document.getElementById('feedback').classList.remove('show');
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  const lastStep = stepIndex === problem.steps.length - 1;
+  const lastProblem = problemIndex === PROBLEMS.length - 1;
+  nextBtn.textContent = !lastStep ? 'Next step'
+                      : lastProblem ? 'See your results'
+                      : 'Next problem';
+
+  // Shuffle the answer choices too, so the correct option is never in a fixed slot.
+  optionOrder = shuffledIndices(step.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(origIndex => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = step.options[origIndex];
+    btn.addEventListener('click', () => handleAnswer(step, origIndex, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+function handleAnswer(step, chosenIndex, btnEl){
+  if(answered) return;
+  answered = true;
+
+  const isCorrect = chosenIndex === step.correct;
+  score.total++;
+  if(isCorrect) score.correct++;
+  const tally = perProblem[currentProblem().id];
+  tally.total++;
+  if(isCorrect) tally.correct++;
+  document.getElementById('scoreBadge').textContent =
+    `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === step.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect
+    ? 'Correct.'
+    : `Not quite — the answer is "${step.options[step.correct]}."`;
+  verdict.className = 'feedback-verdict ' + (isCorrect ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = step.explain;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  const problem = currentProblem();
+  if(stepIndex < problem.steps.length - 1){
+    stepIndex++;
+    loadStep();
+  } else if(problemIndex < PROBLEMS.length - 1){
+    problemIndex++;
+    loadProblem();
+  } else {
+    showResults();      // bank finished -- stop here rather than wrapping round
+  }
+});
+
+function showQuiz(){
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('quizPanel').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+}
+
+function showResults(){
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('quizPanel').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(score.correct / score.total * 100);
+  const band = BANDS.find(b => pct >= b.min);
+
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  \u00b7  ${pct}%`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  // breakdown in the fixed teaching order, not the shuffled order they saw
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  PROBLEMS.forEach(p => {
+    const t = perProblem[p.id];
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${p.topic}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
