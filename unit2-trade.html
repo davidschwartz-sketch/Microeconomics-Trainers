@@ -495,7 +495,7 @@ const R_IMP = 'A world price BELOW the no-trade price pulls the domestic price d
 const R_EXP = 'A world price ABOVE the no-trade price pulls the domestic price up to it, and the country exports. At that price read Qs off supply and Qd off demand separately; ' +
   'exports are the gap, Qs − Qd. Domestic sellers gain more than buyers lose, and the net gain is 1/2 × exports × (the price rise).';
 const R_WIN = 'Opening to trade moves the domestic price to the world price, and that move alone decides the winners. Imports push the price down, which helps buyers and hurts domestic sellers; ' +
-  'exports push it up, which does the reverse. The gain to the favoured side is always larger than the loss to the other.';
+  'exports push it up, which does the reverse. The gain to the favored side is always larger than the loss to the other.';
 const R_TAR = 'A tariff lifts the domestic price to Pw + t, so recompute Qs and Qd at that higher price. Revenue = t × the imports that remain AFTER the tariff, never the free-trade imports. ' +
   'The loss comes as TWO triangles: 1/2 × (the rise in Qs) × t on the production side, and 1/2 × (the fall in Qd) × t on the consumption side.';
 const R_QUO = 'An import quota caps imports at a fixed number, and the domestic price climbs until Qd − Qs equals exactly that number. The gap between the new domestic price and the world price, ' +
@@ -528,9 +528,9 @@ const PROBLEMS = [
                   "It exports, and domestic consumers gain while domestic producers lose",
                   "It imports, and domestic consumers gain while domestic producers lose",
                   "It exports, and domestic consumers are unaffected since they still buy at home"], correct: 0,
-        explain: "A no-trade price below the world price means the country is a cheap place to make the good, so it sells abroad. The domestic price rises to the world price, which favours domestic sellers and hurts domestic buyers. Everything is decided by which way the price moves." },
+        explain: "A no-trade price below the world price means the country is a cheap place to make the good, so it sells abroad. The domestic price rises to the world price, which favors domestic sellers and hurts domestic buyers. Everything is decided by which way the price moves." },
       { prompt: "What is true of total surplus in BOTH the importing and the exporting case?",
-        options: ["It rises in both, because the gain to the favoured side always exceeds the loss to the other",
+        options: ["It rises in both, because the gain to the favored side always exceeds the loss to the other",
                   "It rises when a country imports and falls when it exports, since exporting sends goods away",
                   "It is unchanged in both, because one domestic group's gain is the other's loss",
                   "It rises in both, and in both cases every domestic group ends up better off than before"], correct: 0,

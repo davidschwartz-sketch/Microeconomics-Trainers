@@ -428,7 +428,7 @@ const CARDS = [
 
   { category:"Perfect Competition",
     prompt:"Perfect competition assumes firms can enter and leave the market freely. What does that assumption rule out?",
-    options:["Barriers to entry such as licences, patents, or very large start-up costs",
+    options:["Barriers to entry such as licenses, patents, or very large start-up costs",
              "Any firm ever choosing to shut down, since free entry means all firms must stay",
              "Firms earning any revenue at all, since free entry drives the price down to zero",
              "Buyers switching between sellers, since sellers come and go too quickly to follow"], correct:0,
@@ -449,7 +449,7 @@ const CARDS = [
              "When the price of a good rises, the demand for it falls, all else held constant",
              "When buyers' incomes rise, the quantity demanded of a good also rises, all else held constant",
              "When the quantity demanded of a good rises, its price must then fall in order to clear the market"], correct:0,
-    explain:"Price up, quantity demanded down. Note the wording: it is QUANTITY DEMANDED that falls, not demand. A price change moves you along the curve; it never shifts the curve itself." },
+    explain:"This question highlights the difference between demand and quantity demanded. 'Demand' refers to the entire curve, while 'quantity demanded' refers to the amount actually bought at a specific price. Here, when price rises, the quantity demanded falls because demand curves slope downward. It is quantity DEMANDED that responds to the good's own price. Demand \u2014 the curve itself \u2014 shifts only for other reasons." },
 
   { category:"Demand",
     prompt:"The price of a good falls and buyers purchase more of it. On the diagram, what has happened?",
@@ -481,7 +481,7 @@ const CARDS = [
              "It increases — buyers switch toward the good whose price did not rise",
              "It is unchanged, because complements affect quantity supplied rather than demand",
              "It increases, provided the two goods are also substitutes for some third good"], correct:0,
-    explain:"Complements are used together: printers and ink, cars and petrol. Dearer printers means fewer printers bought, and therefore less ink wanted at every ink price — so ink's demand curve shifts left." },
+    explain:"Complements are used together: printers and ink, cars and gasoline. Dearer printers means fewer printers bought, and therefore less ink wanted at every ink price — so ink's demand curve shifts left." },
 
   { category:"Demand",
     prompt:"Buyers come to expect that a good's price will be much higher next month. What happens to demand for it today?",
@@ -514,7 +514,7 @@ const CARDS = [
              "When the price of a good rises, the supply of it rises, all else held constant",
              "When production costs rise, the quantity supplied rises in order to help cover those costs",
              "When the quantity supplied rises, the price must also rise in order to pay for the extra output"], correct:0,
-    explain:"Price up, quantity supplied up — the supply curve slopes upward. As with demand, it is QUANTITY SUPPLIED that responds to the good's own price. Supply itself shifts only for other reasons." },
+    explain:"This question highlights the difference between supply and quantity supplied. 'Supply' refers to the entire curve, while 'quantity supplied' refers to the amount actually supplied at a specific price. Here, when price rises, the quantity supplied goes up because supply curves slope upward. As with demand, it is quantity SUPPLIED that responds to the good's own price. Supply \u2014 the curve itself \u2014 shifts only for other reasons." },
 
   { category:"Supply",
     prompt:"The cost of an input used to make a good goes up. What happens in that market?",
@@ -569,16 +569,16 @@ const CARDS = [
     prompt:"What defines market equilibrium?",
     options:["The price at which quantity demanded equals quantity supplied, so there is neither a shortage nor a surplus",
              "The price at which sellers take in the largest total revenue available to them",
-             "The price at which the largest possible quantity of the good changes hands",
+             "The price a regulator must set, because a free market will not find it on its own",
              "The price at which buyers and sellers end up with equal shares of the surplus"], correct:0,
     explain:"Equilibrium is where the two quantities match. Nothing is left unsold and nobody willing to pay the price goes unserved, so no force is pushing the price in either direction." },
 
   { category:"Equilibrium",
-    prompt:"On a supply and demand diagram, what are P* and Q*?",
-    options:["The price and quantity at the point where the two curves cross, the point usually labelled E",
+    prompt:"On a supply and demand diagram, what are the equilibrium values P* and Q*?",
+    options:["The price and quantity at the point where the two curves cross, the point usually labeled E",
              "The highest price that buyers would ever pay and the largest quantity sellers could possibly make",
              "The price and quantity a government sets as its target for the market",
-             "The price read off the demand curve and the quantity read off the supply curve at the same point"], correct:0,
+             "The price and quantity that would maximize profits for a hypothetical monopolist"], correct:0,
     explain:"P* and Q* are the equilibrium price and quantity — the coordinates of point E where supply meets demand. Every surplus, shortage or deadweight loss later in the unit is measured relative to that point." },
 
   { category:"Equilibrium",
@@ -603,7 +603,7 @@ const CARDS = [
              "Sellers raise the price, which rations the goods among the buyers who want them most",
              "The surplus persists, because nothing in a free market pushes the price downward",
              "Buyers raise their offers, which encourages sellers to bring still more to market"], correct:0,
-    explain:"Unsold stock pushes sellers to cut prices. As the price falls, buyers want more and sellers offer less, and the two quantities converge on equilibrium. The correction needs nobody to organise it." },
+    explain:"Unsold stock pushes sellers to cut prices. As the price falls, buyers want more and sellers offer less, and the two quantities converge on equilibrium. The correction needs nobody to organize it." },
 
   { category:"Equilibrium",
     prompt:"A shortage exists in a free market. How does the market correct itself?",
@@ -636,7 +636,7 @@ const CARDS = [
              "Necessities are usually cheaper, and cheap goods always turn out to have inelastic demand",
              "Luxuries have fewer substitutes, which makes their demand harder to change",
              "Necessities are bought by far more people, and more buyers always means less elastic demand"], correct:0,
-    explain:"Necessity versus luxury is a determinant in its own right. If you genuinely have to have the good, a higher price mostly means you pay more rather than buy less — so quantity demanded barely moves." },
+    explain:"While cheaper goods tend to have lower elasticity, that is not always the case, and necessity versus luxury is a determinant in its own right. If you genuinely have to have the good, a higher price mostly means you pay more rather than buy less \u2014 so quantity demanded barely moves." },
 
   { category:"Elasticity of Demand",
     prompt:"How does the time horizon affect price elasticity of demand?",
@@ -644,7 +644,7 @@ const CARDS = [
              "Demand is more elastic over a shorter period, because the price change is still fresh in mind",
              "Time affects the quantity actually traded but has no bearing on elasticity",
              "Demand becomes perfectly inelastic in the long run, once buying habits have properly settled"], correct:0,
-    explain:"Given time, buyers adjust: they find substitutes, change equipment, change habits. A petrol price rise barely dents consumption this week and dents it considerably over several years." },
+    explain:"Given time, buyers adjust: they find substitutes, change equipment, change habits. A gasoline price rise barely dents consumption this week and dents it considerably over several years." },
 
   { category:"Elasticity of Demand",
     prompt:"Which has the more elastic demand — 'food' as a whole, or 'Granny Smith apples'?",
@@ -778,12 +778,12 @@ const CARDS = [
     explain:"A quota fixes a quantity rather than a price, and binds only when it is set below the quantity the market would otherwise trade. The price then adjusts to whatever clears that restricted quantity." },
 
   { category:"Price Controls and Quotas",
-    prompt:"Under a quota, what does a licence entitle its holder to do?",
-    options:["Supply one of the limited number of units the quota allows, which is what makes the licence worth having",
+    prompt:"Under a quota, what does a license entitle its holder to do?",
+    options:["Supply one of the limited number of units the quota allows, which is what makes the license worth having",
              "Charge a higher price for the good than other sellers are permitted to charge",
              "Avoid paying a tax that the government levies on the restricted good",
              "Buy the good at the world price instead of at the domestic price"], correct:0,
-    explain:"The quota makes the right to supply scarce, and a licence is that right. Because the restricted price sits above what the unit costs to supply, the licence carries a gap in value — which is why taxi medallions and fishing licences trade for serious money." },
+    explain:"The quota makes the right to supply scarce, and a license is that right. Because the restricted price sits above what the unit costs to supply, the license carries a gap in value — which is why taxi medallions and fishing licenses trade for serious money." },
 
   /* ---- trade ---- */
   { category:"Trade",
@@ -808,7 +808,7 @@ const CARDS = [
              "Export the good, because its own producers evidently value it rather more than foreigners do",
              "Neither import nor export, because the two prices will always settle somewhere in the middle",
              "Import the good, but only up until the domestic price has risen to meet the world price exactly"], correct:0,
-    explain:"Compare the two prices and nothing else. A no-trade price above the world price means the country is an expensive place to make the good, so buyers turn abroad and it becomes an importer." },
+    explain:"Because we are assuming perfect competition, the domestic price will always switch to the global price. A no-trade price above the world price means the country is a relatively expensive place to make the good, so buyers turn abroad and it becomes an importer." },
 
   { category:"Trade",
     prompt:"When a country opens to trade at a given world price, what happens to its domestic price?",
