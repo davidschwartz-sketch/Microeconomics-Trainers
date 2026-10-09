@@ -479,7 +479,7 @@ const R_REC = 'Three questions sort the five mechanisms. Does it fix a PRICE or 
 
 const PROBLEMS = [
   {
-    id: "P1", pin: "first",
+    id: "P1",
     topic: "Excise tax — the full calculation",
     method: "Excise tax · wedge, revenue and deadweight loss",
     scenario: "Harbor Marine sells boat anchors. P is the price in dollars per anchor and Q is anchors per week. The government then puts a $16 per-unit tax on the market.",
@@ -632,7 +632,7 @@ const PROBLEMS = [
         explain: "Price is how a market normally decides who gets a scarce good, and the ceiling has switched that mechanism off without reducing scarcity. Something else has to do the rationing: queues, who you know, landlords quietly favoring some applicants, or black-market payments on the side. Those are not incidental side effects, they are the predictable consequence of holding a price below the clearing level." },
       { prompt: "Assume the ten flats rented at the ceiling go to the tenants who value them most. What is the deadweight loss from the ceiling?",
         options: ["$150", "$300", "$75", "$600"], correct: 0,
-        explain: "Ten flats that should have been let are not. At Q = 10 a tenant values a flat at 90 − 10 = $80 while it costs 30 + 20 = $50 to provide, a gap of $30 that narrows to zero at Q* = 20. DWL = 1/2 × 10 × 30 = $150." },
+        explain: "Ten flats that should have been let are not. At Q = 10 a tenant values a flat at 90 − 10 = $80 while it costs 30 + 20 = $50 to provide, a gap of $30 that narrows to zero at Q* = 20. DWL = 1/2 × 10 × 30 = $150. $300 is a tempting wrong answer because it is what landlords lose, but half of that reaches the tenants who do get a flat, as a lower rent. A transfer from one side to the other is not destroyed surplus. Only the $150 that reaches nobody is deadweight loss." },
       { prompt: "Still assuming the flats go to the tenants who value them most, consumer surplus RISES here from $200 to $350 while producer surplus falls from $400 to $100. Is that consistent?",
         options: ["Yes — the tenants who do get a flat pay far less, and that gain outweighs the surplus lost by the tenants shut out; landlords lose $300, of which $150 is transferred and $150 destroyed",
                   "No — consumer surplus must fall whenever the quantity traded falls, because surplus accrues only on units actually exchanged, so cutting the flats let from 20 to 10 has to cut the tenants' total too",
@@ -676,7 +676,7 @@ const PROBLEMS = [
         explain: "This is the single most common wording trap in the topic. The 18 crates are excess supply, measured in crates. Producer surplus is $700, measured in dollars, and it is the area between the $84 price and the supply curve over the 14 crates actually sold — it has nothing to do with the unsold ones. When a question says ‘surplus’, check whether it means goods piling up or money being gained." },
       { prompt: "What is the deadweight loss from the floor?",
         options: ["$108", "$216", "$54", "$360"], correct: 0,
-        explain: "Six crates that should have been traded are not. At Q = 14 a buyer values a crate at 140 − 56 = $84 while it costs 20 + 28 = $48 to grow, a gap of $36 narrowing to zero at Q* = 20. DWL = 1/2 × 6 × 36 = $108." },
+        explain: "Six crates that should have been traded are not. At Q = 14 a buyer values a crate at 140 − 56 = $84 while it costs 20 + 28 = $48 to grow, a gap of $36 narrowing to zero at Q* = 20. DWL = 1/2 × 6 × 36 = $108. Watch the direction of the transfer here: buyers lose $408 while growers gain $300, and only the $108 difference is destroyed. The surplus one side gives up is never the deadweight loss on its own — you have to take out whatever the other side, or the government, or a license holder, actually receives." },
       { prompt: "Who gains and who loses from this floor?",
         options: ["Producers who still sell gain (PS rises from $400 to $700) while buyers lose heavily (CS falls from $800 to $392) — and $108 of the loss is destroyed rather than transferred",
                   "Producers gain and buyers gain too, since a guaranteed minimum price makes the market steadier and more orderly, and that predictability is worth something to both sides",
@@ -709,7 +709,7 @@ const PROBLEMS = [
         explain: "This is what distinguishes a quota from a tax. The wedge is the same shape and the same size, but no government collects it: buyers pay $84 and only $48 of that reflects the cost of landing the fish. The extra $36 a crate is the value of permission to sell, and it accrues to the license holder. If licenses can be traded, that is precisely what they sell for — which is why taxi medallions and fishing licenses become assets worth more than the boats." },
       { prompt: "What is the deadweight loss from the quota?",
         options: ["$216", "$648", "$108", "$432"], correct: 0,
-        explain: "Twelve crates that should have been traded are not. The gap between the curves is $36 at the quota and narrows to zero at Q* = 30. DWL = 1/2 × 12 × 36 = $216." },
+        explain: "Twelve crates that should have been traded are not. The gap between the curves is $36 at the quota and narrows to zero at Q* = 30. DWL = 1/2 × 12 × 36 = $216. $648 is the quota rent, and it is the classic wrong answer here: it is a rectangle that changes hands, not value that disappears. The two sides give up $864 between them, the license holders receive $648 of that, and the $216 left over is the only part nobody ends up holding." },
       { prompt: "Check the books: CS is $324, PS is $162, and the quota rent is $648. Do they reconcile with the free-market total surplus of $1,350?",
         options: ["Yes — $324 + $162 + $648 = $1,134, which is $1,350 less the $216 deadweight loss",
                   "No — they come to more than $1,350, so the quota increases total surplus",
@@ -769,7 +769,7 @@ const PROBLEMS = [
     ]
   },
   {
-    id: "P9",
+    id: "P9", pin: "first",
     topic: "Recognizing the mechanism from the description",
     method: "Interpretation — no calculation",
     scenario: "No arithmetic here. Each part describes a real policy; name the mechanism it is.",
