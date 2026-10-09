@@ -505,7 +505,40 @@ const R_SYN = 'Three questions sort any trade problem. Is the world price below 
 
 const PROBLEMS = [
   {
-    id: "P1", pin: "first",
+    id: "P0", pin: "first",
+    topic: "Which way trade runs, and who gains at home",
+    method: "Interpretation — no calculation",
+    scenario: "No arithmetic in this one. These parts fix the two things every later question turns on: where the domestic price ends up once a country opens to trade, and which side of the domestic market that move helps.",
+    terms: TERMS, review: R_SYN,
+    steps: [
+      { prompt: "A country small enough to take the world price as given opens up to trade. What happens to the domestic price of the good?",
+        options: ["It moves to the world price — down to it if the world price is lower, up to it if the world price is higher",
+                  "It settles halfway between the old domestic price and the world price, the two markets meeting in the middle",
+                  "It stays where it was, because domestic supply and domestic demand are what set the price at home",
+                  "It becomes the world price on imported units only, while units made at home keep the old domestic price"], correct: 0,
+        explain: "This is the hinge the whole topic turns on. Once the good can cross the border freely, nobody at home will pay more than the world price for something available at that price abroad, and no domestic seller will take less when foreigners will pay it. So the domestic price simply becomes the world price — it does not split the difference, and it does not apply to only some of the units. Every quantity, every surplus and every gap in the rest of the topic is then read off the domestic curves at that one price." },
+      { prompt: "A country's no-trade price is ABOVE the world price. Which way does trade run once it opens, and which domestic group gains?",
+        options: ["It imports, and domestic consumers gain while domestic producers lose",
+                  "It imports, and domestic producers gain while domestic consumers lose",
+                  "It exports, and domestic producers gain while domestic consumers lose",
+                  "It imports, and both domestic groups gain because the total surplus rises"], correct: 0,
+        explain: "A no-trade price above the world price means the country is an expensive place to make the good, so it buys abroad. The domestic price falls to the world price, and a falling price is good news for buyers and bad news for domestic sellers." },
+      { prompt: "A country's no-trade price is BELOW the world price. Which way does trade run, and which domestic group gains?",
+        options: ["It exports, and domestic producers gain while domestic consumers lose",
+                  "It exports, and domestic consumers gain while domestic producers lose",
+                  "It imports, and domestic consumers gain while domestic producers lose",
+                  "It exports, and domestic consumers are unaffected since they still buy at home"], correct: 0,
+        explain: "A no-trade price below the world price means the country is a cheap place to make the good, so it sells abroad. The domestic price rises to the world price, which favours domestic sellers and hurts domestic buyers. Everything is decided by which way the price moves." },
+      { prompt: "What is true of total surplus in BOTH the importing and the exporting case?",
+        options: ["It rises in both, because the gain to the favoured side always exceeds the loss to the other",
+                  "It rises when a country imports and falls when it exports, since exporting sends goods away",
+                  "It is unchanged in both, because one domestic group's gain is the other's loss",
+                  "It rises in both, and in both cases every domestic group ends up better off than before"], correct: 0,
+        explain: "Opening to trade raises total surplus whichever way the goods move, and the gain is 1/2 × the volume traded × the gap between the world price and the no-trade price. What changes between the two cases is only who collects the gain and who pays." }
+    ]
+  },
+  {
+    id: "P1", pin: "second",
     topic: "Autarky — the no-trade benchmark",
     method: "Autarky · no trade allowed",
     scenario: "Narvia produces steel rods and currently allows no trade in them at all. P is the price in dollars per rod and Q is rods per day.",
@@ -816,27 +849,9 @@ const PROBLEMS = [
     id: "P10", pin: "last",
     topic: "Putting the trade results together",
     method: "Interpretation — no calculation",
-    scenario: "No arithmetic in this one. These parts are about the patterns that hold across every trade problem, whichever direction the goods move.",
+    scenario: "No arithmetic in this one. These parts pull together what a barrier does, having worked the cases: where the revenue comes from, why the loss comes in two pieces, and what the gains-from-trade result does and does not promise.",
     terms: TERMS, review: R_SYN,
     steps: [
-      { prompt: "A country's no-trade price is ABOVE the world price. Which way does trade run once it opens, and which domestic group gains?",
-        options: ["It imports, and domestic consumers gain while domestic producers lose",
-                  "It imports, and domestic producers gain while domestic consumers lose",
-                  "It exports, and domestic producers gain while domestic consumers lose",
-                  "It imports, and both domestic groups gain because the total surplus rises"], correct: 0,
-        explain: "A no-trade price above the world price means the country is an expensive place to make the good, so it buys abroad. The domestic price falls to the world price, and a falling price is good news for buyers and bad news for domestic sellers." },
-      { prompt: "A country's no-trade price is BELOW the world price. Which way does trade run, and which domestic group gains?",
-        options: ["It exports, and domestic producers gain while domestic consumers lose",
-                  "It exports, and domestic consumers gain while domestic producers lose",
-                  "It imports, and domestic consumers gain while domestic producers lose",
-                  "It exports, and domestic consumers are unaffected since they still buy at home"], correct: 0,
-        explain: "A no-trade price below the world price means the country is a cheap place to make the good, so it sells abroad. The domestic price rises to the world price, which favours domestic sellers and hurts domestic buyers. Everything is decided by which way the price moves." },
-      { prompt: "What is true of total surplus in BOTH the importing and the exporting case?",
-        options: ["It rises in both, because the gain to the favoured side always exceeds the loss to the other",
-                  "It rises when a country imports and falls when it exports, since exporting sends goods away",
-                  "It is unchanged in both, because one domestic group's gain is the other's loss",
-                  "It rises in both, and in both cases every domestic group ends up better off than before"], correct: 0,
-        explain: "Opening to trade raises total surplus whichever way the goods move, and the gain is 1/2 × the volume traded × the gap between the world price and the no-trade price. What changes between the two cases is only who collects the gain and who pays." },
       { prompt: "Tariff revenue must be computed using which import quantity?",
         options: ["The imports left AFTER the tariff, since no revenue is collected on trade the tariff prevented",
                   "The imports there would have been under free trade, since the tariff is a charge on that whole flow",
@@ -849,6 +864,12 @@ const PROBLEMS = [
                   "Because one triangle is the revenue collected and the other is the surplus genuinely destroyed",
                   "Because the tariff is paid twice over, once by importers at the border and once by buyers in the shops"], correct: 0,
         explain: "The higher domestic price pulls in two directions. On the production side, domestic firms make units that the rest of the world could have supplied for less, wasting the difference. On the consumption side, buyers who valued the good above the world price stop buying it. Neither waste is a transfer to anyone, which is what makes both of them deadweight loss." },
+      { prompt: "A tariff and an import quota are set so that the domestic price ends up at exactly the same level. What is the one thing that differs between them?",
+        options: ["Who receives the block between the world price and the domestic price — the government under a tariff, the license holders under a quota",
+                  "The deadweight loss, which comes out larger under the quota because no revenue is raised to set against it",
+                  "The domestic quantity supplied, which is higher under a quota because a cap protects domestic producers directly",
+                  "The price domestic buyers pay, which is higher under a quota because the quantity is fixed instead of the price"], correct: 0,
+        explain: "Set to the same domestic price the two are one policy drawn two ways: same quantity supplied at home, same quantity demanded, same imports, same consumer surplus, same domestic producer surplus, and the same two deadweight-loss triangles. What differs is where the rectangle between the world price and the domestic price ends up. A tariff sends it to the treasury. A quota sends it to whoever holds the import licenses — and if those go to foreign exporters it leaves the country altogether, which is the one way the quota is genuinely worse." },
       { prompt: "Does the finding that trade raises total surplus mean nobody in the country is harmed by it?",
         options: ["No — one domestic group loses in every case, and the result says only that the other group's gain is larger",
                   "Yes — a rise in total surplus means every group must be at least as well off as before",
@@ -862,9 +883,9 @@ const PROBLEMS = [
 /* ------------------------------------------------------------ state + helpers */
 /* Results bands. Banding uses the ROUNDED percentage -- the same number shown
    to the student -- so the label can never disagree with the figure beside it.
-   Raw-score ranges over this 57-question bank, checked in the scratch script:
-     Mastered 52-57 | Strong 46-51 | Developing 40-45 | Shaky 32-39 | below 32
-   Blind guessing on 4 options averages 14/57, which lands in the bottom band. */
+   Raw-score ranges over this 59-question bank, checked in the scratch script:
+     Mastered 53-59 | Strong 47-52 | Developing 42-46 | Shaky 33-41 | below 33
+   Blind guessing on 4 options averages 15/59, which lands in the bottom band. */
 const BANDS = [
   { min: 90, label: 'Mastered', tone: 'good',
     note: 'You can place the world price, read both quantities off the curves, and carry a tariff or a quota through to revenue, rent and deadweight loss. Treat this topic as secure.' },
@@ -904,11 +925,15 @@ function shuffledIndices(n){
    or reaches furthest. Everything between them shuffles exactly as before,
    and the answer options still shuffle on every step regardless. */
 function buildProblemOrder(){
-  const first = [], middle = [], last = [];
+  const first = [], second = [], middle = [], last = [];
   PROBLEMS.forEach((p, i) => {
-    (p.pin === 'first' ? first : p.pin === 'last' ? last : middle).push(i);
+    const bucket = p.pin === 'first'  ? first
+                 : p.pin === 'second' ? second
+                 : p.pin === 'last'   ? last
+                 : middle;
+    bucket.push(i);
   });
-  return [...first, ...shuffledIndices(middle.length).map(k => middle[k]), ...last];
+  return [...first, ...second, ...shuffledIndices(middle.length).map(k => middle[k]), ...last];
 }
 
 function currentProblem(){ return PROBLEMS[problemOrder[problemIndex]]; }

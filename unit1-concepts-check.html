@@ -398,6 +398,7 @@ const CARDS = [
 let order = [];
 let index = 0;
 let answered = false;
+let optionOrder = [];               // display position -> index in card.options
 let score = { correct:0, total:0 };
 
 function shuffledIndices(n){
@@ -424,13 +425,17 @@ function loadCard(){
   document.getElementById('feedback').classList.remove('show');
   document.getElementById('nextBtn').disabled = true;
 
+  /* Shuffle the choices. Without this the answer sits wherever it was written,
+     and in this bank it was written second on 24 of the 40 cards - so "always
+     click the second one" scored 60% while knowing nothing. */
+  optionOrder = shuffledIndices(card.options.length);
   const wrap = document.getElementById('optionsWrap');
   wrap.innerHTML = '';
-  card.options.forEach((optText, i)=>{
+  optionOrder.forEach(origIndex=>{
     const btn = document.createElement('button');
     btn.className = 'choice-btn';
-    btn.textContent = optText;
-    btn.addEventListener('click', ()=>handleAnswer(card, i, btn));
+    btn.textContent = card.options[origIndex];
+    btn.addEventListener('click', ()=>handleAnswer(card, origIndex, btn));
     wrap.appendChild(btn);
   });
 }
@@ -443,9 +448,9 @@ function handleAnswer(card, chosenIndex, btnEl){
   if(isCorrect) score.correct++;
   document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
 
-  [...document.getElementById('optionsWrap').children].forEach((b,i)=>{
+  [...document.getElementById('optionsWrap').children].forEach((b,pos)=>{
     b.disabled = true;
-    if(i === card.correct) b.classList.add('correct');
+    if(optionOrder[pos] === card.correct) b.classList.add('correct');
     else if(b === btnEl) b.classList.add('incorrect');
   });
 

@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept Check: Unit 2 — Supply, Demand and Market Policy</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+    --demand: #2F6F62;
+    --supply: #C1542C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:760px;margin:0 auto;}
+
+  header{
+    margin-bottom:20px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  header h1{
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+  }
+
+  .mode-row{
+    display:flex;
+    align-items:center;
+    gap:10px 12px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .mode-label{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+  }
+  .segmented{
+    display:inline-flex;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--surface);
+  }
+  .segmented button{
+    border:none;
+    background:transparent;
+    padding:7px 14px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .segmented button + button{border-left:1px solid var(--border);}
+  .segmented button:hover[aria-pressed="false"]{background:#FFFBF2;}
+  .segmented button[aria-pressed="true"]{
+    background:var(--accent);
+    color:var(--ink);
+  }
+  .mode-hint{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  @media (max-width:560px){
+    .segmented{width:100%;}
+    .segmented button{flex:1;padding:8px 6px;font-size:12px;}
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .count-group{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .card-count{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .score-badge{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px;
+  }
+
+  .method-badge{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:3px 9px;
+    border-radius:6px;
+    margin-bottom:12px;
+  }
+  .scenario{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .formula-note{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:10px 13px;
+    margin-bottom:18px;
+  }
+  .formula-note b{color:var(--ink);}
+
+  .table-wrap{overflow-x:auto;margin-bottom:20px;}
+  table.data-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.data-table th, table.data-table td{
+    border:1px solid var(--border);
+    padding:9px 11px;
+    text-align:center;
+    white-space:nowrap;
+  }
+  table.data-table th{
+    background:var(--surface-alt);
+    font-weight:700;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  table.data-table td.row-label{
+    font-weight:700;
+    text-align:left;
+    color:var(--ink-soft);
+  }
+  table.data-table td.p-cell{color:var(--supply); font-weight:700;}
+  table.data-table td.wrap-cell{
+    text-align:left;
+    white-space:normal;
+    font-weight:600;
+  }
+  table.data-table td.q-cell{color:var(--demand); font-weight:700;}
+
+  .graph-wrap{
+    margin-bottom:20px;
+    text-align:center;
+  }
+  .graph-wrap svg{width:100%;max-width:480px;height:auto;}
+
+  .prompt{
+    font-size:18px;
+    font-weight:600;
+    line-height:1.4;
+    color:var(--ink);
+    margin-bottom:18px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .choice-btn{
+    text-align:left;
+    padding:13px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){
+    border-color:var(--accent);
+    background:#FFFBF2;
+  }
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{
+    background:var(--correct-soft);
+    border-color:var(--correct);
+    color:var(--correct);
+  }
+  .choice-btn.incorrect{
+    background:var(--incorrect-soft);
+    border-color:var(--incorrect);
+    color:var(--incorrect);
+  }
+
+  .feedback{
+    display:none;
+    margin-bottom:16px;
+  }
+  .feedback.show{display:block;}
+  .feedback-verdict{
+    font-weight:800;
+    font-size:15px;
+    margin-bottom:6px;
+  }
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    padding:12px 14px;
+    border-radius:0 8px 8px 0;
+  }
+
+  .controls{
+    display:flex;
+    justify-content:flex-end;
+  }
+  .btn{
+    padding:11px 20px;
+    border-radius:10px;
+    border:none;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover{background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{
+    font-size:34px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    margin-bottom:10px;
+  }
+  .results-note{
+    font-size:15px;
+    color:var(--ink-soft);
+    margin-bottom:20px;
+  }
+  table.data-table th.topic-head, table.data-table td.topic-cell{
+    text-align:left;
+    white-space:normal;
+  }
+  table.data-table td.topic-cell{font-weight:600;color:var(--ink);}
+  table.data-table td.topic-score{font-weight:700;}
+  table.data-table td.topic-score.full{color:var(--correct);}
+  table.data-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+    line-height:1.5;
+    border-top:1px solid var(--border);
+    padding-top:14px;
+    margin:18px 0 20px;
+  }
+
+  footer.reset-row{
+    margin-top:20px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Concept Check: Unit 2</h1>
+    <p>The terms and ideas of Unit 2 &mdash; demand and supply and what shifts each, equilibrium, elasticity, surplus, price controls and trade</p>
+  </header>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="card-count" id="cardCount">Card 1 of 51</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="panel" id="quizPanel">
+    <span class="method-badge" id="categoryTag"></span>
+
+    <div class="prompt" id="promptText">Loading&hellip;</div>
+
+    <div class="options" id="optionsWrap"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-verdict" id="feedbackVerdict"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn" disabled>Next card</button>
+    </div>
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">Area</th><th>Score</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <p class="results-caveat">These bands say whether the Unit 2 vocabulary is secure &mdash; they are not an AP score
+    prediction. The exam covers every unit, counts free response for a third of the grade, and gives you no
+    feedback until it is over. Treat a strong result here as one topic secured, not as a score.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Start again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Start over</button>
+  </footer>
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   A definitions bank, so there is no arithmetic to verify here. What IS
+   checked, in a scratch script, is the shape of the bank: that every term the
+   brief asks for appears, that the correct option is written first in every
+   card (the page shuffles them on screen, so a fixed slot cannot leak the
+   answer), that no two options inside a card are the same, and that option
+   length does not give the answer away.
+--------------------------------------------------------------------------- */
+const CARDS = [
+
+  /* ---- perfectly competitive markets ---- */
+  { category:"Perfect Competition",
+    prompt:"Which of these is an assumption of a perfectly competitive market?",
+    options:["There are many buyers and many sellers, each too small to move the market price alone",
+             "A few large firms compete, each with a big enough share to influence the going market price",
+             "One seller supplies the entire market and picks the price that suits it best",
+             "Sellers offer noticeably different versions, so buyers have a reason to prefer one of them"], correct:0,
+    explain:"Perfect competition assumes many buyers and many sellers, all small relative to the market. That is what makes each one a price taker: no single participant trades enough to shift the price by acting differently." },
+
+  { category:"Perfect Competition",
+    prompt:"In a perfectly competitive market, an individual seller is described as what?",
+    options:["A price taker — it has to accept the market price, because it is too small to move it",
+             "A price maker — it picks whatever price it calculates will earn it the greatest profit",
+             "A price leader — it sets a price, and the other sellers in the market then follow its lead",
+             "A price negotiator — it agrees a separate price with each buyer it deals with"], correct:0,
+    explain:"A price taker accepts the market price as given. Charge a penny more and buyers go elsewhere, because the product is identical and alternatives are everywhere; charge less and you give away money you could have had." },
+
+  { category:"Perfect Competition",
+    prompt:"Which assumption of perfect competition explains why buyers do not care which seller they buy from?",
+    options:["The product is identical from one seller to the next, so there is nothing to choose between them",
+             "Every seller is required by law to charge exactly the same price as every other seller in the market",
+             "Buyers have no information about who the sellers are or what any of them charge",
+             "Sellers are so numerous that no buyer could ever compare them all, so the choice is made at random"], correct:0,
+    explain:"A homogeneous product means one seller's unit is a perfect substitute for another's. Buyers then have no reason to prefer a seller except on price, which is exactly what forces every seller to the same price." },
+
+  { category:"Perfect Competition",
+    prompt:"Perfect competition assumes firms can enter and leave the market freely. What does that assumption rule out?",
+    options:["Barriers to entry such as licences, patents, or very large start-up costs",
+             "Any firm ever choosing to shut down, since free entry means all firms must stay",
+             "Firms earning any revenue at all, since free entry drives the price down to zero",
+             "Buyers switching between sellers, since sellers come and go too quickly to follow"], correct:0,
+    explain:"Free entry and exit means nothing legal or financial blocks a new firm from starting up or an existing one from leaving. Licences, patents and heavy start-up costs are exactly the barriers the assumption excludes." },
+
+  /* ---- demand ---- */
+  { category:"Demand",
+    prompt:"What is the difference between demand and quantity demanded?",
+    options:["Demand is the whole relationship between price and amount wanted; quantity demanded is the single amount at one particular price",
+             "Demand is what buyers would like to have; quantity demanded is what they can actually afford to buy",
+             "Demand describes one individual buyer; quantity demanded describes the market as a whole",
+             "They mean the same thing, and economists use the two terms interchangeably"], correct:0,
+    explain:"Demand is the entire schedule or curve — the amount wanted at every possible price. Quantity demanded is one point on it. The distinction is what makes 'demand rises' and 'quantity demanded rises' two different claims, caused by different things." },
+
+  { category:"Demand",
+    prompt:"What does the law of demand state?",
+    options:["When the price of a good rises, the quantity demanded of it falls, all else held constant",
+             "When the price of a good rises, the demand for it falls, all else held constant",
+             "When buyers' incomes rise, the quantity demanded of a good also rises, all else held constant",
+             "When the quantity demanded of a good rises, its price must then fall in order to clear the market"], correct:0,
+    explain:"Price up, quantity demanded down. Note the wording: it is QUANTITY DEMANDED that falls, not demand. A price change moves you along the curve; it never shifts the curve itself." },
+
+  { category:"Demand",
+    prompt:"The price of a good falls and buyers purchase more of it. On the diagram, what has happened?",
+    options:["A movement along the demand curve, from one point on it to another",
+             "A shift of the whole demand curve to the right",
+             "A shift of the whole demand curve to the left",
+             "A movement along the curve and a shift of it, happening at the same time"], correct:0,
+    explain:"The good's OWN price is the one thing that never shifts its demand curve. A price change moves you along the curve you already have. Everything else — income, tastes, related prices, expectations, the number of buyers — shifts it." },
+
+  { category:"Demand",
+    prompt:"Household incomes rise and the good in question is a normal good. What happens in that market?",
+    options:["Demand increases — the whole curve shifts to the right",
+             "Quantity demanded increases, but the demand curve itself does not move",
+             "Demand decreases — the whole curve shifts to the left",
+             "Nothing changes, because income is not the good's own price"], correct:0,
+    explain:"For a normal good, more income means buyers want more at every price, so the whole curve shifts right. (For an inferior good it would shift left — that is what makes the good inferior.)" },
+
+  { category:"Demand",
+    prompt:"Two goods are substitutes. The price of one of them rises. What happens to demand for the other?",
+    options:["It increases — buyers switch toward the good whose price did not rise",
+             "It decreases — the two tend to be bought together, so less of both is wanted",
+             "It is unchanged, because only a good's own price can move its demand curve",
+             "Its quantity demanded increases, but the demand curve itself stays put"], correct:0,
+    explain:"Substitutes are alternatives to each other: tea and coffee, two brands of the same thing. When one gets dearer, buyers move to the other, so the other's whole demand curve shifts right." },
+
+  { category:"Demand",
+    prompt:"Two goods are complements. The price of one of them rises. What happens to demand for the other?",
+    options:["It decreases — the two are used together, so buyers end up wanting less of both",
+             "It increases — buyers switch toward the good whose price did not rise",
+             "It is unchanged, because complements affect quantity supplied rather than demand",
+             "It increases, provided the two goods are also substitutes for some third good"], correct:0,
+    explain:"Complements are used together: printers and ink, cars and petrol. Dearer printers means fewer printers bought, and therefore less ink wanted at every ink price — so ink's demand curve shifts left." },
+
+  { category:"Demand",
+    prompt:"Buyers come to expect that a good's price will be much higher next month. What happens to demand for it today?",
+    options:["Demand today increases, as buyers bring purchases forward to beat the rise",
+             "Demand today decreases, as buyers hold off and wait for the higher price",
+             "Demand today is unchanged, since the price has not actually risen yet",
+             "Quantity demanded today falls, moving the market down along its existing curve"], correct:0,
+    explain:"Expectations shift demand now, before anything has actually happened to the price. Expecting a rise makes buying today look cheap by comparison, so today's demand curve shifts right." },
+
+  { category:"Demand",
+    prompt:"A town's population grows, so more people want to buy a good there. Which determinant of demand is that?",
+    options:["The number of buyers in the market",
+             "Buyers' tastes and preferences",
+             "The prices of related goods",
+             "Buyers' expectations about future prices"], correct:0,
+    explain:"More buyers means more wanted at every price, so the market demand curve shifts right. Market demand is just the sum of individual demands, so adding people adds demand." },
+
+  { category:"Demand",
+    prompt:"An advertising campaign makes a good fashionable. Which determinant has changed, and which way does the curve move?",
+    options:["Tastes and preferences, and the demand curve shifts right",
+             "Tastes and preferences, and the demand curve shifts left",
+             "The number of buyers, and the demand curve shifts right",
+             "Nothing shifts — fashion changes quantity demanded, not demand"], correct:0,
+    explain:"Tastes are a determinant of demand in their own right. If buyers simply want the good more than they did, they want more of it at every price, and the whole curve moves right." },
+
+  /* ---- supply ---- */
+  { category:"Supply",
+    prompt:"What does the law of supply state?",
+    options:["When the price of a good rises, the quantity supplied of it rises, all else held constant",
+             "When the price of a good rises, the supply of it rises, all else held constant",
+             "When production costs rise, the quantity supplied rises in order to help cover those costs",
+             "When the quantity supplied rises, the price must also rise in order to pay for the extra output"], correct:0,
+    explain:"Price up, quantity supplied up — the supply curve slopes upward. As with demand, it is QUANTITY SUPPLIED that responds to the good's own price. Supply itself shifts only for other reasons." },
+
+  { category:"Supply",
+    prompt:"The cost of an input used to make a good goes up. What happens in that market?",
+    options:["Supply decreases — the whole curve shifts to the left",
+             "Supply increases — the whole curve shifts to the right",
+             "Quantity supplied falls, but the supply curve itself does not move",
+             "Supply is unchanged, because input costs affect profit rather than supply"], correct:0,
+    explain:"Dearer inputs mean each unit costs more to make, so sellers will offer fewer units at any given price. That is a leftward shift of the whole supply curve, not a movement along it." },
+
+  { category:"Supply",
+    prompt:"A better production technology is introduced in an industry. What happens to supply?",
+    options:["Supply increases — the curve shifts right, because each unit now costs less to make",
+             "Supply decreases — the curve shifts left, because the new equipment is expensive to buy",
+             "Quantity supplied rises along the existing supply curve, with no shift in the curve at all",
+             "Supply does not change until the price of the good itself rises"], correct:0,
+    explain:"Better technology lowers the cost of producing each unit, so firms are willing to supply more at every price. Technology is one of the most reliable rightward shifters of supply." },
+
+  { category:"Supply",
+    prompt:"More firms enter a market. What happens to the market supply curve?",
+    options:["It shifts right, because more sellers are offering the good at every price",
+             "It shifts left, because each individual firm now sells a smaller share",
+             "It does not move, since the number of sellers is a determinant of demand",
+             "It gets steeper, because competition makes sellers less responsive to price"], correct:0,
+    explain:"Market supply is the sum of what all the sellers will offer. Add sellers and the total offered at every price goes up, shifting the curve right." },
+
+  { category:"Supply",
+    prompt:"Sellers come to expect a much higher price for their good next month. What happens to supply today?",
+    options:["Supply today decreases, as sellers hold stock back for the better price",
+             "Supply today increases, as sellers rush to sell before conditions change",
+             "Supply today is unchanged, since the price has not actually risen yet",
+             "Quantity supplied today rises, moving along the existing supply curve"], correct:0,
+    explain:"Expectations shift supply the OPPOSITE way to demand. A seller expecting a better price soon has every reason to keep stock off the market today, so today's supply curve shifts left — while a buyer expecting a rise buys more today." },
+
+  { category:"Supply",
+    prompt:"The government puts a per-unit tax on the producers of a good. What happens to supply?",
+    options:["Supply decreases — the curve shifts left, because each unit now costs more to bring to market",
+             "Supply increases — the curve shifts right, because sellers must sell more to cover the new tax",
+             "Supply is unchanged, because a tax shifts the demand curve instead",
+             "Quantity supplied falls along the existing supply curve, with no shift of the curve itself at all"], correct:0,
+    explain:"Government policy — taxes, subsidies, regulations — is a determinant of supply. A per-unit tax adds to the cost of every unit, so sellers offer fewer at any price and the curve shifts left. A subsidy does the reverse." },
+
+  { category:"Supply",
+    prompt:"Which of these would SHIFT the supply curve rather than cause a movement along it?",
+    options:["A subsidy paid to producers for every unit they sell",
+             "A rise in the market price of the good itself",
+             "A fall in the market price of the good itself",
+             "A change in how much buyers choose to purchase at the going price"], correct:0,
+    explain:"Only the good's own price produces a movement along the supply curve. A subsidy changes what it effectively costs a seller to supply a unit, so it shifts the whole curve — to the right, since each unit is now more worth making." },
+
+  /* ---- equilibrium and disequilibrium ---- */
+  { category:"Equilibrium",
+    prompt:"What defines market equilibrium?",
+    options:["The price at which quantity demanded equals quantity supplied, so there is neither a shortage nor a surplus",
+             "The price at which sellers take in the largest total revenue available to them",
+             "The price at which the largest possible quantity of the good changes hands",
+             "The price at which buyers and sellers end up with equal shares of the surplus"], correct:0,
+    explain:"Equilibrium is where the two quantities match. Nothing is left unsold and nobody willing to pay the price goes unserved, so no force is pushing the price in either direction." },
+
+  { category:"Equilibrium",
+    prompt:"On a supply and demand diagram, what are P* and Q*?",
+    options:["The price and quantity at the point where the two curves cross, the point usually labelled E",
+             "The highest price that buyers would ever pay and the largest quantity sellers could possibly make",
+             "The price and quantity a government sets as its target for the market",
+             "The price read off the demand curve and the quantity read off the supply curve at the same point"], correct:0,
+    explain:"P* and Q* are the equilibrium price and quantity — the coordinates of point E where supply meets demand. Every surplus, shortage or deadweight loss later in the unit is measured relative to that point." },
+
+  { category:"Equilibrium",
+    prompt:"The going price in a market is ABOVE the equilibrium price. What exists in that market?",
+    options:["A surplus — quantity supplied exceeds quantity demanded, so goods go unsold",
+             "A shortage — quantity demanded exceeds quantity supplied, so buyers go unserved",
+             "A surplus — quantity demanded exceeds quantity supplied at the higher price",
+             "Equilibrium, since any price will clear a market provided sellers accept it"], correct:0,
+    explain:"Above equilibrium, the high price attracts sellers and deters buyers: Qs > Qd. The gap is a surplus, also called excess supply, and it is counted in units of the good." },
+
+  { category:"Equilibrium",
+    prompt:"The going price in a market is BELOW the equilibrium price. What exists in that market?",
+    options:["A shortage — quantity demanded exceeds quantity supplied, so buyers go unserved",
+             "A surplus — quantity supplied exceeds quantity demanded, so goods go unsold",
+             "A shortage — quantity supplied exceeds quantity demanded at the lower price",
+             "Equilibrium, since a low enough price always attracts buyers to clear the market"], correct:0,
+    explain:"Below equilibrium, the low price attracts buyers and deters sellers: Qd > Qs. The gap is a shortage, also called excess demand." },
+
+  { category:"Equilibrium",
+    prompt:"A surplus exists in a free market. How does the market correct itself?",
+    options:["Sellers cut the price, which raises quantity demanded and lowers quantity supplied until the gap closes",
+             "Sellers raise the price, which rations the goods among the buyers who want them most",
+             "The surplus persists, because nothing in a free market pushes the price downward",
+             "Buyers raise their offers, which encourages sellers to bring still more to market"], correct:0,
+    explain:"Unsold stock pushes sellers to cut prices. As the price falls, buyers want more and sellers offer less, and the two quantities converge on equilibrium. The correction needs nobody to organise it." },
+
+  { category:"Equilibrium",
+    prompt:"A shortage exists in a free market. How does the market correct itself?",
+    options:["The price gets bid up, which lowers quantity demanded and raises quantity supplied until the gap closes",
+             "The price falls, which encourages the sellers still in the market to supply more",
+             "The shortage persists, because a free market has no way to ration a scarce good",
+             "Sellers ration the good by queue, leaving the price exactly where it started"], correct:0,
+    explain:"Unserved buyers bid against each other and the price rises. A higher price damps down quantity demanded and draws out quantity supplied, closing the gap at equilibrium." },
+
+  /* ---- elasticity of demand ---- */
+  { category:"Elasticity of Demand",
+    prompt:"What does price elasticity of demand measure?",
+    options:["How much quantity demanded responds to a change in price, in percentage terms",
+             "How much the price changes when quantity demanded changes, measured in dollars",
+             "The slope of the demand curve at the point where the market is in equilibrium",
+             "How much total revenue changes when the price changes, measured in dollars"], correct:0,
+    explain:"It is a ratio of percentage changes: the percentage change in quantity demanded over the percentage change in price. Using percentages rather than units is what lets you compare markets measured in completely different things." },
+
+  { category:"Elasticity of Demand",
+    prompt:"A good has many close substitutes. What does that do to its price elasticity of demand?",
+    options:["It makes demand more elastic — buyers can easily switch away if the price rises",
+             "It makes demand less elastic — buyers have more reason to stay with what they know",
+             "It has no effect, since elasticity depends only on the good's own price",
+             "It makes demand perfectly inelastic, because a substitute is always available"], correct:0,
+    explain:"Availability of substitutes is the single most important determinant. The easier it is to switch to something else, the more sharply buyers react to a price rise — and the more elastic demand is." },
+
+  { category:"Elasticity of Demand",
+    prompt:"Why is demand for a necessity typically less elastic than demand for a luxury?",
+    options:["Buyers cut back very little on something they must have, however far the price rises",
+             "Necessities are usually cheaper, and cheap goods always turn out to have inelastic demand",
+             "Luxuries have fewer substitutes, which makes their demand harder to change",
+             "Necessities are bought by far more people, and more buyers always means less elastic demand"], correct:0,
+    explain:"Necessity versus luxury is a determinant in its own right. If you genuinely have to have the good, a higher price mostly means you pay more rather than buy less — so quantity demanded barely moves." },
+
+  { category:"Elasticity of Demand",
+    prompt:"How does the time horizon affect price elasticity of demand?",
+    options:["Demand is more elastic over a longer period, because buyers have time to find alternatives",
+             "Demand is more elastic over a shorter period, because the price change is still fresh in mind",
+             "Time affects the quantity actually traded but has no bearing on elasticity",
+             "Demand becomes perfectly inelastic in the long run, once buying habits have properly settled"], correct:0,
+    explain:"Given time, buyers adjust: they find substitutes, change equipment, change habits. A petrol price rise barely dents consumption this week and dents it considerably over several years." },
+
+  { category:"Elasticity of Demand",
+    prompt:"Which has the more elastic demand — 'food' as a whole, or 'Granny Smith apples'?",
+    options:["Granny Smith apples — the more narrowly a market is defined, the more substitutes sit outside it",
+             "Food — a broader category covers more goods, so buyers have more ways to cut back",
+             "They are equally elastic, since Granny Smith apples are themselves a kind of food",
+             "Food — necessities always turn out to have the more elastic demand of the two"], correct:0,
+    explain:"How the market is defined is a determinant. Narrow the definition and the substitutes move outside it: there is no substitute for food in general, but plenty for one variety of apple." },
+
+  { category:"Elasticity of Demand",
+    prompt:"A good takes up a large share of a household's budget. What does that do to its price elasticity of demand?",
+    options:["It makes demand more elastic — a given percentage rise costs real money, so households react",
+             "It makes demand less elastic — the household has already committed to buying it",
+             "It has no effect at all, since elasticity is about percentage changes rather than dollar amounts",
+             "It makes demand perfectly elastic, because households stop buying the good altogether at that point"], correct:0,
+    explain:"Share of budget is a determinant. A 20% rise on something costing a dollar is easy to ignore; a 20% rise on rent is not, so buyers put real effort into finding a way around it." },
+
+  { category:"Elasticity of Demand",
+    prompt:"What does a perfectly INELASTIC demand curve look like, and what does it mean?",
+    options:["Vertical — quantity demanded does not change at all, whatever happens to the price",
+             "Horizontal — buyers will take any quantity at one single price and none at all above it",
+             "Vertical — buyers will take any quantity at one single price and none at all above it",
+             "Flatter than usual — quantity demanded responds rather more than the price itself does"], correct:0,
+    explain:"Perfectly inelastic means the elasticity is zero: the same quantity is bought at every price, which draws as a vertical line. Vertical is the one that does NOT respond — the word 'inelastic' and the upright line go together." },
+
+  { category:"Elasticity of Demand",
+    prompt:"What does a perfectly ELASTIC demand curve look like, and what does it mean?",
+    options:["Horizontal — buyers will take any quantity at that one price, and none at all above it",
+             "Vertical — quantity demanded does not change at all, whatever then happens to the price",
+             "Horizontal — quantity demanded does not change at all, whatever then happens to the price",
+             "Steeper than usual — the price responds a good deal more than the quantity demanded does"], correct:0,
+    explain:"Perfectly elastic means the elasticity is infinite: the smallest price rise sends quantity demanded to zero, which draws as a horizontal line. It is the demand curve a single seller faces under perfect competition." },
+
+  /* ---- elasticity of supply ---- */
+  { category:"Elasticity of Supply",
+    prompt:"What does price elasticity of supply measure?",
+    options:["How much quantity supplied responds to a change in price, in percentage terms",
+             "How much a seller's own costs change whenever the quantity it supplies changes",
+             "How far the price must rise before any new seller is willing to enter the market",
+             "The share of the total market output that the largest seller is able to supply"], correct:0,
+    explain:"Same structure as elasticity of demand, on the other side of the market: the percentage change in quantity supplied over the percentage change in price. It is positive, because supply slopes upward." },
+
+  { category:"Elasticity of Supply",
+    prompt:"Why is supply usually more elastic in the long run than in the short run?",
+    options:["Given time, firms can build capacity, hire and retool, so output can respond far more fully",
+             "Given time, buyers lose interest, so sellers have to respond more sharply to keep hold of them",
+             "In the long run prices stop moving about, which makes any response look larger than it really is",
+             "Supply is in fact less elastic in the long run, once contracts and wage rates have been fixed"], correct:0,
+    explain:"Time to adjust is the main determinant of supply elasticity. This week a factory can only work its existing machines harder; over two years it can build another factory." },
+
+  { category:"Elasticity of Supply",
+    prompt:"A firm can easily move its workers and machines to producing a different good. What does that do to its price elasticity of supply?",
+    options:["It makes supply more elastic — resources can be shifted in or out as the price moves",
+             "It makes supply less elastic — a firm with options is slower to commit to any one of them",
+             "It has no effect, since elasticity depends only on how long the price change lasts",
+             "It makes supply perfectly inelastic, because output is fixed by the equipment on hand"], correct:0,
+    explain:"Mobility of inputs is a determinant. If the same workers and machines can turn to another product, a firm can expand or contract this one quickly, which is exactly what elastic supply means." },
+
+  { category:"Elasticity of Supply",
+    prompt:"A factory is running well below its maximum output. What does that spare capacity do to its price elasticity of supply?",
+    options:["It makes supply more elastic — the firm can raise output quickly without new investment",
+             "It makes supply less elastic — an under-used factory has little reason to react to price",
+             "It has no effect, since capacity determines a firm's costs rather than its elasticity",
+             "It makes supply perfectly elastic, because output can then rise without any limit"], correct:0,
+    explain:"Spare capacity is a determinant. A firm already at full stretch can barely respond to a higher price; one with idle machines can lift output straight away, so its supply is far more elastic." },
+
+  /* ---- surplus, and the word that means two things ---- */
+  { category:"Surplus and Deadweight Loss",
+    prompt:"What is consumer surplus?",
+    options:["The gap between what buyers were willing to pay and what they actually paid, added up over every unit bought",
+             "The total amount of money buyers actually spend on the good at the market price",
+             "The number of units buyers would like to buy but cannot find at the going price",
+             "The amount by which quantity demanded exceeds quantity supplied at the going price"], correct:0,
+    explain:"Consumer surplus is the value buyers get over and above what they hand over. On a diagram it is the area under the demand curve and above the price line, out to the quantity traded." },
+
+  { category:"Surplus and Deadweight Loss",
+    prompt:"What is producer surplus?",
+    options:["The gap between what sellers received and the least they would have accepted, added up over every unit sold",
+             "The total revenue sellers take in from the good at the going market price",
+             "The number of units sellers produced but could not manage to sell at that price",
+             "The amount by which quantity supplied exceeds quantity demanded at the going price"], correct:0,
+    explain:"Producer surplus is what sellers get over and above their lowest acceptable price. On a diagram it is the area above the supply curve and below the price line, out to the quantity traded." },
+
+  { category:"Surplus and Deadweight Loss",
+    prompt:"A market has a 'surplus' of 40 units, and the same market has 'producer surplus' of $900. How are those two figures related?",
+    options:["They are unrelated ideas that happen to share a word — one counts unsold units, the other is a dollar measure of how well sellers did",
+             "The 40 unsold units are worth $900 between them, which is what producer surplus measures",
+             "They are the same quantity in different units, so dividing $900 by 40 converts one to the other",
+             "Producer surplus is what sellers lose on the 40 units they were unable to sell"], correct:0,
+    explain:"This catches people every year. 'Surplus' on its own means excess supply: quantity supplied above quantity demanded at the going price, counted in units of the good, and it exists only when the price is above equilibrium. 'Producer surplus' is a dollar measure of how much better off sellers are than their lowest acceptable price, and it exists in every market that trades at all — including one with no excess supply whatsoever. The word is shared; nothing else is." },
+
+  { category:"Surplus and Deadweight Loss",
+    prompt:"What is total surplus in a market?",
+    options:["Consumer surplus plus producer surplus — the whole gain that buyers and sellers get from trading",
+             "The total amount of money that changes hands between buyers and sellers",
+             "The number of units left unsold once the market has finished trading",
+             "Producer surplus less consumer surplus, which is what society nets out"], correct:0,
+    explain:"Total surplus adds the two triangles together. It is the standard measure of how much a market is worth to the people in it, and it is at its largest at the equilibrium quantity." },
+
+  { category:"Surplus and Deadweight Loss",
+    prompt:"What is deadweight loss?",
+    options:["Total surplus destroyed because the quantity traded is not the efficient quantity — nobody ends up receiving it",
+             "Surplus that is transferred from buyers to sellers, or from sellers to buyers",
+             "The revenue a government collects when it places a tax on a market",
+             "The money sellers lose on units that they produce but cannot manage to sell"], correct:0,
+    explain:"Deadweight loss is surplus that stops existing, not surplus that changes hands. That distinction is the whole point: tax revenue and quota rent are transfers, because somebody receives them, and they are not part of the deadweight loss." },
+
+  /* ---- price controls and quotas ---- */
+  { category:"Price Controls and Quotas",
+    prompt:"What is a price ceiling?",
+    options:["A legal maximum price, which has an effect only when it is set below the equilibrium price",
+             "A legal minimum price, which has an effect only when it is set above the equilibrium price",
+             "A legal maximum price, which has an effect only when it is set above the equilibrium price",
+             "The highest price that any buyer in the market is actually willing to pay"], correct:0,
+    explain:"A ceiling caps the price. Set it above equilibrium and the market never reaches it, so nothing happens. Set it below and it binds, producing a shortage — rent control is the standard example." },
+
+  { category:"Price Controls and Quotas",
+    prompt:"What is a price floor?",
+    options:["A legal minimum price, which has an effect only when it is set above the equilibrium price",
+             "A legal maximum price, which has an effect only when it is set below the equilibrium price",
+             "A legal minimum price, which has an effect only when it is set below the equilibrium price",
+             "The lowest price that any seller in the market is actually willing to accept"], correct:0,
+    explain:"A floor props the price up. Set it below equilibrium and the market is already above it, so nothing happens. Set it above and it binds, producing excess supply — a minimum wage is the standard example." },
+
+  { category:"Price Controls and Quotas",
+    prompt:"What is a quota?",
+    options:["A legal limit on the quantity that may be produced, sold or imported, whatever the price",
+             "A legal limit on the price that may be charged, whatever the quantity traded",
+             "A tax charged on each unit of a good that crosses a national border",
+             "A payment made to producers for each unit they manage to sell"], correct:0,
+    explain:"A quota fixes a quantity rather than a price, and binds only when it is set below the quantity the market would otherwise trade. The price then adjusts to whatever clears that restricted quantity." },
+
+  { category:"Price Controls and Quotas",
+    prompt:"Under a quota, what does a licence entitle its holder to do?",
+    options:["Supply one of the limited number of units the quota allows, which is what makes the licence worth having",
+             "Charge a higher price for the good than other sellers are permitted to charge",
+             "Avoid paying a tax that the government levies on the restricted good",
+             "Buy the good at the world price instead of at the domestic price"], correct:0,
+    explain:"The quota makes the right to supply scarce, and a licence is that right. Because the restricted price sits above what the unit costs to supply, the licence carries a gap in value — which is why taxi medallions and fishing licences trade for serious money." },
+
+  /* ---- trade ---- */
+  { category:"Trade",
+    prompt:"What does autarky mean?",
+    options:["A situation with no trade at all — the country supplies everything it consumes from its own market",
+             "A situation in which a country trades freely with every other country in the world",
+             "A tax that a country places on the goods it buys in from abroad",
+             "A legal limit on how much of a good a country is allowed to import"], correct:0,
+    explain:"Autarky is the no-trade benchmark. Its price and quantity are found by clearing the domestic market on its own, and every result about trade is measured as a change from that starting point." },
+
+  { category:"Trade",
+    prompt:"What is a tariff?",
+    options:["A tax on imported goods, which raises the price those goods sell for inside the country",
+             "A limit on the number of units that may be imported, whatever price they happen to fetch",
+             "A payment that a government makes to any domestic firm which sells its goods abroad instead",
+             "The price at which a good happens to be trading on the world market at any particular time"], correct:0,
+    explain:"A tariff is a tax levied at the border. It lifts the domestic price to the world price plus the tariff, raises domestic production, cuts domestic consumption, and shrinks imports from both ends at once." },
+
+  { category:"Trade",
+    prompt:"A country's no-trade price is ABOVE the world price. What will it do once it opens to trade?",
+    options:["Import the good, because it can be bought abroad for less than it costs to make at home",
+             "Export the good, because its own producers evidently value it rather more than foreigners do",
+             "Neither import nor export, because the two prices will always settle somewhere in the middle",
+             "Import the good, but only up until the domestic price has risen to meet the world price exactly"], correct:0,
+    explain:"Compare the two prices and nothing else. A no-trade price above the world price means the country is an expensive place to make the good, so buyers turn abroad and it becomes an importer." },
+
+  { category:"Trade",
+    prompt:"When a country opens to trade at a given world price, what happens to its domestic price?",
+    options:["It moves to the world price, whether that means rising or falling",
+             "It settles halfway between the old domestic price and the world price",
+             "It stays where it was, since domestic supply and demand still set it",
+             "It always falls, because trade brings in cheaper goods from abroad"], correct:0,
+    explain:"One price rules the market. Nobody at home pays more than the world price for something available abroad at that price, and no domestic seller accepts less when foreigners will pay it. Whether that is a rise or a fall depends on which side of the world price the country started." },
+
+];
+
+/* ------------------------------------------------------------ state + helpers */
+/* Results bands. Banding uses the ROUNDED percentage -- the same number shown
+   to the student -- so the label can never disagree with the figure beside it.
+   Raw-score ranges over this 51-card bank, checked in the scratch script:
+     Mastered 46-51 | Strong 41-45 | Developing 36-40 | Shaky 28-35 | below 28
+   Blind guessing on 4 options averages 13/51, which lands in the bottom band. */
+const BANDS = [
+  { min: 90, label: 'Mastered', tone: 'good',
+    note: 'The vocabulary is secure. You can tell demand from quantity demanded, name what shifts each curve, and say what every term in the unit actually means.' },
+  { min: 80, label: 'Strong', tone: 'good',
+    note: 'Solid command of the terms. Look at the areas below where you dropped marks, then run it again.' },
+  { min: 70, label: 'Developing', tone: 'mid',
+    note: 'Most of it is there, but some definitions are still blurred at the edges. The breakdown below shows which.' },
+  { min: 55, label: 'Shaky', tone: 'poor',
+    note: 'Enough of the vocabulary is unsettled to cost you marks on questions you could otherwise answer. Review the areas below before drilling again.' },
+  { min: 0, label: 'Needs Review', tone: 'poor',
+    note: 'Go back to the Unit 2 notes and the definitions first. More practice without review will not close a gap this size.' },
+];
+
+let order = [];
+let index = 0;
+let answered = false;
+let optionOrder = [];               // display position -> index in card.options
+let score = { correct: 0, total: 0 };
+let perArea = {};                   // category -> { correct, total }, for the breakdown
+
+function shuffledIndices(n){
+  const arr = [...Array(n).keys()];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+const AREAS = [...new Set(CARDS.map(c => c.category))];
+
+function init(){
+  order = shuffledIndices(CARDS.length);
+  index = 0;
+  score = { correct: 0, total: 0 };
+  perArea = {};
+  AREAS.forEach(a => perArea[a] = { correct: 0, total: 0 });
+  showQuiz();
+  loadCard();
+}
+
+function loadCard(){
+  answered = false;
+  const card = CARDS[order[index]];
+  document.getElementById('cardCount').textContent = `Card ${index + 1} of ${CARDS.length}`;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('categoryTag').textContent = card.category;
+  document.getElementById('promptText').textContent = card.prompt;
+  document.getElementById('feedback').classList.remove('show');
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  nextBtn.textContent = index === CARDS.length - 1 ? 'See your results' : 'Next card';
+
+  /* Every card is written with its correct option first, so the options MUST be
+     shuffled here or the answer would sit in slot 1 every time. */
+  optionOrder = shuffledIndices(card.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(origIndex => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = card.options[origIndex];
+    btn.addEventListener('click', () => handleAnswer(card, origIndex, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+function handleAnswer(card, chosenIndex, btnEl){
+  if(answered) return;
+  answered = true;
+
+  const isCorrect = chosenIndex === card.correct;
+  score.total++;
+  if(isCorrect) score.correct++;
+  const tally = perArea[card.category];
+  tally.total++;
+  if(isCorrect) tally.correct++;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === card.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect
+    ? 'Correct.'
+    : `Not quite \u2014 the answer is "${card.options[card.correct]}."`;
+  verdict.className = 'feedback-verdict ' + (isCorrect ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = card.explain;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if(index < CARDS.length - 1){
+    index++;
+    loadCard();
+  } else {
+    showResults();
+  }
+});
+
+function showQuiz(){
+  document.getElementById('quizPanel').style.display = '';
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+}
+
+function showResults(){
+  document.getElementById('quizPanel').style.display = 'none';
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(100 * score.correct / score.total);
+  const band = BANDS.find(b => pct >= b.min);
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  (${pct}%)`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  // breakdown in the fixed teaching order, not the shuffled order they saw
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  AREAS.forEach(a => {
+    const t = perArea[a];
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${a}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
