@@ -1,0 +1,34 @@
+{
+ "P1": {
+  "s1_mu3": "14 utils",
+  "s2_mu5": "6 utils"
+ },
+ "P2": {
+  "s1_per": "6 utils per dollar",
+  "s2_per": "7 utils per dollar"
+ },
+ "P3": {
+  "s1_bundle": "3 tacos and 4 juices",
+  "s2_ratios": "7 for tacos and 7 for juices",
+  "s3_tu": "176 utils",
+  "s4_rival": "170 utils, which is lower than 176"
+ },
+ "P4": {
+  "s1_ratios": "12 for bus rides and 4 for coffees"
+ },
+ "P5": {
+  "s1_in_text_new": "32, 26, 20, 14, 8, 2",
+  "s1_in_text_old": "16, 13, 10, 7, 4, 1",
+  "s2_broken": "No \u2014 comics now give 20 utils per dollar against the soda's 10, so the bundle is no longer balanced",
+  "s4_bundle": "5 comics and 3 sodas"
+ },
+ "P6": {
+  "s1_xint": "6",
+  "s2_yint": "12",
+  "s3_slope": "\u22122: each extra ticket costs him 2 paperbacks",
+  "s4_in_text_cost": "$40",
+  "s4_in_text_left": "$8",
+  "s5_income": "It shifts out parallel \u2014 intercepts of 9 tickets and 18 paperbacks, slope still \u22122",
+  "s6_in_text_pivot": "$48 \u00f7 $4 = 12"
+ }
+}

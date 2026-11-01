@@ -428,22 +428,22 @@
    numbers, because reading the intercepts off the income and prices is the
    exercise. */
 const BUDGET_GRAPH = `
-<svg viewBox="0 0 360 250" role="img" aria-label="A budget line sloping down from the vertical axis to the horizontal axis">
-  <line x1="48" y1="210" x2="340" y2="210" stroke="#6B5D4C" stroke-width="1.5"/>
-  <line x1="48" y1="210" x2="48" y2="24" stroke="#6B5D4C" stroke-width="1.5"/>
-  <text x="340" y="240" text-anchor="end" font-size="10.5" fill="#6B5D4C">Quantity of X (horizontal good)</text>
-  <text x="44" y="20" text-anchor="end" font-size="10.5" fill="#6B5D4C">Quantity of Y</text>
-  <line x1="48" y1="46" x2="286" y2="210" stroke="#2F6F62" stroke-width="2.5"/>
-  <circle cx="48" cy="46" r="4" fill="#2B2118"/>
-  <circle cx="286" cy="210" r="4" fill="#2B2118"/>
-  <text x="300" y="120" font-size="11" font-weight="700" fill="#2F6F62">Budget line</text>
+<svg viewBox="0 0 360 250" role="img" aria-label="A budget line sloping down from the paperbacks axis to the cinema tickets axis">
+  <line x1="56" y1="206" x2="340" y2="206" stroke="#6B5D4C" stroke-width="1.5"/>
+  <line x1="56" y1="206" x2="56" y2="24" stroke="#6B5D4C" stroke-width="1.5"/>
+  <text x="198" y="236" text-anchor="middle" font-size="11" fill="#6B5D4C">Cinema tickets</text>
+  <text transform="rotate(-90 20 115)" x="20" y="115" text-anchor="middle" font-size="11" fill="#6B5D4C">Paperbacks</text>
+  <line x1="56" y1="44" x2="290" y2="206" stroke="#2F6F62" stroke-width="2.5"/>
+  <circle cx="56" cy="44" r="4" fill="#2B2118"/>
+  <circle cx="290" cy="206" r="4" fill="#2B2118"/>
+  <text x="340" y="112" text-anchor="end" font-size="11" font-weight="700" fill="#2F6F62">Budget line</text>
 </svg>`;
 
 const TERMS = '<b>TU</b> = total utility, the satisfaction from all units together. <b>MU</b> = marginal utility, the extra ' +
   'satisfaction from one more unit. <b>MU/P</b> = marginal utility per dollar. <b>Px</b> and <b>Py</b> = the prices of the two goods. ' +
   '<b>Utils</b> = the made-up unit utility is counted in.';
-const R_MU = 'Marginal utility is the step up in total utility from one more unit, so read it as the difference between neighbouring rows. ' +
-  'Diminishing marginal utility means each extra unit adds less than the one before it, which shows up as a falling MU column. ' +
+const R_MU = 'Marginal utility is the step up in total utility from one more unit, so read it as the difference between neighboring entries. ' +
+  'Diminishing marginal utility means each extra unit adds less than the one before it, which shows up as a falling run of MU figures. ' +
   'Total utility keeps rising for as long as marginal utility stays above zero.';
 const R_PER = 'Dividing marginal utility by the price gives marginal utility per dollar, and that is what makes two goods comparable when they ' +
   'cost different amounts. A good can deliver more satisfaction per unit and still be the worse buy, if it costs enough more per unit.';
@@ -453,7 +453,7 @@ const R_ADJ = 'When MUx/Px is above MUy/Py, move spending toward X. Buying more 
   'buying less Y pushes MUy up. The two ratios therefore close on each other, and the adjustment stops where they meet.';
 const R_PRICE = 'A fall in Px lifts MUx/Px at every quantity, since the same marginal utility is divided by a smaller number. The old bundle ' +
   'stops satisfying the rule, and restoring it takes more X. That is the law of demand, built up from one consumer\'s own choice.';
-const R_BUD = 'Course extension, not tested on the AP exam. The budget line joins every bundle that spends the whole income. Each intercept is ' +
+const R_BUD = 'Course extension: this topic is not currently in the College Board\'s Course and Exam Description, so it is unlikely to be tested. The budget line joins every bundle that spends the whole income. Each intercept is ' +
   'the income divided by that good\'s price, and the slope is the horizontal good\'s price divided by the vertical good\'s price. ' +
   'Changing one price pivots the line; changing income shifts it parallel.';
 
@@ -469,16 +469,16 @@ const PROBLEMS = [
     steps: [
       { prompt: "What is the marginal utility of Dara's 3rd slice?",
         options: ["14 utils", "54 utils", "18 utils", "10 utils"], correct: 0,
-        explain: "Marginal utility is the step up in total utility from one more unit: 54 − 40 = 14 utils. It is a difference between two rows, never a row on its own — 54 is the TOTAL utility from three slices, not what the third slice added." },
+        explain: "Marginal utility is the step up in total utility from one more unit: 54 − 40 = 14 utils. It is a difference between two entries, never an entry on its own — 54 is the TOTAL utility from three slices, not what the third slice added." },
       { prompt: "What is the marginal utility of Dara's 5th slice?",
         options: ["6 utils", "70 utils", "10 utils", "2 utils"], correct: 0,
         explain: "70 − 64 = 6 utils. Watch the counting: the 5th slice takes her from 4 slices to 5 slices, so it is the gap between the 4-slice and 5-slice entries. Reading one column across gives 10, which is the 4th slice." },
-      { prompt: "Worked out for every slice, the marginal utilities are 22, 18, 14, 10, 6 and 2. What does that column show?",
+      { prompt: "Worked out for every slice, the marginal utilities are 22, 18, 14, 10, 6 and 2. What does that progression show?",
         options: ["Diminishing marginal utility — each slice adds less satisfaction than the one before it",
                   "Diminishing total utility — each slice leaves Dara with less satisfaction overall than before",
                   "Negative marginal utility — the later slices are actively making Dara worse off",
                   "Constant marginal utility — the satisfaction per slice is falling by the same 4 utils each time"], correct: 0,
-        explain: "The column falls, so each slice adds less than the one before: that is diminishing marginal utility, and it is the near-universal pattern that the whole topic rests on. The drops happen to be a steady 4 utils here, but that is a feature of these particular numbers, not the definition." },
+        explain: "The progression falls, so each slice adds less than the one before: that is diminishing marginal utility, and it is the near-universal pattern that the whole topic rests on. The drops happen to be a steady 4 utils here, but that is a feature of these particular numbers, not the definition." },
       { prompt: "What does diminishing marginal utility actually claim about Dara?",
         options: ["Each extra slice is worth less to her than the last, though every slice still adds something",
                   "Each extra slice makes her worse off than she was before she ate it",
@@ -496,7 +496,7 @@ const PROBLEMS = [
   {
     id: "P2",
     topic: "Marginal utility per dollar, and why price has to come in",
-    method: "MU ÷ P for each good",
+    method: "Comparing two differently priced goods",
     scenario: "At a campus café Theo is choosing between smoothies at $6 each and muffins at $2 each. The table gives the marginal utility, in utils, of each successive smoothie and each successive muffin.",
     terms: TERMS, review: R_PER,
     table: { cols: ["Unit", "1st", "2nd", "3rd", "4th", "5th"], colClass: ["row-label", "q-cell", "q-cell", "q-cell", "q-cell", "q-cell"],
@@ -520,7 +520,7 @@ const PROBLEMS = [
                   "Yes — more satisfaction per unit is exactly what it means for a good to be the better buy",
                   "No — but only because Theo will eventually run out of money for smoothies",
                   "It cannot be said without knowing Theo's income and how much he plans to spend in total"], correct: 0,
-        explain: "Run both columns through the division. Smoothies give 6, 5, 4, 3, 2 utils per dollar; muffins give 8, 7, 6, 5, 4. The muffin is ahead at every single quantity despite giving less satisfaction per unit, because it costs a third as much. This is the trap the per-dollar idea exists to close." },
+        explain: "Run both rows through the division. Smoothies give 6, 5, 4, 3, 2 utils per dollar; muffins give 8, 7, 6, 5, 4. The muffin is ahead at every single quantity despite giving less satisfaction per unit, because it costs a third as much. This is the trap the per-dollar idea exists to close." },
       { prompt: "Why divide marginal utility by price at all, rather than just comparing marginal utilities?",
         options: ["Because a dollar is the common unit — it is the dollar the consumer is allocating, not the unit of the good",
                   "Because marginal utility is unreliable on its own and dividing by price corrects the measurement error",
@@ -532,14 +532,14 @@ const PROBLEMS = [
   {
     id: "P3",
     topic: "The utility-maximizing rule and the bundle it picks",
-    method: "MUx/Px = MUy/Py, budget spent",
+    method: "Finding the best bundle",
     scenario: "Mira has exactly $20 to spend. Tacos cost $4 each, juices cost $2 each, and she will spend all of it. The table gives her marginal utility, in utils, from each successive taco and each successive juice.",
     terms: TERMS, review: R_RULE,
     table: { cols: ["Unit", "1st", "2nd", "3rd", "4th", "5th", "6th"], colClass: ["row-label", "q-cell", "q-cell", "q-cell", "q-cell", "q-cell", "q-cell"],
              rows: [["Taco MU ($4 each)", "44", "36", "28", "20", "12", "4"],
                     ["Juice MU ($2 each)", "20", "18", "16", "14", "12", "10"]] },
     steps: [
-      { prompt: "Each of these four bundles costs Mira exactly $20. At which one is marginal utility per dollar the same for both goods?",
+      { prompt: "Each of the following four bundles costs Mira exactly $20. At which one is marginal utility per dollar the same for both goods?",
         options: ["3 tacos and 4 juices", "2 tacos and 6 juices", "4 tacos and 2 juices", "5 tacos and 0 juices"], correct: 0,
         explain: "Work the ratios at each bundle. At 3 tacos and 4 juices: 28 ÷ $4 = 7 and 14 ÷ $2 = 7 — equal. At 2 and 6: 36 ÷ $4 = 9 against 10 ÷ $2 = 5. At 4 and 2: 20 ÷ $4 = 5 against 18 ÷ $2 = 9. At 5 and 0 there is no juice ratio to match at all. Only the first bundle balances." },
       { prompt: "What are the two marginal-utility-per-dollar figures at that bundle?",
@@ -582,13 +582,13 @@ const PROBLEMS = [
                   "It rises, because buying more of a good she likes raises the satisfaction it gives",
                   "It stays at 12, because the price of a bus ride has not changed",
                   "It falls, because buying more of a good pushes its price up"], correct: 0,
-        explain: "Diminishing marginal utility does the work. The numerator shrinks with every extra ride while the $2 denominator stays put, so the ratio comes down. This is what stops the argument running away — otherwise 'buy more of the better buy' would say to spend everything on one good." },
+        explain: "Diminishing marginal utility does the work. We are taking it that Nadia sees bus rides and coffee the way most people see most goods — the tenth ride of the month is worth less to her than the first — which is the typical case rather than an iron law. The numerator shrinks with every extra ride while the $2 denominator stays put, so the ratio comes down. This is what stops the argument running away — otherwise 'buy more of the better buy' would say to spend everything on one good." },
       { prompt: "As Nadia buys fewer coffees, what happens to marginal utility per dollar for coffees?",
-        options: ["It rises, because with fewer coffees each remaining one is worth more to her",
+        options: ["It rises, because having fewer coffees raises the last one's marginal benefit",
                   "It falls, because she is clearly getting less satisfaction out of coffee overall",
                   "It stays at 4, because the price of a coffee has not changed",
                   "It rises, because cutting back on a good pushes its price down"], correct: 0,
-        explain: "Diminishing marginal utility read backwards. Moving down the coffee column toward fewer units means moving toward the earlier, higher marginal utilities, so MU rises while the $4 price is unchanged — and the ratio rises with it." },
+        explain: "Diminishing marginal utility read backwards — again on the usual assumption that Nadia's taste for coffee is the ordinary kind, where each successive cup adds a little less than the one before. Cutting back means moving toward the earlier, higher marginal utilities, so the marginal benefit of her last coffee rises while the $4 price is unchanged — and the ratio rises with it." },
       { prompt: "Where does this adjustment stop?",
         options: ["Where the two marginal utilities per dollar have met, with the whole budget spent",
                   "When Nadia has moved her entire budget into bus rides, the good with the higher ratio",
@@ -612,8 +612,8 @@ const PROBLEMS = [
                   "It is unchanged at every quantity, because the marginal utility of a comic has not changed",
                   "It halves at every quantity, from 16, 13, 10, 7, 4, 1 to 8, 6.5, 5, 3.5, 2, 0.5",
                   "It doubles only for the comics Owen was already buying, and is unchanged for the rest"], correct: 0,
-        explain: "The marginal utilities themselves have not moved — a comic gives the same satisfaction whatever it costs. What has changed is the divisor. At $4 the comic column reads 16, 13, 10, 7, 4, 1 utils per dollar; at $2 it reads 32, 26, 20, 14, 8, 2. Halving the price doubles every entry, and that is the entire mechanism by which a price change reaches the consumer's decision." },
-      { prompt: "At his old bundle of 3 comics and 2 sodas, does the rule still hold at the new prices?",
+        explain: "The marginal utilities themselves have not moved — a comic gives the same satisfaction whatever it costs. What has changed is the divisor. At $4 the comic row reads 16, 13, 10, 7, 4, 1 utils per dollar; at $2 it reads 32, 26, 20, 14, 8, 2. Halving the price doubles every entry, and that is the entire mechanism by which a price change reaches the consumer's decision." },
+      { prompt: "At his old bundle of 3 comics and 2 sodas, marginal utility per dollar was equal for the two goods. Does the rule still hold at the new prices?",
         options: ["No — comics now give 20 utils per dollar against the soda's 10, so the bundle is no longer balanced",
                   "Yes — the bundle still costs $16, and that is what the rule requires",
                   "No — sodas now give 20 utils per dollar against the comic's 10, so he should buy more sodas",
@@ -639,8 +639,8 @@ const PROBLEMS = [
   {
     id: "P6", pin: "last",
     topic: "Course extension — the budget line",
-    method: "Course extension · not on the AP exam",
-    scenario: "COURSE EXTENSION — this problem is not tested on the AP exam; it is here because the budget line makes the spending constraint easy to see. Ravi has $48 a month. Cinema tickets cost $8 each and go on the HORIZONTAL axis; paperbacks cost $4 each and go on the VERTICAL axis.",
+    method: "Course extension",
+    scenario: "COURSE EXTENSION — this topic is not currently included in the College Board's Course and Exam Description, so it is unlikely to be tested on the AP exam. It is here because the budget line makes the spending constraint easy to see. Ravi has $48 a month. Cinema tickets cost $8 each and go on the horizontal axis; paperbacks cost $4 each and go on the vertical axis.",
     terms: TERMS, review: R_BUD, graph: "BUDGET",
     table: { cols: ["", "Price", "Axis"], colClass: ["row-label", "q-cell", "q-cell"],
              rows: [["Cinema tickets", "$8", "horizontal"], ["Paperbacks", "$4", "vertical"], ["Income", "$48", "—"]] },
@@ -660,7 +660,7 @@ const PROBLEMS = [
                   "On it — the bundle costs exactly $48, so it spends his income precisely",
                   "Outside it — the bundle costs $56, which is more than he can afford",
                   "Inside it — the bundle costs $40, and the $8 left over is what economists call deadweight loss"], correct: 0,
-        explain: "3 × $8 + 4 × $4 = $24 + $16 = $40, which is $8 short of $48. Bundles inside the line are affordable but leave money unspent; bundles on the line spend it exactly; bundles outside it cannot be bought at all. A utility-maximizing consumer always ends up ON the line, since the leftover $8 could still buy something worth having." },
+        explain: "3 × $8 + 4 × $4 = $24 + $16 = $40, which is $8 short of $48. Bundles inside the line are affordable but leave money unspent; bundles on the line spend it exactly; bundles outside it cannot be bought at all. A utility-maximizing consumer always ends up ON the line, since the leftover $8 could still buy something worth having. Deadweight loss has no bearing on any of this: it is a Unit 2 idea about surplus destroyed when a market trades the wrong quantity, and it is sitting in that option purely to pull you off course. Money a consumer has not spent yet is just money not spent yet." },
       { prompt: "Ravi's income rises to $72 and both prices stay the same. What happens to the budget line?",
         options: ["It shifts out parallel — intercepts of 9 tickets and 18 paperbacks, slope still −2",
                   "It pivots outward on the vertical intercept — 9 tickets, still 12 paperbacks",
