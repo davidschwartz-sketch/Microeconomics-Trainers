@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working Examples: Consumer Choice</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+    --demand: #2F6F62;
+    --supply: #C1542C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:760px;margin:0 auto;}
+
+  header{
+    margin-bottom:20px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  header h1{
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+  }
+
+  .mode-row{
+    display:flex;
+    align-items:center;
+    gap:10px 12px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .mode-label{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+  }
+  .segmented{
+    display:inline-flex;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--surface);
+  }
+  .segmented button{
+    border:none;
+    background:transparent;
+    padding:7px 14px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .segmented button + button{border-left:1px solid var(--border);}
+  .segmented button:hover[aria-pressed="false"]{background:#FFFBF2;}
+  .segmented button[aria-pressed="true"]{
+    background:var(--accent);
+    color:var(--ink);
+  }
+  .mode-hint{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  @media (max-width:560px){
+    .segmented{width:100%;}
+    .segmented button{flex:1;padding:8px 6px;font-size:12px;}
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .count-group{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .card-count{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .score-badge{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px;
+  }
+
+  .method-badge{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:3px 9px;
+    border-radius:6px;
+    margin-bottom:12px;
+  }
+  .scenario{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .formula-note{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:10px 13px;
+    margin-bottom:18px;
+  }
+  .formula-note b{color:var(--ink);}
+
+  .table-wrap{overflow-x:auto;margin-bottom:20px;}
+  table.data-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.data-table th, table.data-table td{
+    border:1px solid var(--border);
+    padding:9px 11px;
+    text-align:center;
+    white-space:nowrap;
+  }
+  table.data-table th{
+    background:var(--surface-alt);
+    font-weight:700;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  table.data-table td.row-label{
+    font-weight:700;
+    text-align:left;
+    color:var(--ink-soft);
+  }
+  table.data-table td.p-cell{color:var(--supply); font-weight:700;}
+  table.data-table td.wrap-cell{
+    text-align:left;
+    white-space:normal;
+    font-weight:600;
+  }
+  table.data-table td.q-cell{color:var(--demand); font-weight:700;}
+
+  .graph-wrap{
+    margin-bottom:20px;
+    text-align:center;
+  }
+  .graph-wrap svg{width:100%;max-width:480px;height:auto;}
+
+  .prompt{
+    font-size:18px;
+    font-weight:600;
+    line-height:1.4;
+    color:var(--ink);
+    margin-bottom:18px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .choice-btn{
+    text-align:left;
+    padding:13px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){
+    border-color:var(--accent);
+    background:#FFFBF2;
+  }
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{
+    background:var(--correct-soft);
+    border-color:var(--correct);
+    color:var(--correct);
+  }
+  .choice-btn.incorrect{
+    background:var(--incorrect-soft);
+    border-color:var(--incorrect);
+    color:var(--incorrect);
+  }
+
+  .feedback{
+    display:none;
+    margin-bottom:16px;
+  }
+  .feedback.show{display:block;}
+  .feedback-verdict{
+    font-weight:800;
+    font-size:15px;
+    margin-bottom:6px;
+  }
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    padding:12px 14px;
+    border-radius:0 8px 8px 0;
+  }
+
+  .controls{
+    display:flex;
+    justify-content:flex-end;
+  }
+  .btn{
+    padding:11px 20px;
+    border-radius:10px;
+    border:none;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover{background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{
+    font-size:34px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    margin-bottom:10px;
+  }
+  .results-note{
+    font-size:15px;
+    color:var(--ink-soft);
+    margin-bottom:20px;
+  }
+  table.data-table th.topic-head, table.data-table td.topic-cell{
+    text-align:left;
+    white-space:normal;
+  }
+  table.data-table td.topic-cell{font-weight:600;color:var(--ink);}
+  table.data-table td.topic-score{font-weight:700;}
+  table.data-table td.topic-score.full{color:var(--correct);}
+  table.data-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+    line-height:1.5;
+    border-top:1px solid var(--border);
+    padding-top:14px;
+    margin:18px 0 20px;
+  }
+
+  footer.reset-row{
+    margin-top:20px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Working Examples: Consumer Choice</h1>
+    <p>Total and marginal utility, satisfaction per dollar, the bundle that maximizes utility, and where the demand curve actually comes from</p>
+  </header>
+
+  <div class="mode-row" id="modeRow">
+    <span class="mode-label">Difficulty</span>
+    <div class="segmented" role="group" aria-label="Difficulty level">
+      <button type="button" id="modeReview" aria-pressed="true">Helpful Utility Review</button>
+      <button type="button" id="modeExam" aria-pressed="false">AP Exam Difficulty</button>
+    </div>
+    <span class="mode-hint" id="modeHint"></span>
+  </div>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="card-count" id="problemCount">Problem 1 of 10</span>
+      <span class="card-count" id="stepCount">Step 1 of 5</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="panel" id="quizPanel">
+    <span class="method-badge" id="methodBadge"></span>
+    <div class="scenario" id="scenarioText"></div>
+    <div class="formula-note" id="formulaNote"></div>
+
+    <div class="table-wrap" id="tableWrap">
+      <table class="data-table">
+        <thead><tr id="tableHead"></tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="graph-wrap" id="graphWrap"></div>
+
+    <div class="prompt" id="promptText">Loading&hellip;</div>
+
+    <div class="options" id="optionsWrap"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-verdict" id="feedbackVerdict"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn" disabled>Next step</button>
+    </div>
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">Topic</th><th>Score</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <p class="results-caveat">These bands say whether you have consumer choice down &mdash; they are not an AP score
+    prediction. The exam covers every unit, counts free response for a third of the grade, and gives you no
+    feedback until it is over. Treat a strong result here as one topic secured, not as a score.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Start again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Restart from problem 1</button>
+  </footer>
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Every number in this bank was solved and asserted in a scratch script before
+   being written here. Utility is counted in whole utils, so nothing rounds.
+   The two bundle problems are not checked against a guess: the script
+   enumerates every bundle in range and proves the stated optimum is the UNIQUE
+   total-utility maximiser, that marginal utility per dollar is exactly equal
+   there, and that the budget is exactly exhausted. The prices, incomes and
+   utility tables were not chosen by hand either - a search picked the only
+   kind of numbers that keep every MU/P column a whole number at BOTH prices
+   while still giving a unique interior optimum before and after the price cut.
+--------------------------------------------------------------------------- */
+
+/* A schematic only: it shows what a budget line IS, and deliberately carries no
+   numbers, because reading the intercepts off the income and prices is the
+   exercise. */
+const BUDGET_GRAPH = `
+<svg viewBox="0 0 360 250" role="img" aria-label="A budget line sloping down from the vertical axis to the horizontal axis">
+  <line x1="48" y1="210" x2="340" y2="210" stroke="#6B5D4C" stroke-width="1.5"/>
+  <line x1="48" y1="210" x2="48" y2="24" stroke="#6B5D4C" stroke-width="1.5"/>
+  <text x="340" y="240" text-anchor="end" font-size="10.5" fill="#6B5D4C">Quantity of X (horizontal good)</text>
+  <text x="44" y="20" text-anchor="end" font-size="10.5" fill="#6B5D4C">Quantity of Y</text>
+  <line x1="48" y1="46" x2="286" y2="210" stroke="#2F6F62" stroke-width="2.5"/>
+  <circle cx="48" cy="46" r="4" fill="#2B2118"/>
+  <circle cx="286" cy="210" r="4" fill="#2B2118"/>
+  <text x="300" y="120" font-size="11" font-weight="700" fill="#2F6F62">Budget line</text>
+</svg>`;
+
+const TERMS = '<b>TU</b> = total utility, the satisfaction from all units together. <b>MU</b> = marginal utility, the extra ' +
+  'satisfaction from one more unit. <b>MU/P</b> = marginal utility per dollar. <b>Px</b> and <b>Py</b> = the prices of the two goods. ' +
+  '<b>Utils</b> = the made-up unit utility is counted in.';
+const R_MU = 'Marginal utility is the step up in total utility from one more unit, so read it as the difference between neighbouring rows. ' +
+  'Diminishing marginal utility means each extra unit adds less than the one before it, which shows up as a falling MU column. ' +
+  'Total utility keeps rising for as long as marginal utility stays above zero.';
+const R_PER = 'Dividing marginal utility by the price gives marginal utility per dollar, and that is what makes two goods comparable when they ' +
+  'cost different amounts. A good can deliver more satisfaction per unit and still be the worse buy, if it costs enough more per unit.';
+const R_RULE = 'Utility is largest when MUx/Px = MUy/Py and the entire budget is spent. Both halves are needed: equal ratios with money still ' +
+  'in hand is not the best the consumer can do, and spending every dollar at unequal ratios is not either.';
+const R_ADJ = 'When MUx/Px is above MUy/Py, move spending toward X. Buying more X pulls MUx down, because of diminishing marginal utility, and ' +
+  'buying less Y pushes MUy up. The two ratios therefore close on each other, and the adjustment stops where they meet.';
+const R_PRICE = 'A fall in Px lifts MUx/Px at every quantity, since the same marginal utility is divided by a smaller number. The old bundle ' +
+  'stops satisfying the rule, and restoring it takes more X. That is the law of demand, built up from one consumer\'s own choice.';
+const R_BUD = 'Course extension, not tested on the AP exam. The budget line joins every bundle that spends the whole income. Each intercept is ' +
+  'the income divided by that good\'s price, and the slope is the horizontal good\'s price divided by the vertical good\'s price. ' +
+  'Changing one price pivots the line; changing income shifts it parallel.';
+
+const PROBLEMS = [
+  {
+    id: "P1", pin: "first",
+    topic: "Total utility, marginal utility, and why MU falls",
+    method: "Reading a utility table",
+    scenario: "Dara is working through a plate of pizza slices. The table records her total utility — the satisfaction from all the slices eaten so far — measured in utils.",
+    terms: TERMS, review: R_MU,
+    table: { cols: ["Slices eaten", "0", "1", "2", "3", "4", "5", "6"], colClass: ["row-label", "q-cell", "q-cell", "q-cell", "q-cell", "q-cell", "q-cell", "q-cell"],
+             rows: [["Total utility (utils)", "0", "22", "40", "54", "64", "70", "72"]] },
+    steps: [
+      { prompt: "What is the marginal utility of Dara's 3rd slice?",
+        options: ["14 utils", "54 utils", "18 utils", "10 utils"], correct: 0,
+        explain: "Marginal utility is the step up in total utility from one more unit: 54 − 40 = 14 utils. It is a difference between two rows, never a row on its own — 54 is the TOTAL utility from three slices, not what the third slice added." },
+      { prompt: "What is the marginal utility of Dara's 5th slice?",
+        options: ["6 utils", "70 utils", "10 utils", "2 utils"], correct: 0,
+        explain: "70 − 64 = 6 utils. Watch the counting: the 5th slice takes her from 4 slices to 5 slices, so it is the gap between the 4-slice and 5-slice entries. Reading one column across gives 10, which is the 4th slice." },
+      { prompt: "Worked out for every slice, the marginal utilities are 22, 18, 14, 10, 6 and 2. What does that column show?",
+        options: ["Diminishing marginal utility — each slice adds less satisfaction than the one before it",
+                  "Diminishing total utility — each slice leaves Dara with less satisfaction overall than before",
+                  "Negative marginal utility — the later slices are actively making Dara worse off",
+                  "Constant marginal utility — the satisfaction per slice is falling by the same 4 utils each time"], correct: 0,
+        explain: "The column falls, so each slice adds less than the one before: that is diminishing marginal utility, and it is the near-universal pattern that the whole topic rests on. The drops happen to be a steady 4 utils here, but that is a feature of these particular numbers, not the definition." },
+      { prompt: "What does diminishing marginal utility actually claim about Dara?",
+        options: ["Each extra slice is worth less to her than the last, though every slice still adds something",
+                  "Each extra slice makes her worse off than she was before she ate it",
+                  "Her total satisfaction from pizza falls as she eats more of it",
+                  "She eventually stops enjoying pizza completely, and marginal utility reaches zero at the 6th slice"], correct: 0,
+        explain: "Diminishing marginal utility is a statement about the EXTRA satisfaction, not the total. Every slice here still adds something — the smallest addition is the 2 utils from the sixth — so Dara's total utility is still climbing even as each slice matters less than the one before." },
+      { prompt: "Total utility is still rising at the 6th slice. What does that tell you about marginal utility there, and what would have to happen for total utility to start falling?",
+        options: ["Marginal utility is still positive, at 2 utils; total utility falls only once marginal utility turns negative",
+                  "Marginal utility has reached zero; total utility falls as soon as marginal utility stops rising",
+                  "Marginal utility is negative; total utility falls whenever marginal utility is getting smaller",
+                  "Marginal utility is still positive; total utility falls as soon as marginal utility drops below its starting value"], correct: 0,
+        explain: "Total utility climbs for as long as each extra unit adds something, however little. It peaks where marginal utility hits zero and only turns down once marginal utility goes negative — the point where another slice would actually make her feel worse. A shrinking marginal utility is not the same as a shrinking total." }
+    ]
+  },
+  {
+    id: "P2",
+    topic: "Marginal utility per dollar, and why price has to come in",
+    method: "MU ÷ P for each good",
+    scenario: "At a campus café Theo is choosing between smoothies at $6 each and muffins at $2 each. The table gives the marginal utility, in utils, of each successive smoothie and each successive muffin.",
+    terms: TERMS, review: R_PER,
+    table: { cols: ["Unit", "1st", "2nd", "3rd", "4th", "5th"], colClass: ["row-label", "q-cell", "q-cell", "q-cell", "q-cell", "q-cell"],
+             rows: [["Smoothie MU ($6 each)", "36", "30", "24", "18", "12"],
+                    ["Muffin MU ($2 each)", "16", "14", "12", "10", "8"]] },
+    steps: [
+      { prompt: "What is the marginal utility per dollar of Theo's 1st smoothie?",
+        options: ["6 utils per dollar", "36 utils per dollar", "30 utils per dollar", "216 utils per dollar"], correct: 0,
+        explain: "Divide the marginal utility by the price: 36 ÷ $6 = 6 utils per dollar. The division is the whole point — it converts satisfaction per smoothie into satisfaction per dollar, which is the only basis on which two differently priced goods can be compared." },
+      { prompt: "What is the marginal utility per dollar of Theo's 2nd muffin?",
+        options: ["7 utils per dollar", "14 utils per dollar", "28 utils per dollar", "5 utils per dollar"], correct: 0,
+        explain: "14 ÷ $2 = 7 utils per dollar. Multiplying instead of dividing gives 28, which is the error to watch for: a higher price should make a good look WORSE per dollar, not better." },
+      { prompt: "Which delivers more satisfaction per dollar, Theo's 2nd smoothie or his 2nd muffin?",
+        options: ["The muffin, at 7 utils per dollar against the smoothie's 5",
+                  "The smoothie, at 30 utils against the muffin's 14",
+                  "The smoothie, at 7 utils per dollar against the muffin's 5",
+                  "Neither — both come to 6 utils per dollar once price is taken into account"], correct: 0,
+        explain: "Smoothie: 30 ÷ $6 = 5 utils per dollar. Muffin: 14 ÷ $2 = 7. The muffin wins. Comparing the raw marginal utilities — 30 against 14 — points the other way, which is exactly the mistake dividing by price is there to prevent." },
+      { prompt: "A smoothie has a higher marginal utility than a muffin at every quantity in this table. Does that make smoothies the better buy?",
+        options: ["No — per dollar the muffin beats the smoothie at every quantity, and per dollar is what counts",
+                  "Yes — more satisfaction per unit is exactly what it means for a good to be the better buy",
+                  "No — but only because Theo will eventually run out of money for smoothies",
+                  "It cannot be said without knowing Theo's income and how much he plans to spend in total"], correct: 0,
+        explain: "Run both columns through the division. Smoothies give 6, 5, 4, 3, 2 utils per dollar; muffins give 8, 7, 6, 5, 4. The muffin is ahead at every single quantity despite giving less satisfaction per unit, because it costs a third as much. This is the trap the per-dollar idea exists to close." },
+      { prompt: "Why divide marginal utility by price at all, rather than just comparing marginal utilities?",
+        options: ["Because a dollar is the common unit — it is the dollar the consumer is allocating, not the unit of the good",
+                  "Because marginal utility is unreliable on its own and dividing by price corrects the measurement error",
+                  "Because prices rise over time, and dividing by price adjusts the utility figures for inflation",
+                  "Because it converts utils into dollars, which lets the consumer work out how much the satisfaction is worth"], correct: 0,
+        explain: "The budget is in dollars, so the comparison has to be in dollars. The question a consumer actually faces is 'where does my next dollar buy the most satisfaction?', and that is what MU/P answers. It does not turn utils into money — the answer is still in utils, just per dollar rather than per unit." }
+    ]
+  },
+  {
+    id: "P3",
+    topic: "The utility-maximizing rule and the bundle it picks",
+    method: "MUx/Px = MUy/Py, budget spent",
+    scenario: "Mira has exactly $20 to spend. Tacos cost $4 each, juices cost $2 each, and she will spend all of it. The table gives her marginal utility, in utils, from each successive taco and each successive juice.",
+    terms: TERMS, review: R_RULE,
+    table: { cols: ["Unit", "1st", "2nd", "3rd", "4th", "5th", "6th"], colClass: ["row-label", "q-cell", "q-cell", "q-cell", "q-cell", "q-cell", "q-cell"],
+             rows: [["Taco MU ($4 each)", "44", "36", "28", "20", "12", "4"],
+                    ["Juice MU ($2 each)", "20", "18", "16", "14", "12", "10"]] },
+    steps: [
+      { prompt: "Each of these four bundles costs Mira exactly $20. At which one is marginal utility per dollar the same for both goods?",
+        options: ["3 tacos and 4 juices", "2 tacos and 6 juices", "4 tacos and 2 juices", "5 tacos and 0 juices"], correct: 0,
+        explain: "Work the ratios at each bundle. At 3 tacos and 4 juices: 28 ÷ $4 = 7 and 14 ÷ $2 = 7 — equal. At 2 and 6: 36 ÷ $4 = 9 against 10 ÷ $2 = 5. At 4 and 2: 20 ÷ $4 = 5 against 18 ÷ $2 = 9. At 5 and 0 there is no juice ratio to match at all. Only the first bundle balances." },
+      { prompt: "What are the two marginal-utility-per-dollar figures at that bundle?",
+        options: ["7 for tacos and 7 for juices", "28 for tacos and 14 for juices", "7 for tacos and 14 for juices", "9 for tacos and 5 for juices"], correct: 0,
+        explain: "The 3rd taco gives 28 utils and costs $4, so 28 ÷ 4 = 7. The 4th juice gives 14 utils and costs $2, so 14 ÷ 2 = 7. Equal at 7, which is what the rule asks for. The raw marginal utilities, 28 and 14, are not equal and are not supposed to be — the whole point is that the dearer good has to deliver proportionally more." },
+      { prompt: "What is Mira's total utility at 3 tacos and 4 juices?",
+        options: ["176 utils", "208 utils", "166 utils", "42 utils"], correct: 0,
+        explain: "Add up the marginal utilities actually consumed. Tacos: 44 + 36 + 28 = 108. Juices: 20 + 18 + 16 + 14 = 68. Total 108 + 68 = 176 utils. Adding only the last unit of each, 28 + 14 = 42, counts just the final bite of each good rather than everything she ate." },
+      { prompt: "Check it against another bundle that also costs exactly $20. What is Mira's total utility at 2 tacos and 6 juices?",
+        options: ["170 utils, which is lower than 176", "180 utils, which is higher than 176", "170 utils, which is higher than 176", "196 utils, which is higher than 176"], correct: 0,
+        explain: "Tacos: 44 + 36 = 80. Juices: 20 + 18 + 16 + 14 + 12 + 10 = 90. Total 170, which is 6 utils below the 176 at the balanced bundle. Both bundles cost the same $20 — the difference is purely that one of them allocates those dollars where they buy more." },
+      { prompt: "State the rule in full. What has to be true at the utility-maximizing bundle?",
+        options: ["Marginal utility per dollar is equal across the goods AND the entire budget is spent",
+                  "Marginal utility per dollar is equal across the goods, whatever is left unspent",
+                  "Marginal utility is equal across the goods AND the entire budget is spent",
+                  "Total utility from each good is equal AND the entire budget is spent"], correct: 0,
+        explain: "Both halves are needed. Equal ratios with money still in hand is not the best she can do — another dollar would still buy her utility. Spending every dollar at unequal ratios is not either, because shifting a dollar from the lower-ratio good to the higher-ratio one would raise total utility without costing anything. Note it is the RATIOS that equalize, never the marginal utilities themselves." }
+    ]
+  },
+  {
+    id: "P4",
+    topic: "When the ratios are unequal, and how spending moves",
+    method: "Adjusting toward the optimum",
+    scenario: "Nadia buys bus rides at $2 each and coffees at $4 each. At the bundle she is currently buying, one more bus ride would add 24 utils and one more coffee would add 16 utils.",
+    terms: TERMS, review: R_ADJ,
+    table: { cols: ["", "Price", "Marginal utility of the next unit"], colClass: ["row-label", "q-cell", "q-cell"],
+             rows: [["Bus rides", "$2", "24 utils"], ["Coffees", "$4", "16 utils"]] },
+    steps: [
+      { prompt: "What is marginal utility per dollar for each good at Nadia's current bundle?",
+        options: ["12 for bus rides and 4 for coffees", "24 for bus rides and 16 for coffees", "4 for bus rides and 12 for coffees", "12 for bus rides and 8 for coffees"], correct: 0,
+        explain: "Bus rides: 24 ÷ $2 = 12 utils per dollar. Coffees: 16 ÷ $4 = 4 utils per dollar. The gap is wide — a dollar spent on bus rides is currently buying three times the satisfaction of a dollar spent on coffee." },
+      { prompt: "Which good should Nadia move her spending toward?",
+        options: ["Bus rides, because a dollar spent there currently buys more satisfaction",
+                  "Coffees, because their marginal utility per dollar is lower and needs bringing up",
+                  "Neither — the ratios differ, so she is already allocating her budget correctly",
+                  "Bus rides, because they have the lower price of the two goods"], correct: 0,
+        explain: "Go where the dollar works hardest. Shifting a dollar from coffee to bus rides loses 4 utils and gains 12, a clear net gain of 8 — and that will stay true as long as the ratios are unequal. Note the reasoning is about the RATIO, not the price: a cheaper good is not automatically the better buy." },
+      { prompt: "As Nadia buys more bus rides, what happens to marginal utility per dollar for bus rides?",
+        options: ["It falls, because each extra ride adds less utility while the price stays at $2",
+                  "It rises, because buying more of a good she likes raises the satisfaction it gives",
+                  "It stays at 12, because the price of a bus ride has not changed",
+                  "It falls, because buying more of a good pushes its price up"], correct: 0,
+        explain: "Diminishing marginal utility does the work. The numerator shrinks with every extra ride while the $2 denominator stays put, so the ratio comes down. This is what stops the argument running away — otherwise 'buy more of the better buy' would say to spend everything on one good." },
+      { prompt: "As Nadia buys fewer coffees, what happens to marginal utility per dollar for coffees?",
+        options: ["It rises, because with fewer coffees each remaining one is worth more to her",
+                  "It falls, because she is clearly getting less satisfaction out of coffee overall",
+                  "It stays at 4, because the price of a coffee has not changed",
+                  "It rises, because cutting back on a good pushes its price down"], correct: 0,
+        explain: "Diminishing marginal utility read backwards. Moving down the coffee column toward fewer units means moving toward the earlier, higher marginal utilities, so MU rises while the $4 price is unchanged — and the ratio rises with it." },
+      { prompt: "Where does this adjustment stop?",
+        options: ["Where the two marginal utilities per dollar have met, with the whole budget spent",
+                  "When Nadia has moved her entire budget into bus rides, the good with the higher ratio",
+                  "When the marginal utilities themselves are equal, at 24 utils and 24 utils",
+                  "When the prices are equal, so that a dollar buys the same quantity of either good"], correct: 0,
+        explain: "The two ratios are closing on each other from both sides: the bus-ride ratio falling as she buys more, the coffee ratio rising as she buys fewer. They meet, and at that point no further shift can help. She does not end up spending everything on bus rides precisely because the ratio falls as she goes — and the marginal utilities themselves end up unequal, since the goods cost different amounts." }
+    ]
+  },
+  {
+    id: "P5",
+    topic: "A price change, and where the demand curve comes from",
+    method: "Re-solving after a price falls",
+    scenario: "Owen has $16 to spend on comics and sodas, and spends all of it. Sodas cost $2 each throughout. Comics used to cost $4 each, and at those prices his best bundle was 3 comics and 2 sodas. Comics now cost $2.",
+    terms: TERMS, review: R_PRICE,
+    table: { cols: ["Unit", "1st", "2nd", "3rd", "4th", "5th", "6th"], colClass: ["row-label", "q-cell", "q-cell", "q-cell", "q-cell", "q-cell", "q-cell"],
+             rows: [["Comic MU", "64", "52", "40", "28", "16", "4"],
+                    ["Soda MU ($2 each)", "24", "20", "16", "12", "8", "4"]] },
+    steps: [
+      { prompt: "When comics fall from $4 to $2, what happens to the marginal utility per dollar of comics?",
+        options: ["It doubles at every quantity, from 16, 13, 10, 7, 4, 1 to 32, 26, 20, 14, 8, 2",
+                  "It is unchanged at every quantity, because the marginal utility of a comic has not changed",
+                  "It halves at every quantity, from 16, 13, 10, 7, 4, 1 to 8, 6.5, 5, 3.5, 2, 0.5",
+                  "It doubles only for the comics Owen was already buying, and is unchanged for the rest"], correct: 0,
+        explain: "The marginal utilities themselves have not moved — a comic gives the same satisfaction whatever it costs. What has changed is the divisor. At $4 the comic column reads 16, 13, 10, 7, 4, 1 utils per dollar; at $2 it reads 32, 26, 20, 14, 8, 2. Halving the price doubles every entry, and that is the entire mechanism by which a price change reaches the consumer's decision." },
+      { prompt: "At his old bundle of 3 comics and 2 sodas, does the rule still hold at the new prices?",
+        options: ["No — comics now give 20 utils per dollar against the soda's 10, so the bundle is no longer balanced",
+                  "Yes — the bundle still costs $16, and that is what the rule requires",
+                  "No — sodas now give 20 utils per dollar against the comic's 10, so he should buy more sodas",
+                  "Yes — a change in the price of comics cannot unbalance a bundle that was already optimal"], correct: 0,
+        explain: "At 3 comics the marginal utility is 40, and at the new $2 price that is 40 ÷ 2 = 20 utils per dollar. At 2 sodas the marginal utility is 20, so 20 ÷ 2 = 10. They were equal at 10 and 10 before the price fell; now comics are twice as productive per dollar, and the old bundle cannot be the best one any more." },
+      { prompt: "Which way should Owen move, and why?",
+        options: ["Buy more comics, because a dollar spent on comics now buys more satisfaction than one spent on sodas",
+                  "Buy more sodas, because comics have become cheap enough that their marginal utility will fall",
+                  "Buy more of both, because the price cut has left him with money he was not expecting to have",
+                  "Buy more comics, and keep buying them until his entire $16 is spent on comics alone"], correct: 0,
+        explain: "The ratio is higher for comics, so the next dollar does more good there. He is also left with spare money at the old bundle — 3 comics and 2 sodas now costs only $10 — so there is a second reason to buy more. But not ALL comics: as he buys more, the comic ratio falls back toward the soda ratio and the two meet before he runs out of other things to buy." },
+      { prompt: "What is Owen's new utility-maximizing bundle at the lower comic price?",
+        options: ["5 comics and 3 sodas", "4 comics and 6 sodas", "6 comics and 4 sodas", "3 comics and 2 sodas"], correct: 0,
+        explain: "At 5 comics the marginal utility is 16, so 16 ÷ $2 = 8; at 3 sodas it is 16, so 16 ÷ $2 = 8. Equal, and the bundle costs 5 × $2 + 3 × $2 = $16, exactly his income. Total utility is 260 utils, against 256 at 4 comics and 4 sodas and 248 at 6 comics and 2 sodas — both of which also cost $16 but do not balance the ratios." },
+      { prompt: "The price of comics fell and Owen bought more of them. What has this problem just derived?",
+        options: ["The law of demand, built up from one consumer's own utility maximization",
+                  "The law of supply, since a lower price has drawn a larger quantity into the market",
+                  "Diminishing marginal utility, since the extra comics were worth less than the earlier ones",
+                  "That comics and sodas are substitutes, since buying more of one meant buying fewer of the other"], correct: 0,
+        explain: "Price $4 and 3 comics; price $2 and 5 comics. Those are two points on Owen's demand curve for comics, and the downward slope was not assumed anywhere — it fell out of him re-balancing MU per dollar after the price moved. Repeat at every price and the whole individual demand curve appears; add up consumers and you have market demand." }
+    ]
+  },
+  {
+    id: "P6", pin: "last",
+    topic: "Course extension — the budget line",
+    method: "Course extension · not on the AP exam",
+    scenario: "COURSE EXTENSION — this problem is not tested on the AP exam; it is here because the budget line makes the spending constraint easy to see. Ravi has $48 a month. Cinema tickets cost $8 each and go on the HORIZONTAL axis; paperbacks cost $4 each and go on the VERTICAL axis.",
+    terms: TERMS, review: R_BUD, graph: "BUDGET",
+    table: { cols: ["", "Price", "Axis"], colClass: ["row-label", "q-cell", "q-cell"],
+             rows: [["Cinema tickets", "$8", "horizontal"], ["Paperbacks", "$4", "vertical"], ["Income", "$48", "—"]] },
+    steps: [
+      { prompt: "If Ravi spends the whole $48 on cinema tickets, how many can he buy? This is the horizontal intercept of his budget line.",
+        options: ["6", "12", "8", "48"], correct: 0,
+        explain: "Income divided by that good's price: $48 ÷ $8 = 6 tickets. An intercept is just the extreme case of spending everything on one good, which is why it is the quickest way to anchor the line on a diagram." },
+      { prompt: "If he spends the whole $48 on paperbacks instead, how many can he buy? This is the vertical intercept.",
+        options: ["12", "6", "4", "24"], correct: 0,
+        explain: "$48 ÷ $4 = 12 paperbacks. The cheaper good gives the larger intercept, which is why the line meets the vertical axis higher up than it meets the horizontal axis here." },
+      { prompt: "With cinema tickets on the horizontal axis and paperbacks on the vertical axis, what is the slope of Ravi's budget line?",
+        options: ["−2: each extra ticket costs him 2 paperbacks", "−1/2: each extra ticket costs him half a paperback",
+                  "−4: each extra ticket costs him 4 paperbacks", "−8: each extra ticket costs him 8 paperbacks"], correct: 0,
+        explain: "The slope is the horizontal good's price over the vertical good's price, carrying a minus sign: −$8 ÷ $4 = −2. Reading it as a trade-off is more useful than reading it as a number — one more ticket means giving up exactly two paperbacks, because a ticket costs twice what a paperback costs. Naming the axes first is essential, since swapping them would turn the slope into −1/2." },
+      { prompt: "Where does the bundle of 3 cinema tickets and 4 paperbacks sit relative to the budget line?",
+        options: ["Inside it — the bundle costs $40, leaving $8 of his income unspent",
+                  "On it — the bundle costs exactly $48, so it spends his income precisely",
+                  "Outside it — the bundle costs $56, which is more than he can afford",
+                  "Inside it — the bundle costs $40, and the $8 left over is what economists call deadweight loss"], correct: 0,
+        explain: "3 × $8 + 4 × $4 = $24 + $16 = $40, which is $8 short of $48. Bundles inside the line are affordable but leave money unspent; bundles on the line spend it exactly; bundles outside it cannot be bought at all. A utility-maximizing consumer always ends up ON the line, since the leftover $8 could still buy something worth having." },
+      { prompt: "Ravi's income rises to $72 and both prices stay the same. What happens to the budget line?",
+        options: ["It shifts out parallel — intercepts of 9 tickets and 18 paperbacks, slope still −2",
+                  "It pivots outward on the vertical intercept — 9 tickets, still 12 paperbacks",
+                  "It shifts out parallel — intercepts of 9 tickets and 18 paperbacks, and the slope gets flatter",
+                  "It stays where it is, because the budget line depends on prices rather than income"], correct: 0,
+        explain: "$72 ÷ $8 = 9 and $72 ÷ $4 = 18, so both intercepts grow by the same proportion. The slope is the ratio of the two prices and neither price moved, so the line cannot tilt — a pure income change always gives a parallel shift." },
+      { prompt: "Back at $48, the price of cinema tickets falls to $4 while paperbacks stay at $4. What happens to the line?",
+        options: ["It pivots outward along the horizontal axis to 12 tickets, the vertical intercept stays at 12, and the line is flatter",
+                  "It shifts out parallel, since a price cut leaves Ravi better off in the same way a pay rise would",
+                  "It pivots outward along the vertical axis to 24 paperbacks, and the horizontal intercept stays at 6",
+                  "It pivots outward along the horizontal axis to 12 tickets, and the line becomes steeper"], correct: 0,
+        explain: "Only the horizontal good's price changed, so only the horizontal intercept moves: $48 ÷ $4 = 12. The vertical intercept is still $48 ÷ $4 = 12, because spending everything on paperbacks is unaffected by what tickets cost. The slope falls from −2 to −1, which is flatter: a ticket now costs only one paperback rather than two. A flatter line always means the horizontal good has got relatively cheaper." }
+    ]
+  }
+];
+
+/* ------------------------------------------------------------ state + helpers */
+/* Results bands. Banding uses the ROUNDED percentage -- the same number shown
+   to the student -- so the label can never disagree with the figure beside it.
+   Raw-score ranges over this 31-question bank, checked in the scratch script:
+     Mastered 28-31 | Strong 25-27 | Developing 22-24 | Shaky 17-21 | below 17
+   Blind guessing on 4 options averages 8/31, which lands in the bottom band. */
+const BANDS = [
+  { min: 90, label: 'Mastered', tone: 'good',
+    note: 'You can turn a utility table into marginal utility, compare goods per dollar, and find the bundle the rule picks. Treat this topic as secure.' },
+  { min: 80, label: 'Strong', tone: 'good',
+    note: 'Solid command of the material. Work the topics below where you dropped marks, then run it again.' },
+  { min: 70, label: 'Developing', tone: 'mid',
+    note: 'The method is there but execution is slipping. The breakdown below shows where to aim.' },
+  { min: 55, label: 'Shaky', tone: 'poor',
+    note: 'Some of it is landing, but the gaps are wide enough to cost you marks. Review what marginal utility per dollar means before drilling again.' },
+  { min: 0, label: 'Needs Review', tone: 'poor',
+    note: 'Go back to the Unit 1 notes on utility and consumer choice first. More practice without review will not close a gap this size.' },
+];
+
+let helpMode = true;          // true = Helpful Utility Review, false = AP Exam Difficulty
+let problemOrder = [];
+let problemIndex = 0;
+let stepIndex = 0;
+let answered = false;
+let optionOrder = [];               // display position -> index in step.options
+let score = { correct: 0, total: 0 };
+let perProblem = {};                // problem id -> { correct, total }, for the breakdown
+
+/* Fisher-Yates */
+function shuffledIndices(n){
+  const arr = [...Array(n).keys()];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/* Most problems shuffle, but a couple have a natural place in the sequence.
+   A problem marked pin:"first" always opens the bank -- the one that
+   establishes what the terms mean before anything is computed -- and
+   pin:"last" always closes it, for the problem that pulls the rest together
+   or reaches furthest. Everything between them shuffles exactly as before,
+   and the answer options still shuffle on every step regardless. */
+function buildProblemOrder(){
+  const first = [], second = [], middle = [], last = [];
+  PROBLEMS.forEach((p, i) => {
+    const bucket = p.pin === 'first'  ? first
+                 : p.pin === 'second' ? second
+                 : p.pin === 'last'   ? last
+                 : middle;
+    bucket.push(i);
+  });
+  return [...first, ...second, ...shuffledIndices(middle.length).map(k => middle[k]), ...last];
+}
+
+function currentProblem(){ return PROBLEMS[problemOrder[problemIndex]]; }
+
+function init(){
+  problemOrder = buildProblemOrder();
+  problemIndex = 0;
+  score = { correct: 0, total: 0 };
+  perProblem = {};
+  PROBLEMS.forEach(p => perProblem[p.id] = { correct: 0, total: 0 });
+  showQuiz();
+  loadProblem();
+}
+
+function loadProblem(){
+  stepIndex = 0;
+  const problem = currentProblem();
+
+  document.getElementById('methodBadge').textContent = problem.method;
+  document.getElementById('scenarioText').textContent = problem.scenario;
+  renderContext();
+  document.getElementById('problemCount').textContent =
+    `Problem ${problemIndex + 1} of ${PROBLEMS.length}`;
+
+  const wrap = document.getElementById('tableWrap');
+  if(problem.table){
+    wrap.style.display = 'block';
+    document.getElementById('tableHead').innerHTML =
+      problem.table.cols.map(c => `<th>${c}</th>`).join('');
+    document.getElementById('tableBody').innerHTML = problem.table.rows
+      .map(r => '<tr>' + r.map((cell, i) =>
+        `<td class="${problem.table.colClass[i]}">${cell}</td>`).join('') + '</tr>')
+      .join('');
+  } else {
+    wrap.style.display = 'none';
+  }
+
+  /* The key is looked up rather than compared against one name, so an unknown
+     key draws nothing instead of silently falling back to the wrong picture. */
+  const GRAPHS = { BUDGET: BUDGET_GRAPH };
+  const graphWrap = document.getElementById('graphWrap');
+  const svg = problem.graph ? GRAPHS[problem.graph] : null;
+  if(svg){
+    graphWrap.style.display = 'block';
+    graphWrap.innerHTML = svg;
+  } else {
+    graphWrap.style.display = 'none';
+    graphWrap.innerHTML = '';
+  }
+
+  loadStep();
+}
+
+// The terms line (what the abbreviations stand for) always shows: the exam
+// writes those out in full, so knowing the notation is not a hint. The review
+// line -- formulas, method definitions, and the sign/classification rules --
+// is what "AP Exam Difficulty" takes away.
+function renderContext(){
+  const problem = currentProblem();
+  document.getElementById('formulaNote').innerHTML =
+    helpMode ? problem.terms + '<br>' + problem.review : problem.terms;
+  document.getElementById('modeHint').textContent = helpMode
+    ? 'Formulas and method reminders stay on screen.'
+    : 'Formulas and method reminders hidden, as on the exam.';
+  document.getElementById('modeReview').setAttribute('aria-pressed', String(helpMode));
+  document.getElementById('modeExam').setAttribute('aria-pressed', String(!helpMode));
+}
+
+function setMode(wantHelp){
+  if(helpMode === wantHelp) return;
+  helpMode = wantHelp;
+  renderContext();          // switches mid-problem without disturbing your place
+}
+
+document.getElementById('modeReview').addEventListener('click', () => setMode(true));
+document.getElementById('modeExam').addEventListener('click', () => setMode(false));
+
+function loadStep(){
+  answered = false;
+  const problem = currentProblem();
+  const step = problem.steps[stepIndex];
+
+  document.getElementById('stepCount').textContent =
+    `Step ${stepIndex + 1} of ${problem.steps.length}`;
+  document.getElementById('scoreBadge').textContent =
+    `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('promptText').textContent = step.prompt;
+  document.getElementById('feedback').classList.remove('show');
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  const lastStep = stepIndex === problem.steps.length - 1;
+  const lastProblem = problemIndex === PROBLEMS.length - 1;
+  nextBtn.textContent = !lastStep ? 'Next step'
+                      : lastProblem ? 'See your results'
+                      : 'Next problem';
+
+  // Shuffle the answer choices too, so the correct option is never in a fixed slot.
+  optionOrder = shuffledIndices(step.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(origIndex => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = step.options[origIndex];
+    btn.addEventListener('click', () => handleAnswer(step, origIndex, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+function handleAnswer(step, chosenIndex, btnEl){
+  if(answered) return;
+  answered = true;
+
+  const isCorrect = chosenIndex === step.correct;
+  score.total++;
+  if(isCorrect) score.correct++;
+  const tally = perProblem[currentProblem().id];
+  tally.total++;
+  if(isCorrect) tally.correct++;
+  document.getElementById('scoreBadge').textContent =
+    `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === step.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect
+    ? 'Correct.'
+    : `Not quite — the answer is "${step.options[step.correct]}."`;
+  verdict.className = 'feedback-verdict ' + (isCorrect ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = step.explain;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  const problem = currentProblem();
+  if(stepIndex < problem.steps.length - 1){
+    stepIndex++;
+    loadStep();
+  } else if(problemIndex < PROBLEMS.length - 1){
+    problemIndex++;
+    loadProblem();
+  } else {
+    showResults();      // bank finished -- stop here rather than wrapping round
+  }
+});
+
+function showQuiz(){
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('quizPanel').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+}
+
+function showResults(){
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('quizPanel').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(score.correct / score.total * 100);
+  const band = BANDS.find(b => pct >= b.min);
+
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  \u00b7  ${pct}%`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  // breakdown in the fixed teaching order, not the shuffled order they saw
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  PROBLEMS.forEach(p => {
+    const t = perProblem[p.id];
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${p.topic}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>

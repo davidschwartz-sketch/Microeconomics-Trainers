@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept Check: Consumer Choice</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+    --demand: #2F6F62;
+    --supply: #C1542C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:760px;margin:0 auto;}
+
+  header{
+    margin-bottom:20px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  header h1{
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+  }
+
+  .mode-row{
+    display:flex;
+    align-items:center;
+    gap:10px 12px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .mode-label{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+  }
+  .segmented{
+    display:inline-flex;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--surface);
+  }
+  .segmented button{
+    border:none;
+    background:transparent;
+    padding:7px 14px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .segmented button + button{border-left:1px solid var(--border);}
+  .segmented button:hover[aria-pressed="false"]{background:#FFFBF2;}
+  .segmented button[aria-pressed="true"]{
+    background:var(--accent);
+    color:var(--ink);
+  }
+  .mode-hint{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  @media (max-width:560px){
+    .segmented{width:100%;}
+    .segmented button{flex:1;padding:8px 6px;font-size:12px;}
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .count-group{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .card-count{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .score-badge{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px;
+  }
+
+  .method-badge{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:3px 9px;
+    border-radius:6px;
+    margin-bottom:12px;
+  }
+  .scenario{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .formula-note{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:10px 13px;
+    margin-bottom:18px;
+  }
+  .formula-note b{color:var(--ink);}
+
+  .table-wrap{overflow-x:auto;margin-bottom:20px;}
+  table.data-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.data-table th, table.data-table td{
+    border:1px solid var(--border);
+    padding:9px 11px;
+    text-align:center;
+    white-space:nowrap;
+  }
+  table.data-table th{
+    background:var(--surface-alt);
+    font-weight:700;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  table.data-table td.row-label{
+    font-weight:700;
+    text-align:left;
+    color:var(--ink-soft);
+  }
+  table.data-table td.p-cell{color:var(--supply); font-weight:700;}
+  table.data-table td.wrap-cell{
+    text-align:left;
+    white-space:normal;
+    font-weight:600;
+  }
+  table.data-table td.q-cell{color:var(--demand); font-weight:700;}
+
+  .graph-wrap{
+    margin-bottom:20px;
+    text-align:center;
+  }
+  .graph-wrap svg{width:100%;max-width:480px;height:auto;}
+
+  .prompt{
+    font-size:18px;
+    font-weight:600;
+    line-height:1.4;
+    color:var(--ink);
+    margin-bottom:18px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .choice-btn{
+    text-align:left;
+    padding:13px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){
+    border-color:var(--accent);
+    background:#FFFBF2;
+  }
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{
+    background:var(--correct-soft);
+    border-color:var(--correct);
+    color:var(--correct);
+  }
+  .choice-btn.incorrect{
+    background:var(--incorrect-soft);
+    border-color:var(--incorrect);
+    color:var(--incorrect);
+  }
+
+  .feedback{
+    display:none;
+    margin-bottom:16px;
+  }
+  .feedback.show{display:block;}
+  .feedback-verdict{
+    font-weight:800;
+    font-size:15px;
+    margin-bottom:6px;
+  }
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    padding:12px 14px;
+    border-radius:0 8px 8px 0;
+  }
+
+  .controls{
+    display:flex;
+    justify-content:flex-end;
+  }
+  .btn{
+    padding:11px 20px;
+    border-radius:10px;
+    border:none;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover{background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{
+    font-size:34px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    margin-bottom:10px;
+  }
+  .results-note{
+    font-size:15px;
+    color:var(--ink-soft);
+    margin-bottom:20px;
+  }
+  table.data-table th.topic-head, table.data-table td.topic-cell{
+    text-align:left;
+    white-space:normal;
+  }
+  table.data-table td.topic-cell{font-weight:600;color:var(--ink);}
+  table.data-table td.topic-score{font-weight:700;}
+  table.data-table td.topic-score.full{color:var(--correct);}
+  table.data-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+    line-height:1.5;
+    border-top:1px solid var(--border);
+    padding-top:14px;
+    margin:18px 0 20px;
+  }
+
+  footer.reset-row{
+    margin-top:20px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Concept Check: Consumer Choice</h1>
+    <p>The terms and ideas behind consumer choice &mdash; total and marginal utility, diminishing marginal utility, satisfaction per dollar, and the rule that picks the best bundle</p>
+  </header>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="card-count" id="cardCount">Card 1 of 23</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="panel" id="quizPanel">
+    <span class="method-badge" id="categoryTag"></span>
+
+    <div class="prompt" id="promptText">Loading&hellip;</div>
+
+    <div class="options" id="optionsWrap"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-verdict" id="feedbackVerdict"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn" disabled>Next card</button>
+    </div>
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">Area</th><th>Score</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <p class="results-caveat">These bands say whether the consumer-choice vocabulary is secure &mdash; they are not an AP score
+    prediction. The exam covers every unit, counts free response for a third of the grade, and gives you no
+    feedback until it is over. Treat a strong result here as one topic secured, not as a score.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Start again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Start over</button>
+  </footer>
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   A definitions bank, so there is no arithmetic to verify here. What IS checked
+   in a scratch script is the shape of the bank: four distinct options a card,
+   the correct option written first (the page shuffles them on screen, so a
+   fixed slot cannot leak the answer), every term the topic needs present, and
+   option length carrying no signal.
+--------------------------------------------------------------------------- */
+const CARDS = [
+
+  /* ---- what the words mean ---- */
+  { category:"Utility Basics",
+    prompt:"What is total utility?",
+    options:["The whole amount of satisfaction a consumer gets from all the units consumed together",
+             "The satisfaction a consumer gets from the single most recent unit consumed",
+             "The total amount of money a consumer spends on a good over some period",
+             "The highest price a consumer would be prepared to pay for one more unit"], correct:0,
+    explain:"Total utility is the running total: the satisfaction from everything consumed so far, added up. It is measured in utils, and on a table it is the figure that sits beside each quantity." },
+
+  { category:"Utility Basics",
+    prompt:"What is marginal utility?",
+    options:["The extra satisfaction a consumer gets from consuming one more unit of a good",
+             "The average satisfaction a consumer gets per unit across everything consumed",
+             "The satisfaction a consumer gets from the whole quantity of the good consumed so far",
+             "The extra money a consumer has to spend in order to buy one more unit"], correct:0,
+    explain:"Marginal always means 'one more'. Marginal utility is the addition to total utility from the next unit, which is why it is read as a difference between two rows of a total utility table rather than as a row itself." },
+
+  { category:"Utility Basics",
+    prompt:"How do you get marginal utility out of a table of total utility?",
+    options:["Subtract each total from the one beside it — marginal utility is the change in total utility",
+             "Divide each total by the quantity consumed, which gives the utility per unit",
+             "Add the totals together and divide by the number of units in the table",
+             "Multiply each total by the price of the good to convert utils into dollars"], correct:0,
+    explain:"MU is the step from one row to the next. If total utility goes 40 then 54, the extra unit delivered 14 utils. Dividing the total by the quantity gives AVERAGE utility, which is a different thing and is not what the rule uses." },
+
+  { category:"Utility Basics",
+    prompt:"What is a 'util'?",
+    options:["A made-up unit for ranking satisfaction, with no value in money and no meaning across people",
+             "A unit of satisfaction equal to the enjoyment one dollar of spending buys",
+             "A measure of how much a consumer is willing to pay, expressed in cents",
+             "A standard international unit of happiness used to compare living standards"], correct:0,
+    explain:"Utils are a bookkeeping device. They let a single consumer's choices be ranked and compared, and nothing more — 40 utils for one person cannot be set against 40 utils for another, and they do not convert into money." },
+
+  { category:"Utility Basics",
+    prompt:"A table shows total utility rising from 64 to 70 when the 5th unit is consumed. What is the marginal utility of that 5th unit?",
+    options:["6 utils", "70 utils", "64 utils", "14 utils"], correct:0,
+    explain:"70 − 64 = 6 utils. The figure 70 is the total from all five units together, not what the fifth one added on its own. Keeping that distinction straight is most of what this topic asks for." },
+
+  /* ---- diminishing marginal utility ---- */
+  { category:"Diminishing Marginal Utility",
+    prompt:"What does the law of diminishing marginal utility say?",
+    options:["As more of a good is consumed, each extra unit adds less satisfaction than the one before it",
+             "As more of a good is consumed, the consumer's total satisfaction from it starts to fall",
+             "As more of a good is consumed, each extra unit adds the same satisfaction as the one before it did",
+             "As the price of a good rises, consumers get less satisfaction out of each unit they buy"], correct:0,
+    explain:"It is a claim about the EXTRA satisfaction, not the total. The second slice of pizza is worth less to you than the first, the third less than the second, and so on — which is exactly why demand curves end up sloping downward." },
+
+  { category:"Diminishing Marginal Utility",
+    prompt:"Marginal utility is positive but falling. What is total utility doing?",
+    options:["Still rising, but by a smaller amount with each extra unit consumed",
+             "Falling, because the satisfaction from each extra unit is getting smaller",
+             "Staying flat, because the gains and the losses are cancelling each other out",
+             "Rising at a steady rate, since marginal utility has not yet reached zero"], correct:0,
+    explain:"Anything positive added to a total makes the total bigger. Falling marginal utility means the total is climbing more and more slowly, which is not the same as the total shrinking — a distinction worth saying out loud, because it is the one students lose marks on." },
+
+  { category:"Diminishing Marginal Utility",
+    prompt:"Where does total utility reach its maximum?",
+    options:["Where marginal utility equals zero — the last unit that adds nothing and takes nothing away",
+             "Where marginal utility reaches its own highest value, which is usually at the very first unit",
+             "Where marginal utility first starts to fall, since that is where the gains begin to shrink away",
+             "Where marginal utility is at its most negative, because consumption has been pushed furthest"], correct:0,
+    explain:"The total keeps climbing while MU is positive and starts falling once MU is negative, so it peaks exactly where MU passes through zero. Note that MU starts falling long before that point, and the total is still rising throughout." },
+
+  { category:"Diminishing Marginal Utility",
+    prompt:"What does a negative marginal utility mean?",
+    options:["The extra unit actually makes the consumer worse off, so total utility falls",
+             "The extra unit adds nothing at all, so total utility stops rising and stays flat",
+             "The consumer regrets the money spent, though the satisfaction itself is unchanged",
+             "The extra unit adds less satisfaction than the unit before it did"], correct:0,
+    explain:"Negative marginal utility is the point past which another unit is a burden — the eleventh slice of pizza that makes you feel ill. Total utility falls from there. Falling marginal utility is an entirely different situation and arrives much earlier." },
+
+  /* ---- marginal utility per dollar ---- */
+  { category:"Utility per Dollar",
+    prompt:"What is marginal utility per dollar?",
+    options:["The marginal utility of a unit divided by the price of that unit",
+             "The marginal utility of a unit multiplied by the price of that unit",
+             "The price of a unit divided by the marginal utility it delivers",
+             "The total utility from a good divided by the total spent on that good"], correct:0,
+    explain:"MU ÷ P. It answers the question a consumer with a budget actually faces: how much satisfaction does my next DOLLAR buy, rather than how much does my next unit deliver." },
+
+  { category:"Utility per Dollar",
+    prompt:"Why compare goods using marginal utility per dollar rather than marginal utility on its own?",
+    options:["Because the budget is in dollars, and the goods cost different amounts per unit",
+             "Because marginal utility on its own is far too hard for most consumers to estimate",
+             "Because dividing by price converts the satisfaction into an amount of money",
+             "Because prices change over time and the division adjusts for that change"], correct:0,
+    explain:"A consumer is allocating dollars, not units. If one good costs three times as much as another, it has to deliver three times the satisfaction per unit just to break even — and dividing by price is what makes that comparison visible." },
+
+  { category:"Utility per Dollar",
+    prompt:"Good A gives more marginal utility than good B at every quantity. Does that make A the better buy?",
+    options:["Not necessarily — if A costs enough more, B can still deliver more satisfaction per dollar",
+             "Yes — more satisfaction per unit is precisely what being the better buy means",
+             "Yes, as long as the consumer can afford at least one unit of good A",
+             "Not necessarily — it depends on which good the consumer happens to prefer"], correct:0,
+    explain:"This is the trap the per-dollar idea exists to close. A good that gives 36 utils at $6 delivers 6 per dollar; one that gives 16 utils at $2 delivers 8. The second wins despite looking far worse on raw marginal utility." },
+
+  { category:"Utility per Dollar",
+    prompt:"The price of good X doubles while its marginal utility at each quantity is unchanged. What happens to MUx/Px?",
+    options:["It halves at every quantity, because the same utility is divided by twice the price",
+             "It doubles at every quantity, because the good has become twice as valuable",
+             "It is unchanged, because the marginal utility of the good has not moved",
+             "It halves, but only for the units the consumer was already buying"], correct:0,
+    explain:"Nothing has happened to the satisfaction a unit delivers; what changed is how many dollars it takes to get it. Doubling the denominator halves the ratio, right down the column — and that is how a price change reaches the consumer's decision." },
+
+  /* ---- the rule ---- */
+  { category:"The Utility-Maximizing Rule",
+    prompt:"What is the utility-maximizing rule for a consumer choosing between two goods?",
+    options:["MUx/Px = MUy/Py, and the entire budget is spent",
+             "MUx = MUy, and the entire budget is spent",
+             "MUx/Px = MUy/Py, whether or not the whole budget is spent",
+             "Px/MUx = Py/MUy, and the consumer buys equal quantities of the two goods"], correct:0,
+    explain:"Both halves are needed. Equal ratios tell you the dollars are allocated as well as they can be; spending the whole budget tells you there are no dollars sitting idle that could still buy satisfaction. Note it is the RATIOS that equalize, never the marginal utilities themselves." },
+
+  { category:"The Utility-Maximizing Rule",
+    prompt:"A consumer has equal marginal utility per dollar across both goods, but still has money left over. Is this the best she can do?",
+    options:["No — spending the rest would add more utility, so the rule is only half satisfied",
+             "Yes — equal marginal utility per dollar is the whole of the utility-maximizing rule",
+             "Yes, provided the money left over is too little to buy another whole unit of either good",
+             "No — unspent money means the ratios must have been calculated incorrectly"], correct:0,
+    explain:"Marginal utility is positive, so an unspent dollar is satisfaction left on the table. The budget condition is not bookkeeping — it is half the rule, and a bundle that leaves money idle is beaten by one that does not." },
+
+  { category:"The Utility-Maximizing Rule",
+    prompt:"A consumer finds MUx/Px = 10 and MUy/Py = 6. What should she do?",
+    options:["Buy more X and less Y, because a dollar currently buys more satisfaction on X",
+             "Buy more Y and less X, to bring the lower ratio up to meet the higher one",
+             "Nothing — the two ratios differ, which is what a well-allocated budget looks like",
+             "Buy more X and less Y, and keep going until the whole budget sits in X"], correct:0,
+    explain:"Shift a dollar from Y to X: lose 6 utils, gain 10, net gain 4. That stays worth doing while the ratios are apart. But not all the way — buying more X drags MUx down and buying less Y pushes MUy up, so the two meet well before the budget is all in one good." },
+
+  { category:"The Utility-Maximizing Rule",
+    prompt:"As a consumer buys more of good X with its price unchanged, what happens to MUx/Px?",
+    options:["It falls, because diminishing marginal utility shrinks the numerator while the price holds still",
+             "It rises, because buying more of a good shows the consumer values it more highly",
+             "It is unchanged, because the price of good X has not moved at all",
+             "It falls, because buying more of a good eventually drives its market price up"], correct:0,
+    explain:"Diminishing marginal utility does the work. Each extra unit of X adds less than the last, so the top of the fraction shrinks while the bottom stays put. This is the self-correcting mechanism that stops the rule from recommending everything in one good." },
+
+  { category:"The Utility-Maximizing Rule",
+    prompt:"Why doesn't a consumer put the whole budget into whichever good has the higher marginal utility per dollar?",
+    options:["Because buying more of it drives its own ratio down until the two goods meet",
+             "Because consumers prefer variety for its own sake, whatever the numbers say",
+             "Because spending everything on one good is usually against the rules of the model",
+             "Because the price of that good would rise as the consumer bought more of it"], correct:0,
+    explain:"'Buy more of the better buy' would be a runaway instruction if marginal utility were constant. Diminishing marginal utility is what closes the gap: the more you buy, the less the next unit adds, until the good stops being the better buy." },
+
+  { category:"The Utility-Maximizing Rule",
+    prompt:"The price of a good falls while the consumer's income and tastes stay the same. What happens?",
+    options:["Its marginal utility per dollar rises at every quantity, so the consumer buys more of it",
+             "Its marginal utility rises at every quantity, so the consumer buys more of it",
+             "Its marginal utility per dollar falls, so the consumer switches toward the other good instead",
+             "Nothing changes, because the satisfaction each unit delivers has not been affected"], correct:0,
+    explain:"The satisfaction per unit is untouched — what changes is the dollars needed to get it, so MU/P rises right down the column. The old bundle stops satisfying the rule, and rebalancing takes more of the cheaper good. Do that at every price and you have traced out the demand curve." },
+
+  /* ---- course extension ---- */
+  { category:"Budget Line (course extension)",
+    prompt:"Course extension, not on the AP exam. What does a budget line show?",
+    options:["Every combination of the two goods that spends the consumer's income exactly",
+             "Every combination of the two goods that gives the consumer equal satisfaction",
+             "The combination of the two goods that maximizes the consumer's total utility",
+             "Every combination of the two goods the consumer can afford, including cheaper ones"], correct:0,
+    explain:"The line itself is the set of bundles costing exactly the income. Bundles below it are affordable but leave money unspent, and bundles above it cannot be bought at all. It says nothing about satisfaction — it is purely what the money will stretch to." },
+
+  { category:"Budget Line (course extension)",
+    prompt:"Course extension, not on the AP exam. With good X on the horizontal axis and good Y on the vertical axis, what is the slope of the budget line?",
+    options:["Px/Py, carrying a minus sign — the amount of Y given up for one more X",
+             "Py/Px, carrying a minus sign — the amount of X given up for one more Y",
+             "The consumer's income divided by the price of the good on the horizontal axis",
+             "The ratio of the marginal utilities of the two goods at the chosen bundle"], correct:0,
+    explain:"The slope is the horizontal good's price over the vertical good's price. Naming the axes first is not optional: swap them and the slope turns upside down. Read it as a trade-off — if X costs twice what Y costs, one more X means two fewer Y." },
+
+  { category:"Budget Line (course extension)",
+    prompt:"Course extension, not on the AP exam. A consumer's income rises while both prices stay the same. What happens to the budget line?",
+    options:["It shifts outward parallel to itself, because both intercepts grow and the slope is unchanged",
+             "It pivots outward on the vertical intercept, because a larger income buys more of each of the goods",
+             "It gets flatter, because the consumer can now afford relatively more of the horizontal-axis good",
+             "It stays exactly where it is, since the position of a budget line is determined by prices alone"], correct:0,
+    explain:"Each intercept is income divided by a price, so both grow in the same proportion. The slope is the ratio of the two prices and neither price moved, so the line cannot tilt. A price change pivots the line; an income change shifts it parallel." },
+
+  { category:"Budget Line (course extension)",
+    prompt:"Course extension, not on the AP exam. A bundle lies strictly INSIDE a consumer's budget line. What does that tell you?",
+    options:["She can afford it and would still have money left over after buying it",
+             "She cannot afford it at all, given her current income and the prices she faces",
+             "She can afford it, and it spends her income exactly, right down to the last dollar",
+             "It is the bundle that gives her the most satisfaction for the money she has"], correct:0,
+    explain:"Inside means it costs less than the income. A utility-maximizing consumer never settles there, because the leftover money could still buy something worth having — which is exactly why the rule insists the whole budget is spent." },
+
+];
+
+/* ------------------------------------------------------------ state + helpers */
+/* Results bands. Banding uses the ROUNDED percentage -- the same number shown
+   to the student -- so the label can never disagree with the figure beside it.
+   Raw-score ranges over this 23-card bank, checked in the scratch script:
+     Mastered 21-23 | Strong 19-20 | Developing 16-18 | Shaky 13-15 | below 13
+   Blind guessing on 4 options averages 6/23, which lands in the bottom band. */
+const BANDS = [
+  { min: 90, label: 'Mastered', tone: 'good',
+    note: 'The vocabulary is secure. You can tell total from marginal utility, say what diminishing marginal utility does and does not claim, and state the rule in full.' },
+  { min: 80, label: 'Strong', tone: 'good',
+    note: 'Solid command of the terms. Look at the areas below where you dropped marks, then run it again.' },
+  { min: 70, label: 'Developing', tone: 'mid',
+    note: 'Most of it is there, but some definitions are still blurred at the edges. The breakdown below shows which.' },
+  { min: 55, label: 'Shaky', tone: 'poor',
+    note: 'Enough of the vocabulary is unsettled to cost you marks on questions you could otherwise answer. Review the areas below before drilling again.' },
+  { min: 0, label: 'Needs Review', tone: 'poor',
+    note: 'Go back to the Unit 1 notes on utility and consumer choice first. More practice without review will not close a gap this size.' },
+];
+
+let order = [];
+let index = 0;
+let answered = false;
+let optionOrder = [];               // display position -> index in card.options
+let score = { correct: 0, total: 0 };
+let perArea = {};                   // category -> { correct, total }, for the breakdown
+
+function shuffledIndices(n){
+  const arr = [...Array(n).keys()];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+const AREAS = [...new Set(CARDS.map(c => c.category))];
+
+function init(){
+  order = shuffledIndices(CARDS.length);
+  index = 0;
+  score = { correct: 0, total: 0 };
+  perArea = {};
+  AREAS.forEach(a => perArea[a] = { correct: 0, total: 0 });
+  showQuiz();
+  loadCard();
+}
+
+function loadCard(){
+  answered = false;
+  const card = CARDS[order[index]];
+  document.getElementById('cardCount').textContent = `Card ${index + 1} of ${CARDS.length}`;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('categoryTag').textContent = card.category;
+  document.getElementById('promptText').textContent = card.prompt;
+  document.getElementById('feedback').classList.remove('show');
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  nextBtn.textContent = index === CARDS.length - 1 ? 'See your results' : 'Next card';
+
+  /* Every card is written with its correct option first, so the options MUST be
+     shuffled here or the answer would sit in slot 1 every time. */
+  optionOrder = shuffledIndices(card.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(origIndex => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = card.options[origIndex];
+    btn.addEventListener('click', () => handleAnswer(card, origIndex, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+function handleAnswer(card, chosenIndex, btnEl){
+  if(answered) return;
+  answered = true;
+
+  const isCorrect = chosenIndex === card.correct;
+  score.total++;
+  if(isCorrect) score.correct++;
+  const tally = perArea[card.category];
+  tally.total++;
+  if(isCorrect) tally.correct++;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === card.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect
+    ? 'Correct.'
+    : `Not quite \u2014 the answer is "${card.options[card.correct]}."`;
+  verdict.className = 'feedback-verdict ' + (isCorrect ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = card.explain;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if(index < CARDS.length - 1){
+    index++;
+    loadCard();
+  } else {
+    showResults();
+  }
+});
+
+function showQuiz(){
+  document.getElementById('quizPanel').style.display = '';
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+}
+
+function showResults(){
+  document.getElementById('quizPanel').style.display = 'none';
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(100 * score.correct / score.total);
+  const band = BANDS.find(b => pct >= b.min);
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  (${pct}%)`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  // breakdown in the fixed teaching order, not the shuffled order they saw
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  AREAS.forEach(a => {
+    const t = perArea[a];
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${a}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
