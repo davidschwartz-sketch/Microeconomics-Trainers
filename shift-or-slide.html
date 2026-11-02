@@ -314,11 +314,13 @@
     pointer-events:none;
     white-space:nowrap;
   }
-  .points-pop.fire{animation:pointsFloat 600ms ease-out;}
+  .points-pop.fire{animation:pointsFloat 1100ms ease-out;}
   @keyframes pointsFloat{
-    0%{opacity:0; transform:translateY(4px);}
-    25%{opacity:1; transform:translateY(-6px);}
-    100%{opacity:0; transform:translateY(-18px);}
+    0%{opacity:0; transform:translateY(4px) scale(.9);}
+    14%{opacity:1; transform:translateY(-6px) scale(1.18);}
+    30%{opacity:1; transform:translateY(-9px) scale(1);}
+    72%{opacity:1; transform:translateY(-14px) scale(1);}
+    100%{opacity:0; transform:translateY(-26px) scale(1);}
   }
   .score-wrap{position:relative; display:inline-block;}
 
@@ -363,28 +365,45 @@
   }
 
   /* the flourish on a right answer: under 600ms so rapid answering never waits */
-  .predict-btn.just-right, .choice-btn.just-right{animation:rightPulse 520ms ease-out;}
+  .predict-btn.just-right, .choice-btn.just-right{animation:rightPulse 820ms ease-out;}
   @keyframes rightPulse{
     0%{transform:scale(1);}
-    22%{transform:scale(1.025); box-shadow:0 0 0 4px var(--correct-soft);}
-    55%{transform:scale(0.998);}
+    14%{transform:scale(1.03); box-shadow:0 0 0 5px var(--correct-soft);}
+    34%{transform:scale(0.997); box-shadow:0 0 0 7px rgba(47,125,79,.10);}
+    62%{transform:scale(1.008); box-shadow:0 0 0 4px var(--correct-soft);}
     100%{transform:scale(1); box-shadow:none;}
   }
-  .spark-host{position:relative;}
+  /* The burst is thrown into a layer over the whole viewport rather than into
+     the button, so it can cross the page. The layer never takes a click, so a
+     student answering quickly is never waiting on it. */
+  .confetti-layer{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:40;
+  }
   .spark{
     position:absolute;
-    top:50%;
-    left:50%;
-    width:7px;
-    height:7px;
+    width:9px;
+    height:14px;
     border-radius:2px;
     pointer-events:none;
     opacity:0;
-    animation:sparkFly 560ms ease-out forwards;
+    will-change:transform, opacity;
+    animation:sparkFly var(--dur) cubic-bezier(.17,.72,.4,1) forwards;
   }
+  .spark.round{width:10px; height:10px; border-radius:50%;}
+  .spark.bar{width:4px; height:16px; border-radius:1px;}
   @keyframes sparkFly{
-    0%{opacity:1; transform:translate(-50%,-50%) rotate(0deg) scale(.6);}
-    100%{opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)) scale(1);}
+    0%{opacity:1; transform:translate(-50%,-50%) rotate(0deg) scale(.5);}
+    12%{opacity:1;}
+    70%{opacity:1;}
+    100%{
+      opacity:0;
+      transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy)))
+                rotate(var(--rot)) scale(1);
+    }
   }
 
   /* ---- end-of-run analysis ---- */
@@ -416,6 +435,7 @@
   @media (prefers-reduced-motion: reduce){
     .streak-badge.grew, .points-pop.fire,
     .predict-btn.just-right, .choice-btn.just-right, .spark{animation:none;}
+    .confetti-layer{display:none;}
     .points-pop.fire{opacity:1;}
     .spark{display:none;}
     .toast{animation:toastFade 2000ms linear forwards;}
@@ -526,6 +546,7 @@
     <button class="link-btn" id="resetAllBtn">Reset the whole trainer</button>
   </footer>
 </div>
+<div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
@@ -1148,6 +1169,14 @@ const GAME = { streak:0, best:0, points:0, correct:0, answered:0, pendingComebac
    replay them. */
 const MILESTONES_FIRED = new Set();
 
+/* Keyed on the streak length that triggers them. The wording states the tier,
+   because the whole point of the bonus is that a student can see it coming. */
+const STREAK_FLASHES = {
+  3:  ["You're on fire!",               'Three in a row. Two more and every right answer doubles.'],
+  5:  ["You're getting double points!", 'Five in a row — +2 for each right answer from here.'],
+  10: ["You're getting triple points!", 'Ten in a row — +3 for each right answer from here.'],
+};
+
 const KIND_LABEL = {
   demand:   'Demand shifts',
   supply:   'Supply shifts',
@@ -1209,29 +1238,55 @@ function milestone(key, title, line){
   toast(title, line);
 }
 
-/* A short, CSS-driven flourish. The elements are created here, but every bit of
-   the motion lives in the stylesheet, and all of it is done inside 600ms. */
+/* The flourish. Every bit of the motion is a CSS keyframe; this only places the
+   pieces and takes them away again. The burst is thrown across the whole
+   viewport from wherever the answered button is, and a bigger bonus throws
+   more of it, so +3 visibly outweighs +1. */
+const BURST_MS = 1250;
 function celebrate(btnEl, gained){
   if(btnEl){
     btnEl.classList.remove('just-right');
     void btnEl.offsetWidth;                       // restart the animation
     btnEl.classList.add('just-right');
-    btnEl.classList.add('spark-host');
-    const colors = ['var(--demand)', 'var(--supply)', 'var(--accent)', 'var(--movement)'];
-    for(let i = 0; i < 8; i++){
-      const s = document.createElement('span');
-      s.className = 'spark';
-      const angle = (Math.PI * 2 * i) / 8 + Math.random() * 0.5;
-      const dist = 26 + Math.random() * 20;
-      s.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
-      s.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
-      s.style.setProperty('--rot', `${Math.round(Math.random() * 300 - 150)}deg`);
-      s.style.background = colors[i % colors.length];
-      btnEl.appendChild(s);
-      setTimeout(() => s.remove(), 620);
-    }
-    setTimeout(() => { btnEl.classList.remove('just-right', 'spark-host'); }, 620);
+    setTimeout(() => btnEl.classList.remove('just-right'), BURST_MS);
   }
+
+  const layer = document.getElementById('confettiLayer');
+  if(layer && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const r = btnEl ? btnEl.getBoundingClientRect()
+                    : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
+    const x0 = r.left + r.width / 2, y0 = r.top + r.height / 2;
+    const colors = ['var(--demand)', 'var(--supply)', 'var(--accent)', 'var(--movement)', 'var(--correct)'];
+    const shapes = ['', ' round', ' bar'];
+    const pieces = gained >= 3 ? 44 : gained >= 2 ? 32 : 22;
+    /* Reach follows the shape of the viewport, not its longest side: one radius
+       threw most of a phone's confetti off the sides while leaving a wide
+       monitor's bunched in the middle. */
+    const reachX = innerWidth * 0.55, reachY = innerHeight * 0.5;
+    for(let i = 0; i < pieces; i++){
+      const s = document.createElement('span');
+      s.className = 'spark' + shapes[i % shapes.length];
+      /* Spread evenly round the circle with a little jitter, so the burst looks
+         scattered rather than striped, then let each piece fall a bit. */
+      const angle = (Math.PI * 2 * i) / pieces + (Math.random() - 0.5) * 0.5;
+      const far = 0.35 + Math.random() * 0.65;
+      const fall = 40 + Math.random() * 160;
+      s.style.left = x0 + 'px';
+      s.style.top = y0 + 'px';
+      s.style.setProperty('--dx', `${Math.cos(angle) * reachX * far}px`);
+      s.style.setProperty('--dy', `${Math.sin(angle) * reachY * far + fall}px`);
+      s.style.setProperty('--rot', `${Math.round(Math.random() * 1000 - 500)}deg`);
+      s.style.setProperty('--dur', `${BURST_MS - 250 + Math.round(Math.random() * 250)}ms`);
+      s.style.background = colors[i % colors.length];
+      layer.appendChild(s);
+    }
+    setTimeout(() => {
+      /* Clear only this burst's worth, oldest first, so a fast answerer who
+         sets off a second burst does not wipe the one still in the air. */
+      for(let i = 0; i < pieces && layer.firstChild; i++) layer.firstChild.remove();
+    }, BURST_MS);
+  }
+
   const pop = document.getElementById('pointsPop');
   pop.textContent = `+${gained}`;
   pop.classList.remove('fire');
@@ -1262,7 +1317,12 @@ function recordAnswer(isCorrect, btnEl, kind){
       GAME.pendingComeback = false;
       milestone('comeback', 'Comeback', 'Straight back on it after a streak went down.');
     }
-    if(GAME.streak === 5) milestone('onfire', 'On Fire', 'Five in a row — right answers are worth +2 from here.');
+    /* These three announce the bonus tier you are now on, so unlike the badges
+       they fire EVERY time a streak reaches the mark -- lose the streak and
+       build it back and you need telling that double points are live again.
+       Each can only fire once per streak, since a streak passes each mark once. */
+    const flash = STREAK_FLASHES[GAME.streak];
+    if(flash) toast(flash[0], flash[1]);
     if(GAME.streak === runLength())
       milestone('perfect', 'Perfect streak', `All ${runLength()} right, without a single miss.`);
   } else {
