@@ -662,17 +662,30 @@ const LINK_OPTIONS = [
   'Demand shifted; supply then shifted too, because growers sold a different amount',
 ];
 
+/* A card that asks which curve moved now has to be answered with the DIRECTION
+   too, so "Demand shifts" is no longer enough on its own. Every one of these
+   twelve cards already names its direction in its own explanation, which is
+   what the mapping below was checked against. */
+const SHIFT_OPTIONS = [
+  'Demand shifts right',
+  'Demand shifts left',
+  'Supply shifts right',
+  'Supply shifts left',
+  'Movement along the curve',
+];
+
 function correctButtonLabel(card){
   if(card.category==='link') return LINK_OPTIONS[card.shiftCurve==='supply' ? 0 : 1];
-  if(card.category==='demand') return 'Demand shifts';
-  if(card.category==='supply') return 'Supply shifts';
-  return 'Movement along the curve';
+  if(card.category==='movement') return 'Movement along the curve';
+  return (card.category==='demand' ? 'Demand' : 'Supply') +
+         ' shifts ' + (card.direction==='increase' ? 'right' : 'left');
 }
 function optionLabels(card){
-  if(card.category!=='link') return ['Demand shifts', 'Supply shifts', 'Movement along the curve'];
-  /* Shuffled, because the answer is always LINK_OPTIONS[0] or [1] and a fixed
-     order would put it in one of the first two slots every time. */
-  return shuffledIndices(LINK_OPTIONS.length).map(i => LINK_OPTIONS[i]);
+  /* Shuffled in both cases. With a fixed order each answer would sit in the
+     same slot for good -- "movement" always last, a demand increase always
+     first -- which is a pattern worth more to a student than the economics. */
+  const pool = card.category==='link' ? LINK_OPTIONS : SHIFT_OPTIONS;
+  return shuffledIndices(pool.length).map(i => pool[i]);
 }
 
 /* ================= SVG HELPERS ================= */
