@@ -471,10 +471,13 @@ const MARKET_GRAPH = `
 </svg>`;
 
 const TERMS = '<b>CS</b> = consumer surplus. <b>PS</b> = producer surplus. <b>TS</b> = total surplus. ' +
-              '<b>DWL</b> = deadweight loss. <b>P*</b> = equilibrium price. <b>Q*</b> = equilibrium quantity.';
+              '<b>DWL</b> = deadweight loss. <b>P*</b> = equilibrium price. <b>Q*</b> = equilibrium quantity. ' +
+              '<b>MB</b> = marginal benefit, the most a buyer will pay for one more unit. ' +
+              '<b>MC</b> = marginal cost, the least a seller will accept to produce it.';
 const REVIEW_CALC = 'CS is the triangle between the demand curve and the price, from 0 out to Q*. PS is the triangle between the price and the ' +
   'supply curve over that same range. Area of a triangle is 1/2 &times; base &times; height, with Q* as the base in both. TS = CS + PS.';
-const REVIEW_DWL = 'TS = CS + PS, and it is largest exactly at Q*. Below Q*, units worth more to buyers than they cost to make go untraded; above Q*, ' +
+const REVIEW_DWL = 'TS = CS + PS, and it is largest exactly at Q*. Read the curves one unit at a time: the height of demand at a quantity is that unit\'s ' +
+  'marginal benefit and the height of supply is its marginal cost. Below Q*, units worth more to buyers than they cost to make go untraded; above Q*, ' +
   'units get made that cost more than buyers value them. Either way the loss is a triangle: DWL = 1/2 &times; (distance from Q*) &times; (gap between the two curves there).';
 const REVIEW_SHIFT = 'Reason first about the curve that did NOT move. If supply shifted, demand is unchanged, so CS follows the price: lower price plus larger ' +
   'quantity makes that triangle bigger, higher price plus smaller quantity makes it smaller. If demand shifted, supply is unchanged and PS follows the price the same way. ' +
@@ -548,7 +551,7 @@ const PROBLEMS = [
   {
     id: "P3",
     topic: "Total surplus is largest exactly at Q*",
-    method: "Deadweight loss · deviating from Q* in either direction",
+    method: "Deadweight loss · one market, several quantities",
     scenario: "Brightwater Filters sells water filters. P is the price in dollars per filter and Q is filters per day.",
     terms: TERMS, review: REVIEW_DWL, graph: "SURPLUS",
     table: { cols: ["", "Equation"], colClass: ["row-label", "q-cell"],
@@ -569,6 +572,24 @@ const PROBLEMS = [
       { prompt: "Now suppose 25 filters are traded — five MORE than Q*. What is the deadweight loss then?",
         options: ["$50", "Zero", "$100", "$25"], correct: 0,
         explain: "At Q = 25 demand is 100 − 2(25) = $50 while supply is 20 + 2(25) = $70, so the 25th filter costs $20 more to make than any buyer thinks it is worth. Those five extra units destroy surplus rather than create it: DWL = 1/2 × 5 × 20 = $50 again, leaving TS at $750 — exactly where it was at 15 filters." },
+      { prompt: "Read one unit at a time. Take the 10th filter, ten units below Q*. What are its marginal benefit and its marginal cost?",
+        options: ["Marginal benefit $80 and marginal cost $40, so what a buyer will pay beats what a seller needs by $40",
+                  "Marginal benefit $40 and marginal cost $80, so what a seller needs beats what a buyer will pay by $40",
+                  "Marginal benefit $80 and marginal cost $80, so willingness to pay and seller cost already match here",
+                  "Marginal benefit $60 and marginal cost $60, since every unit traded changes hands at the $60 price"], correct: 0,
+        explain: "The height of the demand curve at a quantity IS the marginal benefit of that unit — the most any buyer will pay for it. The height of the supply curve is the marginal cost — the least any seller will accept to produce it. At Q = 10: MB = 100 − 2(10) = $80 and MC = 20 + 2(10) = $40. Marginal benefit is $40 above marginal cost, so the 10th filter is worth making; it creates $40 of surplus for the two sides to share. The same holds for every unit up to Q*, which is why the demand curve lies above the supply curve the whole way there. Note the last option: $60 is what the unit SELLS for, which is not the same as what it is worth to the buyer or what it costs the seller." },
+      { prompt: "Now the 30th filter, ten units beyond Q*. What are its marginal benefit and its marginal cost?",
+        options: ["Marginal benefit $40 and marginal cost $80, so it costs $40 more to make than a buyer will pay",
+                  "Marginal benefit $80 and marginal cost $40, so it is worth $40 more to a buyer than it costs to make",
+                  "Marginal benefit $40 and marginal cost $40, so willingness to pay and seller cost match beyond Q*",
+                  "Marginal benefit $60 and marginal cost $60, since past Q* both settle back to the $60 market price"], correct: 0,
+        explain: "MB = 100 − 2(30) = $40 and MC = 20 + 2(30) = $80. Past Q* the curves have crossed, so the order reverses: the cheapest seller still willing to make a 30th filter needs $80 for it, while the keenest buyer left will pay only $40. Making that filter destroys $40 of value — it consumes $80 of resources to produce something worth $40 to the person who ends up with it. Every unit beyond Q* is like this, which is why pushing output past Q* lowers total surplus instead of raising it." },
+      { prompt: "At Q* = 20 itself, what is true of marginal benefit and marginal cost, and why does that make Q* the quantity that maximizes total surplus?",
+        options: ["They are equal, both $60: every unit whose marginal benefit beat its marginal cost has been made, and no unit past Q* has",
+                  "Marginal benefit is at its highest here, $100, because the market trades on until buyers' willingness to pay can climb no further",
+                  "Marginal cost is at its lowest here, $20, because the market trades on until sellers have used up every one of their cheapest units",
+                  "They are equal, both $60, and that equality is also the reason consumer surplus and producer surplus always come out equal at Q*"], correct: 0,
+        explain: "MB = 100 − 2(20) = $60 and MC = 20 + 2(20) = $60. At Q* the curves cross, so marginal benefit and marginal cost are equal — and both equal P*. That is the whole case for the competitive equilibrium in one line: every filter before the 20th was worth more to a buyer than it cost a seller and got made, and every filter after it would have cost more than it was worth, so it does not get made. This is also where the two deadweight losses you just computed come from. Trade too little and the units you give up are exactly the ones whose marginal benefit exceeded their marginal cost — that was the $50 at 15 filters. Trade too much and you produce units whose marginal cost exceeded their marginal benefit — the $50 at 25 filters. Both losses shrink to nothing only here, where the gap between the curves closes. Watch the last option: CS and PS really are equal in this market, but that is a coincidence of the slopes, not the reason Q* is best." },
       { prompt: "What is the general principle these two cases illustrate?",
         options: ["Total surplus is largest exactly at Q*, and moving away from it in either direction destroys surplus",
                   "Total surplus rises with quantity, so producing more output is always better for buyers and sellers alike",
@@ -828,9 +849,9 @@ const PROBLEMS = [
 /* ------------------------------------------------------------ state + helpers */
 /* Results bands. Banding uses the ROUNDED percentage -- the same number shown
    to the student -- so the label can never disagree with the figure beside it.
-   Raw-score ranges over this 54-question bank, checked in the scratch script:
-     Mastered 49-54 | Strong 43-48 | Developing 38-42 | Shaky 30-37 | below 30
-   Blind guessing on 4 options averages 14/54, which lands in the bottom band. */
+   Raw-score ranges over this 57-question bank, checked in the scratch script:
+     Mastered 52-57 | Strong 46-51 | Developing 40-45 | Shaky 32-39 | below 32
+   Blind guessing on 4 options averages 14/57, which lands in the bottom band. */
 const BANDS = [
   { min: 90, label: 'Mastered', tone: 'good',
     note: 'You can compute the surplus areas, size a deadweight loss, and say who gains from a shift. Treat this topic as secure.' },
