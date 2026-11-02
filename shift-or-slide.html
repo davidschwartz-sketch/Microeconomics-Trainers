@@ -104,6 +104,8 @@
     display:flex;
     justify-content:space-between;
     align-items:center;
+    flex-wrap:wrap;
+    gap:6px 10px;
     margin-bottom:14px;
   }
   .card-count{
@@ -441,6 +443,87 @@
     .toast{animation:toastFade 2000ms linear forwards;}
     @keyframes toastFade{0%,80%{opacity:1;} 100%{opacity:0;}}
   }
+
+  /* ---- growth track ----
+     Lightness climbs at every stage (0.08 -> 0.19 -> 0.35 -> 0.61 relative
+     luminance), so the stage is readable without seeing colour at all. The
+     name, the icon and the caption say it in words as well. */
+  .growth{display:none; margin:-4px 0 14px;}
+  .growth.show{display:block;}
+  .growth-head{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; flex-wrap:wrap; margin-bottom:5px;
+  }
+  .growth-stage{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink);}
+  .growth-stage b{font-weight:800; letter-spacing:.01em;}
+  .growth-icon{width:18px; height:18px; display:inline-block; flex:none;}
+  .growth-icon svg{width:18px; height:18px; display:block;}
+  .growth-caption{font-size:11.5px; color:var(--ink-soft);}
+  .growth-groove{
+    position:relative; height:12px; border-radius:999px;
+    background:#EFE6D4; border:1px solid var(--border); overflow:hidden;
+  }
+  .growth-fill{
+    position:absolute; left:0; top:0; bottom:0; width:0;
+    border-radius:999px; transition:width 420ms ease-out, background-color 420ms ease-out;
+  }
+  .growth-fill.planted{background:#8E3123;}
+  .growth-fill.sprouting{background:#A06F16;}
+  .growth-fill.grown{background:#5FB081;}
+  .growth-fill.harvest, .growth-fill.juice{background:#EFC976;}
+  .growth-mark{
+    position:absolute; top:0; bottom:0; width:2px;
+    background:rgba(43,33,24,.17); pointer-events:none;
+  }
+  .growth.bump .growth-groove{animation:growthBump 620ms ease-out;}
+  @keyframes growthBump{
+    0%{transform:scaleY(1);}
+    30%{transform:scaleY(1.55);}
+    60%{transform:scaleY(.95);}
+    100%{transform:scaleY(1);}
+  }
+
+  /* ---- shields ---- */
+  .shield-badge{
+    display:none; align-items:center; gap:5px;
+    font-size:12px; font-weight:700; color:var(--ink-soft); white-space:nowrap;
+  }
+  .shield-badge.show{display:inline-flex;}
+  .shield-badge .pips{display:inline-flex; gap:2px;}
+  .shield-badge svg{width:14px; height:14px; display:block;}
+  .choice-btn.shielded, .predict-btn.shielded{
+    text-decoration:line-through;
+    opacity:.55;
+    border-color:var(--border);
+  }
+
+  /* ---- the perfect-score sign on the results panel ---- */
+  .perfect-sign{
+    display:none;
+    margin:0 0 18px;
+    padding:16px 20px;
+    border-radius:12px;
+    background:linear-gradient(#E6C068, #CE9F3D);
+    border:2px solid #A97C22;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.45), 0 2px 8px rgba(43,33,24,.14);
+    color:#43300E;
+    font-weight:800;
+    font-size:17px;
+    letter-spacing:.01em;
+    text-align:center;
+  }
+  .perfect-sign.show{display:block;}
+  .perfect-sign span{display:block; font-weight:600; font-size:13px; opacity:.8; margin-top:3px;}
+
+  .results-retry{
+    font-size:13.5px; color:var(--ink-soft); margin:-8px 0 16px;
+  }
+  .results-retry b{color:var(--ink);}
+
+  @media (max-width:420px){
+    .growth-head{gap:4px;}
+    .growth-caption{font-size:11px;}
+  }
 </style>
 </head>
 <body>
@@ -463,9 +546,20 @@
       <div class="card-meta">
         <span class="card-count" id="cardCount">Card 1 of 26</span>
         <span class="streak-badge" id="streakBadge"><span class="flame">&#128293;</span><span id="streakText">3 in a row</span></span>
+        <span class="shield-badge" id="shieldBadge"><span class="pips" id="shieldPips"></span><span id="shieldNext"></span></span>
         <span class="score-wrap"><span class="score-badge" id="scoreBadge">0 pts &middot; 0/0</span><span class="points-pop" id="pointsPop">+1</span></span>
       </div>
       <div class="scoring-rule" id="scoringRule"></div>
+
+      <div class="growth" id="growthTrack">
+        <div class="growth-head">
+          <span class="growth-stage"><span class="growth-icon" id="growthIcon"></span><b id="growthStage">Planted</b></span>
+          <span class="growth-caption" id="growthCaption"></span>
+        </div>
+        <div class="growth-groove" id="growthGroove" role="img" aria-label="">
+          <div class="growth-fill" id="growthFill"></div>
+        </div>
+      </div>
 
       <div class="shock-card" id="shockText">Loading…</div>
 
@@ -523,10 +617,12 @@
   </div>
 
   <div class="panel results-panel" id="resultsPanel">
+    <div class="perfect-sign" id="perfectSign">Congratulations! You Got a Perfect Score!<span id="perfectSignSub"></span></div>
     <div class="results-band" id="resultsBand"></div>
     <div class="results-score" id="resultsScore"></div>
     <div class="results-points" id="resultsPoints"></div>
     <div class="results-note" id="resultsNote"></div>
+    <div class="results-retry" id="resultsRetry"></div>
 
     <table class="results-table">
       <thead><tr><th>Kind of card</th><th class="score-head">Score</th></tr></thead>
@@ -538,6 +634,7 @@
     anything the raw score does not. These bands are not an AP score prediction either.</p>
 
     <div class="controls">
+      <button class="btn btn-secondary" id="retryBtn" style="display:none;">Replay just the cards I missed</button>
       <button class="btn btn-primary" id="againBtn">Run it again</button>
     </div>
   </div>
@@ -800,7 +897,13 @@ function easeInOut(t){ return t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
 function animate(durationMs, onFrame, onDone){
   const start = performance.now();
   function frame(now){
-    let t = Math.min(1, (now-start)/durationMs);
+    /* Clamped at BOTH ends. A requestAnimationFrame timestamp can predate the
+       performance.now() captured just above -- it is the frame's start time,
+       and a blocked main thread makes the gap large. A negative t runs through
+       easeInOut's 2*t*t branch, which exceeds 1 once t < -0.707, and the lerp
+       then overshoots the curve's own intercept into negative prices, leaving
+       the line with no points inside the plot at all. */
+    let t = Math.min(1, Math.max(0, (now-start)/durationMs));
     onFrame(easeInOut(t));
     if(t<1) requestAnimationFrame(frame); else if(onDone) onDone();
   }
@@ -824,16 +927,19 @@ function shuffledIndices(n){
 }
 
 function initStep(){
-  stepOrder = shuffledIndices(CARDS.length);
+  const rids = retryIds; retryIds = null;
+  stepOrder = rids ? shuffledIndices(rids.length).map(i => rids[i])
+                   : shuffledIndices(CARDS.length);
   stepIndex = 0;
-  resetGame();
+  resetGame(!!rids);
   loadStepCard();
 }
 
 function loadStepCard(){
   stepAnswered = false;
+  startCard();
   const card = CARDS[stepOrder[stepIndex]];
-  document.getElementById('cardCount').textContent = `Card ${stepIndex+1} of ${CARDS.length}`;
+  document.getElementById('cardCount').textContent = `Card ${stepIndex+1} of ${stepOrder.length}`;
   document.getElementById('shockText').textContent = card.text;
   document.getElementById('feedback').classList.remove('show');
   document.getElementById('replayBtn').disabled = true;
@@ -860,9 +966,12 @@ function loadStepCard(){
 
 function handleStepAnswer(card, chosenLabel, btnEl){
   if(stepAnswered) return;
-  stepAnswered = true;
   const correctLabel = correctButtonLabel(card);
   const isCorrect = chosenLabel === correctLabel;
+  /* A shield takes the hit and the card stays open: nothing below runs, so no
+     verdict, no explanation and no animation. */
+  if(!isCorrect && shieldAbsorbs(btnEl)) return;
+  stepAnswered = true;
 
   [...document.getElementById('predictButtons').children].forEach(b=>{
     b.disabled = true;
@@ -873,7 +982,9 @@ function handleStepAnswer(card, chosenLabel, btnEl){
   const fb = document.getElementById('feedback');
   fb.classList.add('show');
   const verdict = document.getElementById('feedbackVerdict');
-  verdict.textContent = isCorrect ? 'Correct.' : `Not quite — the answer is "${correctLabel}."`;
+  verdict.textContent = isCorrect
+    ? reactionLine('right')
+    : `${reactionLine('miss')} The answer is "${correctLabel}."`;
   verdict.className = 'feedback-verdict ' + (isCorrect?'correct':'incorrect');
   document.getElementById('feedbackExplain').textContent = card.explain;
 
@@ -881,7 +992,7 @@ function handleStepAnswer(card, chosenLabel, btnEl){
   document.getElementById('nextBtn').disabled = false;
   document.getElementById('replayBtn').onclick = ()=>runStepAnimation(card);
   runStepAnimation(card);
-  recordAnswer(isCorrect, btnEl, card.category);   // game layer, after the page has judged
+  recordAnswer(isCorrect, btnEl, card.category, stepOrder[stepIndex]);   // game layer, after the page has judged
 }
 
 function runStepAnimation(card){
@@ -1012,7 +1123,7 @@ function animateMovement(card){
 }
 
 document.getElementById('nextBtn').addEventListener('click', ()=>{
-  if(stepIndex === CARDS.length - 1){
+  if(stepIndex === stepOrder.length - 1){
     showGameResults();        // run finished -- stop here rather than wrapping round
   } else {
     stepIndex++;
@@ -1041,16 +1152,18 @@ let currentDiagnoseCard = null;
 let diagnoseAnswered = false;
 
 function initDiagnose(){
+  const rids = retryIds; retryIds = null;
   diagnoseScore = {correct:0, total:0};
-  diagnoseOrder = shuffledIndices(DIAGNOSE_KEYS.length);
+  diagnoseOrder = rids ? shuffledIndices(rids.length).map(i => rids[i])
+                       : shuffledIndices(DIAGNOSE_KEYS.length);
   diagnoseIndex = 0;
   document.getElementById('scoreBadge').style.display = 'inline-block';
-  resetGame();
+  resetGame(!!rids);
   loadDiagnoseCard();
 }
 
 function advanceDiagnose(){
-  if(diagnoseIndex === DIAGNOSE_KEYS.length - 1){
+  if(diagnoseIndex === diagnoseOrder.length - 1){
     showGameResults();        // round finished -- stop here rather than wrapping round
     return;
   }
@@ -1080,8 +1193,9 @@ function loadDiagnoseCard(){
   const card = sameDiagram[Math.floor(Math.random()*sameDiagram.length)];
   currentDiagnoseCard = card;
   diagnoseAnswered = false;
+  startCard();
   document.getElementById('cardCount').textContent =
-    `Diagnose ${diagnoseIndex+1} of ${DIAGNOSE_KEYS.length}`;
+    `Diagnose ${diagnoseIndex+1} of ${diagnoseOrder.length}`;
   updateGameUI();
   document.getElementById('shockText').textContent = 'Look at the graph. Which shock caused this?';
   document.getElementById('feedback').classList.remove('show');
@@ -1089,7 +1203,7 @@ function loadDiagnoseCard(){
   document.getElementById('nextBtn').disabled = true;
   document.getElementById('replayBtn').style.display = 'none';
   document.getElementById('nextBtn').textContent =
-    diagnoseIndex === DIAGNOSE_KEYS.length - 1 ? 'See your results' : 'Next card';
+    diagnoseIndex === diagnoseOrder.length - 1 ? 'See your results' : 'Next card';
 
   // Render the FINAL state directly, no animation, no explanation yet
   let k = BASE_K, c = BASE_C;
@@ -1142,8 +1256,9 @@ function loadDiagnoseCard(){
 
 function handleDiagnoseAnswer(correctCard, chosenCard, btnEl){
   if(diagnoseAnswered) return;
-  diagnoseAnswered = true;
   const isCorrect = chosenCard === correctCard;
+  if(!isCorrect && shieldAbsorbs(btnEl)) return;   // same gate as step mode
+  diagnoseAnswered = true;
   diagnoseScore.total++;
   if(isCorrect) diagnoseScore.correct++;
 
@@ -1156,11 +1271,11 @@ function handleDiagnoseAnswer(correctCard, chosenCard, btnEl){
   const fb = document.getElementById('feedback');
   fb.classList.add('show');
   const verdict = document.getElementById('feedbackVerdict');
-  verdict.textContent = isCorrect ? 'Correct.' : 'Not quite.';
+  verdict.textContent = isCorrect ? reactionLine('right') : reactionLine('miss');
   verdict.className = 'feedback-verdict ' + (isCorrect?'correct':'incorrect');
   document.getElementById('feedbackExplain').textContent = correctCard.explain;
   document.getElementById('nextBtn').disabled = false;
-  recordAnswer(isCorrect, btnEl, correctCard.category);   // game layer, after the page has judged
+  recordAnswer(isCorrect, btnEl, correctCard.category, diagnoseOrder[diagnoseIndex]);   // game layer, after the page has judged
 }
 
 document.getElementById('nextBtn').addEventListener('click', ()=>{
@@ -1177,10 +1292,81 @@ document.getElementById('nextBtn').addEventListener('click', ()=>{
    The rule is printed on screen because a student should be able to check it. */
 function pointsFor(streak){ return streak >= 10 ? 3 : streak >= 5 ? 2 : 1; }
 
-const GAME = { streak:0, best:0, points:0, correct:0, answered:0, pendingComeback:false, perKind:{} };
+/* ---- the growth track ----
+   Point totals for the full 26-card run, whose maximum is 65. */
+const YELLOW_AT = 25;
+const GREEN_AT  = 30;
+const GOLD_AT   = 50;
+const JUICE_AT  = 60;
+/* A shield every fifth answer in a streak, which lines the awards up with the
+   double-points tier at 5 and the triple-points tier at 10. */
+const SHIELD_EVERY = 5;
+/* Below this the track is not worth drawing: a Diagnose round or a short retry
+   cannot reach the stages, and a bar that can never fill is discouraging. */
+const TRACK_MIN_MAX = 40;
+
+const ICONS = {
+  seedling: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18V9" stroke="#5B7A4A" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M10 10C10 6.5 7.2 4.6 4.3 4.6 4.3 8.1 6.9 10 10 10Z" fill="#6B8F55"/><path d="M10 11.5c0-3 2.4-4.7 4.9-4.7 0 3-2.2 4.7-4.9 4.7Z" fill="#8AAE6E"/></svg>',
+  vine:     '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18V5" stroke="#5B7A4A" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M10 8C7.6 8 6 6.4 6 4c2.4 0 4 1.6 4 4Z" fill="#6B8F55"/><path d="M10 12c2.4 0 4-1.6 4-4-2.4 0-4 1.6-4 4Z" fill="#8AAE6E"/><circle cx="10" cy="4" r="1.6" fill="#A06F16"/></svg>',
+  grapes:   '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 6V3.2" stroke="#6B8F55" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M10.2 3.4c1.5-1.1 3-1.2 3.6-.7" stroke="#6B8F55" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="7.6" cy="8.4" r="2.1" fill="#6B4A86"/><circle cx="12.4" cy="8.4" r="2.1" fill="#7A5896"/><circle cx="10" cy="11.4" r="2.1" fill="#6B4A86"/><circle cx="6.6" cy="12.4" r="2" fill="#7A5896"/><circle cx="13.4" cy="12.4" r="2" fill="#7A5896"/><circle cx="10" cy="15.4" r="2" fill="#5C3E75"/></svg>',
+  basket:   '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="7.4" cy="7.2" r="2" fill="#6B4A86"/><circle cx="11" cy="6.4" r="2" fill="#7A5896"/><circle cx="13.2" cy="8.4" r="1.8" fill="#6B4A86"/><path d="M3 9.8h14l-1.6 7.2H4.6L3 9.8Z" fill="#B4762F"/><path d="M3 9.8h14" stroke="#8A5820" stroke-width="1.6" stroke-linecap="round"/><path d="M6.6 11.6l.7 4M10 11.6v4m3.4-4l-.7 4" stroke="#8A5820" stroke-width="1.1" stroke-linecap="round"/></svg>',
+  jug:      '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 2.6h4v2.2H8z" fill="#9A7340"/><path d="M7.4 5h5.2c1.5 1.4 2.4 3.2 2.4 5.3V16a1.6 1.6 0 0 1-1.6 1.6H6.6A1.6 1.6 0 0 1 5 16v-5.7C5 8.2 5.9 6.4 7.4 5Z" fill="#C8A86E"/><path d="M5.2 11.4h9.6V16a1.6 1.6 0 0 1-1.6 1.6H6.8A1.6 1.6 0 0 1 5.2 16v-4.6Z" fill="#6B2E5E"/></svg>',
+  shield:   '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.2 16.4 4v5.4c0 4-2.7 7-6.4 8.4-3.7-1.4-6.4-4.4-6.4-8.4V4L10 2.2Z" fill="#2F6F62"/><path d="m7.2 10 2 2 3.6-3.8" stroke="#F6FBF8" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+};
+
+/* Ordered by the points at which each one starts. `toast` is absent on the
+   first two: the change at YELLOW_AT is a colour change only. */
+const GROWTH_STAGES = [
+  { at: 0,         key:'planted',   name:'Planted',            icon:'seedling' },
+  { at: YELLOW_AT, key:'sprouting', name:'Sprouting',          icon:'vine' },
+  { at: GREEN_AT,  key:'grown',     name:'Grapes Have Grown!', icon:'grapes',
+    toast:['Grapes Have Grown!', 'The vines have come good. Keep going.'] },
+  { at: GOLD_AT,   key:'harvest',   name:'Harvest',            icon:'basket',
+    toast:['Harvest time! The grapes are in.', 'Every crate picked. Ten more points and they go to the press.'] },
+  { at: JUICE_AT,  key:'juice',     name:'Grape Juice',        icon:'jug',
+    toast:['You crushed the harvest into grape juice!', 'Top of the track. Nothing left to grow.'] },
+];
+
+function stageFor(points){
+  let out = GROWTH_STAGES[0];
+  for(const st of GROWTH_STAGES) if(points >= st.at) out = st;
+  return out;
+}
+function nextStage(points){
+  return GROWTH_STAGES.find(st => st.at > points) || null;
+}
+
+/* ---- what the page says when an answer lands ----
+   In theme, and deliberately empty of information: none of these hints at the
+   answer, so the line can be read before the explanation without giving
+   anything away. */
+const RIGHT_LINES = [
+  'Straight off the vine.', 'Clean pick.', 'Sharp eye.', "That's the one.",
+  'Nicely judged.', 'Straight to the crate.', 'No bruises on that one.',
+  'A good bunch.', 'The vineyard approves.', 'Crisp.',
+];
+const MISS_LINES = [
+  'Not this time.', 'That one got away.', 'Happens to every grower.',
+  'Shake it off.', 'One to learn from.', 'Worth another look.',
+];
+const LAST_LINE = { right:-1, miss:-1 };
+function reactionLine(kind){
+  const pool = kind === 'right' ? RIGHT_LINES : MISS_LINES;
+  let i = Math.floor(Math.random() * pool.length);
+  if(i === LAST_LINE[kind]) i = (i + 1) % pool.length;   // never the same line twice running
+  LAST_LINE[kind] = i;
+  return pool[i];
+}
+
+const GAME = { streak:0, best:0, points:0, correct:0, answered:0, misses:0,
+               shields:0, shieldSaves:0, savedThisCard:false, isRetry:false,
+               missed:[], stagesFired:null, pendingComeback:false, perKind:{} };
 /* Milestones fire once per page load, not once per run, so restarting does not
    replay them. */
 const MILESTONES_FIRED = new Set();
+
+/* Non-null means the next run replays exactly these, instead of the whole bank. */
+let retryIds = null;
 
 /* Keyed on the streak length that triggers them. The wording states the tier,
    because the whole point of the bonus is that a student can see it coming. */
@@ -1199,12 +1385,25 @@ const KIND_LABEL = {
 const KIND_ORDER = ['demand', 'supply', 'movement', 'link'];
 
 function runLength(){
-  return currentMode === 'step' ? CARDS.length : DIAGNOSE_KEYS.length;
+  /* The ORDER, not the bank: a retry run is only as long as the list of cards
+     that were missed. */
+  return currentMode === 'step' ? stepOrder.length : diagnoseOrder.length;
 }
+function reducedMotion(){
+  /* Guarded: a host without matchMedia must not take the page down with it. */
+  return typeof window.matchMedia === 'function' &&
+         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+function toTop(){ if(typeof window.scrollTo === 'function') window.scrollTo(0, 0); }
 
-function resetGame(){
+function resetGame(isRetry){
   GAME.streak = 0; GAME.best = 0; GAME.points = 0;
-  GAME.correct = 0; GAME.answered = 0; GAME.pendingComeback = false;
+  GAME.correct = 0; GAME.answered = 0; GAME.misses = 0;
+  GAME.shields = 0; GAME.shieldSaves = 0; GAME.savedThisCard = false;
+  GAME.isRetry = !!isRetry;
+  GAME.missed = [];
+  GAME.stagesFired = new Set();
+  GAME.pendingComeback = false;
   GAME.perKind = {};
   KIND_ORDER.forEach(k => GAME.perKind[k] = { correct:0, total:0 });
   const badge = document.getElementById('streakBadge');
@@ -1212,10 +1411,17 @@ function resetGame(){
   document.getElementById('scoringRule').innerHTML =
     'Scoring: <b>+1</b> for a right answer, <b>+2</b> once you are on a streak of 5, ' +
     '<b>+3</b> from 10. A wrong answer sends the streak back to zero. ' +
-    'A flawless run is worth <b>' + maxPoints(runLength()) + '</b>.';
+    'A flawless run is worth <b>' + maxPoints(runLength()) + '</b>. ' +
+    'Every ' + SHIELD_EVERY + ' in a row also earns a shield, which absorbs one wrong answer and ' +
+    'gives you a second try — though a card you needed a shield on still counts as missed.';
+  document.getElementById('growthTrack').classList.toggle(
+    'show', maxPoints(runLength()) >= TRACK_MIN_MAX && !GAME.isRetry);
   updateGameUI();
   hideResults();
 }
+
+/* Called as each card is dealt, so the shield state belongs to this card only. */
+function startCard(){ GAME.savedThisCard = false; }
 
 function maxPoints(n){
   let t = 0;
@@ -1232,6 +1438,67 @@ function updateGameUI(){
     badge.classList.add('show');
   } else {
     badge.classList.remove('show');
+  }
+
+  const sh = document.getElementById('shieldBadge');
+  if(GAME.shields > 0 || GAME.streak > 0){
+    document.getElementById('shieldPips').innerHTML = ICONS.shield.repeat(Math.min(GAME.shields, 5));
+    const togo = SHIELD_EVERY - (GAME.streak % SHIELD_EVERY);
+    document.getElementById('shieldNext').textContent =
+      (GAME.shields > 5 ? '+' + (GAME.shields - 5) + ' · ' : '') + 'next shield in ' + togo;
+    sh.classList.add('show');
+  } else {
+    sh.classList.remove('show');
+  }
+
+  updateTrack();
+}
+
+function updateTrack(){
+  const track = document.getElementById('growthTrack');
+  if(!track.classList.contains('show')) return;
+  const max = maxPoints(runLength());
+  const st = stageFor(GAME.points);
+  const nx = nextStage(GAME.points);
+  const fill = document.getElementById('growthFill');
+  fill.style.width = Math.min(100, (GAME.points / max) * 100) + '%';
+  fill.className = 'growth-fill ' + st.key;
+  document.getElementById('growthIcon').innerHTML = ICONS[st.icon];
+  document.getElementById('growthStage').textContent = st.name;
+  document.getElementById('growthCaption').textContent = nx
+    ? `${nx.at - GAME.points} more point${nx.at - GAME.points === 1 ? '' : 's'} to ${nx.name}`
+    : 'Top of the track.';
+  document.getElementById('growthGroove').setAttribute(
+    'aria-label', `${GAME.points} of ${max} points — ${st.name}`);
+
+  /* The marks sit where the stages start, so the next one is visible before
+     it is reached. Drawn once, then left alone. */
+  const groove = document.getElementById('growthGroove');
+  if(!groove.dataset.marked){
+    GROWTH_STAGES.slice(1).forEach(g => {
+      const m = document.createElement('span');
+      m.className = 'growth-mark';
+      m.style.left = (g.at / max) * 100 + '%';
+      groove.appendChild(m);
+    });
+    groove.dataset.marked = '1';
+  }
+}
+
+/* Fires each stage once per run, with a bump on the bar and a toast. */
+function checkGrowthStages(){
+  if(!document.getElementById('growthTrack').classList.contains('show')) return;
+  for(const st of GROWTH_STAGES){
+    if(!st.toast || GAME.points < st.at || GAME.stagesFired.has(st.key)) continue;
+    GAME.stagesFired.add(st.key);
+    toast(st.toast[0], st.toast[1]);
+    if(!reducedMotion()){
+      const track = document.getElementById('growthTrack');
+      track.classList.remove('bump');
+      void track.offsetWidth;
+      track.classList.add('bump');
+      setTimeout(() => track.classList.remove('bump'), 700);
+    }
   }
 }
 
@@ -1265,7 +1532,7 @@ function celebrate(btnEl, gained){
   }
 
   const layer = document.getElementById('confettiLayer');
-  if(layer && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  if(layer && !reducedMotion()){
     const r = btnEl ? btnEl.getBoundingClientRect()
                     : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
     const x0 = r.left + r.width / 2, y0 = r.top + r.height / 2;
@@ -1307,15 +1574,39 @@ function celebrate(btnEl, gained){
   pop.classList.add('fire');
 }
 
+/* A wrong answer meets the shield before anything else. Returns true when the
+   shield absorbed it, in which case the caller must NOT reveal anything: the
+   student gets the card back with the option they picked struck out. */
+function shieldAbsorbs(btnEl){
+  if(GAME.shields <= 0 || GAME.savedThisCard) return false;
+  GAME.shields--;
+  GAME.savedThisCard = true;
+  btnEl.disabled = true;
+  btnEl.classList.add('shielded');
+  toast('Shield used. One more try.', 'That answer is out. The card is still open.');
+  updateGameUI();
+  return true;
+}
+
 /* The single place an answer reaches the game. Called AFTER the page has
    already judged and explained the answer, so it cannot affect either. */
-function recordAnswer(isCorrect, btnEl, kind){
+function recordAnswer(isCorrect, btnEl, kind, id){
   GAME.answered++;
+  /* Only a clean first-try win scores. A card rescued by a shield is a MISS for
+     the band and the per-kind table, however it ends. */
+  const clean = isCorrect && !GAME.savedThisCard;
+  const saved = isCorrect && GAME.savedThisCard;
   if(kind && GAME.perKind[kind]){
     GAME.perKind[kind].total++;
-    if(isCorrect) GAME.perKind[kind].correct++;
+    if(clean) GAME.perKind[kind].correct++;
   }
-  if(isCorrect){
+  if(!clean){
+    GAME.misses++;
+    if(id !== undefined && id !== null) GAME.missed.push(id);
+  }
+  if(saved) GAME.shieldSaves++;
+
+  if(clean){
     GAME.streak++;
     GAME.best = Math.max(GAME.best, GAME.streak);
     const gained = pointsFor(GAME.streak);
@@ -1330,19 +1621,33 @@ function recordAnswer(isCorrect, btnEl, kind){
       GAME.pendingComeback = false;
       milestone('comeback', 'Comeback', 'Straight back on it after a streak went down.');
     }
-    /* These three announce the bonus tier you are now on, so unlike the badges
-       they fire EVERY time a streak reaches the mark -- lose the streak and
-       build it back and you need telling that double points are live again.
-       Each can only fire once per streak, since a streak passes each mark once. */
+    /* A shield every SHIELD_EVERY, which lands on the same answers as the
+       bonus tiers -- so 5 and 10 say both things in one toast rather than
+       stacking two. */
+    const earned = GAME.streak % SHIELD_EVERY === 0;
+    if(earned) GAME.shields++;
     const flash = STREAK_FLASHES[GAME.streak];
-    if(flash) toast(flash[0], flash[1]);
-    if(GAME.streak === runLength())
-      milestone('perfect', 'Perfect streak', `All ${runLength()} right, without a single miss.`);
+    if(flash && earned)      toast(flash[0].replace(/!$/, '') + ' and a shield!', flash[1]);
+    else if(flash)           toast(flash[0], flash[1]);
+    else if(earned)          toast('Another shield!',
+                                   `${GAME.streak} in a row. That is ${GAME.shields} ` +
+                                   `${GAME.shields === 1 ? 'shield' : 'shields'} in hand.`);
+  } else if(saved){
+    /* The streak is not broken, but the card did not earn it either: it stays
+       where it is rather than moving on. */
   } else {
     if(GAME.streak >= 3) GAME.pendingComeback = true;
     GAME.streak = 0;
   }
+
   updateGameUI();
+  checkGrowthStages();
+
+  /* A perfect score is the whole run answered with no misses at all, which a
+     shield save does not qualify for. Retry runs do not count. */
+  if(!GAME.isRetry && GAME.answered === runLength() && GAME.misses === 0)
+    toast('Congratulations! You Got a Perfect Score!',
+          `All ${runLength()} right, first time, with nothing to come back to.`);
 }
 
 /* ---- end-of-run analysis ----
@@ -1379,14 +1684,41 @@ function showGameResults(){
   const pct = GAME.answered ? Math.round(GAME.correct / GAME.answered * 100) : 0;
   const band = BANDS.find(b => pct >= b.min) || BANDS[BANDS.length - 1];
   const bandEl = document.getElementById('resultsBand');
+  const perfect = !GAME.isRetry && GAME.misses === 0 && GAME.answered > 0;
+
+  /* A retry is scored on its own terms and never carries a band: it is a
+     second look at a handful of cards, not a measure of the topic. */
+  bandEl.style.display = GAME.isRetry ? 'none' : '';
+  document.getElementById('perfectSign').classList.toggle('show', perfect);
+  document.getElementById('perfectSignSub').textContent = perfect
+    ? `All ${GAME.answered} right, first time, with no shields spent.` : '';
+
   bandEl.textContent = band.label;
   bandEl.className = 'results-band ' + band.tone;
-  document.getElementById('resultsScore').textContent =
-    `${GAME.correct} / ${GAME.answered}  ·  ${pct}%`;
-  document.getElementById('resultsPoints').innerHTML =
-    `<b>${GAME.points}</b> points out of a possible <b>${maxPoints(GAME.answered)}</b> ` +
-    `&middot; longest streak <b>${GAME.best}</b>`;
-  document.getElementById('resultsNote').textContent = band.note;
+  document.getElementById('resultsScore').textContent = GAME.isRetry
+    ? `Fixed ${GAME.correct} of ${GAME.answered}`
+    : `${GAME.correct} / ${GAME.answered}  ·  ${pct}%`;
+  document.getElementById('resultsPoints').innerHTML = GAME.isRetry
+    ? `A second look at the cards you missed. This does not change the score or the band from your full run.`
+    : `<b>${GAME.points}</b> points out of a possible <b>${maxPoints(GAME.answered)}</b> ` +
+      `&middot; longest streak <b>${GAME.best}</b>` +
+      (GAME.shieldSaves ? ` &middot; saved by a shield: <b>${GAME.shieldSaves}</b>` : '');
+  document.getElementById('resultsNote').textContent = GAME.isRetry
+    ? (GAME.missed.length
+        ? 'Still some to go. Run them again as many times as you like.'
+        : 'Every one of them fixed.')
+    : band.note;
+
+  const retryBtn = document.getElementById('retryBtn');
+  const left = GAME.missed.length;
+  retryBtn.style.display = left ? 'inline-block' : 'none';
+  retryBtn.textContent = GAME.isRetry
+    ? `Replay the ${left} still to fix`
+    : 'Replay just the cards I missed';
+  document.getElementById('resultsRetry').innerHTML = left
+    ? `You missed <b>${left}</b> ${left === 1 ? 'card' : 'cards'}` +
+      (GAME.shieldSaves ? `, ${GAME.shieldSaves} of which a shield gave you a second try at` : '') + '.'
+    : '';
 
   const body = document.getElementById('resultsBody');
   body.innerHTML = '';
@@ -1401,10 +1733,18 @@ function showGameResults(){
   });
 
   document.getElementById('resultsPanel').classList.add('show');
-  window.scrollTo(0, 0);
+  toTop();
 }
 
-document.getElementById('againBtn').addEventListener('click', ()=>switchMode(currentMode));
+document.getElementById('againBtn').addEventListener('click', ()=>{
+  retryIds = null;                       // a full run, whatever the last one was
+  switchMode(currentMode);
+});
+document.getElementById('retryBtn').addEventListener('click', ()=>{
+  if(!GAME.missed.length) return;
+  retryIds = GAME.missed.slice();        // consumed by initStep / initDiagnose
+  switchMode(currentMode);
+});
 
 /* ================= MODE SWITCHING ================= */
 let currentMode = 'step';
@@ -1423,7 +1763,7 @@ function switchMode(mode){
   nextBtn.parentNode.replaceChild(freshNext, nextBtn);
   if(mode==='step'){
     document.getElementById('nextBtn').addEventListener('click', ()=>{
-      if(stepIndex === CARDS.length - 1){
+      if(stepIndex === stepOrder.length - 1){
         showGameResults();        // run finished -- stop here rather than wrapping round
       } else {
         stepIndex++;
