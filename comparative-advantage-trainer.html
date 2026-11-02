@@ -211,6 +211,36 @@
     text-decoration:underline;
     cursor:pointer;
   }
+
+  /* ---- end-of-run analysis (added; nothing above it changed) ---- */
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{
+    font-size:13px; font-weight:800; letter-spacing:.06em;
+    text-transform:uppercase; margin-bottom:6px;
+  }
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{font-size:34px; font-weight:800; letter-spacing:-0.02em; margin-bottom:10px;}
+  .results-note{font-size:15px; color:var(--ink-soft); margin-bottom:20px;}
+  table.results-table{width:100%; border-collapse:collapse; font-size:14px; margin-bottom:4px;}
+  table.results-table th, table.results-table td{
+    padding:9px 12px; border-bottom:1px solid var(--border); text-align:left;
+  }
+  table.results-table th{
+    font-size:12px; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--ink-soft); font-weight:700; background:var(--surface-alt);
+  }
+  table.results-table th.score-head, table.results-table td.topic-score{text-align:right; white-space:nowrap;}
+  table.results-table td.topic-cell{font-weight:600; color:var(--ink);}
+  table.results-table td.topic-score{font-weight:700;}
+  table.results-table td.topic-score.full{color:var(--correct);}
+  table.results-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px; color:var(--ink-soft); font-style:italic; line-height:1.5;
+    border-top:1px solid var(--border); padding-top:14px; margin:18px 0 20px;
+  }
 </style>
 </head>
 <body>
@@ -220,7 +250,7 @@
     <p>Gains from Trade — calculate opportunity costs, find the advantage, find the trade range</p>
   </header>
 
-  <div class="meta-row">
+  <div class="meta-row" id="metaRow">
     <div class="count-group">
       <span class="card-count" id="problemCount">Problem 1 of 6</span>
       <span class="card-count" id="stepCount">Step 1 of 5</span>
@@ -228,7 +258,7 @@
     <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
   </div>
 
-  <div class="panel">
+  <div class="panel" id="quizPanel">
     <div class="scenario" id="scenarioText"></div>
 
     <table class="prod-table" id="prodTable">
@@ -267,7 +297,25 @@
     </div>
   </div>
 
-  <footer class="reset-row">
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <table class="results-table">
+      <thead><tr><th>Problem</th><th class="score-head">Score</th></tr></thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+
+    <p class="results-caveat">These bands say whether you have this topic down &mdash; they are not an AP score prediction. The exam covers every unit, counts free response for a third of the grade, and gives you no feedback until it is over. Treat a strong result here as one topic secured, not as a score.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Run it again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
     <button class="link-btn" id="resetBtn">Restart from problem 1</button>
   </footer>
 </div>
@@ -419,6 +467,37 @@ let problemIndex = 0;
 let stepIndex = 0;
 let answered = false;
 let score = { correct:0, total:0 };
+/* ---- end-of-run analysis ----------------------------------------------
+   Banding uses the ROUNDED percentage, the same number shown beside it, so
+   the label can never disagree with the figure. Raw-score ranges over this
+   30-question bank, checked in verify_bands.py:
+     Mastered 27-30 | Strong 24-26 | Developing 21-23 | Shaky 17-20 | Needs Review 0-16
+   Guessing averages 10/30, which lands in the bottom band. */
+const BANDS = [
+  { min:90, label:'Mastered', tone:'good',
+    note:'You can read opportunity costs off an output table, assign each comparative advantage, and bound the terms of trade. Treat this topic as secure.' },
+  { min:80, label:'Strong', tone:'good',
+    note:'Solid command of the material. Work the topics below where you dropped marks, then run it again.' },
+  { min:70, label:'Developing', tone:'mid',
+    note:'The method is there but execution is slipping. The breakdown below shows where to aim.' },
+  { min:55, label:'Shaky', tone:'poor',
+    note:'Some of it is landing, but the gaps are wide enough to cost you marks. Review how an opportunity cost is computed from an output table before drilling again.' },
+  { min:0, label:'Needs Review', tone:'poor',
+    note:'Go back to the notes on this topic first. More practice without review will not close a gap this size.' },
+];
+let perTopic = {};
+
+/* Each problem's steps are tallied under its own heading. The headings live
+   here rather than inside PROBLEMS so the question bank stays untouched. */
+const TOPIC_ORDER = [
+  "Automobiles and bread",
+  "Corn and computers",
+  "Fish and coconuts",
+  "Shirts and wheat",
+  "Cars and wine",
+  "Toys and textiles"
+];
+
 
 function shuffledIndices(n){
   const arr = [...Array(n).keys()];
@@ -430,6 +509,9 @@ function init(){
   problemOrder = shuffledIndices(PROBLEMS.length);
   problemIndex = 0;
   score = { correct:0, total:0 };
+  perTopic = {};
+  TOPIC_ORDER.forEach(t => perTopic[t] = { correct:0, total:0 });
+  hideResults();
   loadProblem();
 }
 
@@ -477,6 +559,9 @@ function handleAnswer(step, chosenIndex, btnEl){
   const isCorrect = chosenIndex === step.correct;
   score.total++;
   if(isCorrect) score.correct++;
+  const topic = TOPIC_ORDER[problemOrder[problemIndex]];
+  perTopic[topic].total++;
+  if(isCorrect) perTopic[topic].correct++;
   document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
 
   [...document.getElementById('optionsWrap').children].forEach((b,i)=>{
@@ -501,13 +586,57 @@ document.getElementById('nextBtn').addEventListener('click', ()=>{
     stepIndex++;
     loadStep();
   } else {
-    problemIndex = (problemIndex+1) % PROBLEMS.length;
-    if(problemIndex === 0) problemOrder = shuffledIndices(PROBLEMS.length);
-    loadProblem();
+    if(problemIndex === PROBLEMS.length - 1){
+      showResults();          // bank finished -- stop here rather than wrapping round
+    } else {
+      problemIndex++;
+      loadProblem();
+    }
   }
 });
 
+
+function showResults(){
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('quizPanel').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(score.correct / score.total * 100);
+  const band = BANDS.find(b => pct >= b.min);
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  \u00b7  ${pct}%`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  /* The breakdown is listed in the fixed teaching order, not the shuffled
+     order the student happened to see. */
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  TOPIC_ORDER.forEach(name => {
+    const t = perTopic[name];
+    if(!t || !t.total) return;
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${name}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+function hideResults(){
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('quizPanel').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+}
+
 document.getElementById('resetBtn').addEventListener('click', init);
+document.getElementById('againBtn').addEventListener('click', init);
 
 init();
 </script>

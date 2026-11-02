@@ -192,6 +192,36 @@
     text-decoration:underline;
     cursor:pointer;
   }
+
+  /* ---- end-of-run analysis (added; nothing above it changed) ---- */
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{
+    font-size:13px; font-weight:800; letter-spacing:.06em;
+    text-transform:uppercase; margin-bottom:6px;
+  }
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{font-size:34px; font-weight:800; letter-spacing:-0.02em; margin-bottom:10px;}
+  .results-note{font-size:15px; color:var(--ink-soft); margin-bottom:20px;}
+  table.results-table{width:100%; border-collapse:collapse; font-size:14px; margin-bottom:4px;}
+  table.results-table th, table.results-table td{
+    padding:9px 12px; border-bottom:1px solid var(--border); text-align:left;
+  }
+  table.results-table th{
+    font-size:12px; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--ink-soft); font-weight:700; background:var(--surface-alt);
+  }
+  table.results-table th.score-head, table.results-table td.topic-score{text-align:right; white-space:nowrap;}
+  table.results-table td.topic-cell{font-weight:600; color:var(--ink);}
+  table.results-table td.topic-score{font-weight:700;}
+  table.results-table td.topic-score.full{color:var(--correct);}
+  table.results-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px; color:var(--ink-soft); font-style:italic; line-height:1.5;
+    border-top:1px solid var(--border); padding-top:14px; margin:18px 0 20px;
+  }
 </style>
 </head>
 <body>
@@ -201,12 +231,12 @@
     <p>Basic Economic Concepts — definitions, systems, and reading a PPC</p>
   </header>
 
-  <div class="meta-row">
-    <span class="card-count" id="cardCount">Card 1 of 38</span>
+  <div class="meta-row" id="metaRow">
+    <span class="card-count" id="cardCount">Card 1 of 40</span>
     <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
   </div>
 
-  <div class="panel">
+  <div class="panel" id="quizPanel">
     <span class="category-tag" id="categoryTag">Category</span>
     <div class="prompt" id="promptText">Loading…</div>
 
@@ -243,7 +273,25 @@
     </div>
   </div>
 
-  <footer class="reset-row">
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <table class="results-table">
+      <thead><tr><th>Area</th><th class="score-head">Score</th></tr></thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+
+    <p class="results-caveat">These bands say whether you have this topic down &mdash; they are not an AP score prediction. The exam covers every unit, counts free response for a third of the grade, and gives you no feedback until it is over. Treat a strong result here as one topic secured, not as a score.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Run it again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
     <button class="link-btn" id="resetBtn">Restart from card 1</button>
   </footer>
 </div>
@@ -400,6 +448,30 @@ let index = 0;
 let answered = false;
 let optionOrder = [];               // display position -> index in card.options
 let score = { correct:0, total:0 };
+/* ---- end-of-run analysis ----------------------------------------------
+   Banding uses the ROUNDED percentage, the same number shown beside it, so
+   the label can never disagree with the figure. Raw-score ranges over this
+   40-question bank, checked in verify_bands.py:
+     Mastered 36-40 | Strong 32-35 | Developing 28-31 | Shaky 22-27 | Needs Review 0-21
+   Guessing averages 13/40, which lands in the bottom band. */
+const BANDS = [
+  { min:90, label:'Mastered', tone:'good',
+    note:'The vocabulary of the unit is secure. Treat this topic as secure.' },
+  { min:80, label:'Strong', tone:'good',
+    note:'Solid command of the material. Work the topics below where you dropped marks, then run it again.' },
+  { min:70, label:'Developing', tone:'mid',
+    note:'The method is there but execution is slipping. The breakdown below shows where to aim.' },
+  { min:55, label:'Shaky', tone:'poor',
+    note:'Some of it is landing, but the gaps are wide enough to cost you marks. Review the definitions in the areas below before drilling again.' },
+  { min:0, label:'Needs Review', tone:'poor',
+    note:'Go back to the notes on this topic first. More practice without review will not close a gap this size.' },
+];
+let perTopic = {};
+
+/* Cards are tallied by the category they already carry, listed in the order
+   they are taught rather than the order they were shuffled into. */
+const TOPIC_ORDER = [...new Set(CARDS.map(c => c.category))];
+
 
 function shuffledIndices(n){
   const arr = [...Array(n).keys()];
@@ -411,6 +483,9 @@ function init(){
   order = shuffledIndices(CARDS.length);
   index = 0;
   score = { correct:0, total:0 };
+  perTopic = {};
+  TOPIC_ORDER.forEach(t => perTopic[t] = { correct:0, total:0 });
+  hideResults();
   loadCard();
 }
 
@@ -446,6 +521,9 @@ function handleAnswer(card, chosenIndex, btnEl){
   const isCorrect = chosenIndex === card.correct;
   score.total++;
   if(isCorrect) score.correct++;
+  const topic = CARDS[order[index]].category;
+  perTopic[topic].total++;
+  if(isCorrect) perTopic[topic].correct++;
   document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
 
   [...document.getElementById('optionsWrap').children].forEach((b,pos)=>{
@@ -465,12 +543,56 @@ function handleAnswer(card, chosenIndex, btnEl){
 }
 
 document.getElementById('nextBtn').addEventListener('click', ()=>{
-  index = (index+1) % CARDS.length;
-  if(index === 0) order = shuffledIndices(CARDS.length);
-  loadCard();
+  if(index === CARDS.length - 1){
+    showResults();            // bank finished -- stop here rather than wrapping round
+  } else {
+    index++;
+    loadCard();
+  }
 });
 
+
+function showResults(){
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('quizPanel').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(score.correct / score.total * 100);
+  const band = BANDS.find(b => pct >= b.min);
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  \u00b7  ${pct}%`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  /* The breakdown is listed in the fixed teaching order, not the shuffled
+     order the student happened to see. */
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  TOPIC_ORDER.forEach(name => {
+    const t = perTopic[name];
+    if(!t || !t.total) return;
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${name}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+function hideResults(){
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('quizPanel').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+}
+
 document.getElementById('resetBtn').addEventListener('click', init);
+document.getElementById('againBtn').addEventListener('click', init);
 
 init();
 </script>
