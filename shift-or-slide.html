@@ -295,7 +295,7 @@
     <!-- CARD PANEL -->
     <div class="panel">
       <div class="card-meta">
-        <span class="card-count" id="cardCount">Card 1 of 18</span>
+        <span class="card-count" id="cardCount">Card 1 of 26</span>
         <span class="score-badge" id="scoreBadge" style="display:none;">Score: 0 / 0</span>
       </div>
 
@@ -370,9 +370,11 @@ const MOVE = 16;  // how far a price movement goes for "movement along" cards
 function eq(k,c){ return { Q:(k-c)/2, P:(k+c)/2 }; }
 
 /* ================= CARD BANK ================= */
-// category: 'demand' | 'supply' | 'movement'
+// category: 'demand' | 'supply' | 'movement' | 'link'
 // for demand/supply: direction 'increase'|'decrease'
 // for movement: curve 'demand'|'supply', priceDir 'increase'|'decrease'
+// for link: shiftCurve 'demand'|'supply', shiftDir 'increase'|'decrease',
+//           asked 'demanded'|'supplied' -- the quantity the student is asked about
 const CARDS = [
   { text:"A new medical study reports that fresh grapes are a superfood.", category:'demand', direction:'increase',
     explain:"A story that changes tastes and preferences for the good itself shifts the whole demand curve — buyers now want more grapes at every price. That's demand increasing (curve shifts right)." },
@@ -412,17 +414,75 @@ const CARDS = [
     explain:"A temporary sticker-price change, with nothing else about the market different, moves buyers along the existing demand curve rather than shifting it." },
   { text:"A flash discount temporarily lowers the price of grapes for one afternoon.", category:'movement', curve:'supply', priceDir:'decrease',
     explain:"A temporary price drop with no change in costs or technology moves sellers along the existing supply curve — quantity supplied falls, the curve itself doesn't move." },
+
+  /* ---- shift on one side, slide on the other ----
+     Numbers checked in verify_shift_link.py against this page's own model: with
+     one curve pinned, every new equilibrium still lies ON that pinned curve, so
+     the point genuinely travels along it rather than jumping off it. */
+  { text:"A late-season hailstorm destroys part of the grape harvest. What happens to the QUANTITY DEMANDED of grapes?",
+    category:'link', shiftCurve:'supply', shiftDir:'decrease', asked:'demanded',
+    explain:"Walk the chain. The hailstorm wipes out part of the crop, so SUPPLY shifts left. Demand is untouched — nothing happened to buyers' tastes, incomes, or the price of anything else they buy. The equilibrium price rises from $60 to $69. Buyers answer that higher price by sliding UP their own demand curve, so quantity demanded falls from 40 crates to 31. The demand curve itself has not moved an inch: it is the same curve, read at a different price." },
+
+  { text:"Spot the error. After a bumper grape crop, prices fell and shoppers went home with more grapes. A student concludes: “Demand must have increased, because people bought more.” What actually happened?",
+    category:'link', shiftCurve:'supply', shiftDir:'increase', asked:'demanded',
+    explain:"The student has read a slide as a shift. The bumper crop shifts SUPPLY right; nothing changed what buyers are willing to pay, so demand stays exactly where it was. The equilibrium price falls from $60 to $51, and buyers slide DOWN the unchanged demand curve, so quantity demanded rises from 40 crates to 49. “People bought more” is quantity demanded rising, not demand increasing. The price is the giveaway: a real increase in demand would have pushed the price UP to $69, and the price went down." },
+
+  { text:"A cheaper drip-irrigation system cuts the cost of growing grapes. What happens to the QUANTITY DEMANDED of grapes?",
+    category:'link', shiftCurve:'supply', shiftDir:'increase', asked:'demanded',
+    explain:"Lower input costs shift SUPPLY right — growers will put more on the market at every price. Demand does not move, because nothing about the buyers has changed. The equilibrium price falls from $60 to $51, and buyers slide DOWN their unchanged demand curve, so quantity demanded rises from 40 crates to 49. One curve shifted; the other was simply read at a new price." },
+
+  { text:"Spot the error. A picking-labor shortage hits the vineyards, grape prices climb, and fewer crates are sold. A student concludes: “Demand must have decreased, since people bought fewer grapes.” What actually happened?",
+    category:'link', shiftCurve:'supply', shiftDir:'decrease', asked:'demanded',
+    explain:"Another slide mistaken for a shift. The labor shortage raises the cost of getting grapes picked, so SUPPLY shifts left; the buyers are the same people wanting the same things, so demand stays put. The equilibrium price rises from $60 to $69 and buyers slide UP the unchanged demand curve, so quantity demanded falls from 40 crates to 31. Check it against the price again: a real decrease in demand would have pushed the price DOWN to $51. The price rose, so the shock came from the supply side." },
+
+  { text:"A major health study reports that grapes lower blood pressure. What happens to the QUANTITY SUPPLIED of grapes?",
+    category:'link', shiftCurve:'demand', shiftDir:'increase', asked:'supplied',
+    explain:"A change in tastes shifts DEMAND right. Supply does not move — growers' costs, technology and numbers are all exactly what they were yesterday. The equilibrium price rises from $60 to $69, and growers slide UP their unchanged supply curve, so quantity supplied rises from 40 crates to 49. They are not supplying more in the sense of a shift; they are selling more because the price is higher, which is a movement along the same curve." },
+
+  { text:"Incomes across the region rise, and grapes are a normal good here. What happens to the QUANTITY SUPPLIED of grapes?",
+    category:'link', shiftCurve:'demand', shiftDir:'increase', asked:'supplied',
+    explain:"Higher incomes shift DEMAND right for a normal good. Nothing has happened to growing costs or technology, so supply stays exactly where it is. The equilibrium price rises from $60 to $69, and growers slide UP the unchanged supply curve: quantity supplied rises from 40 crates to 49. Income is a determinant of demand, never of supply — it reaches the growers only through the price." },
+
+  { text:"The price of raisins, a close substitute for fresh grapes, falls sharply. What happens to the QUANTITY SUPPLIED of grapes?",
+    category:'link', shiftCurve:'demand', shiftDir:'decrease', asked:'supplied',
+    explain:"Cheaper raisins pull buyers away from fresh grapes, so DEMAND for grapes shifts left. Supply is untouched: the price of raisins is not an input to growing grapes. The equilibrium price falls from $60 to $51, and growers slide DOWN their unchanged supply curve, so quantity supplied falls from 40 crates to 31. Watch which curve the raisin price moved — the price of a related good is a determinant of demand, not of supply." },
+
+  { text:"Shoppers hear a rumor that grape prices will jump next month, and start stocking up now. What happens to the QUANTITY SUPPLIED of grapes?",
+    category:'link', shiftCurve:'demand', shiftDir:'increase', asked:'supplied',
+    explain:"An expectation held by BUYERS shifts today's DEMAND right. This week's supply is unchanged, since the growers' costs and capacity are what they were. The equilibrium price rises from $60 to $69, and growers slide UP the unchanged supply curve, so quantity supplied rises from 40 crates to 49. Be careful whose expectation it is: the same rumor believed by SELLERS would shift supply LEFT instead, as they held crates back for next month." },
+
 ];
 
 function answerKey(card){
+  if(card.category === 'link') return `link-${card.shiftCurve}-${card.shiftDir}`;
   return card.category === 'movement'
     ? `movement-${card.curve}-${card.priceDir}`
     : `${card.category}-${card.direction}`;
 }
+
+/* The link cards need their own options: the three original buttons cannot
+   express "one curve shifted AND the point slid along the other", and the two
+   wrong ones below are the exact error these cards are built to catch.
+   Kept to within a character of each other in length, so nothing is given away
+   by picking the longest. */
+const LINK_OPTIONS = [
+  'Supply shifted; quantity demanded then slid along a demand curve that never moved',
+  'Demand shifted; quantity supplied then slid along a supply curve that never moved',
+  'Supply shifted; demand then shifted too, because buyers bought a different amount',
+  'Demand shifted; supply then shifted too, because growers sold a different amount',
+];
+
 function correctButtonLabel(card){
+  if(card.category==='link') return LINK_OPTIONS[card.shiftCurve==='supply' ? 0 : 1];
   if(card.category==='demand') return 'Demand shifts';
   if(card.category==='supply') return 'Supply shifts';
   return 'Movement along the curve';
+}
+function optionLabels(card){
+  if(card.category!=='link') return ['Demand shifts', 'Supply shifts', 'Movement along the curve'];
+  /* Shuffled, because the answer is always LINK_OPTIONS[0] or [1] and a fixed
+     order would put it in one of the first two slots every time. */
+  return shuffledIndices(LINK_OPTIONS.length).map(i => LINK_OPTIONS[i]);
 }
 
 /* ================= SVG HELPERS ================= */
@@ -572,7 +632,7 @@ function loadStepCard(){
 
   const buttonsEl = document.getElementById('predictButtons');
   buttonsEl.innerHTML = '';
-  const options = ['Demand shifts', 'Supply shifts', 'Movement along the curve'];
+  const options = optionLabels(card);
   options.forEach(label=>{
     const btn = document.createElement('button');
     btn.className = 'predict-btn';
@@ -610,9 +670,62 @@ function handleStepAnswer(card, chosenLabel, btnEl){
 function runStepAnimation(card){
   if(card.category==='movement'){
     animateMovement(card);
+  } else if(card.category==='link'){
+    animateLink(card);
   } else {
     animateShift(card);
   }
+}
+
+/* One curve shifts while the other is pinned. Because the pinned curve never
+   moves, every equilibrium along the way still sits ON it -- so the travelling
+   point IS the slide along the other curve, and it is drawn in the movement
+   colour to say so. */
+function animateLink(card){
+  const startK = BASE_K, startC = BASE_C;
+  let endK = BASE_K, endC = BASE_C;
+  if(card.shiftCurve==='supply') endC = BASE_C + (card.shiftDir==='increase'? -SHIFT : SHIFT);
+  else                           endK = BASE_K + (card.shiftDir==='increase'?  SHIFT : -SHIFT);
+
+  const e0 = eq(startK, startC);
+  demandLineBase.setAttribute('opacity', 1);
+  supplyLineBase.setAttribute('opacity', 1);
+  setLine(demandLineBase, startK, -1);
+  setLine(supplyLineBase, startC, 1);
+  eqDotBase.setAttribute('cx', qToX(e0.Q));
+  eqDotBase.setAttribute('cy', pToY(e0.P));
+  eqDotBase.setAttribute('opacity', 1);
+
+  if(card.shiftCurve==='demand') demandLabelNew.setAttribute('opacity', 1);
+  else                           supplyLabelNew.setAttribute('opacity', 1);
+
+  moveDot.setAttribute('opacity', 1);
+  eqDot.setAttribute('opacity', 0);
+
+  animate(900, (t)=>{
+    const k = lerp(startK, endK, t);
+    const c = lerp(startC, endC, t);
+    setLine(demandLine, k, -1);
+    setLine(supplyLine, c, 1);
+    positionLabel(demandLabel, k, -1);
+    positionLabel(supplyLabel, c, 1);
+    if(card.shiftCurve==='demand') positionLabel(demandLabelNew, k, -1);
+    else                           positionLabel(supplyLabelNew, c, 1);
+    const e = eq(k, c);
+    moveDot.setAttribute('cx', qToX(e.Q));
+    moveDot.setAttribute('cy', pToY(e.P));
+    showEqCross(e);
+  }, ()=>{
+    const e1 = eq(endK, endC);
+    const slid = card.asked==='demanded' ? 'Quantity demanded' : 'Quantity supplied';
+    const pinned = card.asked==='demanded' ? 'demand' : 'supply';
+    updateReadout('readout', [
+      {label:'Old equilibrium', value:`$${e0.P.toFixed(0)}, Q=${e0.Q.toFixed(0)}`},
+      {label:'New equilibrium', value:`$${e1.P.toFixed(0)}, Q=${e1.Q.toFixed(0)}`},
+      {label:`${slid}, sliding along the unchanged ${pinned} curve`,
+       value:`${e0.Q.toFixed(0)} → ${e1.Q.toFixed(0)}`},
+    ]);
+  });
 }
 
 function animateShift(card){
@@ -693,6 +806,11 @@ document.getElementById('nextBtn').addEventListener('click', ()=>{
 });
 
 /* ================= DIAGNOSE MODE ================= */
+/* Diagnose asks "which shock drew this picture?", so it needs cards whose text
+   NAMES a shock. A link card's text is a question about the chain, and its
+   diagram is the same one its plain shift-card twin draws -- two cards, one
+   picture, only one of them marked right. Both reasons say: leave them out. */
+const DIAGNOSE_CARDS = CARDS.filter(c => c.category !== 'link');
 let diagnoseScore = {correct:0, total:0};
 let currentDiagnoseCard = null;
 let diagnoseAnswered = false;
@@ -706,7 +824,7 @@ function initDiagnose(){
 function pickDistractors(correctCard, count){
   const correctKey = answerKey(correctCard);
   const seenKeys = new Set([correctKey]);
-  const pool = shuffledIndices(CARDS.length).map(i=>CARDS[i]);
+  const pool = shuffledIndices(DIAGNOSE_CARDS.length).map(i=>DIAGNOSE_CARDS[i]);
   const result = [];
   for(const c of pool){
     const k = answerKey(c);
@@ -720,7 +838,7 @@ function pickDistractors(correctCard, count){
 }
 
 function loadDiagnoseCard(){
-  const card = CARDS[Math.floor(Math.random()*CARDS.length)];
+  const card = DIAGNOSE_CARDS[Math.floor(Math.random()*DIAGNOSE_CARDS.length)];
   currentDiagnoseCard = card;
   diagnoseAnswered = false;
   document.getElementById('cardCount').textContent = 'Diagnose the cause';
