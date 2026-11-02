@@ -275,6 +275,152 @@
     text-decoration:underline;
     cursor:pointer;
   }
+
+  /* ================= GAME LAYER (additive) =================
+     Same palette, same type. Nothing here restyles anything that was already
+     on the page; it only adds the streak badge, the points chip, the toasts,
+     the correct-answer flourish and the end-of-run analysis. */
+  .streak-badge{
+    display:none;
+    align-items:center;
+    gap:5px;
+    background:#FDF0DC;
+    border:1px solid #EFD2A0;
+    color:#8A5A12;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.02em;
+    padding:4px 10px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .streak-badge.show{display:inline-flex;}
+  .streak-badge .flame{font-size:13px; line-height:1;}
+  .streak-badge.grew{animation:streakGrow 380ms ease-out;}
+  @keyframes streakGrow{
+    0%{transform:scale(1);}
+    40%{transform:scale(1.14);}
+    100%{transform:scale(1);}
+  }
+
+  .points-pop{
+    position:absolute;
+    right:0;
+    top:-4px;
+    font-size:13px;
+    font-weight:800;
+    color:var(--correct);
+    opacity:0;
+    pointer-events:none;
+    white-space:nowrap;
+  }
+  .points-pop.fire{animation:pointsFloat 600ms ease-out;}
+  @keyframes pointsFloat{
+    0%{opacity:0; transform:translateY(4px);}
+    25%{opacity:1; transform:translateY(-6px);}
+    100%{opacity:0; transform:translateY(-18px);}
+  }
+  .score-wrap{position:relative; display:inline-block;}
+
+  .scoring-rule{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin:-2px 0 12px;
+    letter-spacing:.01em;
+  }
+  .scoring-rule b{color:var(--ink); font-weight:700;}
+
+  /* toasts: non-blocking, fade themselves out, never wait for a click */
+  .toast-wrap{
+    position:fixed;
+    left:50%;
+    bottom:26px;
+    transform:translateX(-50%);
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    align-items:center;
+    pointer-events:none;
+    z-index:50;
+  }
+  .toast{
+    background:var(--ink);
+    color:#FFF8EC;
+    border-radius:12px;
+    padding:10px 18px;
+    box-shadow:0 6px 20px rgba(43,33,24,.22);
+    font-size:13.5px;
+    text-align:center;
+    animation:toastIn 2000ms ease-out forwards;
+  }
+  .toast b{display:block; font-size:14.5px; font-weight:800; letter-spacing:.01em;}
+  .toast span{opacity:.82;}
+  @keyframes toastIn{
+    0%{opacity:0; transform:translateY(10px) scale(.96);}
+    12%{opacity:1; transform:translateY(0) scale(1);}
+    78%{opacity:1; transform:translateY(0) scale(1);}
+    100%{opacity:0; transform:translateY(-6px) scale(.98);}
+  }
+
+  /* the flourish on a right answer: under 600ms so rapid answering never waits */
+  .predict-btn.just-right, .choice-btn.just-right{animation:rightPulse 520ms ease-out;}
+  @keyframes rightPulse{
+    0%{transform:scale(1);}
+    22%{transform:scale(1.025); box-shadow:0 0 0 4px var(--correct-soft);}
+    55%{transform:scale(0.998);}
+    100%{transform:scale(1); box-shadow:none;}
+  }
+  .spark-host{position:relative;}
+  .spark{
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:7px;
+    height:7px;
+    border-radius:2px;
+    pointer-events:none;
+    opacity:0;
+    animation:sparkFly 560ms ease-out forwards;
+  }
+  @keyframes sparkFly{
+    0%{opacity:1; transform:translate(-50%,-50%) rotate(0deg) scale(.6);}
+    100%{opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)) scale(1);}
+  }
+
+  /* ---- end-of-run analysis ---- */
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px;}
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{font-size:34px; font-weight:800; letter-spacing:-0.02em; margin-bottom:4px;}
+  .results-points{font-size:14px; color:var(--ink-soft); margin-bottom:14px;}
+  .results-points b{color:var(--ink);}
+  .results-note{font-size:15px; color:var(--ink-soft); margin-bottom:20px;}
+  table.results-table{width:100%; border-collapse:collapse; font-size:14px;}
+  table.results-table th, table.results-table td{padding:9px 12px; border-bottom:1px solid var(--border); text-align:left;}
+  table.results-table th{font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); font-weight:700; background:var(--surface-alt);}
+  table.results-table th.score-head, table.results-table td.topic-score{text-align:right; white-space:nowrap;}
+  table.results-table td.topic-cell{font-weight:600; color:var(--ink);}
+  table.results-table td.topic-score{font-weight:700;}
+  table.results-table td.topic-score.full{color:var(--correct);}
+  table.results-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px; color:var(--ink-soft); font-style:italic; line-height:1.5;
+    border-top:1px solid var(--border); padding-top:14px; margin:18px 0 20px;
+  }
+
+  /* Anyone who has asked their system for less motion gets the information
+     without the movement. */
+  @media (prefers-reduced-motion: reduce){
+    .streak-badge.grew, .points-pop.fire,
+    .predict-btn.just-right, .choice-btn.just-right, .spark{animation:none;}
+    .points-pop.fire{opacity:1;}
+    .spark{display:none;}
+    .toast{animation:toastFade 2000ms linear forwards;}
+    @keyframes toastFade{0%,80%{opacity:1;} 100%{opacity:0;}}
+  }
 </style>
 </head>
 <body>
@@ -291,13 +437,15 @@
     </div>
   </header>
 
-  <div class="main">
+  <div class="main" id="mainArea">
     <!-- CARD PANEL -->
     <div class="panel">
       <div class="card-meta">
         <span class="card-count" id="cardCount">Card 1 of 26</span>
-        <span class="score-badge" id="scoreBadge" style="display:none;">Score: 0 / 0</span>
+        <span class="streak-badge" id="streakBadge"><span class="flame">&#128293;</span><span id="streakText">3 in a row</span></span>
+        <span class="score-wrap"><span class="score-badge" id="scoreBadge">0 pts &middot; 0/0</span><span class="points-pop" id="pointsPop">+1</span></span>
       </div>
+      <div class="scoring-rule" id="scoringRule"></div>
 
       <div class="shock-card" id="shockText">Loading…</div>
 
@@ -354,10 +502,31 @@
     </div>
   </div>
 
-  <footer class="reset-row">
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-points" id="resultsPoints"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <table class="results-table">
+      <thead><tr><th>Kind of card</th><th class="score-head">Score</th></tr></thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+
+    <p class="results-caveat">The band is worked out from how many you got right, not from the points &mdash;
+    the points are there to make a long run of right answers worth chasing, and they cannot tell you
+    anything the raw score does not. These bands are not an AP score prediction either.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Run it again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
     <button class="link-btn" id="resetAllBtn">Reset the whole trainer</button>
   </footer>
 </div>
+<div class="toast-wrap" id="toastWrap"></div>
 
 <script>
 /* ================= ECONOMIC MODEL ================= */
@@ -623,6 +792,7 @@ function shuffledIndices(n){
 function initStep(){
   stepOrder = shuffledIndices(CARDS.length);
   stepIndex = 0;
+  resetGame();
   loadStepCard();
 }
 
@@ -677,6 +847,7 @@ function handleStepAnswer(card, chosenLabel, btnEl){
   document.getElementById('nextBtn').disabled = false;
   document.getElementById('replayBtn').onclick = ()=>runStepAnimation(card);
   runStepAnimation(card);
+  recordAnswer(isCorrect, btnEl, card.category);   // game layer, after the page has judged
 }
 
 function runStepAnimation(card){
@@ -807,8 +978,12 @@ function animateMovement(card){
 }
 
 document.getElementById('nextBtn').addEventListener('click', ()=>{
-  stepIndex = (stepIndex+1) % CARDS.length;
-  loadStepCard();
+  if(stepIndex === CARDS.length - 1){
+    showGameResults();        // run finished -- stop here rather than wrapping round
+  } else {
+    stepIndex++;
+    loadStepCard();
+  }
 });
 
 /* ================= DIAGNOSE MODE ================= */
@@ -836,15 +1011,16 @@ function initDiagnose(){
   diagnoseOrder = shuffledIndices(DIAGNOSE_KEYS.length);
   diagnoseIndex = 0;
   document.getElementById('scoreBadge').style.display = 'inline-block';
+  resetGame();
   loadDiagnoseCard();
 }
 
 function advanceDiagnose(){
-  diagnoseIndex++;
-  if(diagnoseIndex >= DIAGNOSE_KEYS.length){
-    diagnoseIndex = 0;
-    diagnoseOrder = shuffledIndices(DIAGNOSE_KEYS.length);
+  if(diagnoseIndex === DIAGNOSE_KEYS.length - 1){
+    showGameResults();        // round finished -- stop here rather than wrapping round
+    return;
   }
+  diagnoseIndex++;
   loadDiagnoseCard();
 }
 
@@ -872,14 +1048,14 @@ function loadDiagnoseCard(){
   diagnoseAnswered = false;
   document.getElementById('cardCount').textContent =
     `Diagnose ${diagnoseIndex+1} of ${DIAGNOSE_KEYS.length}`;
-  document.getElementById('scoreBadge').textContent = `Score: ${diagnoseScore.correct} / ${diagnoseScore.total}`;
+  updateGameUI();
   document.getElementById('shockText').textContent = 'Look at the graph. Which shock caused this?';
   document.getElementById('feedback').classList.remove('show');
   document.getElementById('replayBtn').disabled = true;
   document.getElementById('nextBtn').disabled = true;
   document.getElementById('replayBtn').style.display = 'none';
   document.getElementById('nextBtn').textContent =
-    diagnoseIndex === DIAGNOSE_KEYS.length - 1 ? 'Start another round' : 'Next card';
+    diagnoseIndex === DIAGNOSE_KEYS.length - 1 ? 'See your results' : 'Next card';
 
   // Render the FINAL state directly, no animation, no explanation yet
   let k = BASE_K, c = BASE_C;
@@ -936,7 +1112,6 @@ function handleDiagnoseAnswer(correctCard, chosenCard, btnEl){
   const isCorrect = chosenCard === correctCard;
   diagnoseScore.total++;
   if(isCorrect) diagnoseScore.correct++;
-  document.getElementById('scoreBadge').textContent = `Score: ${diagnoseScore.correct} / ${diagnoseScore.total}`;
 
   [...document.getElementById('predictButtons').children].forEach(b=>{
     b.disabled = true;
@@ -951,11 +1126,212 @@ function handleDiagnoseAnswer(correctCard, chosenCard, btnEl){
   verdict.className = 'feedback-verdict ' + (isCorrect?'correct':'incorrect');
   document.getElementById('feedbackExplain').textContent = correctCard.explain;
   document.getElementById('nextBtn').disabled = false;
+  recordAnswer(isCorrect, btnEl, correctCard.category);   // game layer, after the page has judged
 }
 
 document.getElementById('nextBtn').addEventListener('click', ()=>{
   if(currentMode==='diagnose') advanceDiagnose();
 });
+
+
+/* ================= GAME LAYER =================
+   Points, streaks, milestones and the end-of-run analysis. None of this
+   reaches into how a card is chosen, judged or explained. */
+
+/* Awarded on a CORRECT answer, read off the streak INCLUDING this answer, so
+   the 5th in a row is the first to pay 2 and the 10th the first to pay 3.
+   The rule is printed on screen because a student should be able to check it. */
+function pointsFor(streak){ return streak >= 10 ? 3 : streak >= 5 ? 2 : 1; }
+
+const GAME = { streak:0, best:0, points:0, correct:0, answered:0, pendingComeback:false, perKind:{} };
+/* Milestones fire once per page load, not once per run, so restarting does not
+   replay them. */
+const MILESTONES_FIRED = new Set();
+
+const KIND_LABEL = {
+  demand:   'Demand shifts',
+  supply:   'Supply shifts',
+  movement: 'Movement along a curve',
+  link:     'One curve shifts, the point slides along the other',
+};
+const KIND_ORDER = ['demand', 'supply', 'movement', 'link'];
+
+function runLength(){
+  return currentMode === 'step' ? CARDS.length : DIAGNOSE_KEYS.length;
+}
+
+function resetGame(){
+  GAME.streak = 0; GAME.best = 0; GAME.points = 0;
+  GAME.correct = 0; GAME.answered = 0; GAME.pendingComeback = false;
+  GAME.perKind = {};
+  KIND_ORDER.forEach(k => GAME.perKind[k] = { correct:0, total:0 });
+  const badge = document.getElementById('streakBadge');
+  badge.classList.remove('show', 'grew');
+  document.getElementById('scoringRule').innerHTML =
+    'Scoring: <b>+1</b> for a right answer, <b>+2</b> once you are on a streak of 5, ' +
+    '<b>+3</b> from 10. A wrong answer sends the streak back to zero. ' +
+    'A flawless run is worth <b>' + maxPoints(runLength()) + '</b>.';
+  updateGameUI();
+  hideResults();
+}
+
+function maxPoints(n){
+  let t = 0;
+  for(let i = 1; i <= n; i++) t += pointsFor(i);
+  return t;
+}
+
+function updateGameUI(){
+  document.getElementById('scoreBadge').textContent =
+    `${GAME.points} pts · ${GAME.correct}/${GAME.answered}`;
+  const badge = document.getElementById('streakBadge');
+  if(GAME.streak >= 3){
+    document.getElementById('streakText').textContent = `${GAME.streak} in a row`;
+    badge.classList.add('show');
+  } else {
+    badge.classList.remove('show');
+  }
+}
+
+function toast(title, line){
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.setAttribute('role', 'status');
+  el.innerHTML = `<b>${title}</b><span>${line}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 2100);   // matches the CSS fade, nothing to dismiss
+}
+
+function milestone(key, title, line){
+  if(MILESTONES_FIRED.has(key)) return;
+  MILESTONES_FIRED.add(key);
+  toast(title, line);
+}
+
+/* A short, CSS-driven flourish. The elements are created here, but every bit of
+   the motion lives in the stylesheet, and all of it is done inside 600ms. */
+function celebrate(btnEl, gained){
+  if(btnEl){
+    btnEl.classList.remove('just-right');
+    void btnEl.offsetWidth;                       // restart the animation
+    btnEl.classList.add('just-right');
+    btnEl.classList.add('spark-host');
+    const colors = ['var(--demand)', 'var(--supply)', 'var(--accent)', 'var(--movement)'];
+    for(let i = 0; i < 8; i++){
+      const s = document.createElement('span');
+      s.className = 'spark';
+      const angle = (Math.PI * 2 * i) / 8 + Math.random() * 0.5;
+      const dist = 26 + Math.random() * 20;
+      s.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+      s.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
+      s.style.setProperty('--rot', `${Math.round(Math.random() * 300 - 150)}deg`);
+      s.style.background = colors[i % colors.length];
+      btnEl.appendChild(s);
+      setTimeout(() => s.remove(), 620);
+    }
+    setTimeout(() => { btnEl.classList.remove('just-right', 'spark-host'); }, 620);
+  }
+  const pop = document.getElementById('pointsPop');
+  pop.textContent = `+${gained}`;
+  pop.classList.remove('fire');
+  void pop.offsetWidth;
+  pop.classList.add('fire');
+}
+
+/* The single place an answer reaches the game. Called AFTER the page has
+   already judged and explained the answer, so it cannot affect either. */
+function recordAnswer(isCorrect, btnEl, kind){
+  GAME.answered++;
+  if(kind && GAME.perKind[kind]){
+    GAME.perKind[kind].total++;
+    if(isCorrect) GAME.perKind[kind].correct++;
+  }
+  if(isCorrect){
+    GAME.streak++;
+    GAME.best = Math.max(GAME.best, GAME.streak);
+    const gained = pointsFor(GAME.streak);
+    GAME.points += gained;
+    GAME.correct++;
+    celebrate(btnEl, gained);
+    const badge = document.getElementById('streakBadge');
+    badge.classList.remove('grew');
+    void badge.offsetWidth;
+    if(GAME.streak >= 3) badge.classList.add('grew');
+    if(GAME.pendingComeback){
+      GAME.pendingComeback = false;
+      milestone('comeback', 'Comeback', 'Straight back on it after a streak went down.');
+    }
+    if(GAME.streak === 5) milestone('onfire', 'On Fire', 'Five in a row — right answers are worth +2 from here.');
+    if(GAME.streak === runLength())
+      milestone('perfect', 'Perfect streak', `All ${runLength()} right, without a single miss.`);
+  } else {
+    if(GAME.streak >= 3) GAME.pendingComeback = true;
+    GAME.streak = 0;
+  }
+  updateGameUI();
+}
+
+/* ---- end-of-run analysis ----
+   Banding uses the ROUNDED percentage of RIGHT ANSWERS, not of points, so the
+   label means the same thing it means in every other trainer here.
+   Checked in verify_game.py:
+     26 cards: Mastered 24-26 | Strong 21-23 | Developing 19-20 | Shaky 15-18 | below 15
+      8 cards: Mastered 8 | Strong 7 | Developing 6 | Shaky 5 | below 5 */
+const BANDS = [
+  { min:90, label:'Mastered', tone:'good',
+    note:'You can tell a shift from a slide, and say which curve moved and which quantity followed. Treat this topic as secure.' },
+  { min:80, label:'Strong', tone:'good',
+    note:'Solid command of the material. Look at the kinds of card below where you dropped marks, then run it again.' },
+  { min:70, label:'Developing', tone:'mid',
+    note:'The distinction is mostly there but it is slipping on some cards. The breakdown below shows which kind.' },
+  { min:55, label:'Shaky', tone:'poor',
+    note:'Enough of these are going wrong to cost you marks. Review what moves a curve against what moves you along one, then drill again.' },
+  { min:0, label:'Needs Review', tone:'poor',
+    note:'Go back to the notes on demand and supply shifts first. More practice without review will not close a gap this size.' },
+];
+
+function hideResults(){
+  document.getElementById('mainArea').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+}
+
+function showGameResults(){
+  document.getElementById('mainArea').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  /* GAME.answered is 0 if this is ever reached without an answer; 0/0 is NaN
+     and NaN matches no band, which used to throw. */
+  const pct = GAME.answered ? Math.round(GAME.correct / GAME.answered * 100) : 0;
+  const band = BANDS.find(b => pct >= b.min) || BANDS[BANDS.length - 1];
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${GAME.correct} / ${GAME.answered}  ·  ${pct}%`;
+  document.getElementById('resultsPoints').innerHTML =
+    `<b>${GAME.points}</b> points out of a possible <b>${maxPoints(GAME.answered)}</b> ` +
+    `&middot; longest streak <b>${GAME.best}</b>`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  KIND_ORDER.forEach(k => {
+    const t = GAME.perKind[k];
+    if(!t || !t.total) return;
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${KIND_LABEL[k]}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', ()=>switchMode(currentMode));
 
 /* ================= MODE SWITCHING ================= */
 let currentMode = 'step';
@@ -967,15 +1343,19 @@ function switchMode(mode){
   document.getElementById('modeStepBtn').classList.toggle('active', mode==='step');
   document.getElementById('modeDiagnoseBtn').classList.toggle('active', mode==='diagnose');
   document.getElementById('replayBtn').style.display = mode==='step' ? 'inline-block' : 'none';
-  document.getElementById('scoreBadge').style.display = mode==='diagnose' ? 'inline-block' : 'none';
+  document.getElementById('scoreBadge').style.display = 'inline-block';
   // rebind Next button per mode
   const nextBtn = document.getElementById('nextBtn');
   const freshNext = nextBtn.cloneNode(true);
   nextBtn.parentNode.replaceChild(freshNext, nextBtn);
   if(mode==='step'){
     document.getElementById('nextBtn').addEventListener('click', ()=>{
-      stepIndex = (stepIndex+1) % CARDS.length;
-      loadStepCard();
+      if(stepIndex === CARDS.length - 1){
+        showGameResults();        // run finished -- stop here rather than wrapping round
+      } else {
+        stepIndex++;
+        loadStepCard();
+      }
     });
     initStep();
   } else {
