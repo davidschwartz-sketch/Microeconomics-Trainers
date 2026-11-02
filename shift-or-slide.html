@@ -380,10 +380,10 @@ const CARDS = [
     explain:"A story that changes tastes and preferences for the good itself shifts the whole demand curve — buyers now want more grapes at every price. That's demand increasing (curve shifts right)." },
   { text:"Regional incomes rise as a new employer opens a large office nearby.", category:'demand', direction:'increase',
     explain:"Grapes are a normal good here: as income rises, buyers want more at every price. Demand shifts right." },
-  { text:"The price of raisins — a close substitute for fresh grapes — drops sharply.", category:'demand', direction:'decrease',
-    explain:"When a substitute gets cheaper, some buyers switch to it instead of grapes. Fewer grapes are wanted at every price — demand shifts left." },
-  { text:"Buyers hear that grape prices will jump sharply next month.", category:'demand', direction:'increase',
-    explain:"Expecting a higher price later makes buyers want to purchase more now, before the price rises. Demand shifts right today." },
+  { text:"The price of bananas — a close substitute for fresh grapes — drops sharply.", category:'demand', direction:'decrease',
+    explain:"When a substitute gets cheaper, some buyers switch to it instead of grapes. Fewer grapes are wanted at every price — demand shifts left. Bananas are a clean test case: they are grown nowhere near this vineyard, so their price cannot reach the growers' costs and the supply curve stays where it is." },
+  { text:"Buyers hear that grape prices will jump sharply next month, though the growers have heard nothing.", category:'demand', direction:'increase',
+    explain:"Expecting a higher price later makes buyers want to purchase more now, before the price rises. Demand shifts right today. The card says the growers have not heard, and it has to: if they had, they would hold crates back for next month and supply would shift left as well, leaving two curves moving at once." },
   { text:"The price of artisanal cheese — often paired with grapes on a board — rises.", category:'demand', direction:'decrease',
     explain:"Cheese and grapes are complements: when cheese gets pricier, some buyers cut back on the whole pairing, wanting fewer grapes at every price. Demand shifts left." },
   { text:"A new housing development brings hundreds of new households into the area.", category:'demand', direction:'increase',
@@ -399,8 +399,8 @@ const CARDS = [
     explain:"Damage that raises production costs (or destroys crop capacity) means less is offered at every price. Supply shifts left." },
   { text:"The government offers a subsidy to grape farmers for sustainable practices.", category:'supply', direction:'increase',
     explain:"A subsidy effectively lowers farmers' costs, so they're willing to supply more at every price. Supply shifts right." },
-  { text:"Expecting higher grape prices next season, farmers hold back part of this year's harvest.", category:'supply', direction:'decrease',
-    explain:"When sellers expect a better price later, they supply less right now. Supply shifts left today." },
+  { text:"Expecting higher grape prices next season, farmers hold back part of this year's harvest. Buyers have heard nothing about next season.", category:'supply', direction:'decrease',
+    explain:"When sellers expect a better price later, they supply less right now. Supply shifts left today. The second sentence is doing real work: buyers who expected the same rise would stock up now, shifting demand right at the same time, and the card would no longer have a single answer." },
 
   { text:"Today's market tag: grapes are priced higher than usual. What happens to quantity demanded?", category:'movement', curve:'demand', priceDir:'increase',
     explain:"Nothing about buyers' tastes, income, or the price of other goods changed — only the price of grapes itself. That's a movement UP along the fixed demand curve: quantity demanded falls, but demand itself hasn't shifted." },
@@ -410,9 +410,9 @@ const CARDS = [
     explain:"With costs and technology unchanged, a higher price simply makes it more worthwhile for farmers to sell more. That's a movement UP along the fixed supply curve." },
   { text:"Grapes go on sale at a lower price today. What happens to quantity supplied?", category:'movement', curve:'supply', priceDir:'decrease',
     explain:"With nothing else changed, a lower price makes farmers willing to sell less. That's a movement DOWN along the fixed supply curve." },
-  { text:"A one-day in-store markup raises the price of grapes for a single afternoon.", category:'movement', curve:'demand', priceDir:'increase',
+  { text:"A one-day in-store markup raises the price of grapes for a single afternoon. What happens to quantity demanded?", category:'movement', curve:'demand', priceDir:'increase',
     explain:"A temporary sticker-price change, with nothing else about the market different, moves buyers along the existing demand curve rather than shifting it." },
-  { text:"A flash discount temporarily lowers the price of grapes for one afternoon.", category:'movement', curve:'supply', priceDir:'decrease',
+  { text:"A flash discount temporarily lowers the price of grapes for one afternoon. What happens to quantity supplied?", category:'movement', curve:'supply', priceDir:'decrease',
     explain:"A temporary price drop with no change in costs or technology moves sellers along the existing supply curve — quantity supplied falls, the curve itself doesn't move." },
 
   /* ---- shift on one side, slide on the other ----
@@ -443,13 +443,13 @@ const CARDS = [
     category:'link', shiftCurve:'demand', shiftDir:'increase', asked:'supplied',
     explain:"Higher incomes shift DEMAND right for a normal good. Nothing has happened to growing costs or technology, so supply stays exactly where it is. The equilibrium price rises from $60 to $69, and growers slide UP the unchanged supply curve: quantity supplied rises from 40 crates to 49. Income is a determinant of demand, never of supply — it reaches the growers only through the price." },
 
-  { text:"The price of raisins, a close substitute for fresh grapes, falls sharply. What happens to the QUANTITY SUPPLIED of grapes?",
+  { text:"The price of bananas, a close substitute for fresh grapes, falls sharply. What happens to the QUANTITY SUPPLIED of grapes?",
     category:'link', shiftCurve:'demand', shiftDir:'decrease', asked:'supplied',
-    explain:"Cheaper raisins pull buyers away from fresh grapes, so DEMAND for grapes shifts left. Supply is untouched: the price of raisins is not an input to growing grapes. The equilibrium price falls from $60 to $51, and growers slide DOWN their unchanged supply curve, so quantity supplied falls from 40 crates to 31. Watch which curve the raisin price moved — the price of a related good is a determinant of demand, not of supply." },
+    explain:"Cheaper bananas pull buyers away from fresh grapes, so DEMAND for grapes shifts left. Supply is untouched: bananas are not an input to growing grapes, and they are not grown on land a vineyard could switch over, so nothing about the growers' costs or choices has changed. The equilibrium price falls from $60 to $51, and growers slide DOWN their unchanged supply curve, so quantity supplied falls from 40 crates to 31. Watch which curve the banana price moved — the price of a related good is a determinant of demand, not of supply." },
 
-  { text:"Shoppers hear a rumor that grape prices will jump next month, and start stocking up now. What happens to the QUANTITY SUPPLIED of grapes?",
+  { text:"Shoppers hear a rumor that grape prices will jump next month and start stocking up now, but suppliers are unaware of the rumor. What happens to the QUANTITY SUPPLIED of grapes?",
     category:'link', shiftCurve:'demand', shiftDir:'increase', asked:'supplied',
-    explain:"An expectation held by BUYERS shifts today's DEMAND right. This week's supply is unchanged, since the growers' costs and capacity are what they were. The equilibrium price rises from $60 to $69, and growers slide UP the unchanged supply curve, so quantity supplied rises from 40 crates to 49. Be careful whose expectation it is: the same rumor believed by SELLERS would shift supply LEFT instead, as they held crates back for next month." },
+    explain:"An expectation held by BUYERS shifts today's DEMAND right. Supply is unchanged, and the card has to say the suppliers have not heard the rumor for that to be true: growers who believed it would hold crates back for next month, shifting supply left at the same moment, and then both curves would be moving. With only the buyers acting, the equilibrium price rises from $60 to $69 and growers slide UP the unchanged supply curve, so quantity supplied rises from 40 crates to 49. They are responding to today's price, not to the rumor." },
 
 ];
 
@@ -548,6 +548,18 @@ function positionLabel(el, intercept, slope, side){
   const pt = slope < 0 ? a : b; // demand label near top-left end, supply near top-right end
   el.setAttribute('x', qToX(pt.q) + (slope<0 ? 6 : -18));
   el.setAttribute('y', pToY(pt.p) - 6);
+}
+
+/* The primed label belongs to the curve that MOVED, the plain one to where that
+   curve started. Both used to be positioned with the NEW intercept, so they
+   stacked on the shifted curve and the dashed original went unlabelled -- and
+   Diagnose never positioned the primed label at all, so it sat at the SVG
+   origin, outside the plot. */
+function placeCurveLabels(k, c, moved){
+  positionLabel(demandLabel, moved === 'demand' ? BASE_K : k, -1);
+  positionLabel(supplyLabel, moved === 'supply' ? BASE_C : c,  1);
+  if(moved === 'demand') positionLabel(demandLabelNew, k, -1);
+  if(moved === 'supply') positionLabel(supplyLabelNew, c,  1);
 }
 
 function renderStatic(k, c){
@@ -707,10 +719,7 @@ function animateLink(card){
     const c = lerp(startC, endC, t);
     setLine(demandLine, k, -1);
     setLine(supplyLine, c, 1);
-    positionLabel(demandLabel, k, -1);
-    positionLabel(supplyLabel, c, 1);
-    if(card.shiftCurve==='demand') positionLabel(demandLabelNew, k, -1);
-    else                           positionLabel(supplyLabelNew, c, 1);
+    placeCurveLabels(k, c, card.shiftCurve);
     const e = eq(k, c);
     moveDot.setAttribute('cx', qToX(e.Q));
     moveDot.setAttribute('cy', pToY(e.P));
@@ -751,10 +760,7 @@ function animateShift(card){
     const c = lerp(startC, endC, t);
     setLine(demandLine, k, -1);
     setLine(supplyLine, c, 1);
-    positionLabel(demandLabel, k, -1);
-    positionLabel(supplyLabel, c, 1);
-    if(card.category==='demand') positionLabel(demandLabelNew, k, -1);
-    if(card.category==='supply') positionLabel(supplyLabelNew, c, 1);
+    placeCurveLabels(k, c, card.category);
     const e = eq(k,c);
     eqDot.setAttribute('cx', qToX(e.Q));
     eqDot.setAttribute('cy', pToY(e.P));
@@ -811,13 +817,34 @@ document.getElementById('nextBtn').addEventListener('click', ()=>{
    diagram is the same one its plain shift-card twin draws -- two cards, one
    picture, only one of them marked right. Both reasons say: leave them out. */
 const DIAGNOSE_CARDS = CARDS.filter(c => c.category !== 'link');
+
+/* Several different shocks draw the SAME picture -- four of them produce the
+   demand-shifts-right diagram alone. Keyed on the card, Diagnose asked the same
+   question more than once with a different answer marked right each time, and
+   because it drew at random with replacement it never ended. A round is now one
+   pass over the diagrams that actually exist, and the correct answer is drawn
+   from the shocks that produce the one on screen. */
+const DIAGNOSE_KEYS = [...new Set(DIAGNOSE_CARDS.map(answerKey))];
+let diagnoseOrder = [];
+let diagnoseIndex = 0;
 let diagnoseScore = {correct:0, total:0};
 let currentDiagnoseCard = null;
 let diagnoseAnswered = false;
 
 function initDiagnose(){
   diagnoseScore = {correct:0, total:0};
+  diagnoseOrder = shuffledIndices(DIAGNOSE_KEYS.length);
+  diagnoseIndex = 0;
   document.getElementById('scoreBadge').style.display = 'inline-block';
+  loadDiagnoseCard();
+}
+
+function advanceDiagnose(){
+  diagnoseIndex++;
+  if(diagnoseIndex >= DIAGNOSE_KEYS.length){
+    diagnoseIndex = 0;
+    diagnoseOrder = shuffledIndices(DIAGNOSE_KEYS.length);
+  }
   loadDiagnoseCard();
 }
 
@@ -838,16 +865,21 @@ function pickDistractors(correctCard, count){
 }
 
 function loadDiagnoseCard(){
-  const card = DIAGNOSE_CARDS[Math.floor(Math.random()*DIAGNOSE_CARDS.length)];
+  const key = DIAGNOSE_KEYS[diagnoseOrder[diagnoseIndex]];
+  const sameDiagram = DIAGNOSE_CARDS.filter(c => answerKey(c) === key);
+  const card = sameDiagram[Math.floor(Math.random()*sameDiagram.length)];
   currentDiagnoseCard = card;
   diagnoseAnswered = false;
-  document.getElementById('cardCount').textContent = 'Diagnose the cause';
+  document.getElementById('cardCount').textContent =
+    `Diagnose ${diagnoseIndex+1} of ${DIAGNOSE_KEYS.length}`;
   document.getElementById('scoreBadge').textContent = `Score: ${diagnoseScore.correct} / ${diagnoseScore.total}`;
   document.getElementById('shockText').textContent = 'Look at the graph. Which shock caused this?';
   document.getElementById('feedback').classList.remove('show');
   document.getElementById('replayBtn').disabled = true;
   document.getElementById('nextBtn').disabled = true;
   document.getElementById('replayBtn').style.display = 'none';
+  document.getElementById('nextBtn').textContent =
+    diagnoseIndex === DIAGNOSE_KEYS.length - 1 ? 'Start another round' : 'Next card';
 
   // Render the FINAL state directly, no animation, no explanation yet
   let k = BASE_K, c = BASE_C;
@@ -874,6 +906,7 @@ function loadDiagnoseCard(){
     eqDotBase.setAttribute('cx', qToX(e0.Q)); eqDotBase.setAttribute('cy', pToY(e0.P));
     eqDotBase.setAttribute('opacity', 1);
     showEqCross(e1);
+    placeCurveLabels(k, c, card.category);
     if(card.category==='demand') demandLabelNew.setAttribute('opacity',1);
     if(card.category==='supply') supplyLabelNew.setAttribute('opacity',1);
     updateReadout('readout', [
@@ -921,7 +954,7 @@ function handleDiagnoseAnswer(correctCard, chosenCard, btnEl){
 }
 
 document.getElementById('nextBtn').addEventListener('click', ()=>{
-  if(currentMode==='diagnose') loadDiagnoseCard();
+  if(currentMode==='diagnose') advanceDiagnose();
 });
 
 /* ================= MODE SWITCHING ================= */
@@ -946,7 +979,7 @@ function switchMode(mode){
     });
     initStep();
   } else {
-    document.getElementById('nextBtn').addEventListener('click', loadDiagnoseCard);
+    document.getElementById('nextBtn').addEventListener('click', advanceDiagnose);
     initDiagnose();
   }
 }
