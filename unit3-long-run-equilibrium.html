@@ -3359,6 +3359,11 @@ function mk(tag, attrs, text){
   if(text !== undefined) e.textContent = text;
   return e;
 }
+/* A white outline painted UNDER the glyphs, so a curve passing behind a label
+   does not run through the letters. Purely cosmetic: nothing moves. */
+const HALO = {stroke:'#FFFFFF', 'stroke-width':3.2, 'paint-order':'stroke',
+              'stroke-linejoin':'round'};
+function halo(attrs){ return Object.assign({}, HALO, attrs); }
 function axisValue(svg, p, where, at, text){
   /* Two equilibria can sit at one price (a constant-cost industry ends where
      it began), and the same tick was then painted twice in the same spot. */
@@ -3441,8 +3446,8 @@ function drawMarket(problem, view){
       }
       l.y = Math.min(l.y, p.y0 - 5);
       placed.push(l);
-      svg.appendChild(mk('text', {x:l.x, y:l.y, 'text-anchor':'end',
-        'font-size':11.5, 'font-weight':800, fill:l.color}, l.text));
+      svg.appendChild(mk('text', halo({x:l.x, y:l.y, 'text-anchor':'end',
+        'font-size':11.5, 'font-weight':800, fill:l.color}), l.text));
     });
   };
 
@@ -3478,8 +3483,8 @@ function drawMarket(problem, view){
       stroke:'#2B2118', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:last ? .55 : .3}));
     svg.appendChild(mk('circle', {cx:X(pt.q), cy:Y(pt.p), r:last ? 5.5 : 4.5,
       fill:last ? '#2B2118' : '#9C8E7A'}));
-    svg.appendChild(mk('text', {x:X(pt.q) + 7, y:Y(pt.p) - 7, 'font-size':11.5, 'font-weight':800,
-      fill:'#2B2118'}, name.replace('E1','E₁').replace('E2','E₂').replace('E3','E₃')));
+    svg.appendChild(mk('text', halo({x:X(pt.q) + 7, y:Y(pt.p) - 7, 'font-size':11.5, 'font-weight':800,
+      fill:'#2B2118'}), name.replace('E1','E₁').replace('E2','E₂').replace('E3','E₃')));
     axisValue(svg, p, 'y', Y(pt.p), '$' + (+pt.p.toFixed(2)));
     axisValue(svg, p, 'x', X(pt.q), String(pt.q));
   });
@@ -3525,11 +3530,11 @@ function drawFirm(problem, view){
          the height of the price line, and the two labels collided there. */
       const atLeft = label.indexOf('ATC') === 0;
       const ref = (atLeft ? pts[0] : pts[pts.length-1]).split(',');
-      svg.appendChild(mk('text', {
+      svg.appendChild(mk('text', halo({
         x: atLeft ? Math.max(+ref[0] - 2, p.x0 + 2) : Math.min(+ref[0] + 4, p.x1 - 2),
         y: +ref[1] - 6 + (labelNudge || 0),
         'text-anchor': atLeft ? 'start' : 'end',
-        'font-size':11.5, 'font-weight':800, fill:color}, label));
+        'font-size':11.5, 'font-weight':800, fill:color}), label));
     }
   };
 
@@ -3556,8 +3561,8 @@ function drawFirm(problem, view){
   /* the price line IS the firm's demand, marginal revenue and average revenue */
   svg.appendChild(mk('line', {x1:p.x0, y1:Y(price), x2:p.x1, y2:Y(price),
     stroke:'#2F6F62', 'stroke-width':2.4}));
-  svg.appendChild(mk('text', {x:p.x1 - 2, y:Y(price) + 13, 'text-anchor':'end',
-    'font-size':10.5, 'font-weight':800, fill:'#2F6F62'}, 'P = D = MR = AR'));
+  svg.appendChild(mk('text', halo({x:p.x1 - 2, y:Y(price) + 13, 'text-anchor':'end',
+    'font-size':10.5, 'font-weight':800, fill:'#2F6F62'}), 'P = D = MR = AR'));
   axisValue(svg, p, 'y', Y(price), '$' + (+price.toFixed(2)));
   const levels = view.atc === 'both' ? [problem.atcShock, problem.atc1] : [A_now];
   levels.forEach(L => { if(Math.abs(L - price) > pmax*0.045) axisValue(svg, p, 'y', Y(L), '$' + (+L.toFixed(2))); });
@@ -3565,8 +3570,8 @@ function drawFirm(problem, view){
   if(view.mark === 'minatc' || view.shade){
     const A_show = view.atc === 'both' ? problem.atc1 : A_now;
     svg.appendChild(mk('circle', {cx:X(QM), cy:Y(A_show), r:4, fill:'#2B2118'}));
-    svg.appendChild(mk('text', {x:X(QM) + 6, y:Y(A_show) + 13, 'font-size':10.5,
-      'font-weight':800, fill:'#2B2118'}, 'min ATC'));
+    svg.appendChild(mk('text', halo({x:X(QM) + 6, y:Y(A_show) + 13, 'font-size':10.5,
+      'font-weight':800, fill:'#2B2118'}), 'min ATC'));
   }
   if(view.arrow){
     const dir = view.arrow === 'UP' ? -1 : 1;
