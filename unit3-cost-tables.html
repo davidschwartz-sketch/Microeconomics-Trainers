@@ -1,0 +1,3818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Working Examples: Cost Tables</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+    --teal: #2F6F62;
+    --orange: #C1542C;
+    --indigo: #4A5FB0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:980px; margin:0 auto; padding:28px 16px 56px;}
+
+  header{border-bottom:2px solid var(--border); padding-bottom:18px; margin-bottom:18px;}
+  header h1{font-size:1.6rem; margin:0 0 6px; letter-spacing:-0.01em;}
+  header p{margin:0; color:var(--ink-soft); font-size:0.97rem; max-width:76ch;}
+
+  .meta-row{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 10px; margin-bottom:12px;}
+  .count-group{display:flex; gap:8px; flex-wrap:wrap;}
+  .pill{
+    background:var(--surface-alt); border:1px solid var(--border); border-radius:999px;
+    padding:4px 12px; font-size:12.5px; font-weight:700; color:var(--ink-soft); white-space:nowrap;
+  }
+  .score-badge{
+    background:#FAEFD6; border:1px solid #EAD4A0; color:#7A5A16;
+    border-radius:999px; padding:4px 12px; font-size:12.5px; font-weight:800; white-space:nowrap;
+  }
+
+  .panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:22px 24px; margin-bottom:16px;
+  }
+  .method-badge{
+    display:inline-block; background:#FAEFD6; border:1px solid #EAD4A0; color:#7A5A16;
+    font-size:11px; font-weight:800; letter-spacing:.07em; text-transform:uppercase;
+    padding:4px 11px; border-radius:999px; margin-bottom:12px;
+  }
+  .scenario{font-size:15.5px; margin-bottom:14px;}
+  .context{
+    background:var(--surface-alt); border:1px solid var(--border); border-radius:12px;
+    padding:13px 16px; margin-bottom:16px; font-size:13.5px; color:var(--ink-soft);
+  }
+  .context b{color:var(--ink);}
+  .flagline{
+    border-left:3px solid var(--indigo); background:#F2F4FB; border-radius:0 9px 9px 0;
+    padding:10px 14px; margin-bottom:16px; font-size:13.5px; color:var(--ink-soft);
+  }
+
+  /* ---- the cost table ---- */
+  .table-card{
+    border:1px solid var(--border); border-radius:12px; padding:12px 14px 10px;
+    margin-bottom:18px; background:var(--surface);
+  }
+  .table-head{
+    display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+    font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--ink-soft); margin-bottom:8px;
+  }
+  .table-head .progress{font-size:10.5px; color:var(--accent);}
+  .table-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-behavior:smooth;}
+  .scroll-hint{
+    display:none; font-size:11.5px; font-style:italic; color:var(--ink-soft); margin-bottom:6px;
+  }
+  @media (prefers-reduced-motion: reduce){ .table-scroll{scroll-behavior:auto;} }
+  table.cost{border-collapse:collapse; width:100%; min-width:430px; font-size:14px;
+             font-variant-numeric:tabular-nums;}
+  table.cost th, table.cost td{
+    border:1px solid var(--border); padding:7px 6px; text-align:center; white-space:nowrap;
+  }
+  table.cost thead th{
+    background:var(--surface-alt); font-size:12px; font-weight:800; letter-spacing:.03em;
+    color:var(--ink); padding:6px 6px 7px;
+  }
+  table.cost thead th small{
+    display:block; font-size:9.5px; font-weight:600; letter-spacing:0;
+    text-transform:none; color:var(--ink-soft); margin-top:1px;
+  }
+  table.cost th.qhead{background:var(--surface-alt);}
+  table.cost td.q{font-weight:800; background:#FDFAF4;}
+  table.cost td.val{font-weight:650;}
+  table.cost td.blank{background:#FBF6EE;}
+  table.cost td.blank::after{content:"?"; color:#C3B49A; font-weight:800;}
+  table.cost td.undef{color:#C3B49A;}
+  table.cost td.marked{box-shadow:inset 0 0 0 2px var(--accent); background:#FDF6E6;}
+  table.cost td.flash-fill{animation:cellFill 1.5s ease-out 1;}
+  table.cost td.flash-mark{animation:cellMark 1.5s ease-out 1;}
+  @keyframes cellFill{
+    0%{background:var(--correct-soft); box-shadow:inset 0 0 0 2px var(--correct);}
+    70%{background:var(--correct-soft); box-shadow:inset 0 0 0 2px var(--correct);}
+    100%{background:transparent; box-shadow:none;}
+  }
+  @keyframes cellMark{
+    0%{background:#FAEFD6;}
+    70%{background:#FAEFD6;}
+    100%{background:transparent;}
+  }
+  .table-legend{
+    margin-top:9px; font-size:11.5px; color:var(--ink-soft); line-height:1.6;
+  }
+  .table-legend b{color:var(--ink);}
+
+  .prompt{font-size:17px; font-weight:650; margin:4px 0 14px; line-height:1.4;}
+  .options{display:flex; flex-direction:column; gap:9px;}
+  .choice-btn{
+    text-align:left; font:inherit; font-size:14.5px; font-weight:650; cursor:pointer;
+    background:var(--surface); border:1.5px solid var(--border); border-radius:11px;
+    padding:12px 15px; color:var(--ink); transition:border-color .13s ease, background .13s ease;
+  }
+  .choice-btn:hover:not(:disabled){border-color:var(--accent);}
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{background:var(--correct-soft); border-color:var(--correct); color:var(--correct);}
+  .choice-btn.incorrect{background:var(--incorrect-soft); border-color:var(--incorrect); color:var(--incorrect);}
+
+  .feedback{display:none; margin-top:14px;}
+  .feedback.show{display:block;}
+  .feedback-verdict{font-size:14.5px; font-weight:800; margin-bottom:6px;}
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    background:var(--surface-alt); border-left:3px solid var(--accent);
+    border-radius:0 9px 9px 0; padding:12px 15px; font-size:14px; color:var(--ink-soft);
+  }
+
+  .controls{display:flex; justify-content:flex-end; gap:10px; margin-top:16px;}
+  .btn{
+    font:inherit; font-size:14px; font-weight:700; border-radius:10px;
+    padding:10px 18px; cursor:pointer; border:1px solid var(--border);
+  }
+  .btn-primary{background:var(--ink); color:var(--surface); border-color:var(--ink);}
+  .btn-primary:hover:not(:disabled){background:#453427;}
+  .btn:disabled{opacity:.4; cursor:default;}
+
+  .reset-row{margin-top:10px; text-align:right;}
+  .link-btn{
+    background:none; border:none; color:var(--ink-soft); font:inherit; font-size:13px;
+    text-decoration:underline; cursor:pointer; padding:0;
+  }
+
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px;}
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{font-size:34px; font-weight:800; letter-spacing:-0.02em; margin-bottom:10px;}
+  .results-note{font-size:15px; color:var(--ink-soft); margin-bottom:20px;}
+  table.results-table{width:100%; border-collapse:collapse; font-size:14px;}
+  table.results-table th, table.results-table td{padding:9px 12px; border-bottom:1px solid var(--border); text-align:left;}
+  table.results-table th{
+    font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft);
+    font-weight:700; background:var(--surface-alt);
+  }
+  table.results-table th.score-head, table.results-table td.topic-score{text-align:right; white-space:nowrap;}
+  table.results-table td.topic-cell{font-weight:600; color:var(--ink);}
+  table.results-table td.topic-score{font-weight:700;}
+  table.results-table td.topic-score.full{color:var(--correct);}
+  table.results-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px; color:var(--ink-soft); font-style:italic; line-height:1.5;
+    border-top:1px solid var(--border); padding-top:14px; margin:18px 0 20px;
+  }
+  .assumptions{
+    font-size:12px; color:var(--ink-soft); line-height:1.5;
+    border-top:1px dashed var(--border); padding-top:11px; margin-top:16px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    table.cost td.flash-fill, table.cost td.flash-mark{animation:none;}
+    .choice-btn{transition:none;}
+  }
+  @media (max-width:560px){
+    .app{padding:20px 12px 48px;}
+    .panel{padding:18px 15px;}
+    table.cost{font-size:13px;}
+    table.cost th, table.cost td{padding:6px 4px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <h1>Working Examples: Cost Tables</h1>
+    <p>One small business at a time, one blank cell at a time. Every column of a short-run cost table comes
+    from the same handful of identities &mdash; fill the table in and the relationships between them stop
+    being a list to memorise.</p>
+  </header>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="pill" id="problemCount">Problem 1 of 10</span>
+      <span class="pill" id="stepCount">Step 1 of 6</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="panel" id="quizPanel">
+    <span class="method-badge" id="methodBadge"></span>
+    <div class="scenario" id="scenarioText">Loading&hellip;</div>
+    <div class="context" id="contextBox"></div>
+    <div class="flagline" id="flagLine" style="display:none;"></div>
+
+    <div class="table-card" id="tableCard">
+      <div class="table-head">
+        <span id="tableTitle">The cost table</span>
+        <span class="progress" id="tableProgress"></span>
+      </div>
+      <div class="scroll-hint" id="scrollHint">Swipe the table sideways to see every column.</div>
+      <div class="table-scroll">
+        <table class="cost" id="costTable"></table>
+      </div>
+      <div class="table-legend" id="tableLegend"></div>
+    </div>
+
+    <div class="prompt" id="promptText"></div>
+    <div class="options" id="optionsWrap"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-verdict" id="feedbackVerdict"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn" disabled>Next step</button>
+    </div>
+
+    <p class="assumptions">Short-run tables only: one input is fixed, which is what makes fixed cost fixed.
+    The quantities usually step in whole units, so marginal cost can be read straight off the totals; where
+    they do not, the problem says so. Every figure has been chosen to come out to an exact number of cents. Real cost schedules are rarely this tidy; the
+    relationships between the columns are the point, not the numbers themselves.</p>
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <table class="results-table">
+      <thead><tr><th>Business and what it gave you</th><th class="score-head">Score</th></tr></thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+
+    <p class="results-caveat">These bands say whether the cost identities are secure &mdash; they are not an
+    AP score prediction. The exam covers every unit, counts free response for a third of the grade, and gives
+    you no feedback until it is over. Treat a strong result here as one skill secured, not as a score.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Run it again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Restart from problem 1</button>
+  </footer>
+
+</div>
+<script>
+const PROBLEMS = [
+ {
+  "id": "P1",
+  "biz": "Sweet Crumb Bakery",
+  "qname": "Dozens",
+  "kind": "tfc_tvc",
+  "badge": "COST TABLE · FILLING IN THE AVERAGES",
+  "gave": "fixed cost and a variable cost schedule",
+  "scenario": "Sweet Crumb Bakery rents its kitchen and equipment for a flat $36 a day. Its flour, butter, boxes and icing cost more the more it bakes, and it has written both columns down.",
+  "flag": "",
+  "tableTitle": "Sweet Crumb Bakery — dozens of cupcakes a day",
+  "qs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "cols": [
+   "tfc",
+   "tvc",
+   "tc",
+   "afc",
+   "avc",
+   "atc",
+   "mc"
+  ],
+  "cells": {
+   "tfc": [
+    "$36",
+    "$36",
+    "$36",
+    "$36",
+    "$36",
+    "$36"
+   ],
+   "tvc": [
+    "$0",
+    "$20",
+    "$34",
+    "$45",
+    "$60",
+    "$85"
+   ],
+   "tc": [
+    "$36",
+    "$56",
+    "$70",
+    "$81",
+    "$96",
+    "$121"
+   ],
+   "afc": [
+    null,
+    "$36.00",
+    "$18.00",
+    "$12.00",
+    "$9.00",
+    "$7.20"
+   ],
+   "avc": [
+    null,
+    "$20.00",
+    "$17.00",
+    "$15.00",
+    "$15.00",
+    "$17.00"
+   ],
+   "atc": [
+    null,
+    "$56.00",
+    "$35.00",
+    "$27.00",
+    "$24.00",
+    "$24.20"
+   ],
+   "mc": [
+    null,
+    "$20.00",
+    "$14.00",
+    "$11.00",
+    "$15.00",
+    "$25.00"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "tfc"
+   ],
+   [
+    1,
+    "tfc"
+   ],
+   [
+    2,
+    "tfc"
+   ],
+   [
+    3,
+    "tfc"
+   ],
+   [
+    4,
+    "tfc"
+   ],
+   [
+    5,
+    "tfc"
+   ],
+   [
+    0,
+    "tvc"
+   ],
+   [
+    1,
+    "tvc"
+   ],
+   [
+    2,
+    "tvc"
+   ],
+   [
+    3,
+    "tvc"
+   ],
+   [
+    4,
+    "tvc"
+   ],
+   [
+    5,
+    "tvc"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Sweet Crumb Bakery pays $36 a day in fixed costs whatever it bakes. What is TOTAL COST at 3 dozen?",
+    "options": [
+     "$81",
+     "$45",
+     "$36",
+     "$70"
+    ],
+    "correct": 0,
+    "explain": "TC = TFC + TVC, so $36 + $45 = $81. Fixed cost is added at EVERY quantity, Q = 0 included — that is why total cost starts at $36 rather than at zero.",
+    "fills": [
+     [
+      0,
+      "tc"
+     ],
+     [
+      1,
+      "tc"
+     ],
+     [
+      2,
+      "tc"
+     ],
+     [
+      3,
+      "tc"
+     ],
+     [
+      4,
+      "tc"
+     ],
+     [
+      5,
+      "tc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is AVERAGE FIXED COST at 4 dozen?",
+    "options": [
+     "$9.00",
+     "$15.00",
+     "$24.00",
+     "$36.00"
+    ],
+    "correct": 0,
+    "explain": "AFC = TFC ÷ Q = $36 ÷ 4 = $9.00. The same $36 is being spread over more and more units, which is why AFC falls at every single step down this column and never turns back up.",
+    "fills": [
+     [
+      1,
+      "afc"
+     ],
+     [
+      2,
+      "afc"
+     ],
+     [
+      3,
+      "afc"
+     ],
+     [
+      4,
+      "afc"
+     ],
+     [
+      5,
+      "afc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is AVERAGE VARIABLE COST at 4 dozen?",
+    "options": [
+     "$15.00",
+     "$9.00",
+     "$24.00",
+     "$60.00"
+    ],
+    "correct": 0,
+    "explain": "AVC = TVC ÷ Q = $60 ÷ 4 = $15.00. Only the variable cost is divided here; the fixed cost has its own average.",
+    "fills": [
+     [
+      1,
+      "avc"
+     ],
+     [
+      2,
+      "avc"
+     ],
+     [
+      3,
+      "avc"
+     ],
+     [
+      4,
+      "avc"
+     ],
+     [
+      5,
+      "avc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is AVERAGE TOTAL COST at 4 dozen?",
+    "options": [
+     "$24.00",
+     "$15.00",
+     "$9.00",
+     "$96.00"
+    ],
+    "correct": 0,
+    "explain": "Two routes, same answer. TC ÷ Q = $96 ÷ 4 = $24.00, and AFC + AVC = $9.00 + $15.00 = $24.00. ATC = AFC + AVC is not a separate fact — it is what you get when you divide TC = TFC + TVC through by Q.",
+    "fills": [
+     [
+      1,
+      "atc"
+     ],
+     [
+      2,
+      "atc"
+     ],
+     [
+      3,
+      "atc"
+     ],
+     [
+      4,
+      "atc"
+     ],
+     [
+      5,
+      "atc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is MARGINAL COST at 5 dozen — the cost of that last dozen?",
+    "options": [
+     "$25.00",
+     "$17.00",
+     "$24.20",
+     "$61.00"
+    ],
+    "correct": 0,
+    "explain": "MC = ΔTC ÷ ΔQ = ($121 − $96) ÷ 1 = $25.00. ΔTVC gives exactly the same number, because the fixed $36 is in both totals and cancels: the marginal cost of a fixed cost is always zero.",
+    "fills": [
+     [
+      1,
+      "mc"
+     ],
+     [
+      2,
+      "mc"
+     ],
+     [
+      3,
+      "mc"
+     ],
+     [
+      4,
+      "mc"
+     ],
+     [
+      5,
+      "mc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "The table is complete. What does the AFC column do as output rises, and why?",
+    "options": [
+     "It falls at every step, because one unchanging $36 is divided among more units",
+     "It falls at first and then rises, the same U shape as ATC",
+     "It stays at $36, because fixed cost never changes",
+     "It falls only while marginal cost is below it"
+    ],
+    "correct": 0,
+    "explain": "AFC = TFC ÷ Q with a numerator that never moves, so it can only fall, and it gets closer and closer to zero without ever reaching it. It has no U shape of its own. That is also why ATC and AVC drift together as output grows: the gap between them IS average fixed cost.",
+    "fills": [],
+    "mark": [
+     [
+      1,
+      "afc"
+     ],
+     [
+      2,
+      "afc"
+     ],
+     [
+      3,
+      "afc"
+     ],
+     [
+      4,
+      "afc"
+     ],
+     [
+      5,
+      "afc"
+     ]
+    ],
+    "note": null
+   }
+  ]
+ },
+ {
+  "id": "P2",
+  "biz": "Press Play Screen Printing",
+  "qname": "Batches",
+  "kind": "tc_only",
+  "badge": "COST TABLE · WORKING BACK FROM TOTALS",
+  "gave": "a total cost column and nothing else",
+  "scenario": "Press Play Screen Printing has handed you one column and one column only: what a day costs in total for each number of batches it prints. No fixed cost stated, no averages, nothing else.",
+  "flag": "",
+  "tableTitle": "Press Play Screen Printing — batches of ten shirts a day",
+  "qs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "cols": [
+   "tfc",
+   "tvc",
+   "tc",
+   "afc",
+   "avc",
+   "atc",
+   "mc"
+  ],
+  "cells": {
+   "tfc": [
+    "$48",
+    "$48",
+    "$48",
+    "$48",
+    "$48",
+    "$48"
+   ],
+   "tvc": [
+    "$0",
+    "$18",
+    "$33",
+    "$45",
+    "$62",
+    "$85"
+   ],
+   "tc": [
+    "$48",
+    "$66",
+    "$81",
+    "$93",
+    "$110",
+    "$133"
+   ],
+   "afc": [
+    null,
+    "$48.00",
+    "$24.00",
+    "$16.00",
+    "$12.00",
+    "$9.60"
+   ],
+   "avc": [
+    null,
+    "$18.00",
+    "$16.50",
+    "$15.00",
+    "$15.50",
+    "$17.00"
+   ],
+   "atc": [
+    null,
+    "$66.00",
+    "$40.50",
+    "$31.00",
+    "$27.50",
+    "$26.60"
+   ],
+   "mc": [
+    null,
+    "$18.00",
+    "$15.00",
+    "$12.00",
+    "$17.00",
+    "$23.00"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "tc"
+   ],
+   [
+    1,
+    "tc"
+   ],
+   [
+    2,
+    "tc"
+   ],
+   [
+    3,
+    "tc"
+   ],
+   [
+    4,
+    "tc"
+   ],
+   [
+    5,
+    "tc"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "All Press Play Screen Printing has given you is its TOTAL COST at each output. What is its TOTAL FIXED COST?",
+    "options": [
+     "$48",
+     "$66",
+     "$18",
+     "$85"
+    ],
+    "correct": 0,
+    "explain": "Read it off Q = 0. At zero output there is no variable cost at all, so whatever total cost remains is pure fixed cost: TC(0) = TFC = $48. That is the one row where the two are the same number.",
+    "fills": [
+     [
+      0,
+      "tfc"
+     ],
+     [
+      1,
+      "tfc"
+     ],
+     [
+      2,
+      "tfc"
+     ],
+     [
+      3,
+      "tfc"
+     ],
+     [
+      4,
+      "tfc"
+     ],
+     [
+      5,
+      "tfc"
+     ]
+    ],
+    "mark": [
+     [
+      0,
+      "tc"
+     ]
+    ],
+    "note": null
+   },
+   {
+    "prompt": "What is TOTAL VARIABLE COST at 3 batches?",
+    "options": [
+     "$45",
+     "$93",
+     "$48",
+     "$12"
+    ],
+    "correct": 0,
+    "explain": "Rearrange TC = TFC + TVC: TVC = TC − TFC = $93 − $48 = $45. The same $48 comes off every row, which is why TVC starts at zero.",
+    "fills": [
+     [
+      0,
+      "tvc"
+     ],
+     [
+      1,
+      "tvc"
+     ],
+     [
+      2,
+      "tvc"
+     ],
+     [
+      3,
+      "tvc"
+     ],
+     [
+      4,
+      "tvc"
+     ],
+     [
+      5,
+      "tvc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is AVERAGE TOTAL COST at 4 batches?",
+    "options": [
+     "$27.50",
+     "$15.50",
+     "$12.00",
+     "$110.00"
+    ],
+    "correct": 0,
+    "explain": "ATC = TC ÷ Q = $110 ÷ 4 = $27.50. It is the cost per batch once everything — the press, the ink, the labour — has been counted and shared out over the batches made.",
+    "fills": [
+     [
+      1,
+      "atc"
+     ],
+     [
+      2,
+      "atc"
+     ],
+     [
+      3,
+      "atc"
+     ],
+     [
+      4,
+      "atc"
+     ],
+     [
+      5,
+      "atc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is AVERAGE FIXED COST at 4 batches?",
+    "options": [
+     "$12.00",
+     "$15.50",
+     "$27.50",
+     "$48.00"
+    ],
+    "correct": 0,
+    "explain": "AFC = TFC ÷ Q = $48 ÷ 4 = $12.00. The $48 itself never moves; only the number of batches it is shared among does, which is why this column can only fall.",
+    "fills": [
+     [
+      1,
+      "afc"
+     ],
+     [
+      2,
+      "afc"
+     ],
+     [
+      3,
+      "afc"
+     ],
+     [
+      4,
+      "afc"
+     ],
+     [
+      5,
+      "afc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is AVERAGE VARIABLE COST at 4 batches? There are two ways to get it.",
+    "options": [
+     "$15.50",
+     "$12.00",
+     "$27.50",
+     "$62.00"
+    ],
+    "correct": 0,
+    "explain": "Either TVC ÷ Q = $62 ÷ 4 = $15.50, or ATC − AFC = $27.50 − $12.00 = $15.50. They agree because ATC = AFC + AVC.",
+    "fills": [
+     [
+      1,
+      "avc"
+     ],
+     [
+      2,
+      "avc"
+     ],
+     [
+      3,
+      "avc"
+     ],
+     [
+      4,
+      "avc"
+     ],
+     [
+      5,
+      "avc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is MARGINAL COST at 2 batches?",
+    "options": [
+     "$15.00",
+     "$16.50",
+     "-$25.50",
+     "$33.00"
+    ],
+    "correct": 0,
+    "explain": "MC = ΔTC ÷ ΔQ = ($81 − $66) ÷ 1 = $15.00. Note what it is NOT: the change in ATC. Averages and marginals answer different questions.",
+    "fills": [
+     [
+      1,
+      "mc"
+     ],
+     [
+      2,
+      "mc"
+     ],
+     [
+      3,
+      "mc"
+     ],
+     [
+      4,
+      "mc"
+     ],
+     [
+      5,
+      "mc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   }
+  ]
+ },
+ {
+  "id": "P3",
+  "biz": "Shine Lane Car Wash",
+  "qname": "Dozens",
+  "kind": "atc_afc",
+  "badge": "COST TABLE · WORKING BACK FROM AVERAGES",
+  "gave": "two average columns, ATC and AFC",
+  "scenario": "Shine Lane Car Wash keeps its books in averages. All you have been given is what a wash costs on average at each output, split into its fixed and its variable halves.",
+  "flag": "",
+  "tableTitle": "Shine Lane Car Wash — dozens of washes a day",
+  "qs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "cols": [
+   "tfc",
+   "tvc",
+   "tc",
+   "afc",
+   "avc",
+   "atc",
+   "mc"
+  ],
+  "cells": {
+   "tfc": [
+    "$60",
+    "$60",
+    "$60",
+    "$60",
+    "$60",
+    "$60"
+   ],
+   "tvc": [
+    "$0",
+    "$9",
+    "$16",
+    "$22.50",
+    "$32",
+    "$47"
+   ],
+   "tc": [
+    "$60",
+    "$69",
+    "$76",
+    "$82.50",
+    "$92",
+    "$107"
+   ],
+   "afc": [
+    null,
+    "$60.00",
+    "$30.00",
+    "$20.00",
+    "$15.00",
+    "$12.00"
+   ],
+   "avc": [
+    null,
+    "$9.00",
+    "$8.00",
+    "$7.50",
+    "$8.00",
+    "$9.40"
+   ],
+   "atc": [
+    null,
+    "$69.00",
+    "$38.00",
+    "$27.50",
+    "$23.00",
+    "$21.40"
+   ],
+   "mc": [
+    null,
+    "$9.00",
+    "$7.00",
+    "$6.50",
+    "$9.50",
+    "$15.00"
+   ]
+  },
+  "given": [
+   [
+    1,
+    "afc"
+   ],
+   [
+    2,
+    "afc"
+   ],
+   [
+    3,
+    "afc"
+   ],
+   [
+    4,
+    "afc"
+   ],
+   [
+    5,
+    "afc"
+   ],
+   [
+    1,
+    "atc"
+   ],
+   [
+    2,
+    "atc"
+   ],
+   [
+    3,
+    "atc"
+   ],
+   [
+    4,
+    "atc"
+   ],
+   [
+    5,
+    "atc"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Shine Lane Car Wash has handed you its ATC and AFC columns and nothing else. What is AVERAGE VARIABLE COST at 3 dozen?",
+    "options": [
+     "$7.50",
+     "$47.50",
+     "$20.00",
+     "$27.50"
+    ],
+    "correct": 0,
+    "explain": "ATC = AFC + AVC, so AVC = ATC − AFC = $27.50 − $20.00 = $7.50. Subtraction, not division: you are not dividing anything here, just splitting an average you already have into its two halves.",
+    "fills": [
+     [
+      1,
+      "avc"
+     ],
+     [
+      2,
+      "avc"
+     ],
+     [
+      3,
+      "avc"
+     ],
+     [
+      4,
+      "avc"
+     ],
+     [
+      5,
+      "avc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is TOTAL FIXED COST for the car wash?",
+    "options": [
+     "$60",
+     "$20",
+     "$69",
+     "$12"
+    ],
+    "correct": 0,
+    "explain": "Go back up from the average: TFC = AFC × Q. At 3 dozen that is $20.00 × 3 = $60; at 5 dozen it is $12.00 × 5 = the same $60. It has to be the same at every quantity — that is what makes it fixed, and it is a useful check that the table is consistent.",
+    "fills": [
+     [
+      0,
+      "tfc"
+     ],
+     [
+      1,
+      "tfc"
+     ],
+     [
+      2,
+      "tfc"
+     ],
+     [
+      3,
+      "tfc"
+     ],
+     [
+      4,
+      "tfc"
+     ],
+     [
+      5,
+      "tfc"
+     ]
+    ],
+    "mark": [
+     [
+      1,
+      "afc"
+     ],
+     [
+      2,
+      "afc"
+     ],
+     [
+      3,
+      "afc"
+     ],
+     [
+      4,
+      "afc"
+     ],
+     [
+      5,
+      "afc"
+     ]
+    ],
+    "note": null
+   },
+   {
+    "prompt": "What is TOTAL VARIABLE COST at 4 dozen?",
+    "options": [
+     "$32",
+     "$8",
+     "$92",
+     "$60"
+    ],
+    "correct": 0,
+    "explain": "Back up from the average again: TVC = AVC × Q = $8.00 × 4 = $32. Every average in this table was made by dividing some total by Q, so multiplying by Q is always the way home.",
+    "fills": [
+     [
+      0,
+      "tvc"
+     ],
+     [
+      1,
+      "tvc"
+     ],
+     [
+      2,
+      "tvc"
+     ],
+     [
+      3,
+      "tvc"
+     ],
+     [
+      4,
+      "tvc"
+     ],
+     [
+      5,
+      "tvc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is TOTAL COST at 4 dozen?",
+    "options": [
+     "$92",
+     "$32",
+     "$60",
+     "$23"
+    ],
+    "correct": 0,
+    "explain": "Either TFC + TVC = $60 + $32 = $92, or ATC × Q = $23.00 × 4 = $92. Both routes are open now that the table is this full.",
+    "fills": [
+     [
+      0,
+      "tc"
+     ],
+     [
+      1,
+      "tc"
+     ],
+     [
+      2,
+      "tc"
+     ],
+     [
+      3,
+      "tc"
+     ],
+     [
+      4,
+      "tc"
+     ],
+     [
+      5,
+      "tc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is MARGINAL COST at 5 dozen?",
+    "options": [
+     "$15.00",
+     "$9.40",
+     "-$1.60",
+     "$24.50"
+    ],
+    "correct": 0,
+    "explain": "MC = ΔTC ÷ ΔQ = ($107 − $92) ÷ 1 = $15.00, which is also ΔTVC = $47 − $32. MC could not be read off the ATC and AFC columns you started with: it needed totals.",
+    "fills": [
+     [
+      1,
+      "mc"
+     ],
+     [
+      2,
+      "mc"
+     ],
+     [
+      3,
+      "mc"
+     ],
+     [
+      4,
+      "mc"
+     ],
+     [
+      5,
+      "mc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   }
+  ]
+ },
+ {
+  "id": "P4",
+  "biz": "Front Porch Lemonade",
+  "qname": "Gallons",
+  "kind": "avc_tfc",
+  "badge": "COST TABLE · FROM AN AVERAGE TO A TOTAL",
+  "gave": "an AVC schedule and a fixed cost",
+  "scenario": "Front Porch Lemonade rents its cart for $24 a day. Its records show the average variable cost of a gallon at each output — lemons, sugar, cups — and nothing else.",
+  "flag": "",
+  "tableTitle": "Front Porch Lemonade — gallons a day",
+  "qs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "cols": [
+   "tfc",
+   "tvc",
+   "tc",
+   "afc",
+   "avc",
+   "atc"
+  ],
+  "cells": {
+   "tfc": [
+    "$24",
+    "$24",
+    "$24",
+    "$24",
+    "$24",
+    "$24"
+   ],
+   "tvc": [
+    "$0",
+    "$3",
+    "$5",
+    "$7.20",
+    "$10",
+    "$14"
+   ],
+   "tc": [
+    "$24",
+    "$27",
+    "$29",
+    "$31.20",
+    "$34",
+    "$38"
+   ],
+   "afc": [
+    null,
+    "$24.00",
+    "$12.00",
+    "$8.00",
+    "$6.00",
+    "$4.80"
+   ],
+   "avc": [
+    null,
+    "$3.00",
+    "$2.50",
+    "$2.40",
+    "$2.50",
+    "$2.80"
+   ],
+   "atc": [
+    null,
+    "$27.00",
+    "$14.50",
+    "$10.40",
+    "$8.50",
+    "$7.60"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "tfc"
+   ],
+   [
+    1,
+    "tfc"
+   ],
+   [
+    2,
+    "tfc"
+   ],
+   [
+    3,
+    "tfc"
+   ],
+   [
+    4,
+    "tfc"
+   ],
+   [
+    5,
+    "tfc"
+   ],
+   [
+    1,
+    "avc"
+   ],
+   [
+    2,
+    "avc"
+   ],
+   [
+    3,
+    "avc"
+   ],
+   [
+    4,
+    "avc"
+   ],
+   [
+    5,
+    "avc"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Front Porch Lemonade rents its cart for $24 a day and has given you AVC at each output. What is TOTAL VARIABLE COST at 4 gallons?",
+    "options": [
+     "$10",
+     "$2.50",
+     "$34",
+     "$26.50"
+    ],
+    "correct": 0,
+    "explain": "An average times the quantity gives you back the total: TVC = AVC × Q = $2.50 × 4 = $10. This is the division in AVC = TVC ÷ Q run backwards.",
+    "fills": [
+     [
+      0,
+      "tvc"
+     ],
+     [
+      1,
+      "tvc"
+     ],
+     [
+      2,
+      "tvc"
+     ],
+     [
+      3,
+      "tvc"
+     ],
+     [
+      4,
+      "tvc"
+     ],
+     [
+      5,
+      "tvc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is TOTAL COST at 4 gallons?",
+    "options": [
+     "$34",
+     "$10",
+     "$24",
+     "$8.50"
+    ],
+    "correct": 0,
+    "explain": "TC = TFC + TVC = $24 + $10 = $34. The cart rent is in every row, Q = 0 included.",
+    "fills": [
+     [
+      0,
+      "tc"
+     ],
+     [
+      1,
+      "tc"
+     ],
+     [
+      2,
+      "tc"
+     ],
+     [
+      3,
+      "tc"
+     ],
+     [
+      4,
+      "tc"
+     ],
+     [
+      5,
+      "tc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is AVERAGE FIXED COST at 5 gallons?",
+    "options": [
+     "$4.80",
+     "$2.80",
+     "$7.60",
+     "$24.00"
+    ],
+    "correct": 0,
+    "explain": "AFC = TFC ÷ Q = $24 ÷ 5 = $4.80. The cart costs the same whether one gallon is sold or five, so each extra gallon carries a smaller share of it.",
+    "fills": [
+     [
+      1,
+      "afc"
+     ],
+     [
+      2,
+      "afc"
+     ],
+     [
+      3,
+      "afc"
+     ],
+     [
+      4,
+      "afc"
+     ],
+     [
+      5,
+      "afc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is AVERAGE TOTAL COST at 5 gallons?",
+    "options": [
+     "$7.60",
+     "$2.80",
+     "$4.80",
+     "$38.00"
+    ],
+    "correct": 0,
+    "explain": "AFC + AVC = $4.80 + $2.80 = $7.60, and TC ÷ Q = $38 ÷ 5 gives the same $7.60. Two routes to one number, because ATC = AFC + AVC is just TC = TFC + TVC with every term divided by Q.",
+    "fills": [
+     [
+      1,
+      "atc"
+     ],
+     [
+      2,
+      "atc"
+     ],
+     [
+      3,
+      "atc"
+     ],
+     [
+      4,
+      "atc"
+     ],
+     [
+      5,
+      "atc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "Look down the finished ATC and AVC columns. What is true of the gap between them?",
+    "options": [
+     "It shrinks as output rises, because the gap is AFC and AFC is falling",
+     "It grows as output rises, because fixed cost is spread more thinly",
+     "It stays at $24, the fixed cost of the cart",
+     "It shrinks until ATC reaches its minimum and then widens again"
+    ],
+    "correct": 0,
+    "explain": "ATC − AVC = AFC exactly, at every quantity. AFC falls towards zero, so the two curves close in on each other without ever meeting. Here the gap goes from $24.00 at 1 gallon down to $4.80 at 5 gallons.",
+    "fills": [],
+    "mark": [
+     [
+      1,
+      "atc"
+     ],
+     [
+      2,
+      "atc"
+     ],
+     [
+      3,
+      "atc"
+     ],
+     [
+      4,
+      "atc"
+     ],
+     [
+      5,
+      "atc"
+     ],
+     [
+      1,
+      "avc"
+     ],
+     [
+      2,
+      "avc"
+     ],
+     [
+      3,
+      "avc"
+     ],
+     [
+      4,
+      "avc"
+     ],
+     [
+      5,
+      "avc"
+     ]
+    ],
+    "note": null
+   }
+  ]
+ },
+ {
+  "id": "P5",
+  "biz": "Hollow Oak Furniture",
+  "qname": "Bookshelves",
+  "kind": "mc_tfc",
+  "badge": "COST TABLE · BUILDING UP FROM MARGINALS",
+  "gave": "a marginal cost schedule and a fixed cost",
+  "scenario": "Hollow Oak Furniture tracks what each additional bookshelf costs to build. The workshop and the tools run to $90 a week whether it builds any bookshelves or not.",
+  "flag": "",
+  "tableTitle": "Hollow Oak Furniture — bookshelves a week",
+  "qs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "cols": [
+   "tfc",
+   "tvc",
+   "tc",
+   "afc",
+   "avc",
+   "atc",
+   "mc"
+  ],
+  "cells": {
+   "tfc": [
+    "$90",
+    "$90",
+    "$90",
+    "$90",
+    "$90",
+    "$90"
+   ],
+   "tvc": [
+    "$0",
+    "$40",
+    "$74",
+    "$105",
+    "$140",
+    "$190"
+   ],
+   "tc": [
+    "$90",
+    "$130",
+    "$164",
+    "$195",
+    "$230",
+    "$280"
+   ],
+   "afc": [
+    null,
+    "$90.00",
+    "$45.00",
+    "$30.00",
+    "$22.50",
+    "$18.00"
+   ],
+   "avc": [
+    null,
+    "$40.00",
+    "$37.00",
+    "$35.00",
+    "$35.00",
+    "$38.00"
+   ],
+   "atc": [
+    null,
+    "$130.00",
+    "$82.00",
+    "$65.00",
+    "$57.50",
+    "$56.00"
+   ],
+   "mc": [
+    null,
+    "$40.00",
+    "$34.00",
+    "$31.00",
+    "$35.00",
+    "$50.00"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "tfc"
+   ],
+   [
+    1,
+    "tfc"
+   ],
+   [
+    2,
+    "tfc"
+   ],
+   [
+    3,
+    "tfc"
+   ],
+   [
+    4,
+    "tfc"
+   ],
+   [
+    5,
+    "tfc"
+   ],
+   [
+    1,
+    "mc"
+   ],
+   [
+    2,
+    "mc"
+   ],
+   [
+    3,
+    "mc"
+   ],
+   [
+    4,
+    "mc"
+   ],
+   [
+    5,
+    "mc"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Hollow Oak Furniture has given you MARGINAL COST at each output and a fixed cost of $90. What is TOTAL VARIABLE COST at 1 bookshelf?",
+    "options": [
+     "$40",
+     "$130",
+     "$90",
+     "$0"
+    ],
+    "correct": 0,
+    "explain": "TVC(0) is zero, and the first bookshelf adds its marginal cost on top: 0 + $40.00 = $40. Running up from the marginals is the reverse of taking differences down the totals.",
+    "fills": [
+     [
+      0,
+      "tvc"
+     ],
+     [
+      1,
+      "tvc"
+     ]
+    ],
+    "mark": [],
+    "note": "Working UP from marginals is a different motion from working DOWN from totals. Each new TVC is the one above it plus that row’s MC."
+   },
+   {
+    "prompt": "Keep going. What is TOTAL VARIABLE COST at 2 bookshelves?",
+    "options": [
+     "$74",
+     "$34",
+     "$164",
+     "$40"
+    ],
+    "correct": 0,
+    "explain": "TVC(2) = TVC(1) + MC(2) = $40 + $34.00 = $74. Equivalently it is the running total of every marginal cost so far: $40.00 + $34.00. Fixed cost never enters this sum — the marginal cost of a fixed cost is zero.",
+    "fills": [
+     [
+      2,
+      "tvc"
+     ],
+     [
+      3,
+      "tvc"
+     ],
+     [
+      4,
+      "tvc"
+     ],
+     [
+      5,
+      "tvc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is TOTAL COST at 4 bookshelves?",
+    "options": [
+     "$230",
+     "$140",
+     "$90",
+     "$195"
+    ],
+    "correct": 0,
+    "explain": "TC = TFC + TVC = $90 + $140 = $230. Fixed cost rejoins the picture here: it was absent from the MC column and absent from TVC, but it is in every row of total cost.",
+    "fills": [
+     [
+      0,
+      "tc"
+     ],
+     [
+      1,
+      "tc"
+     ],
+     [
+      2,
+      "tc"
+     ],
+     [
+      3,
+      "tc"
+     ],
+     [
+      4,
+      "tc"
+     ],
+     [
+      5,
+      "tc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is AVERAGE VARIABLE COST at 4 bookshelves?",
+    "options": [
+     "$35.00",
+     "$22.50",
+     "$57.50",
+     "$140.00"
+    ],
+    "correct": 0,
+    "explain": "AVC = TVC ÷ Q = $140 ÷ 4 = $35.00. Note it is not the average of the MC column read off by eye — though as it happens, averaging those marginals gives the same thing, because they are exactly what TVC is made of.",
+    "fills": [
+     [
+      1,
+      "avc"
+     ],
+     [
+      2,
+      "avc"
+     ],
+     [
+      3,
+      "avc"
+     ],
+     [
+      4,
+      "avc"
+     ],
+     [
+      5,
+      "avc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is AVERAGE FIXED COST at 4 bookshelves?",
+    "options": [
+     "$22.50",
+     "$35.00",
+     "$57.50",
+     "$90.00"
+    ],
+    "correct": 0,
+    "explain": "AFC = TFC ÷ Q = $90 ÷ 4 = $22.50. Nothing in the MC column could have told you this: marginal cost carries no fixed cost at all, so AFC had to come from TFC directly.",
+    "fills": [
+     [
+      1,
+      "afc"
+     ],
+     [
+      2,
+      "afc"
+     ],
+     [
+      3,
+      "afc"
+     ],
+     [
+      4,
+      "afc"
+     ],
+     [
+      5,
+      "afc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is AVERAGE TOTAL COST at 4 bookshelves?",
+    "options": [
+     "$57.50",
+     "$35.00",
+     "$22.50",
+     "$230.00"
+    ],
+    "correct": 0,
+    "explain": "AFC + AVC = $22.50 + $35.00 = $57.50, matching TC ÷ Q = $230 ÷ 4. The table that started as a bare MC column and one fixed cost is now complete.",
+    "fills": [
+     [
+      1,
+      "atc"
+     ],
+     [
+      2,
+      "atc"
+     ],
+     [
+      3,
+      "atc"
+     ],
+     [
+      4,
+      "atc"
+     ],
+     [
+      5,
+      "atc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   }
+  ]
+ },
+ {
+  "id": "P6",
+  "biz": "Layer One 3D Printing",
+  "qname": "Cases",
+  "kind": "gap_mc",
+  "badge": "COST TABLE · A GAP IN THE QUANTITIES",
+  "gave": "ATC at two quantities far apart",
+  "scenario": "Layer One 3D Printing pays $60 a day for its printer and software. Its accountant has reported average total cost at just two output levels, a long way apart.",
+  "flag": "These two output levels are a long way apart, so the marginal cost you work out here is an AVERAGE rate over that whole stretch — not the cost of any one case. Real marginal cost changes from unit to unit, and an average like this flattens all of that out.",
+  "tableTitle": "Layer One 3D Printing — phone cases a day",
+  "qs": [
+   0,
+   20,
+   50
+  ],
+  "cols": [
+   "tfc",
+   "tvc",
+   "tc",
+   "atc",
+   "mc"
+  ],
+  "cells": {
+   "tfc": [
+    "$60",
+    "$60",
+    "$60"
+   ],
+   "tvc": [
+    "$0",
+    "$40",
+    "$160"
+   ],
+   "tc": [
+    "$60",
+    "$100",
+    "$220"
+   ],
+   "atc": [
+    null,
+    "$5.00",
+    "$4.40"
+   ],
+   "mc": [
+    null,
+    "$2.00",
+    "$4.00"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "tfc"
+   ],
+   [
+    1,
+    "tfc"
+   ],
+   [
+    2,
+    "tfc"
+   ],
+   [
+    1,
+    "atc"
+   ],
+   [
+    2,
+    "atc"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Layer One 3D Printing knows its fixed cost is $60 a day, and its accountant has given it ATC at just two output levels. What is TOTAL COST at 20 cases?",
+    "options": [
+     "$100",
+     "$5",
+     "$60",
+     "$65"
+    ],
+    "correct": 0,
+    "explain": "TC = ATC × Q = $5.00 × 20 = $100. An average cost tells you nothing on its own until you multiply it back up by how many units it was averaged over.",
+    "fills": [
+     [
+      0,
+      "tc"
+     ],
+     [
+      1,
+      "tc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "And TOTAL COST at 50 cases?",
+    "options": [
+     "$220",
+     "$4.40",
+     "$100",
+     "$64.40"
+    ],
+    "correct": 0,
+    "explain": "TC = ATC × Q = $4.40 × 50 = $220. Notice ATC FELL from $5.00 to $4.40 while total cost ROSE from $100 to $220 — an average falling does not mean a total falling.",
+    "fills": [
+     [
+      2,
+      "tc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is TOTAL VARIABLE COST at 50 cases?",
+    "options": [
+     "$160",
+     "$220",
+     "$60",
+     "$40"
+    ],
+    "correct": 0,
+    "explain": "TVC = TC − TFC = $220 − $60 = $160. The same $60 comes off every row, so TVC is $0 at zero output — a shop that prints nothing still pays for the printer, but not for plastic.",
+    "fills": [
+     [
+      0,
+      "tvc"
+     ],
+     [
+      1,
+      "tvc"
+     ],
+     [
+      2,
+      "tvc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is the AVERAGE marginal cost per case between 20 cases and 50 cases?",
+    "options": [
+     "$4.00",
+     "$120.00",
+     "$4.40",
+     "-$0.60"
+    ],
+    "correct": 0,
+    "explain": "ΔTC ÷ ΔQ = ($220 − $100) ÷ (50 − 20) = $120 ÷ 30 = $4.00. Dividing by ΔQ is the whole point: the $120 rise in total cost is spread over 30 extra cases, not over one.",
+    "fills": [
+     [
+      2,
+      "mc"
+     ]
+    ],
+    "mark": [],
+    "note": "These quantities are 30 apart, not one apart, so this is an AVERAGE rate over the stretch — not the marginal cost of any particular case. Real marginal cost moves from unit to unit, and this number flattens all of that out."
+   },
+   {
+    "prompt": "What is the average marginal cost per case over the first stretch, from 0 cases to 20 cases?",
+    "options": [
+     "$2.00",
+     "$40.00",
+     "$5.00",
+     "$4.00"
+    ],
+    "correct": 0,
+    "explain": "($100 − $60) ÷ 20 = $40 ÷ 20 = $2.00. Put beside the $4.00 over the later stretch, it says the extra cases are getting more expensive to make as output grows — which is what a rising MC curve means.",
+    "fills": [
+     [
+      1,
+      "mc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   }
+  ]
+ },
+ {
+  "id": "P7",
+  "biz": "Happy Tails Dog Walking",
+  "qname": "Walks",
+  "kind": "tc_consec",
+  "badge": "COST TABLE · MARGINALS OUT OF TOTALS",
+  "gave": "total cost at every quantity",
+  "scenario": "Happy Tails Dog Walking has one column of totals: what a day costs in all for each number of walks booked.",
+  "flag": "",
+  "tableTitle": "Happy Tails Dog Walking — walks a day",
+  "qs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "cols": [
+   "tfc",
+   "tvc",
+   "tc",
+   "afc",
+   "avc",
+   "atc",
+   "mc"
+  ],
+  "cells": {
+   "tfc": [
+    "$30",
+    "$30",
+    "$30",
+    "$30",
+    "$30",
+    "$30"
+   ],
+   "tvc": [
+    "$0",
+    "$8",
+    "$14",
+    "$21",
+    "$30",
+    "$48"
+   ],
+   "tc": [
+    "$30",
+    "$38",
+    "$44",
+    "$51",
+    "$60",
+    "$78"
+   ],
+   "afc": [
+    null,
+    "$30.00",
+    "$15.00",
+    "$10.00",
+    "$7.50",
+    "$6.00"
+   ],
+   "avc": [
+    null,
+    "$8.00",
+    "$7.00",
+    "$7.00",
+    "$7.50",
+    "$9.60"
+   ],
+   "atc": [
+    null,
+    "$38.00",
+    "$22.00",
+    "$17.00",
+    "$15.00",
+    "$15.60"
+   ],
+   "mc": [
+    null,
+    "$8.00",
+    "$6.00",
+    "$7.00",
+    "$9.00",
+    "$18.00"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "tc"
+   ],
+   [
+    1,
+    "tc"
+   ],
+   [
+    2,
+    "tc"
+   ],
+   [
+    3,
+    "tc"
+   ],
+   [
+    4,
+    "tc"
+   ],
+   [
+    5,
+    "tc"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Happy Tails Dog Walking has given you total cost at each number of walks. What is MARGINAL COST at 3 walks?",
+    "options": [
+     "$7.00",
+     "$17.00",
+     "$13.00",
+     "$9.00"
+    ],
+    "correct": 0,
+    "explain": "MC = ΔTC ÷ ΔQ = ($51 − $44) ÷ 1 = $7.00. The quantities step up by one here, so the subtraction IS the marginal cost with no dividing to do.",
+    "fills": [
+     [
+      1,
+      "mc"
+     ],
+     [
+      2,
+      "mc"
+     ],
+     [
+      3,
+      "mc"
+     ],
+     [
+      4,
+      "mc"
+     ],
+     [
+      5,
+      "mc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is TOTAL FIXED COST?",
+    "options": [
+     "$30",
+     "$38",
+     "$8",
+     "$78"
+    ],
+    "correct": 0,
+    "explain": "TC at zero walks is $30, and at zero output there is nothing variable being spent, so that whole amount is fixed cost.",
+    "fills": [
+     [
+      0,
+      "tfc"
+     ],
+     [
+      1,
+      "tfc"
+     ],
+     [
+      2,
+      "tfc"
+     ],
+     [
+      3,
+      "tfc"
+     ],
+     [
+      4,
+      "tfc"
+     ],
+     [
+      5,
+      "tfc"
+     ]
+    ],
+    "mark": [
+     [
+      0,
+      "tc"
+     ]
+    ],
+    "note": null
+   },
+   {
+    "prompt": "What is TOTAL VARIABLE COST at 4 walks?",
+    "options": [
+     "$30",
+     "$60",
+     "$9",
+     "$21"
+    ],
+    "correct": 0,
+    "explain": "TVC = TC − TFC = $60 − $30 = $30. Everything that does not vary with the number of walks has now been stripped out of the total.",
+    "fills": [
+     [
+      0,
+      "tvc"
+     ],
+     [
+      1,
+      "tvc"
+     ],
+     [
+      2,
+      "tvc"
+     ],
+     [
+      3,
+      "tvc"
+     ],
+     [
+      4,
+      "tvc"
+     ],
+     [
+      5,
+      "tvc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is AVERAGE TOTAL COST at 4 walks?",
+    "options": [
+     "$15.00",
+     "$7.50",
+     "$60.00",
+     "$9.00"
+    ],
+    "correct": 0,
+    "explain": "ATC = TC ÷ Q = $60 ÷ 4 = $15.00 — the cost of an average walk at this output, which is a different question from what the NEXT walk costs.",
+    "fills": [
+     [
+      1,
+      "atc"
+     ],
+     [
+      2,
+      "atc"
+     ],
+     [
+      3,
+      "atc"
+     ],
+     [
+      4,
+      "atc"
+     ],
+     [
+      5,
+      "atc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What are AVERAGE FIXED COST and AVERAGE VARIABLE COST at 4 walks?",
+    "options": [
+     "$7.50",
+     "$15.00",
+     "$30.00",
+     "$10.00"
+    ],
+    "correct": 0,
+    "explain": "AFC = $30 ÷ 4 = $7.50 and AVC = $30 ÷ 4 = $7.50. They add to $15.00, which is the ATC you just found. (The option above is AFC; AVC fills in alongside it.)",
+    "fills": [
+     [
+      1,
+      "afc"
+     ],
+     [
+      2,
+      "afc"
+     ],
+     [
+      3,
+      "afc"
+     ],
+     [
+      4,
+      "afc"
+     ],
+     [
+      5,
+      "afc"
+     ],
+     [
+      1,
+      "avc"
+     ],
+     [
+      2,
+      "avc"
+     ],
+     [
+      3,
+      "avc"
+     ],
+     [
+      4,
+      "avc"
+     ],
+     [
+      5,
+      "avc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "The table is complete. Reading down the ATC column, at how many walks is ATC at its LOWEST?",
+    "options": [
+     "4 walks, where ATC is $15.00",
+     "5 walks, where ATC is $15.60",
+     "2 walks, where MC is at its lowest",
+     "3 walks, where ATC is $17.00"
+    ],
+    "correct": 0,
+    "explain": "Just read the column: $38.00, $22.00, $17.00, $15.00, $15.60. The lowest is $15.00 at 4 walks, and ATC turns back up after it. The quantity with the lowest marginal cost is a different one (2 walks) — MC bottoms out well before ATC does, because MC has to climb back above ATC before it can start dragging the average up.",
+    "fills": [],
+    "mark": [
+     [
+      4,
+      "atc"
+     ]
+    ],
+    "note": null
+   }
+  ]
+ },
+ {
+  "id": "P8",
+  "biz": "Cold Press Smoothies",
+  "qname": "Dozens",
+  "kind": "web",
+  "badge": "COST TABLE · PICK YOUR OWN ROUTE",
+  "gave": "a nearly complete table with scattered gaps",
+  "scenario": "Cold Press Smoothies has very nearly filled its table in. Four cells are still empty, and they are scattered across different rows and different columns.",
+  "flag": "There is more than one valid route to most of these cells. Any identity that uses what the table already shows will get you there, and the explanations point out the alternatives.",
+  "tableTitle": "Cold Press Smoothies — dozens of smoothies a day",
+  "qs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "cols": [
+   "tfc",
+   "tvc",
+   "tc",
+   "afc",
+   "avc",
+   "atc",
+   "mc"
+  ],
+  "cells": {
+   "tfc": [
+    "$30",
+    "$30",
+    "$30",
+    "$30",
+    "$30",
+    "$30"
+   ],
+   "tvc": [
+    "$0",
+    "$14",
+    "$25",
+    "$36",
+    "$50",
+    "$72"
+   ],
+   "tc": [
+    "$30",
+    "$44",
+    "$55",
+    "$66",
+    "$80",
+    "$102"
+   ],
+   "afc": [
+    null,
+    "$30.00",
+    "$15.00",
+    "$10.00",
+    "$7.50",
+    "$6.00"
+   ],
+   "avc": [
+    null,
+    "$14.00",
+    "$12.50",
+    "$12.00",
+    "$12.50",
+    "$14.40"
+   ],
+   "atc": [
+    null,
+    "$44.00",
+    "$27.50",
+    "$22.00",
+    "$20.00",
+    "$20.40"
+   ],
+   "mc": [
+    null,
+    "$14.00",
+    "$11.00",
+    "$11.00",
+    "$14.00",
+    "$22.00"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "tfc"
+   ],
+   [
+    1,
+    "tfc"
+   ],
+   [
+    2,
+    "tfc"
+   ],
+   [
+    3,
+    "tfc"
+   ],
+   [
+    4,
+    "tfc"
+   ],
+   [
+    5,
+    "tfc"
+   ],
+   [
+    0,
+    "tvc"
+   ],
+   [
+    1,
+    "tvc"
+   ],
+   [
+    2,
+    "tvc"
+   ],
+   [
+    3,
+    "tvc"
+   ],
+   [
+    5,
+    "tvc"
+   ],
+   [
+    0,
+    "tc"
+   ],
+   [
+    1,
+    "tc"
+   ],
+   [
+    2,
+    "tc"
+   ],
+   [
+    3,
+    "tc"
+   ],
+   [
+    4,
+    "tc"
+   ],
+   [
+    5,
+    "tc"
+   ],
+   [
+    1,
+    "afc"
+   ],
+   [
+    2,
+    "afc"
+   ],
+   [
+    3,
+    "afc"
+   ],
+   [
+    4,
+    "afc"
+   ],
+   [
+    1,
+    "avc"
+   ],
+   [
+    3,
+    "avc"
+   ],
+   [
+    4,
+    "avc"
+   ],
+   [
+    5,
+    "avc"
+   ],
+   [
+    1,
+    "atc"
+   ],
+   [
+    2,
+    "atc"
+   ],
+   [
+    3,
+    "atc"
+   ],
+   [
+    4,
+    "atc"
+   ],
+   [
+    5,
+    "atc"
+   ],
+   [
+    1,
+    "mc"
+   ],
+   [
+    2,
+    "mc"
+   ],
+   [
+    4,
+    "mc"
+   ],
+   [
+    5,
+    "mc"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "This table is nearly full — only four cells are missing, scattered about. Start with AVERAGE VARIABLE COST at 2 dozen.",
+    "options": [
+     "$12.50",
+     "$42.50",
+     "$15.00",
+     "$27.50"
+    ],
+    "correct": 0,
+    "explain": "That row already has ATC and AFC, so the quickest route is ATC − AFC = $27.50 − $15.00 = $12.50. TVC ÷ Q = $25 ÷ 2 gives the same answer — both paths are open, which is the point of this problem.",
+    "fills": [
+     [
+      2,
+      "avc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "Now find MARGINAL COST at 3 dozen.",
+    "options": [
+     "$11.00",
+     "$22.00",
+     "$5.50",
+     "$12.00"
+    ],
+    "correct": 0,
+    "explain": "Nothing in that row alone gives MC — it is a comparison BETWEEN rows. TC at 2 dozen and at 3 dozen are both known: ($66 − $55) ÷ 1 = $11.00.",
+    "fills": [
+     [
+      3,
+      "mc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "Now find TOTAL VARIABLE COST at 4 dozen.",
+    "options": [
+     "$50",
+     "$80",
+     "$30",
+     "$12.50"
+    ],
+    "correct": 0,
+    "explain": "Three routes all land on $50: TC − TFC = $80 − $30, or AVC × Q = $12.50 × 4, or TVC at 3 dozen plus the MC of that unit = $36 + $14.00.",
+    "fills": [
+     [
+      4,
+      "tvc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "Last one: AVERAGE FIXED COST at 5 dozen.",
+    "options": [
+     "$6.00",
+     "$14.40",
+     "$20.40",
+     "$30.00"
+    ],
+    "correct": 0,
+    "explain": "AFC = TFC ÷ Q = $30 ÷ 5 = $6.00, or ATC − AVC = $20.40 − $14.40. The table is now complete.",
+    "fills": [
+     [
+      5,
+      "afc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "Which of these is NOT a way to get a missing cell, no matter which cell it is?",
+    "options": [
+     "Subtracting one row’s ATC from the next row’s ATC to get that row’s MC",
+     "Subtracting AFC from ATC to get AVC in the same row",
+     "Subtracting the total cost of one row from the next to get MC",
+     "Multiplying AVC by Q to get TVC in the same row"
+    ],
+    "correct": 0,
+    "explain": "The change in an AVERAGE is not a marginal. MC is the change in a TOTAL, ΔTC ÷ ΔQ. In this table ATC goes from $22.00 to $20.00 between 3 dozen and 4 dozen, a change of -$2.00, while the actual MC of that unit is $14.00 — not close. The other three are all sound: they are the identities read in whichever direction you need.",
+    "fills": [],
+    "mark": [],
+    "note": null
+   }
+  ]
+ },
+ {
+  "id": "P9",
+  "biz": "Wick & Wax Candles",
+  "qname": "Dozens",
+  "kind": "crossings",
+  "badge": "COST TABLE · MARGINALS AGAINST AVERAGES",
+  "gave": "everything but the marginal cost column",
+  "scenario": "Wick & Wax Candles has every column filled except marginal cost. Once that one is in, the table shows something worth noticing about where the two average curves bottom out.",
+  "flag": "",
+  "tableTitle": "Wick & Wax Candles — dozens of candles a week",
+  "qs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "cols": [
+   "tfc",
+   "tvc",
+   "tc",
+   "afc",
+   "avc",
+   "atc",
+   "mc"
+  ],
+  "cells": {
+   "tfc": [
+    "$24",
+    "$24",
+    "$24",
+    "$24",
+    "$24",
+    "$24",
+    "$24"
+   ],
+   "tvc": [
+    "$0",
+    "$10",
+    "$18",
+    "$24",
+    "$33",
+    "$45",
+    "$66"
+   ],
+   "tc": [
+    "$24",
+    "$34",
+    "$42",
+    "$48",
+    "$57",
+    "$69",
+    "$90"
+   ],
+   "afc": [
+    null,
+    "$24.00",
+    "$12.00",
+    "$8.00",
+    "$6.00",
+    "$4.80",
+    "$4.00"
+   ],
+   "avc": [
+    null,
+    "$10.00",
+    "$9.00",
+    "$8.00",
+    "$8.25",
+    "$9.00",
+    "$11.00"
+   ],
+   "atc": [
+    null,
+    "$34.00",
+    "$21.00",
+    "$16.00",
+    "$14.25",
+    "$13.80",
+    "$15.00"
+   ],
+   "mc": [
+    null,
+    "$10.00",
+    "$8.00",
+    "$6.00",
+    "$9.00",
+    "$12.00",
+    "$21.00"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "tfc"
+   ],
+   [
+    1,
+    "tfc"
+   ],
+   [
+    2,
+    "tfc"
+   ],
+   [
+    3,
+    "tfc"
+   ],
+   [
+    4,
+    "tfc"
+   ],
+   [
+    5,
+    "tfc"
+   ],
+   [
+    6,
+    "tfc"
+   ],
+   [
+    0,
+    "tvc"
+   ],
+   [
+    1,
+    "tvc"
+   ],
+   [
+    2,
+    "tvc"
+   ],
+   [
+    3,
+    "tvc"
+   ],
+   [
+    4,
+    "tvc"
+   ],
+   [
+    5,
+    "tvc"
+   ],
+   [
+    6,
+    "tvc"
+   ],
+   [
+    0,
+    "tc"
+   ],
+   [
+    1,
+    "tc"
+   ],
+   [
+    2,
+    "tc"
+   ],
+   [
+    3,
+    "tc"
+   ],
+   [
+    4,
+    "tc"
+   ],
+   [
+    5,
+    "tc"
+   ],
+   [
+    6,
+    "tc"
+   ],
+   [
+    1,
+    "afc"
+   ],
+   [
+    2,
+    "afc"
+   ],
+   [
+    3,
+    "afc"
+   ],
+   [
+    4,
+    "afc"
+   ],
+   [
+    5,
+    "afc"
+   ],
+   [
+    6,
+    "afc"
+   ],
+   [
+    1,
+    "avc"
+   ],
+   [
+    2,
+    "avc"
+   ],
+   [
+    3,
+    "avc"
+   ],
+   [
+    4,
+    "avc"
+   ],
+   [
+    5,
+    "avc"
+   ],
+   [
+    6,
+    "avc"
+   ],
+   [
+    1,
+    "atc"
+   ],
+   [
+    2,
+    "atc"
+   ],
+   [
+    3,
+    "atc"
+   ],
+   [
+    4,
+    "atc"
+   ],
+   [
+    5,
+    "atc"
+   ],
+   [
+    6,
+    "atc"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Wick & Wax Candles has a complete table except for MARGINAL COST. What is MC at 4 dozen?",
+    "options": [
+     "$9.00",
+     "$8.25",
+     "$14.25",
+     "-$1.75"
+    ],
+    "correct": 0,
+    "explain": "MC = ΔTC ÷ ΔQ = ($57 − $48) ÷ 1 = $9.00. The whole MC column fills in the same way.",
+    "fills": [
+     [
+      1,
+      "mc"
+     ],
+     [
+      2,
+      "mc"
+     ],
+     [
+      3,
+      "mc"
+     ],
+     [
+      4,
+      "mc"
+     ],
+     [
+      5,
+      "mc"
+     ],
+     [
+      6,
+      "mc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "At how many dozen is AVERAGE VARIABLE COST at its lowest?",
+    "options": [
+     "3 — AVC is $8.00 there",
+     "1 — AVC is $10.00 there",
+     "6 — AVC is $11.00 there",
+     "3 — where MC is at its lowest"
+    ],
+    "correct": 0,
+    "explain": "Read the column: $10.00, $9.00, $8.00, $8.25, $9.00, $11.00. The lowest is $8.00 at 3 dozen.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "avc"
+     ]
+    ],
+    "note": null
+   },
+   {
+    "prompt": "And at how many dozen is AVERAGE TOTAL COST at its lowest?",
+    "options": [
+     "5 — ATC is $13.80 there",
+     "3 — the same place AVC bottoms out",
+     "6 — ATC is $15.00 there",
+     "4 — ATC is $14.25 there"
+    ],
+    "correct": 0,
+    "explain": "ATC runs $34.00, $21.00, $16.00, $14.25, $13.80, $15.00, lowest at 5 dozen. It bottoms out LATER than AVC does (5 dozen against 3 dozen), because ATC is still being dragged down by falling AFC after AVC has already turned up.",
+    "fills": [],
+    "mark": [
+     [
+      5,
+      "atc"
+     ]
+    ],
+    "note": null
+   },
+   {
+    "prompt": "Compare MC with AVC on either side of 3 dozen.",
+    "options": [
+     "MC is below AVC up to 3 dozen and above it from 4 dozen on",
+     "MC is above AVC the whole way across the table",
+     "MC equals AVC at every quantity, since neither includes fixed cost",
+     "MC is below AVC the whole way across the table"
+    ],
+    "correct": 0,
+    "explain": "At 3 dozen, MC is $6.00 against AVC of $8.00 — below it. At 4 dozen, MC is $9.00 against AVC of $8.25 — above it. So MC passes through AVC right where AVC turns around.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "avc"
+     ],
+     [
+      3,
+      "mc"
+     ],
+     [
+      4,
+      "avc"
+     ],
+     [
+      4,
+      "mc"
+     ]
+    ],
+    "note": null
+   },
+   {
+    "prompt": "The same thing happens with ATC. Why does MC cross ATC and AVC exactly at their minimum points?",
+    "options": [
+     "While MC is below the average each new unit pulls the average down; once MC is above it each new unit pulls it up — the minimum is where it switches",
+     "Because MC is the slope of ATC, and a slope is zero at a minimum",
+     "Because at the minimum the firm is producing efficiently, so all three costs are equal",
+     "Because fixed cost has been spread as thinly as it can be by that quantity"
+    ],
+    "correct": 0,
+    "explain": "It is the arithmetic of averages, nothing more. Add a unit that costs less than the running average and the average falls; add one that costs more and it rises. The turning point is the quantity where the new unit costs exactly what the average already is. Here MC is $12.00 at 5 dozen against ATC of $13.80, then $21.00 at 6 dozen against ATC of $15.00 — and 5 dozen is where ATC bottoms out. It is the same reason a batting average rises only when you beat it.",
+    "fills": [],
+    "mark": [
+     [
+      5,
+      "atc"
+     ],
+     [
+      5,
+      "mc"
+     ],
+     [
+      6,
+      "atc"
+     ],
+     [
+      6,
+      "mc"
+     ]
+    ],
+    "note": null
+   }
+  ]
+ },
+ {
+  "id": "P10",
+  "biz": "Two Spoke Bike Repair",
+  "qname": "Repairs",
+  "kind": "returns",
+  "badge": "COST TABLE · WHERE MARGINAL COST TURNS",
+  "gave": "fixed cost and a variable cost schedule that bends",
+  "scenario": "Two Spoke Bike Repair pays $45 a day for the shop and its tools. Its variable costs — parts, and the hours its mechanics work — rise with every repair, but not at a steady rate.",
+  "flag": "",
+  "tableTitle": "Two Spoke Bike Repair — repairs a day",
+  "qs": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "cols": [
+   "tfc",
+   "tvc",
+   "tc",
+   "mc"
+  ],
+  "cells": {
+   "tfc": [
+    "$45",
+    "$45",
+    "$45",
+    "$45",
+    "$45",
+    "$45",
+    "$45"
+   ],
+   "tvc": [
+    "$0",
+    "$20",
+    "$36",
+    "$48",
+    "$58",
+    "$72",
+    "$96"
+   ],
+   "tc": [
+    "$45",
+    "$65",
+    "$81",
+    "$93",
+    "$103",
+    "$117",
+    "$141"
+   ],
+   "mc": [
+    null,
+    "$20.00",
+    "$16.00",
+    "$12.00",
+    "$10.00",
+    "$14.00",
+    "$24.00"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "tfc"
+   ],
+   [
+    1,
+    "tfc"
+   ],
+   [
+    2,
+    "tfc"
+   ],
+   [
+    3,
+    "tfc"
+   ],
+   [
+    4,
+    "tfc"
+   ],
+   [
+    5,
+    "tfc"
+   ],
+   [
+    6,
+    "tfc"
+   ],
+   [
+    0,
+    "tvc"
+   ],
+   [
+    1,
+    "tvc"
+   ],
+   [
+    2,
+    "tvc"
+   ],
+   [
+    3,
+    "tvc"
+   ],
+   [
+    4,
+    "tvc"
+   ],
+   [
+    5,
+    "tvc"
+   ],
+   [
+    6,
+    "tvc"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Two Spoke Bike Repair has a fixed cost of $45 a day. What is TOTAL COST at 2 repairs?",
+    "options": [
+     "$81",
+     "$36",
+     "$45",
+     "$65"
+    ],
+    "correct": 0,
+    "explain": "TC = TFC + TVC = $45 + $36 = $81. The $45 is in every row of this column, Q = 0 included, which is exactly why it will drop out of marginal cost in a moment.",
+    "fills": [
+     [
+      0,
+      "tc"
+     ],
+     [
+      1,
+      "tc"
+     ],
+     [
+      2,
+      "tc"
+     ],
+     [
+      3,
+      "tc"
+     ],
+     [
+      4,
+      "tc"
+     ],
+     [
+      5,
+      "tc"
+     ],
+     [
+      6,
+      "tc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "What is MARGINAL COST at 3 repairs?",
+    "options": [
+     "$12.00",
+     "$48.00",
+     "$57.00",
+     "$28.00"
+    ],
+    "correct": 0,
+    "explain": "MC = ΔTC ÷ ΔQ = ($93 − $81) ÷ 1 = $12.00, which is also ΔTVC = $48 − $36. The fixed $45 is in both totals and cancels out.",
+    "fills": [
+     [
+      1,
+      "mc"
+     ],
+     [
+      2,
+      "mc"
+     ],
+     [
+      3,
+      "mc"
+     ],
+     [
+      4,
+      "mc"
+     ],
+     [
+      5,
+      "mc"
+     ],
+     [
+      6,
+      "mc"
+     ]
+    ],
+    "mark": [],
+    "note": null
+   },
+   {
+    "prompt": "Read the finished MC column. At how many repairs does MARGINAL COST start RISING?",
+    "options": [
+     "5 — MC falls to $10.00 at 4 repairs and is $14.00 here",
+     "4 — that is where MC is at its lowest",
+     "1 — MC rises from the very first repair",
+     "6 — MC only rises at the very last row"
+    ],
+    "correct": 0,
+    "explain": "MC runs $20.00, $16.00, $12.00, $10.00, $14.00, $24.00. It falls to its lowest, $10.00, at 4 repairs, and the next repair costs more than the one before it: $14.00 at 5 repairs. That is the first repair for which marginal cost is rising.",
+    "fills": [],
+    "mark": [
+     [
+      4,
+      "mc"
+     ],
+     [
+      5,
+      "mc"
+     ]
+    ],
+    "note": null
+   },
+   {
+    "prompt": "MC falls while the extra worker-hours are getting MORE productive and rises once they get less so. So 5 repairs is the same output at which the shop’s marginal product of labour would start ___",
+    "options": [
+     "falling — this is where diminishing marginal returns set in",
+     "rising — more output always means more productive workers",
+     "falling to zero — the next worker adds nothing at all",
+     "staying constant — marginal product is flat once MC turns"
+    ],
+    "correct": 0,
+    "explain": "Marginal cost and marginal product are two readings of one thing. If each extra hour of labour costs the same wage, then MC = wage ÷ marginal product: when the extra hour produces MORE, the next unit costs LESS, and when it produces less, the next unit costs more. MC bottoming out at 4 repairs repairs and rising from 5 repairs is exactly marginal product peaking and then falling — diminishing marginal returns. Module 3 does this properly; this is just the hinge.",
+    "fills": [],
+    "mark": [
+     [
+      5,
+      "mc"
+     ]
+    ],
+    "note": null
+   },
+   {
+    "prompt": "Does any of that affect the TFC column?",
+    "options": [
+     "No — TFC is $45 at every output, including zero, so it adds nothing to MC",
+     "Yes — TFC falls per unit, which is why MC falls at first",
+     "Yes — TFC is part of TC, so part of every MC is fixed cost",
+     "No — TFC is zero in the short run"
+    ],
+    "correct": 0,
+    "explain": "MC is a CHANGE in total cost, and the fixed $45 does not change, so it contributes exactly zero to every marginal cost. That is why ΔTC and ΔTVC give the same MC column. What falls per unit is AFC, which is a different thing from MC altogether.",
+    "fills": [],
+    "mark": [
+     [
+      0,
+      "tfc"
+     ],
+     [
+      1,
+      "tfc"
+     ],
+     [
+      2,
+      "tfc"
+     ],
+     [
+      3,
+      "tfc"
+     ],
+     [
+      4,
+      "tfc"
+     ],
+     [
+      5,
+      "tfc"
+     ],
+     [
+      6,
+      "tfc"
+     ]
+    ],
+    "note": null
+   }
+  ]
+ }
+];
+const BANDS = [
+ {
+  "min": 90,
+  "label": "Mastered",
+  "tone": "good",
+  "note": "The identities are second nature: you are moving between totals, averages and marginals in whichever direction the table needs."
+ },
+ {
+  "min": 80,
+  "label": "Strong",
+  "tone": "good",
+  "note": "Solid. Look at which rows you missed — one identity is usually doing all the damage."
+ },
+ {
+  "min": 70,
+  "label": "Developing",
+  "tone": "mid",
+  "note": "The arithmetic is mostly there. The gap is usually direction: going from an average back up to a total, or building totals up from marginals."
+ },
+ {
+  "min": 55,
+  "label": "Shaky",
+  "tone": "poor",
+  "note": "Work through the four identities one at a time before running this again: TC = TFC + TVC, the three averages as a total divided by Q, ATC = AFC + AVC, and MC as the change in a total."
+ },
+ {
+  "min": 0,
+  "label": "Needs Review",
+  "tone": "poor",
+  "note": "Start from the definitions rather than the table. An average is a total shared out over every unit; a marginal is what one more unit adds. Confusing those two is what most of these questions test."
+ }
+];
+const TERMS = "<b>TFC</b> total fixed cost &middot; <b>TVC</b> total variable cost &middot; <b>TC</b> = TFC + TVC, at every quantity including Q&nbsp;=&nbsp;0.<br><b>AFC</b> = TFC &divide; Q &middot; <b>AVC</b> = TVC &divide; Q &middot; <b>ATC</b> = TC &divide; Q = AFC + AVC.<br><b>MC</b> = &Delta;TC &divide; &Delta;Q = &Delta;TVC &divide; &Delta;Q &mdash; fixed cost never changes, so it adds nothing to marginal cost.<br>An <b>average</b> is a total shared out over every unit made. A <b>marginal</b> is what one more unit adds. They answer different questions and they are rarely the same number.";
+const LEGEND = "A cell you work out flashes <b>green</b> as it fills. A <b>gold outline</b> marks the cells a question is asking you to look at. A dash means the figure does not exist at that quantity &mdash; you cannot divide by zero output, and there is no previous row to compare against.";
+
+const COLNAME = {tfc:'TFC', tvc:'TVC', tc:'TC', afc:'AFC', avc:'AVC', atc:'ATC', mc:'MC'};
+const COLFULL = {tfc:'total fixed', tvc:'total variable', tc:'total cost',
+                 afc:'avg fixed', avc:'avg variable', atc:'avg total', mc:'marginal'};
+
+function cellId(qi, col){ return 'c-' + qi + '-' + col; }
+function cellAt(qi, col){ return document.getElementById(cellId(qi, col)); }
+
+/* Build the grid with every derivable cell blank. The cells the problem hands
+   over are filled straight afterwards, without a flash: they were never
+   anybody's work. */
+function renderTable(p){
+  const tbl = document.getElementById('costTable');
+  let h = '<thead><tr><th class="qhead" scope="col">' + p.qname + '<small>output</small></th>';
+  p.cols.forEach(c => { h += '<th scope="col">' + COLNAME[c] + '<small>' + COLFULL[c] + '</small></th>'; });
+  h += '</tr></thead><tbody>';
+  p.qs.forEach((q, qi) => {
+    h += '<tr><td class="q">' + q + '</td>';
+    p.cols.forEach(c => {
+      const v = p.cells[c][qi];
+      /* null means the cell has no value at all, not that it is hidden:
+         an average or a marginal at zero output divides by zero. */
+      h += '<td id="' + cellId(qi, c) + '" class="' + (v === null ? 'undef' : 'blank') + '">'
+         + (v === null ? '—' : '') + '</td>';
+    });
+    h += '</tr>';
+  });
+  tbl.innerHTML = h + '</tbody>';
+  p.given.forEach(g => fillCell(p, g[0], g[1], false));
+  clearMarks();
+  updateTableProgress(p);
+  updateScrollHint();
+}
+
+function fillCell(p, qi, col, flash){
+  const td = cellAt(qi, col);
+  if(!td) return;
+  const v = p.cells[col][qi];
+  if(v === null) return;
+  td.textContent = v;
+  td.classList.remove('blank');
+  td.classList.add('val');
+  if(flash) startFlash(td, 'flash-fill');
+}
+
+/* The class is taken off again when the animation ends, so a cell is only
+   ever marked as flashing while it really is. Without this the class lingers
+   for the rest of the run and any test that looks for it passes vacuously. */
+function startFlash(td, cls){
+  td.classList.remove(cls);
+  void td.offsetWidth;              /* restart the animation on a re-fill */
+  td.classList.add(cls);
+  const off = e => { if(e.animationName){ td.classList.remove(cls); td.removeEventListener('animationend', off); } };
+  td.addEventListener('animationend', off);
+}
+
+function clearMarks(){
+  [...document.querySelectorAll('#costTable td.marked, #costTable td.flash-mark')]
+    .forEach(td => td.classList.remove('marked', 'flash-mark'));
+}
+
+function markCells(cells, flash){
+  cells.forEach(m => {
+    const td = cellAt(m[0], m[1]);
+    if(!td) return;
+    td.classList.add('marked');
+    if(flash) startFlash(td, 'flash-mark');
+  });
+}
+
+/* On a narrow screen the table scrolls inside its card. Say so when it does,
+   and bring a cell that has just been filled or marked into view, so the
+   student is not told the answer has landed somewhere they cannot see. */
+function updateScrollHint(){
+  const wrap = document.querySelector('.table-scroll');
+  const hint = document.getElementById('scrollHint');
+  if(!wrap || !hint) return;
+  hint.style.display = wrap.scrollWidth > wrap.clientWidth + 1 ? 'block' : 'none';
+}
+
+function scrollCellIntoView(cells){
+  const wrap = document.querySelector('.table-scroll');
+  if(!wrap || wrap.scrollWidth <= wrap.clientWidth + 1 || !cells.length) return;
+  const td = cellAt(cells[0][0], cells[0][1]);
+  if(!td) return;
+  const r = td.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+  if(r.left < w.left) wrap.scrollLeft += r.left - w.left - 12;
+  else if(r.right > w.right) wrap.scrollLeft += r.right - w.right + 12;
+}
+
+function blanksLeft(){
+  return document.querySelectorAll('#costTable td.blank').length;
+}
+
+function updateTableProgress(){
+  const n = blanksLeft();
+  document.getElementById('tableProgress').textContent =
+    n === 0 ? 'Table complete' : (n === 1 ? '1 cell to fill' : n + ' cells to fill');
+}
+
+/* ===================== state ===================== */
+let problemOrder = [], problemIndex = 0, stepIndex = 0;
+let optionOrder = [], answered = false;
+let score = 0, asked = 0;
+let perProblem = [];           /* right-answer count, indexed as PROBLEMS is */
+
+function shuffle(a){
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function currentProblem(){ return PROBLEMS[problemOrder[problemIndex]]; }
+function currentStep(){ return currentProblem().steps[stepIndex]; }
+function totalSteps(){ return PROBLEMS.reduce((s, p) => s + p.steps.length, 0); }
+
+/* ===================== rendering ===================== */
+function loadProblem(){
+  const p = currentProblem();
+  document.getElementById('methodBadge').textContent = p.badge;
+  document.getElementById('scenarioText').textContent = p.scenario;
+  document.getElementById('contextBox').innerHTML = TERMS;
+  const flag = document.getElementById('flagLine');
+  if(p.flag){ flag.textContent = p.flag; flag.style.display = ''; }
+  else { flag.style.display = 'none'; flag.textContent = ''; }
+  document.getElementById('tableTitle').textContent = p.tableTitle;
+  document.getElementById('tableLegend').innerHTML = LEGEND;
+  renderTable(p);
+  stepIndex = 0;
+  loadStep();
+}
+
+function loadStep(){
+  const p = currentProblem(), st = currentStep();
+  answered = false;
+  clearMarks();
+  document.getElementById('problemCount').textContent =
+    'Problem ' + (problemIndex + 1) + ' of ' + PROBLEMS.length;
+  document.getElementById('stepCount').textContent =
+    'Step ' + (stepIndex + 1) + ' of ' + p.steps.length;
+  document.getElementById('promptText').textContent = st.prompt;
+
+  optionOrder = shuffle(st.options.map((_, i) => i));
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(oi => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'choice-btn';
+    b.textContent = st.options[oi];
+    b.addEventListener('click', () => choose(oi, b));
+    wrap.appendChild(b);
+  });
+
+  document.getElementById('feedback').classList.remove('show');
+  document.getElementById('feedbackExplain').textContent = '';
+  const next = document.getElementById('nextBtn');
+  next.disabled = true;
+  next.textContent = lastStepOfProblem() ? (lastProblem() ? 'See results' : 'Next problem')
+                                         : 'Next step';
+  updateScore();
+  updateTableProgress();
+}
+
+function lastStepOfProblem(){ return stepIndex === currentProblem().steps.length - 1; }
+function lastProblem(){ return problemIndex === PROBLEMS.length - 1; }
+
+function updateScore(){
+  document.getElementById('scoreBadge').textContent = 'Score: ' + score + ' / ' + asked;
+}
+
+/* ===================== answering ===================== */
+function choose(oi, btn){
+  if(answered) return;
+  answered = true;
+  const p = currentProblem(), st = currentStep();
+  const right = oi === st.correct;
+  asked++;
+  if(right){
+    score++;
+    perProblem[problemOrder[problemIndex]]++;
+  }
+
+  [...document.querySelectorAll('#optionsWrap .choice-btn')].forEach((b, i) => {
+    b.disabled = true;
+    if(optionOrder[i] === st.correct) b.classList.add('correct');
+  });
+  if(!right) btn.classList.add('incorrect');
+
+  /* The table moves whether the answer was right or wrong: a student who got
+     it wrong still needs the finished table to work from. */
+  st.fills.forEach(f => fillCell(p, f[0], f[1], true));
+  markCells(st.mark, true);
+  updateTableProgress();
+  scrollCellIntoView(st.fills.length ? st.fills : st.mark);
+
+  const fb = document.getElementById('feedback');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.className = 'feedback-verdict ' + (right ? 'correct' : 'incorrect');
+  verdict.textContent = right ? 'Correct.'
+                              : 'Not quite — the answer is ' + st.options[st.correct] + '.';
+  document.getElementById('feedbackExplain').textContent =
+    st.explain + (st.note ? '  ' + st.note : '');
+  fb.classList.add('show');
+
+  document.getElementById('nextBtn').disabled = false;
+  updateScore();
+}
+
+/* ===================== moving on ===================== */
+function next(){
+  if(!answered) return;
+  if(!lastStepOfProblem()){
+    stepIndex++;
+    loadStep();
+    scrollToPrompt();
+    return;
+  }
+  if(!lastProblem()){
+    problemIndex++;
+    loadProblem();
+    scrollToTop();
+    return;
+  }
+  showResults();
+}
+
+function scrollToPrompt(){
+  try{ window.scrollTo({top: document.getElementById('promptText').offsetTop - 90,
+                        behavior: 'smooth'}); }catch(e){}
+}
+function scrollToTop(){
+  try{ window.scrollTo({top: 0, behavior: 'smooth'}); }catch(e){}
+}
+
+/* ===================== the analysis ===================== */
+function bandFor(pct){
+  for(const b of BANDS) if(pct >= b.min) return b;
+  return BANDS[BANDS.length - 1];
+}
+
+function showResults(){
+  document.getElementById('quizPanel').style.display = 'none';
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+  const panel = document.getElementById('resultsPanel');
+  panel.classList.add('show');
+
+  const n = totalSteps();
+  const pct = Math.round(100 * score / n);
+  const b = bandFor(pct);
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.className = 'results-band ' + b.tone;
+  bandEl.textContent = b.label;
+  document.getElementById('resultsScore').textContent = score + ' / ' + n + '  ·  ' + pct + '%';
+  document.getElementById('resultsNote').textContent = b.note;
+
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  PROBLEMS.forEach((p, i) => {
+    const got = perProblem[i], outOf = p.steps.length;
+    const tr = document.createElement('tr');
+    const td1 = document.createElement('td');
+    td1.className = 'topic-cell';
+    td1.textContent = p.biz + ' — ' + p.gave;
+    const td2 = document.createElement('td');
+    td2.className = 'topic-score' + (got === outOf ? ' full' : (got <= outOf / 2 ? ' low' : ''));
+    td2.textContent = got + ' / ' + outOf;
+    tr.appendChild(td1); tr.appendChild(td2);
+    body.appendChild(tr);
+  });
+  scrollToTop();
+}
+
+/* ===================== start ===================== */
+function startRun(){
+  problemOrder = shuffle(PROBLEMS.map((_, i) => i));
+  perProblem = PROBLEMS.map(() => 0);
+  problemIndex = 0; stepIndex = 0; score = 0; asked = 0;
+  document.getElementById('resultsPanel').classList.remove('show');
+  document.getElementById('quizPanel').style.display = '';
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  loadProblem();
+}
+
+window.addEventListener('resize', updateScrollHint);
+document.getElementById('nextBtn').addEventListener('click', next);
+document.getElementById('resetBtn').addEventListener('click', () => { startRun(); scrollToTop(); });
+document.getElementById('againBtn').addEventListener('click', () => { startRun(); scrollToTop(); });
+startRun();
+</script>
+</body>
+</html>
