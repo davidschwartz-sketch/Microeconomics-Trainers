@@ -1,0 +1,3787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Working Examples: Long-Run Equilibrium</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+    --teal: #2F6F62;
+    --orange: #C1542C;
+    --indigo: #4A5FB0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:1120px; margin:0 auto; padding:28px 16px 56px;}
+
+  header{border-bottom:2px solid var(--border); padding-bottom:18px; margin-bottom:18px;}
+  header h1{font-size:1.6rem; margin:0 0 6px; letter-spacing:-0.01em;}
+  header p{margin:0; color:var(--ink-soft); font-size:0.97rem; max-width:76ch;}
+
+  .difficulty-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
+  .difficulty-label{font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft);}
+  .seg{display:inline-flex; border:1px solid var(--border); border-radius:999px; overflow:hidden; background:var(--surface);}
+  .seg button{
+    background:none; border:none; cursor:pointer; font:inherit; font-size:13px; font-weight:700;
+    padding:6px 14px; color:var(--ink-soft);
+  }
+  .seg button.active{background:var(--accent); color:#2B2118;}
+  .difficulty-note{font-size:12.5px; color:var(--ink-soft); font-style:italic;}
+
+  .meta-row{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 10px; margin-bottom:12px;}
+  .count-group{display:flex; gap:8px; flex-wrap:wrap;}
+  .pill{
+    background:var(--surface-alt); border:1px solid var(--border); border-radius:999px;
+    padding:4px 12px; font-size:12.5px; font-weight:700; color:var(--ink-soft); white-space:nowrap;
+  }
+  .score-badge{
+    background:#FAEFD6; border:1px solid #EAD4A0; color:#7A5A16;
+    border-radius:999px; padding:4px 12px; font-size:12.5px; font-weight:800; white-space:nowrap;
+  }
+
+  .panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:22px 24px; margin-bottom:16px;
+  }
+  .method-badge{
+    display:inline-block; background:#FAEFD6; border:1px solid #EAD4A0; color:#7A5A16;
+    font-size:11px; font-weight:800; letter-spacing:.07em; text-transform:uppercase;
+    padding:4px 11px; border-radius:999px; margin-bottom:12px;
+  }
+  .scenario{font-size:15.5px; margin-bottom:14px;}
+  .context{
+    background:var(--surface-alt); border:1px solid var(--border); border-radius:12px;
+    padding:13px 16px; margin-bottom:16px; font-size:13.5px; color:var(--ink-soft);
+  }
+  .context b{color:var(--ink);}
+  .context .review{margin-top:7px;}
+
+  /* ---- the two graph panels ---- */
+  .graphs{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px;}
+  @media (max-width:860px){ .graphs{grid-template-columns:1fr;} }
+  .graph-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:12px 14px 10px; transition:border-color .18s ease, box-shadow .18s ease;
+  }
+  .graph-card.active{border-color:var(--accent); box-shadow:0 0 0 3px rgba(217,164,65,.16);}
+  .graph-head{
+    display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+    font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--ink-soft); margin-bottom:6px;
+  }
+  .graph-card.active .graph-head .which{color:var(--accent);}
+  .graph-head .which{font-size:10.5px;}
+  .graph-card svg{width:100%; height:auto; display:block;}
+  .readout{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+  .chip{
+    background:var(--surface-alt); border:1px solid var(--border); border-radius:9px;
+    padding:5px 10px; font-size:12px; line-height:1.3;
+  }
+  .chip .label{display:block; font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); font-weight:700;}
+  .chip .value{font-weight:800;}
+
+  .prompt{font-size:17px; font-weight:650; margin:4px 0 14px; line-height:1.4;}
+  .options{display:flex; flex-direction:column; gap:9px;}
+  .choice-btn{
+    text-align:left; font:inherit; font-size:14.5px; font-weight:650; cursor:pointer;
+    background:var(--surface); border:1.5px solid var(--border); border-radius:11px;
+    padding:12px 15px; color:var(--ink); transition:border-color .13s ease, background .13s ease;
+  }
+  .choice-btn:hover:not(:disabled){border-color:var(--accent);}
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{background:var(--correct-soft); border-color:var(--correct); color:var(--correct);}
+  .choice-btn.incorrect{background:var(--incorrect-soft); border-color:var(--incorrect); color:var(--incorrect);}
+
+  .feedback{display:none; margin-top:14px;}
+  .feedback.show{display:block;}
+  .feedback-verdict{font-size:14.5px; font-weight:800; margin-bottom:6px;}
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    background:var(--surface-alt); border-left:3px solid var(--accent);
+    border-radius:0 9px 9px 0; padding:12px 15px; font-size:14px; color:var(--ink-soft);
+  }
+
+  .controls{display:flex; justify-content:flex-end; gap:10px; margin-top:16px;}
+  .btn{
+    font:inherit; font-size:14px; font-weight:700; border-radius:10px;
+    padding:10px 18px; cursor:pointer; border:1px solid var(--border);
+  }
+  .btn-primary{background:var(--ink); color:var(--surface); border-color:var(--ink);}
+  .btn-primary:hover:not(:disabled){background:#453427;}
+  .btn:disabled{opacity:.4; cursor:default;}
+
+  .reset-row{margin-top:10px; text-align:right;}
+  .link-btn{
+    background:none; border:none; color:var(--ink-soft); font:inherit; font-size:13px;
+    text-decoration:underline; cursor:pointer; padding:0;
+  }
+
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px;}
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{font-size:34px; font-weight:800; letter-spacing:-0.02em; margin-bottom:10px;}
+  .results-note{font-size:15px; color:var(--ink-soft); margin-bottom:20px;}
+  table.results-table{width:100%; border-collapse:collapse; font-size:14px;}
+  table.results-table th, table.results-table td{padding:9px 12px; border-bottom:1px solid var(--border); text-align:left;}
+  table.results-table th{
+    font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft);
+    font-weight:700; background:var(--surface-alt);
+  }
+  table.results-table th.score-head, table.results-table td.topic-score{text-align:right; white-space:nowrap;}
+  table.results-table td.topic-cell{font-weight:600; color:var(--ink);}
+  table.results-table td.topic-score{font-weight:700;}
+  table.results-table td.topic-score.full{color:var(--correct);}
+  table.results-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px; color:var(--ink-soft); font-style:italic; line-height:1.5;
+    border-top:1px solid var(--border); padding-top:14px; margin:18px 0 20px;
+  }
+  .assumptions{
+    font-size:12px; color:var(--ink-soft); line-height:1.5;
+    border-top:1px dashed var(--border); padding-top:11px; margin-top:16px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .graph-card{transition:none;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <h1>Working Examples: Long-Run Equilibrium</h1>
+    <p>A shock hits the market, the typical firm makes a profit or a loss, firms enter or leave, and the price
+    settles somewhere new &mdash; or back where it started. Which one depends on whether the industry is
+    constant-, increasing-, or decreasing-cost.</p>
+  </header>
+
+  <div class="difficulty-row" id="difficultyRow">
+    <span class="difficulty-label">Difficulty</span>
+    <span class="seg">
+      <button id="easyBtn" class="active" type="button">Helpful Review</button>
+      <button id="hardBtn" type="button">AP Exam Difficulty</button>
+    </span>
+    <span class="difficulty-note" id="difficultyNote">Method reminders stay on screen.</span>
+  </div>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="pill" id="problemCount">Problem 1 of 9</span>
+      <span class="pill" id="stepCount">Step 1 of 8</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="panel" id="quizPanel">
+    <span class="method-badge" id="methodBadge"></span>
+    <div class="scenario" id="scenarioText">Loading&hellip;</div>
+    <div class="context" id="contextBox">
+      <div class="terms" id="termsText"></div>
+      <div class="review" id="reviewText"></div>
+    </div>
+
+    <div class="graphs">
+      <div class="graph-card" id="firmCard">
+        <div class="graph-head"><span>The typical firm</span><span class="which" id="firmWhich"></span></div>
+        <svg id="firmSvg" viewBox="0 0 440 320" xmlns="http://www.w3.org/2000/svg" role="img"></svg>
+        <div class="readout" id="firmReadout"></div>
+      </div>
+      <div class="graph-card" id="marketCard">
+        <div class="graph-head"><span>The whole market</span><span class="which" id="marketWhich"></span></div>
+        <svg id="marketSvg" viewBox="0 0 440 320" xmlns="http://www.w3.org/2000/svg" role="img"></svg>
+        <div class="readout" id="marketReadout"></div>
+      </div>
+    </div>
+
+    <div class="prompt" id="promptText"></div>
+    <div class="options" id="optionsWrap"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-verdict" id="feedbackVerdict"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn" disabled>Next step</button>
+    </div>
+
+    <p class="assumptions">Straight-line demand and supply, one shock resolved at a time, and a single
+    &ldquo;typical firm&rdquo; standing in for the whole industry. Real cost curves are not parabolas and real
+    industries do not finish adjusting on cue. The direction of each link in the chain is the point here, not
+    the exact shapes.</p>
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <table class="results-table">
+      <thead><tr><th>Industry and cost structure</th><th class="score-head">Score</th></tr></thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+
+    <p class="results-caveat">These bands say whether you have the long-run chain down &mdash; they are not an
+    AP score prediction. The exam covers every unit, counts free response for a third of the grade, and gives
+    you no feedback until it is over. Treat a strong result here as one topic secured, not as a score.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Run it again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Restart from problem 1</button>
+  </footer>
+
+</div>
+<script>
+const PROBLEMS = [
+ {
+  "id": "P1",
+  "unit": "thousand jars a week",
+  "topic": "Organic honey — constant cost, demand rises",
+  "method": "Demand shock · the long-run chain",
+  "scenario": "This organic honey industry is in long-run equilibrium: price is $6, the typical firm is breaking even, and 80 thousand jars a week change hands. A national diet trend puts honey on every breakfast table, and buyers want far more of it at every price.",
+  "terms": "<b>ATC</b> = average total cost. <b>MC</b> = marginal cost. <b>min ATC</b> = the lowest point on the ATC curve, which is the firm’s break-even price. <b>Economic profit</b> counts the owner’s next-best use of their own money as a cost, so zero economic profit still means a normal return. <b>LRS</b> = long-run supply. <b>P*</b> and <b>Q*</b> = equilibrium price and quantity.",
+  "review": "The chain: the shock moves one curve and the market finds a new SHORT-run price. Compare that price with the typical firm’s min ATC — above it is economic profit, below it is a loss. Profit draws entry and shifts market supply right; loss forces exit and shifts it left. That continues until economic profit is zero again, which is where price equals min ATC. Whether that final price is the same as, higher than, or lower than the original depends on what changing the industry’s SIZE does to input prices: nothing in a constant-cost industry, pushes them the same way in an increasing-cost one, pushes them the opposite way in a decreasing-cost one.",
+  "p0": "6",
+  "q0": 80,
+  "psr": "9",
+  "qsr": 140,
+  "plr": "6",
+  "qlr": 170,
+  "atc0": 6.0,
+  "atcShock": 6.0,
+  "atc1": 6.0,
+  "market": {
+   "bd": 10,
+   "bs": 20,
+   "qmax": 217.6,
+   "pmax": 15.75,
+   "dem": {
+    "D1": [
+     {
+      "a": 14,
+      "label": "D",
+      "solid": true
+     }
+    ],
+    "D2": [
+     {
+      "a": 14,
+      "label": "D₁",
+      "solid": false
+     },
+     {
+      "a": 23,
+      "label": "D₂",
+      "solid": true
+     }
+    ]
+   },
+   "sup": {
+    "S1": [
+     {
+      "c": 2,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Stech": [
+     {
+      "c": 2,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Sfinal": [
+     {
+      "c": 2,
+      "label": "S₁",
+      "solid": false
+     },
+     {
+      "c": -2.5,
+      "label": "S₂",
+      "solid": true
+     }
+    ]
+   }
+  },
+  "firm": {
+   "pmax": 15.75
+  },
+  "points": {
+   "E1": {
+    "q": 80,
+    "p": 6.0
+   },
+   "E2": {
+    "q": 140,
+    "p": 9.0
+   },
+   "E3": {
+    "q": 170,
+    "p": 6.0
+   }
+  },
+  "steps": [
+   {
+    "prompt": "Which curve moves, and which way?",
+    "options": [
+     "Demand shifts right",
+     "Demand shifts left",
+     "Supply shifts right",
+     "Supply shifts left"
+    ],
+    "correct": 0,
+    "explain": "Nothing here changed what it costs to make the good, so supply stays put. What changed is how much buyers want at every price, which is a shift of DEMAND to the right. You drilled this in Unit 2; it is only the first link here.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1"
+      ],
+      "arrow": "DR",
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Where does the market settle in the SHORT run, before the number of firms can change?",
+    "options": [
+     "P = $9, Q = 140",
+     "P = $6, Q = 140",
+     "P = $9, Q = 80",
+     "P = $6, Q = 170"
+    ],
+    "correct": 0,
+    "explain": "The new demand curve meets the unchanged short-run supply curve at $9 and 140 thousand jars a week. Both price and quantity move, which is why neither of the middle two options can be right. The number of firms is fixed for now, so this is as far as the short run goes.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Take a typical firm in this industry at the new price of $9. Is it earning positive economic profit, taking a loss, or breaking even?",
+    "options": [
+     "Positive economic profit — price is above its minimum ATC",
+     "An economic loss — price is below its minimum ATC",
+     "Zero economic profit — price is exactly its minimum ATC",
+     "It cannot be said without knowing how much of the firm’s cost is fixed"
+    ],
+    "correct": 0,
+    "explain": "Nothing has touched its cost curves, so its minimum ATC is still $6. At $9 the price line sits above that, so the typical firm is making an economic profit. The gap between the price line and ATC at the firm’s chosen quantity is the per-unit profit, and the shaded rectangle is the total. Whether it keeps producing in the short run is the operate-or-shut-down question from the last module; all this step asks is which side of minimum ATC the price is on.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Free entry and exit is one of the four conditions. What does that profit set off, and what does it do to market supply?",
+    "options": [
+     "New firms enter, which shifts market supply to the right",
+     "Some firms exit, which shifts market supply to the left",
+     "New firms enter, which shifts market supply to the left",
+     "The number of firms stays put; the existing firms simply adjust their own output"
+    ],
+    "correct": 0,
+    "explain": "A better-than-normal return is a signal, and with no barriers to entry, outside firms act on it so new firms enter. More sellers at every price IS a rightward shift of market supply; fewer sellers is a leftward one. Watch the second pair of options: entry and a leftward shift cannot go together.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": "SR",
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "What finally brings the entry to a halt?",
+    "options": [
+     "Price falls until it equals the typical firm’s minimum ATC, leaving zero economic profit",
+     "Price falls until it equals the typical firm’s average VARIABLE cost",
+     "It stops once every remaining firm is producing at full capacity",
+     "It stops when the industry runs out of firms willing to enter"
+    ],
+    "correct": 0,
+    "explain": "The signal is the thing that has to disappear. As long as there is economic profit to be had, more firms keep coming; as long as there are losses, more keep going. Movement stops only where economic profit is exactly zero, and that is where price equals minimum ATC. Average variable cost is the shut-down test, not the entry-and-exit test, and it sits below ATC.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": "minatc",
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "This is a constant-cost industry. As entry expands the industry it, what happens to EVERY firm’s ATC curve?",
+    "options": [
+     "It stays exactly where it is — input prices do not move as a constant-cost industry changes size",
+     "It shifts UP, because more firms compete for the same inputs",
+     "It shifts DOWN, because suppliers reach economies of scale of their own",
+     "It shifts for the firms that just arrived, but not for the ones already there"
+    ],
+    "correct": 0,
+    "explain": "This is a constant-cost industry: the inputs it uses are a small enough part of their own markets that adding firms does not bid their prices up. Every firm’s ATC curve is exactly where it started, so the break-even price is still $6. The last option is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Entry goes on until price equals that break-even level. Where does the market end up in the LONG run?",
+    "options": [
+     "P = $6, Q = 170",
+     "P = $6, Q = 140",
+     "P = $9, Q = 170",
+     "P = $6, Q = 80"
+    ],
+    "correct": 0,
+    "explain": "Price has to come to rest at $6, the new minimum ATC, because that is the only price at which economic profit is zero. Read the quantity off the demand curve the market is now on: at $6 buyers take 170 thousand jars a week. The short-run supply curve has shifted right far enough to pass through that point.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
+    "options": [
+     "The same — $6 before and $6 after",
+     "Higher — $9 against the original $6",
+     "Lower — $9 against the original $6",
+     "Higher, because the industry ended up producing more than before"
+    ],
+    "correct": 0,
+    "explain": "It comes back to $6, exactly where it started: entry drove the short-run price of $9 all the way back down. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The last option is the trap: quantity did end up higher, but quantity is not what decides the long-run price — the break-even level of ATC is.",
+    "panel": "both",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   }
+  ]
+ },
+ {
+  "id": "P2",
+  "unit": "hundred wash-loads a day",
+  "topic": "Self-serve laundromats — constant cost, demand falls",
+  "method": "Demand shock · the long-run chain",
+  "scenario": "This self-serve laundromats industry is in long-run equilibrium: price is $8, the typical firm is breaking even, and 120 hundred wash-loads a day change hands. A wave of new apartment buildings comes with in-unit washers, and far fewer households need a laundromat at any price.",
+  "terms": "<b>ATC</b> = average total cost. <b>MC</b> = marginal cost. <b>min ATC</b> = the lowest point on the ATC curve, which is the firm’s break-even price. <b>Economic profit</b> counts the owner’s next-best use of their own money as a cost, so zero economic profit still means a normal return. <b>LRS</b> = long-run supply. <b>P*</b> and <b>Q*</b> = equilibrium price and quantity.",
+  "review": "The chain: the shock moves one curve and the market finds a new SHORT-run price. Compare that price with the typical firm’s min ATC — above it is economic profit, below it is a loss. Profit draws entry and shifts market supply right; loss forces exit and shifts it left. That continues until economic profit is zero again, which is where price equals min ATC. Whether that final price is the same as, higher than, or lower than the original depends on what changing the industry’s SIZE does to input prices: nothing in a constant-cost industry, pushes them the same way in an increasing-cost one, pushes them the opposite way in a decreasing-cost one.",
+  "p0": "8",
+  "q0": 120,
+  "psr": "5",
+  "qsr": 60,
+  "plr": "8",
+  "qlr": 30,
+  "atc0": 8.0,
+  "atcShock": 8.0,
+  "atc1": 8.0,
+  "market": {
+   "bd": 10,
+   "bs": 20,
+   "qmax": 153.6,
+   "pmax": 14.0,
+   "dem": {
+    "D1": [
+     {
+      "a": 20,
+      "label": "D",
+      "solid": true
+     }
+    ],
+    "D2": [
+     {
+      "a": 20,
+      "label": "D₁",
+      "solid": false
+     },
+     {
+      "a": 11,
+      "label": "D₂",
+      "solid": true
+     }
+    ]
+   },
+   "sup": {
+    "S1": [
+     {
+      "c": 2,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Stech": [
+     {
+      "c": 2,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Sfinal": [
+     {
+      "c": 2,
+      "label": "S₁",
+      "solid": false
+     },
+     {
+      "c": 6.5,
+      "label": "S₂",
+      "solid": true
+     }
+    ]
+   }
+  },
+  "firm": {
+   "pmax": 14.0
+  },
+  "points": {
+   "E1": {
+    "q": 120,
+    "p": 8.0
+   },
+   "E2": {
+    "q": 60,
+    "p": 5.0
+   },
+   "E3": {
+    "q": 30,
+    "p": 8.0
+   }
+  },
+  "steps": [
+   {
+    "prompt": "Which curve moves, and which way?",
+    "options": [
+     "Demand shifts left",
+     "Demand shifts right",
+     "Supply shifts right",
+     "Supply shifts left"
+    ],
+    "correct": 0,
+    "explain": "Nothing here changed what it costs to make the good, so supply stays put. What changed is how much buyers want at every price, which is a shift of DEMAND to the left. You drilled this in Unit 2; it is only the first link here.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1"
+      ],
+      "arrow": "DL",
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Where does the market settle in the SHORT run, before the number of firms can change?",
+    "options": [
+     "P = $5, Q = 60",
+     "P = $8, Q = 60",
+     "P = $5, Q = 120",
+     "P = $8, Q = 30"
+    ],
+    "correct": 0,
+    "explain": "The new demand curve meets the unchanged short-run supply curve at $5 and 60 hundred wash-loads a day. Both price and quantity move, which is why neither of the middle two options can be right. The number of firms is fixed for now, so this is as far as the short run goes.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Take a typical firm in this industry at the new price of $5. Is it earning positive economic profit, taking a loss, or breaking even?",
+    "options": [
+     "An economic loss — price is below its minimum ATC",
+     "Positive economic profit — price is above its minimum ATC",
+     "Zero economic profit — price is exactly its minimum ATC",
+     "It cannot be said without knowing how much of the firm’s cost is fixed"
+    ],
+    "correct": 0,
+    "explain": "Nothing has touched its cost curves, so its minimum ATC is still $8. At $5 the price line sits below that, so the typical firm is taking an economic loss. The gap between the price line and ATC at the firm’s chosen quantity is the per-unit loss, and the shaded rectangle is the total. Whether it keeps producing in the short run is the operate-or-shut-down question from the last module; all this step asks is which side of minimum ATC the price is on.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "loss",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Free entry and exit is one of the four conditions. What does that loss set off, and what does it do to market supply?",
+    "options": [
+     "Some firms exit, which shifts market supply to the left",
+     "New firms enter, which shifts market supply to the right",
+     "Some firms exit, which shifts market supply to the right",
+     "The number of firms stays put; the existing firms simply adjust their own output"
+    ],
+    "correct": 0,
+    "explain": "A loss is a signal too, and with nothing holding firms in, some of them leave so the industry loses firms. More sellers at every price IS a rightward shift of market supply; fewer sellers is a leftward one. Watch the second pair of options: entry and a leftward shift cannot go together.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": "SL",
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "loss",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "What finally brings the exit to a halt?",
+    "options": [
+     "Price rises until it equals the typical firm’s minimum ATC, leaving zero economic profit",
+     "Price rises until it equals the typical firm’s average VARIABLE cost",
+     "It stops once every remaining firm is producing at full capacity",
+     "It stops when the industry runs out of firms willing to leave"
+    ],
+    "correct": 0,
+    "explain": "The signal is the thing that has to disappear. As long as there is economic profit to be had, more firms keep coming; as long as there are losses, more keep going. Movement stops only where economic profit is exactly zero, and that is where price equals minimum ATC. Average variable cost is the shut-down test, not the entry-and-exit test, and it sits below ATC.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "loss",
+      "mark": "minatc",
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "This is a constant-cost industry. As exit shrinks the industry it, what happens to EVERY firm’s ATC curve?",
+    "options": [
+     "It stays exactly where it is — input prices do not move as a constant-cost industry changes size",
+     "It shifts UP, because more firms compete for the same inputs",
+     "It shifts DOWN, because suppliers reach economies of scale of their own",
+     "It shifts for the firms that just arrived, but not for the ones already there"
+    ],
+    "correct": 0,
+    "explain": "This is a constant-cost industry: the inputs it uses are a small enough part of their own markets that losing firms does not bid their prices down. Every firm’s ATC curve is exactly where it started, so the break-even price is still $8. The last option is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Exit goes on until price equals that break-even level. Where does the market end up in the LONG run?",
+    "options": [
+     "P = $8, Q = 30",
+     "P = $8, Q = 60",
+     "P = $5, Q = 30",
+     "P = $8, Q = 120"
+    ],
+    "correct": 0,
+    "explain": "Price has to come to rest at $8, the new minimum ATC, because that is the only price at which economic profit is zero. Read the quantity off the demand curve the market is now on: at $8 buyers take 30 hundred wash-loads a day. The short-run supply curve has shifted left far enough to pass through that point.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
+    "options": [
+     "The same — $8 before and $8 after",
+     "Higher — $5 against the original $8",
+     "Lower — $5 against the original $8",
+     "Lower, because the industry ended up producing less than before"
+    ],
+    "correct": 0,
+    "explain": "It comes back to $8, exactly where it started: entry drove the short-run price of $5 all the way back down. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The last option is the trap: quantity did end up lower, but quantity is not what decides the long-run price — the break-even level of ATC is.",
+    "panel": "both",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   }
+  ]
+ },
+ {
+  "id": "P3",
+  "unit": "repairs a day",
+  "topic": "Phone-screen repair — decreasing cost, demand rises",
+  "method": "Demand shock · the long-run chain",
+  "scenario": "This phone-screen repair industry is in long-run equilibrium: price is $20, the typical firm is breaking even, and 60 repairs a day change hands. Phones get a redesign with a famously fragile screen, and buyers want far more repairs at every price.",
+  "terms": "<b>ATC</b> = average total cost. <b>MC</b> = marginal cost. <b>min ATC</b> = the lowest point on the ATC curve, which is the firm’s break-even price. <b>Economic profit</b> counts the owner’s next-best use of their own money as a cost, so zero economic profit still means a normal return. <b>LRS</b> = long-run supply. <b>P*</b> and <b>Q*</b> = equilibrium price and quantity.",
+  "review": "The chain: the shock moves one curve and the market finds a new SHORT-run price. Compare that price with the typical firm’s min ATC — above it is economic profit, below it is a loss. Profit draws entry and shifts market supply right; loss forces exit and shifts it left. That continues until economic profit is zero again, which is where price equals min ATC. Whether that final price is the same as, higher than, or lower than the original depends on what changing the industry’s SIZE does to input prices: nothing in a constant-cost industry, pushes them the same way in an increasing-cost one, pushes them the opposite way in a decreasing-cost one.",
+  "p0": "20",
+  "q0": 60,
+  "psr": "28",
+  "qsr": 100,
+  "plr": "16",
+  "qlr": 160,
+  "atc0": 20.0,
+  "atcShock": 20.0,
+  "atc1": 16.0,
+  "market": {
+   "bd": 5,
+   "bs": 5,
+   "qmax": 204.8,
+   "pmax": 49.0,
+   "dem": {
+    "D1": [
+     {
+      "a": 32,
+      "label": "D",
+      "solid": true
+     }
+    ],
+    "D2": [
+     {
+      "a": 32,
+      "label": "D₁",
+      "solid": false
+     },
+     {
+      "a": 48,
+      "label": "D₂",
+      "solid": true
+     }
+    ]
+   },
+   "sup": {
+    "S1": [
+     {
+      "c": 8,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Stech": [
+     {
+      "c": 8,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Sfinal": [
+     {
+      "c": 8,
+      "label": "S₁",
+      "solid": false
+     },
+     {
+      "c": -16.0,
+      "label": "S₂",
+      "solid": true
+     }
+    ]
+   }
+  },
+  "firm": {
+   "pmax": 49.0
+  },
+  "points": {
+   "E1": {
+    "q": 60,
+    "p": 20.0
+   },
+   "E2": {
+    "q": 100,
+    "p": 28.0
+   },
+   "E3": {
+    "q": 160,
+    "p": 16.0
+   }
+  },
+  "steps": [
+   {
+    "prompt": "Which curve moves, and which way?",
+    "options": [
+     "Demand shifts right",
+     "Demand shifts left",
+     "Supply shifts right",
+     "Supply shifts left"
+    ],
+    "correct": 0,
+    "explain": "Nothing here changed what it costs to make the good, so supply stays put. What changed is how much buyers want at every price, which is a shift of DEMAND to the right. You drilled this in Unit 2; it is only the first link here.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1"
+      ],
+      "arrow": "DR",
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Where does the market settle in the SHORT run, before the number of firms can change?",
+    "options": [
+     "P = $28, Q = 100",
+     "P = $20, Q = 100",
+     "P = $28, Q = 60",
+     "P = $16, Q = 160"
+    ],
+    "correct": 0,
+    "explain": "The new demand curve meets the unchanged short-run supply curve at $28 and 100 repairs a day. Both price and quantity move, which is why neither of the middle two options can be right. The number of firms is fixed for now, so this is as far as the short run goes.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Take a typical firm in this industry at the new price of $28. Is it earning positive economic profit, taking a loss, or breaking even?",
+    "options": [
+     "Positive economic profit — price is above its minimum ATC",
+     "An economic loss — price is below its minimum ATC",
+     "Zero economic profit — price is exactly its minimum ATC",
+     "It cannot be said without knowing how much of the firm’s cost is fixed"
+    ],
+    "correct": 0,
+    "explain": "Nothing has touched its cost curves, so its minimum ATC is still $20. At $28 the price line sits above that, so the typical firm is making an economic profit. The gap between the price line and ATC at the firm’s chosen quantity is the per-unit profit, and the shaded rectangle is the total. Whether it keeps producing in the short run is the operate-or-shut-down question from the last module; all this step asks is which side of minimum ATC the price is on.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Free entry and exit is one of the four conditions. What does that profit set off, and what does it do to market supply?",
+    "options": [
+     "New firms enter, which shifts market supply to the right",
+     "Some firms exit, which shifts market supply to the left",
+     "New firms enter, which shifts market supply to the left",
+     "The number of firms stays put; the existing firms simply adjust their own output"
+    ],
+    "correct": 0,
+    "explain": "A better-than-normal return is a signal, and with no barriers to entry, outside firms act on it so new firms enter. More sellers at every price IS a rightward shift of market supply; fewer sellers is a leftward one. Watch the second pair of options: entry and a leftward shift cannot go together.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": "SR",
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "What finally brings the entry to a halt?",
+    "options": [
+     "Price falls until it equals the typical firm’s minimum ATC, leaving zero economic profit",
+     "Price falls until it equals the typical firm’s average VARIABLE cost",
+     "It stops once every remaining firm is producing at full capacity",
+     "It stops when the industry runs out of firms willing to enter"
+    ],
+    "correct": 0,
+    "explain": "The signal is the thing that has to disappear. As long as there is economic profit to be had, more firms keep coming; as long as there are losses, more keep going. Movement stops only where economic profit is exactly zero, and that is where price equals minimum ATC. Average variable cost is the shut-down test, not the entry-and-exit test, and it sits below ATC.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": "minatc",
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "This is a decreasing-cost industry. As entry expands the industry it, what happens to EVERY firm’s ATC curve?",
+    "options": [
+     "It shifts DOWN — minimum ATC moves from $20 to $16",
+     "It stays exactly where it is — industry size does not move input prices here",
+     "It shifts UP, because more firms compete for the same inputs",
+     "It shifts for the firms that just arrived, but not for the ones already there"
+    ],
+    "correct": 0,
+    "explain": "A decreasing-cost industry’s costs move AGAINST its size. A bigger industry supports specialized suppliers and shared infrastructure that reach their own economies of scale, so input prices fall, and every firm’s cost curves move down. The break-even price moves from $20 to $16. The last option is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "both",
+      "shade": null,
+      "mark": null,
+      "arrow": "DOWN"
+     }
+    }
+   },
+   {
+    "prompt": "Entry goes on until price equals that break-even level. Where does the market end up in the LONG run?",
+    "options": [
+     "P = $16, Q = 160",
+     "P = $16, Q = 100",
+     "P = $28, Q = 160",
+     "P = $20, Q = 60"
+    ],
+    "correct": 0,
+    "explain": "Price has to come to rest at $16, the new minimum ATC, because that is the only price at which economic profit is zero. Read the quantity off the demand curve the market is now on: at $16 buyers take 160 repairs a day. The short-run supply curve has shifted right far enough to pass through that point.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
+    "options": [
+     "Lower — $16 against the original $20",
+     "The same — $20 before and $16 after",
+     "Higher — $28 against the original $20",
+     "Higher, because the industry ended up producing more than before"
+    ],
+    "correct": 0,
+    "explain": "It ends at $16, below the $20 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The last option is the trap: quantity did end up higher, but quantity is not what decides the long-run price — the break-even level of ATC is.",
+    "panel": "both",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   }
+  ]
+ },
+ {
+  "id": "P4",
+  "unit": "tons a week",
+  "topic": "Almond growing — increasing cost, demand rises",
+  "method": "Demand shock · the long-run chain",
+  "scenario": "This almond growing industry is in long-run equilibrium: price is $6, the typical firm is breaking even, and 300 tons a week change hands. Almond milk takes off nationally, and buyers want far more almonds at every price.",
+  "terms": "<b>ATC</b> = average total cost. <b>MC</b> = marginal cost. <b>min ATC</b> = the lowest point on the ATC curve, which is the firm’s break-even price. <b>Economic profit</b> counts the owner’s next-best use of their own money as a cost, so zero economic profit still means a normal return. <b>LRS</b> = long-run supply. <b>P*</b> and <b>Q*</b> = equilibrium price and quantity.",
+  "review": "The chain: the shock moves one curve and the market finds a new SHORT-run price. Compare that price with the typical firm’s min ATC — above it is economic profit, below it is a loss. Profit draws entry and shifts market supply right; loss forces exit and shifts it left. That continues until economic profit is zero again, which is where price equals min ATC. Whether that final price is the same as, higher than, or lower than the original depends on what changing the industry’s SIZE does to input prices: nothing in a constant-cost industry, pushes them the same way in an increasing-cost one, pushes them the opposite way in a decreasing-cost one.",
+  "p0": "6",
+  "q0": 300,
+  "psr": "9",
+  "qsr": 600,
+  "plr": "7",
+  "qlr": 700,
+  "atc0": 6.0,
+  "atcShock": 6.0,
+  "atc1": 7.0,
+  "market": {
+   "bd": 50,
+   "bs": 100,
+   "qmax": 896.0,
+   "pmax": 15.75,
+   "dem": {
+    "D1": [
+     {
+      "a": 12,
+      "label": "D",
+      "solid": true
+     }
+    ],
+    "D2": [
+     {
+      "a": 12,
+      "label": "D₁",
+      "solid": false
+     },
+     {
+      "a": 21,
+      "label": "D₂",
+      "solid": true
+     }
+    ]
+   },
+   "sup": {
+    "S1": [
+     {
+      "c": 3,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Stech": [
+     {
+      "c": 3,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Sfinal": [
+     {
+      "c": 3,
+      "label": "S₁",
+      "solid": false
+     },
+     {
+      "c": 0.0,
+      "label": "S₂",
+      "solid": true
+     }
+    ]
+   }
+  },
+  "firm": {
+   "pmax": 15.75
+  },
+  "points": {
+   "E1": {
+    "q": 300,
+    "p": 6.0
+   },
+   "E2": {
+    "q": 600,
+    "p": 9.0
+   },
+   "E3": {
+    "q": 700,
+    "p": 7.0
+   }
+  },
+  "steps": [
+   {
+    "prompt": "Which curve moves, and which way?",
+    "options": [
+     "Demand shifts right",
+     "Demand shifts left",
+     "Supply shifts right",
+     "Supply shifts left"
+    ],
+    "correct": 0,
+    "explain": "Nothing here changed what it costs to make the good, so supply stays put. What changed is how much buyers want at every price, which is a shift of DEMAND to the right. You drilled this in Unit 2; it is only the first link here.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1"
+      ],
+      "arrow": "DR",
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Where does the market settle in the SHORT run, before the number of firms can change?",
+    "options": [
+     "P = $9, Q = 600",
+     "P = $6, Q = 600",
+     "P = $9, Q = 300",
+     "P = $7, Q = 700"
+    ],
+    "correct": 0,
+    "explain": "The new demand curve meets the unchanged short-run supply curve at $9 and 600 tons a week. Both price and quantity move, which is why neither of the middle two options can be right. The number of firms is fixed for now, so this is as far as the short run goes.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Take a typical firm in this industry at the new price of $9. Is it earning positive economic profit, taking a loss, or breaking even?",
+    "options": [
+     "Positive economic profit — price is above its minimum ATC",
+     "An economic loss — price is below its minimum ATC",
+     "Zero economic profit — price is exactly its minimum ATC",
+     "It cannot be said without knowing how much of the firm’s cost is fixed"
+    ],
+    "correct": 0,
+    "explain": "Nothing has touched its cost curves, so its minimum ATC is still $6. At $9 the price line sits above that, so the typical firm is making an economic profit. The gap between the price line and ATC at the firm’s chosen quantity is the per-unit profit, and the shaded rectangle is the total. Whether it keeps producing in the short run is the operate-or-shut-down question from the last module; all this step asks is which side of minimum ATC the price is on.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Free entry and exit is one of the four conditions. What does that profit set off, and what does it do to market supply?",
+    "options": [
+     "New firms enter, which shifts market supply to the right",
+     "Some firms exit, which shifts market supply to the left",
+     "New firms enter, which shifts market supply to the left",
+     "The number of firms stays put; the existing firms simply adjust their own output"
+    ],
+    "correct": 0,
+    "explain": "A better-than-normal return is a signal, and with no barriers to entry, outside firms act on it so new firms enter. More sellers at every price IS a rightward shift of market supply; fewer sellers is a leftward one. Watch the second pair of options: entry and a leftward shift cannot go together.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": "SR",
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "What finally brings the entry to a halt?",
+    "options": [
+     "Price falls until it equals the typical firm’s minimum ATC, leaving zero economic profit",
+     "Price falls until it equals the typical firm’s average VARIABLE cost",
+     "It stops once every remaining firm is producing at full capacity",
+     "It stops when the industry runs out of firms willing to enter"
+    ],
+    "correct": 0,
+    "explain": "The signal is the thing that has to disappear. As long as there is economic profit to be had, more firms keep coming; as long as there are losses, more keep going. Movement stops only where economic profit is exactly zero, and that is where price equals minimum ATC. Average variable cost is the shut-down test, not the entry-and-exit test, and it sits below ATC.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": "minatc",
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "This is a increasing-cost industry. As entry expands the industry it, what happens to EVERY firm’s ATC curve?",
+    "options": [
+     "It shifts UP — minimum ATC moves from $6 to $7",
+     "It stays exactly where it is — industry size does not move input prices here",
+     "It shifts DOWN, because suppliers reach economies of scale of their own",
+     "It shifts for the firms that just arrived, but not for the ones already there"
+    ],
+    "correct": 0,
+    "explain": "An increasing-cost industry’s costs move WITH its size. More firms compete for the same land, labor and materials, so input prices are bid up, and that lifts every firm’s cost curves up. The break-even price moves from $6 to $7. The last option is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "both",
+      "shade": null,
+      "mark": null,
+      "arrow": "UP"
+     }
+    }
+   },
+   {
+    "prompt": "Entry goes on until price equals that break-even level. Where does the market end up in the LONG run?",
+    "options": [
+     "P = $7, Q = 700",
+     "P = $7, Q = 600",
+     "P = $9, Q = 700",
+     "P = $6, Q = 300"
+    ],
+    "correct": 0,
+    "explain": "Price has to come to rest at $7, the new minimum ATC, because that is the only price at which economic profit is zero. Read the quantity off the demand curve the market is now on: at $7 buyers take 700 tons a week. The short-run supply curve has shifted right far enough to pass through that point.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
+    "options": [
+     "Higher — $7 against the original $6",
+     "The same — $6 before and $7 after",
+     "Lower — $9 against the original $6",
+     "Higher, because the industry ended up producing more than before"
+    ],
+    "correct": 0,
+    "explain": "It ends at $7, above the $6 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The last option is the trap: quantity did end up higher, but quantity is not what decides the long-run price — the break-even level of ATC is.",
+    "panel": "both",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   }
+  ]
+ },
+ {
+  "id": "P5",
+  "unit": "service calls a month",
+  "topic": "Offshore wind turbine servicing — increasing cost, demand rises",
+  "method": "Demand shock · the long-run chain",
+  "scenario": "This offshore wind turbine servicing industry is in long-run equilibrium: price is $40, the typical firm is breaking even, and 40 service calls a month change hands. Several large offshore wind farms come online at once, and operators want far more servicing at every price.",
+  "terms": "<b>ATC</b> = average total cost. <b>MC</b> = marginal cost. <b>min ATC</b> = the lowest point on the ATC curve, which is the firm’s break-even price. <b>Economic profit</b> counts the owner’s next-best use of their own money as a cost, so zero economic profit still means a normal return. <b>LRS</b> = long-run supply. <b>P*</b> and <b>Q*</b> = equilibrium price and quantity.",
+  "review": "The chain: the shock moves one curve and the market finds a new SHORT-run price. Compare that price with the typical firm’s min ATC — above it is economic profit, below it is a loss. Profit draws entry and shifts market supply right; loss forces exit and shifts it left. That continues until economic profit is zero again, which is where price equals min ATC. Whether that final price is the same as, higher than, or lower than the original depends on what changing the industry’s SIZE does to input prices: nothing in a constant-cost industry, pushes them the same way in an increasing-cost one, pushes them the opposite way in a decreasing-cost one.",
+  "p0": "40",
+  "q0": 40,
+  "psr": "55",
+  "qsr": 70,
+  "plr": "46",
+  "qlr": 79,
+  "atc0": 40.0,
+  "atcShock": 40.0,
+  "atc1": 46.0,
+  "market": {
+   "bd": 1,
+   "bs": 2,
+   "qmax": 101.12,
+   "pmax": 96.25,
+   "dem": {
+    "D1": [
+     {
+      "a": 80,
+      "label": "D",
+      "solid": true
+     }
+    ],
+    "D2": [
+     {
+      "a": 80,
+      "label": "D₁",
+      "solid": false
+     },
+     {
+      "a": 125,
+      "label": "D₂",
+      "solid": true
+     }
+    ]
+   },
+   "sup": {
+    "S1": [
+     {
+      "c": 20,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Stech": [
+     {
+      "c": 20,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Sfinal": [
+     {
+      "c": 20,
+      "label": "S₁",
+      "solid": false
+     },
+     {
+      "c": 6.5,
+      "label": "S₂",
+      "solid": true
+     }
+    ]
+   }
+  },
+  "firm": {
+   "pmax": 96.25
+  },
+  "points": {
+   "E1": {
+    "q": 40,
+    "p": 40.0
+   },
+   "E2": {
+    "q": 70,
+    "p": 55.0
+   },
+   "E3": {
+    "q": 79,
+    "p": 46.0
+   }
+  },
+  "steps": [
+   {
+    "prompt": "Which curve moves, and which way?",
+    "options": [
+     "Demand shifts right",
+     "Demand shifts left",
+     "Supply shifts right",
+     "Supply shifts left"
+    ],
+    "correct": 0,
+    "explain": "Nothing here changed what it costs to make the good, so supply stays put. What changed is how much buyers want at every price, which is a shift of DEMAND to the right. You drilled this in Unit 2; it is only the first link here.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1"
+      ],
+      "arrow": "DR",
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Where does the market settle in the SHORT run, before the number of firms can change?",
+    "options": [
+     "P = $55, Q = 70",
+     "P = $40, Q = 70",
+     "P = $55, Q = 40",
+     "P = $46, Q = 79"
+    ],
+    "correct": 0,
+    "explain": "The new demand curve meets the unchanged short-run supply curve at $55 and 70 service calls a month. Both price and quantity move, which is why neither of the middle two options can be right. The number of firms is fixed for now, so this is as far as the short run goes.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Take a typical firm in this industry at the new price of $55. Is it earning positive economic profit, taking a loss, or breaking even?",
+    "options": [
+     "Positive economic profit — price is above its minimum ATC",
+     "An economic loss — price is below its minimum ATC",
+     "Zero economic profit — price is exactly its minimum ATC",
+     "It cannot be said without knowing how much of the firm’s cost is fixed"
+    ],
+    "correct": 0,
+    "explain": "Nothing has touched its cost curves, so its minimum ATC is still $40. At $55 the price line sits above that, so the typical firm is making an economic profit. The gap between the price line and ATC at the firm’s chosen quantity is the per-unit profit, and the shaded rectangle is the total. Whether it keeps producing in the short run is the operate-or-shut-down question from the last module; all this step asks is which side of minimum ATC the price is on.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Free entry and exit is one of the four conditions. What does that profit set off, and what does it do to market supply?",
+    "options": [
+     "New firms enter, which shifts market supply to the right",
+     "Some firms exit, which shifts market supply to the left",
+     "New firms enter, which shifts market supply to the left",
+     "The number of firms stays put; the existing firms simply adjust their own output"
+    ],
+    "correct": 0,
+    "explain": "A better-than-normal return is a signal, and with no barriers to entry, outside firms act on it so new firms enter. More sellers at every price IS a rightward shift of market supply; fewer sellers is a leftward one. Watch the second pair of options: entry and a leftward shift cannot go together.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": "SR",
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "What finally brings the entry to a halt?",
+    "options": [
+     "Price falls until it equals the typical firm’s minimum ATC, leaving zero economic profit",
+     "Price falls until it equals the typical firm’s average VARIABLE cost",
+     "It stops once every remaining firm is producing at full capacity",
+     "It stops when the industry runs out of firms willing to enter"
+    ],
+    "correct": 0,
+    "explain": "The signal is the thing that has to disappear. As long as there is economic profit to be had, more firms keep coming; as long as there are losses, more keep going. Movement stops only where economic profit is exactly zero, and that is where price equals minimum ATC. Average variable cost is the shut-down test, not the entry-and-exit test, and it sits below ATC.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": "minatc",
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "This is a increasing-cost industry. As entry expands the industry it, what happens to EVERY firm’s ATC curve?",
+    "options": [
+     "It shifts UP — minimum ATC moves from $40 to $46",
+     "It stays exactly where it is — industry size does not move input prices here",
+     "It shifts DOWN, because suppliers reach economies of scale of their own",
+     "It shifts for the firms that just arrived, but not for the ones already there"
+    ],
+    "correct": 0,
+    "explain": "An increasing-cost industry’s costs move WITH its size. More firms compete for the same land, labor and materials, so input prices are bid up, and that lifts every firm’s cost curves up. The break-even price moves from $40 to $46. The last option is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "both",
+      "shade": null,
+      "mark": null,
+      "arrow": "UP"
+     }
+    }
+   },
+   {
+    "prompt": "Entry goes on until price equals that break-even level. Where does the market end up in the LONG run?",
+    "options": [
+     "P = $46, Q = 79",
+     "P = $46, Q = 70",
+     "P = $55, Q = 79",
+     "P = $40, Q = 40"
+    ],
+    "correct": 0,
+    "explain": "Price has to come to rest at $46, the new minimum ATC, because that is the only price at which economic profit is zero. Read the quantity off the demand curve the market is now on: at $46 buyers take 79 service calls a month. The short-run supply curve has shifted right far enough to pass through that point.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
+    "options": [
+     "Higher — $46 against the original $40",
+     "The same — $40 before and $46 after",
+     "Lower — $55 against the original $40",
+     "Higher, because the industry ended up producing more than before"
+    ],
+    "correct": 0,
+    "explain": "It ends at $46, above the $40 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The last option is the trap: quantity did end up higher, but quantity is not what decides the long-run price — the break-even level of ATC is.",
+    "panel": "both",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   }
+  ]
+ },
+ {
+  "id": "P6",
+  "unit": "hundred pounds a day",
+  "topic": "Commercial lobster fishing — increasing cost, demand falls",
+  "method": "Demand shock · the long-run chain",
+  "scenario": "This commercial lobster fishing industry is in long-run equilibrium: price is $12, the typical firm is breaking even, and 80 hundred pounds a day change hands. A health advisory about shellfish is published, and buyers want far fewer lobsters at every price.",
+  "terms": "<b>ATC</b> = average total cost. <b>MC</b> = marginal cost. <b>min ATC</b> = the lowest point on the ATC curve, which is the firm’s break-even price. <b>Economic profit</b> counts the owner’s next-best use of their own money as a cost, so zero economic profit still means a normal return. <b>LRS</b> = long-run supply. <b>P*</b> and <b>Q*</b> = equilibrium price and quantity.",
+  "review": "The chain: the shock moves one curve and the market finds a new SHORT-run price. Compare that price with the typical firm’s min ATC — above it is economic profit, below it is a loss. Profit draws entry and shifts market supply right; loss forces exit and shifts it left. That continues until economic profit is zero again, which is where price equals min ATC. Whether that final price is the same as, higher than, or lower than the original depends on what changing the industry’s SIZE does to input prices: nothing in a constant-cost industry, pushes them the same way in an increasing-cost one, pushes them the opposite way in a decreasing-cost one.",
+  "p0": "12",
+  "q0": 80,
+  "psr": "8",
+  "qsr": 40,
+  "plr": "10",
+  "qlr": 20,
+  "atc0": 12.0,
+  "atcShock": 12.0,
+  "atc1": 10.0,
+  "market": {
+   "bd": 10,
+   "bs": 10,
+   "qmax": 102.4,
+   "pmax": 21.0,
+   "dem": {
+    "D1": [
+     {
+      "a": 20,
+      "label": "D",
+      "solid": true
+     }
+    ],
+    "D2": [
+     {
+      "a": 20,
+      "label": "D₁",
+      "solid": false
+     },
+     {
+      "a": 12,
+      "label": "D₂",
+      "solid": true
+     }
+    ]
+   },
+   "sup": {
+    "S1": [
+     {
+      "c": 4,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Stech": [
+     {
+      "c": 4,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Sfinal": [
+     {
+      "c": 4,
+      "label": "S₁",
+      "solid": false
+     },
+     {
+      "c": 8.0,
+      "label": "S₂",
+      "solid": true
+     }
+    ]
+   }
+  },
+  "firm": {
+   "pmax": 21.0
+  },
+  "points": {
+   "E1": {
+    "q": 80,
+    "p": 12.0
+   },
+   "E2": {
+    "q": 40,
+    "p": 8.0
+   },
+   "E3": {
+    "q": 20,
+    "p": 10.0
+   }
+  },
+  "steps": [
+   {
+    "prompt": "Which curve moves, and which way?",
+    "options": [
+     "Demand shifts left",
+     "Demand shifts right",
+     "Supply shifts right",
+     "Supply shifts left"
+    ],
+    "correct": 0,
+    "explain": "Nothing here changed what it costs to make the good, so supply stays put. What changed is how much buyers want at every price, which is a shift of DEMAND to the left. You drilled this in Unit 2; it is only the first link here.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1"
+      ],
+      "arrow": "DL",
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Where does the market settle in the SHORT run, before the number of firms can change?",
+    "options": [
+     "P = $8, Q = 40",
+     "P = $12, Q = 40",
+     "P = $8, Q = 80",
+     "P = $10, Q = 20"
+    ],
+    "correct": 0,
+    "explain": "The new demand curve meets the unchanged short-run supply curve at $8 and 40 hundred pounds a day. Both price and quantity move, which is why neither of the middle two options can be right. The number of firms is fixed for now, so this is as far as the short run goes.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Take a typical firm in this industry at the new price of $8. Is it earning positive economic profit, taking a loss, or breaking even?",
+    "options": [
+     "An economic loss — price is below its minimum ATC",
+     "Positive economic profit — price is above its minimum ATC",
+     "Zero economic profit — price is exactly its minimum ATC",
+     "It cannot be said without knowing how much of the firm’s cost is fixed"
+    ],
+    "correct": 0,
+    "explain": "Nothing has touched its cost curves, so its minimum ATC is still $12. At $8 the price line sits below that, so the typical firm is taking an economic loss. The gap between the price line and ATC at the firm’s chosen quantity is the per-unit loss, and the shaded rectangle is the total. Whether it keeps producing in the short run is the operate-or-shut-down question from the last module; all this step asks is which side of minimum ATC the price is on.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "loss",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Free entry and exit is one of the four conditions. What does that loss set off, and what does it do to market supply?",
+    "options": [
+     "Some firms exit, which shifts market supply to the left",
+     "New firms enter, which shifts market supply to the right",
+     "Some firms exit, which shifts market supply to the right",
+     "The number of firms stays put; the existing firms simply adjust their own output"
+    ],
+    "correct": 0,
+    "explain": "A loss is a signal too, and with nothing holding firms in, some of them leave so the industry loses firms. More sellers at every price IS a rightward shift of market supply; fewer sellers is a leftward one. Watch the second pair of options: entry and a leftward shift cannot go together.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": "SL",
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "loss",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "What finally brings the exit to a halt?",
+    "options": [
+     "Price rises until it equals the typical firm’s minimum ATC, leaving zero economic profit",
+     "Price rises until it equals the typical firm’s average VARIABLE cost",
+     "It stops once every remaining firm is producing at full capacity",
+     "It stops when the industry runs out of firms willing to leave"
+    ],
+    "correct": 0,
+    "explain": "The signal is the thing that has to disappear. As long as there is economic profit to be had, more firms keep coming; as long as there are losses, more keep going. Movement stops only where economic profit is exactly zero, and that is where price equals minimum ATC. Average variable cost is the shut-down test, not the entry-and-exit test, and it sits below ATC.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "loss",
+      "mark": "minatc",
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "This is a increasing-cost industry. As exit shrinks the industry it, what happens to EVERY firm’s ATC curve?",
+    "options": [
+     "It shifts DOWN — minimum ATC moves from $12 to $10",
+     "It stays exactly where it is — industry size does not move input prices here",
+     "It shifts UP, because more firms compete for the same inputs",
+     "It shifts for the firms that just arrived, but not for the ones already there"
+    ],
+    "correct": 0,
+    "explain": "An increasing-cost industry’s costs move WITH its size. Fewer firms are competing for the same land, labor and materials, so input prices ease back, and that lifts every firm’s cost curves down. The break-even price moves from $12 to $10. The last option is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "both",
+      "shade": null,
+      "mark": null,
+      "arrow": "DOWN"
+     }
+    }
+   },
+   {
+    "prompt": "Exit goes on until price equals that break-even level. Where does the market end up in the LONG run?",
+    "options": [
+     "P = $10, Q = 20",
+     "P = $10, Q = 40",
+     "P = $8, Q = 20",
+     "P = $12, Q = 80"
+    ],
+    "correct": 0,
+    "explain": "Price has to come to rest at $10, the new minimum ATC, because that is the only price at which economic profit is zero. Read the quantity off the demand curve the market is now on: at $10 buyers take 20 hundred pounds a day. The short-run supply curve has shifted left far enough to pass through that point.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
+    "options": [
+     "Lower — $10 against the original $12",
+     "The same — $12 before and $10 after",
+     "Higher — $8 against the original $12",
+     "Lower, because the industry ended up producing less than before"
+    ],
+    "correct": 0,
+    "explain": "It ends at $10, below the $12 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The last option is the trap: quantity did end up lower, but quantity is not what decides the long-run price — the break-even level of ATC is.",
+    "panel": "both",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   }
+  ]
+ },
+ {
+  "id": "P7",
+  "unit": "installations a month",
+  "topic": "Rooftop solar installation — decreasing cost, demand rises",
+  "method": "Demand shock · the long-run chain",
+  "scenario": "This rooftop solar installation industry is in long-run equilibrium: price is $15, the typical firm is breaking even, and 200 installations a month change hands. A long-running federal tax credit for home solar is renewed, and homeowners want far more installations at every price.",
+  "terms": "<b>ATC</b> = average total cost. <b>MC</b> = marginal cost. <b>min ATC</b> = the lowest point on the ATC curve, which is the firm’s break-even price. <b>Economic profit</b> counts the owner’s next-best use of their own money as a cost, so zero economic profit still means a normal return. <b>LRS</b> = long-run supply. <b>P*</b> and <b>Q*</b> = equilibrium price and quantity.",
+  "review": "The chain: the shock moves one curve and the market finds a new SHORT-run price. Compare that price with the typical firm’s min ATC — above it is economic profit, below it is a loss. Profit draws entry and shifts market supply right; loss forces exit and shifts it left. That continues until economic profit is zero again, which is where price equals min ATC. Whether that final price is the same as, higher than, or lower than the original depends on what changing the industry’s SIZE does to input prices: nothing in a constant-cost industry, pushes them the same way in an increasing-cost one, pushes them the opposite way in a decreasing-cost one.",
+  "p0": "15",
+  "q0": 200,
+  "psr": "21",
+  "qsr": 320,
+  "plr": "12",
+  "qlr": 500,
+  "atc0": 15.0,
+  "atcShock": 15.0,
+  "atc1": 12.0,
+  "market": {
+   "bd": 20,
+   "bs": 20,
+   "qmax": 640.0,
+   "pmax": 36.75,
+   "dem": {
+    "D1": [
+     {
+      "a": 25,
+      "label": "D",
+      "solid": true
+     }
+    ],
+    "D2": [
+     {
+      "a": 25,
+      "label": "D₁",
+      "solid": false
+     },
+     {
+      "a": 37,
+      "label": "D₂",
+      "solid": true
+     }
+    ]
+   },
+   "sup": {
+    "S1": [
+     {
+      "c": 5,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Stech": [
+     {
+      "c": 5,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Sfinal": [
+     {
+      "c": 5,
+      "label": "S₁",
+      "solid": false
+     },
+     {
+      "c": -13.0,
+      "label": "S₂",
+      "solid": true
+     }
+    ]
+   }
+  },
+  "firm": {
+   "pmax": 36.75
+  },
+  "points": {
+   "E1": {
+    "q": 200,
+    "p": 15.0
+   },
+   "E2": {
+    "q": 320,
+    "p": 21.0
+   },
+   "E3": {
+    "q": 500,
+    "p": 12.0
+   }
+  },
+  "steps": [
+   {
+    "prompt": "Which curve moves, and which way?",
+    "options": [
+     "Demand shifts right",
+     "Demand shifts left",
+     "Supply shifts right",
+     "Supply shifts left"
+    ],
+    "correct": 0,
+    "explain": "Nothing here changed what it costs to make the good, so supply stays put. What changed is how much buyers want at every price, which is a shift of DEMAND to the right. You drilled this in Unit 2; it is only the first link here.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1"
+      ],
+      "arrow": "DR",
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Where does the market settle in the SHORT run, before the number of firms can change?",
+    "options": [
+     "P = $21, Q = 320",
+     "P = $15, Q = 320",
+     "P = $21, Q = 200",
+     "P = $12, Q = 500"
+    ],
+    "correct": 0,
+    "explain": "The new demand curve meets the unchanged short-run supply curve at $21 and 320 installations a month. Both price and quantity move, which is why neither of the middle two options can be right. The number of firms is fixed for now, so this is as far as the short run goes.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Take a typical firm in this industry at the new price of $21. Is it earning positive economic profit, taking a loss, or breaking even?",
+    "options": [
+     "Positive economic profit — price is above its minimum ATC",
+     "An economic loss — price is below its minimum ATC",
+     "Zero economic profit — price is exactly its minimum ATC",
+     "It cannot be said without knowing how much of the firm’s cost is fixed"
+    ],
+    "correct": 0,
+    "explain": "Nothing has touched its cost curves, so its minimum ATC is still $15. At $21 the price line sits above that, so the typical firm is making an economic profit. The gap between the price line and ATC at the firm’s chosen quantity is the per-unit profit, and the shaded rectangle is the total. Whether it keeps producing in the short run is the operate-or-shut-down question from the last module; all this step asks is which side of minimum ATC the price is on.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Free entry and exit is one of the four conditions. What does that profit set off, and what does it do to market supply?",
+    "options": [
+     "New firms enter, which shifts market supply to the right",
+     "Some firms exit, which shifts market supply to the left",
+     "New firms enter, which shifts market supply to the left",
+     "The number of firms stays put; the existing firms simply adjust their own output"
+    ],
+    "correct": 0,
+    "explain": "A better-than-normal return is a signal, and with no barriers to entry, outside firms act on it so new firms enter. More sellers at every price IS a rightward shift of market supply; fewer sellers is a leftward one. Watch the second pair of options: entry and a leftward shift cannot go together.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": "SR",
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "What finally brings the entry to a halt?",
+    "options": [
+     "Price falls until it equals the typical firm’s minimum ATC, leaving zero economic profit",
+     "Price falls until it equals the typical firm’s average VARIABLE cost",
+     "It stops once every remaining firm is producing at full capacity",
+     "It stops when the industry runs out of firms willing to enter"
+    ],
+    "correct": 0,
+    "explain": "The signal is the thing that has to disappear. As long as there is economic profit to be had, more firms keep coming; as long as there are losses, more keep going. Movement stops only where economic profit is exactly zero, and that is where price equals minimum ATC. Average variable cost is the shut-down test, not the entry-and-exit test, and it sits below ATC.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": "minatc",
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "This is a decreasing-cost industry. As entry expands the industry it, what happens to EVERY firm’s ATC curve?",
+    "options": [
+     "It shifts DOWN — minimum ATC moves from $15 to $12",
+     "It stays exactly where it is — industry size does not move input prices here",
+     "It shifts UP, because more firms compete for the same inputs",
+     "It shifts for the firms that just arrived, but not for the ones already there"
+    ],
+    "correct": 0,
+    "explain": "A decreasing-cost industry’s costs move AGAINST its size. A bigger industry supports specialized suppliers and shared infrastructure that reach their own economies of scale, so input prices fall, and every firm’s cost curves move down. The break-even price moves from $15 to $12. The last option is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "both",
+      "shade": null,
+      "mark": null,
+      "arrow": "DOWN"
+     }
+    }
+   },
+   {
+    "prompt": "Entry goes on until price equals that break-even level. Where does the market end up in the LONG run?",
+    "options": [
+     "P = $12, Q = 500",
+     "P = $12, Q = 320",
+     "P = $21, Q = 500",
+     "P = $15, Q = 200"
+    ],
+    "correct": 0,
+    "explain": "Price has to come to rest at $12, the new minimum ATC, because that is the only price at which economic profit is zero. Read the quantity off the demand curve the market is now on: at $12 buyers take 500 installations a month. The short-run supply curve has shifted right far enough to pass through that point.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
+    "options": [
+     "Lower — $12 against the original $15",
+     "The same — $15 before and $12 after",
+     "Higher — $21 against the original $15",
+     "Higher, because the industry ended up producing more than before"
+    ],
+    "correct": 0,
+    "explain": "It ends at $12, below the $15 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The last option is the trap: quantity did end up higher, but quantity is not what decides the long-run price — the break-even level of ATC is.",
+    "panel": "both",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   }
+  ]
+ },
+ {
+  "id": "P8",
+  "unit": "racks a week",
+  "topic": "Data-center liquid cooling — decreasing cost, demand falls",
+  "method": "Demand shock · the long-run chain",
+  "scenario": "This data-center liquid cooling industry is in long-run equilibrium: price is $30, the typical firm is breaking even, and 100 racks a week change hands. A new generation of chips runs far cooler, and data centers want far fewer liquid-cooling racks at every price.",
+  "terms": "<b>ATC</b> = average total cost. <b>MC</b> = marginal cost. <b>min ATC</b> = the lowest point on the ATC curve, which is the firm’s break-even price. <b>Economic profit</b> counts the owner’s next-best use of their own money as a cost, so zero economic profit still means a normal return. <b>LRS</b> = long-run supply. <b>P*</b> and <b>Q*</b> = equilibrium price and quantity.",
+  "review": "The chain: the shock moves one curve and the market finds a new SHORT-run price. Compare that price with the typical firm’s min ATC — above it is economic profit, below it is a loss. Profit draws entry and shifts market supply right; loss forces exit and shifts it left. That continues until economic profit is zero again, which is where price equals min ATC. Whether that final price is the same as, higher than, or lower than the original depends on what changing the industry’s SIZE does to input prices: nothing in a constant-cost industry, pushes them the same way in an increasing-cost one, pushes them the opposite way in a decreasing-cost one.",
+  "p0": "30",
+  "q0": 100,
+  "psr": "26",
+  "qsr": 80,
+  "plr": "33",
+  "qlr": 45,
+  "atc0": 30.0,
+  "atcShock": 30.0,
+  "atc1": 33.0,
+  "market": {
+   "bd": 5,
+   "bs": 5,
+   "qmax": 128.0,
+   "pmax": 57.75,
+   "dem": {
+    "D1": [
+     {
+      "a": 50,
+      "label": "D",
+      "solid": true
+     }
+    ],
+    "D2": [
+     {
+      "a": 50,
+      "label": "D₁",
+      "solid": false
+     },
+     {
+      "a": 42,
+      "label": "D₂",
+      "solid": true
+     }
+    ]
+   },
+   "sup": {
+    "S1": [
+     {
+      "c": 10,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Stech": [
+     {
+      "c": 10,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Sfinal": [
+     {
+      "c": 10,
+      "label": "S₁",
+      "solid": false
+     },
+     {
+      "c": 24.0,
+      "label": "S₂",
+      "solid": true
+     }
+    ]
+   }
+  },
+  "firm": {
+   "pmax": 57.75
+  },
+  "points": {
+   "E1": {
+    "q": 100,
+    "p": 30.0
+   },
+   "E2": {
+    "q": 80,
+    "p": 26.0
+   },
+   "E3": {
+    "q": 45,
+    "p": 33.0
+   }
+  },
+  "steps": [
+   {
+    "prompt": "Which curve moves, and which way?",
+    "options": [
+     "Demand shifts left",
+     "Demand shifts right",
+     "Supply shifts right",
+     "Supply shifts left"
+    ],
+    "correct": 0,
+    "explain": "Nothing here changed what it costs to make the good, so supply stays put. What changed is how much buyers want at every price, which is a shift of DEMAND to the left. You drilled this in Unit 2; it is only the first link here.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1"
+      ],
+      "arrow": "DL",
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Where does the market settle in the SHORT run, before the number of firms can change?",
+    "options": [
+     "P = $26, Q = 80",
+     "P = $30, Q = 80",
+     "P = $26, Q = 100",
+     "P = $33, Q = 45"
+    ],
+    "correct": 0,
+    "explain": "The new demand curve meets the unchanged short-run supply curve at $26 and 80 racks a week. Both price and quantity move, which is why neither of the middle two options can be right. The number of firms is fixed for now, so this is as far as the short run goes.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Take a typical firm in this industry at the new price of $26. Is it earning positive economic profit, taking a loss, or breaking even?",
+    "options": [
+     "An economic loss — price is below its minimum ATC",
+     "Positive economic profit — price is above its minimum ATC",
+     "Zero economic profit — price is exactly its minimum ATC",
+     "It cannot be said without knowing how much of the firm’s cost is fixed"
+    ],
+    "correct": 0,
+    "explain": "Nothing has touched its cost curves, so its minimum ATC is still $30. At $26 the price line sits below that, so the typical firm is taking an economic loss. The gap between the price line and ATC at the firm’s chosen quantity is the per-unit loss, and the shaded rectangle is the total. Whether it keeps producing in the short run is the operate-or-shut-down question from the last module; all this step asks is which side of minimum ATC the price is on.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "S1",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "loss",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Free entry and exit is one of the four conditions. What does that loss set off, and what does it do to market supply?",
+    "options": [
+     "Some firms exit, which shifts market supply to the left",
+     "New firms enter, which shifts market supply to the right",
+     "Some firms exit, which shifts market supply to the right",
+     "The number of firms stays put; the existing firms simply adjust their own output"
+    ],
+    "correct": 0,
+    "explain": "A loss is a signal too, and with nothing holding firms in, some of them leave so the industry loses firms. More sellers at every price IS a rightward shift of market supply; fewer sellers is a leftward one. Watch the second pair of options: entry and a leftward shift cannot go together.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": "SL",
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "loss",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "What finally brings the exit to a halt?",
+    "options": [
+     "Price rises until it equals the typical firm’s minimum ATC, leaving zero economic profit",
+     "Price rises until it equals the typical firm’s average VARIABLE cost",
+     "It stops once every remaining firm is producing at full capacity",
+     "It stops when the industry runs out of firms willing to leave"
+    ],
+    "correct": 0,
+    "explain": "The signal is the thing that has to disappear. As long as there is economic profit to be had, more firms keep coming; as long as there are losses, more keep going. Movement stops only where economic profit is exactly zero, and that is where price equals minimum ATC. Average variable cost is the shut-down test, not the entry-and-exit test, and it sits below ATC.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "loss",
+      "mark": "minatc",
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "This is a decreasing-cost industry. As exit shrinks the industry it, what happens to EVERY firm’s ATC curve?",
+    "options": [
+     "It shifts UP — minimum ATC moves from $30 to $33",
+     "It stays exactly where it is — industry size does not move input prices here",
+     "It shifts DOWN, because suppliers reach economies of scale of their own",
+     "It shifts for the firms that just arrived, but not for the ones already there"
+    ],
+    "correct": 0,
+    "explain": "A decreasing-cost industry’s costs move AGAINST its size. A shrinking industry loses the specialized suppliers and shared infrastructure it had grown, so input prices rise, and every firm’s cost curves move up. The break-even price moves from $30 to $33. The last option is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "both",
+      "shade": null,
+      "mark": null,
+      "arrow": "UP"
+     }
+    }
+   },
+   {
+    "prompt": "Exit goes on until price equals that break-even level. Where does the market end up in the LONG run?",
+    "options": [
+     "P = $33, Q = 45",
+     "P = $33, Q = 80",
+     "P = $26, Q = 45",
+     "P = $30, Q = 100"
+    ],
+    "correct": 0,
+    "explain": "Price has to come to rest at $33, the new minimum ATC, because that is the only price at which economic profit is zero. Read the quantity off the demand curve the market is now on: at $33 buyers take 45 racks a week. The short-run supply curve has shifted left far enough to pass through that point.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
+    "options": [
+     "Higher — $33 against the original $30",
+     "The same — $30 before and $33 after",
+     "Lower — $26 against the original $30",
+     "Lower, because the industry ended up producing less than before"
+    ],
+    "correct": 0,
+    "explain": "It ends at $33, above the $30 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The last option is the trap: quantity did end up lower, but quantity is not what decides the long-run price — the break-even level of ATC is.",
+    "panel": "both",
+    "view": {
+     "market": {
+      "dem": "D2",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   }
+  ]
+ },
+ {
+  "id": "P9",
+  "unit": "thousand bulbs a day",
+  "topic": "LED bulb assembly — constant cost, a cost-cutting technology",
+  "method": "Supply shock · the long-run chain",
+  "scenario": "This LED bulb assembly industry is in long-run equilibrium: price is $9, the typical firm is breaking even, and 120 thousand bulbs a day change hands. A cheaper phosphor coating is published openly and every assembler adopts it within months. It cuts the cost of making a bulb across the whole industry.",
+  "terms": "<b>ATC</b> = average total cost. <b>MC</b> = marginal cost. <b>min ATC</b> = the lowest point on the ATC curve, which is the firm’s break-even price. <b>Economic profit</b> counts the owner’s next-best use of their own money as a cost, so zero economic profit still means a normal return. <b>LRS</b> = long-run supply. <b>P*</b> and <b>Q*</b> = equilibrium price and quantity.",
+  "review": "The chain: the shock moves one curve and the market finds a new SHORT-run price. Compare that price with the typical firm’s min ATC — above it is economic profit, below it is a loss. Profit draws entry and shifts market supply right; loss forces exit and shifts it left. That continues until economic profit is zero again, which is where price equals min ATC. Whether that final price is the same as, higher than, or lower than the original depends on what changing the industry’s SIZE does to input prices: nothing in a constant-cost industry, pushes them the same way in an increasing-cost one, pushes them the opposite way in a decreasing-cost one.",
+  "p0": "9",
+  "q0": 120,
+  "psr": "7.50",
+  "qsr": 150,
+  "plr": "6",
+  "qlr": 180,
+  "atc0": 9.0,
+  "atcShock": 6.0,
+  "atc1": 6.0,
+  "market": {
+   "bd": 20,
+   "bs": 20,
+   "qmax": 230.4,
+   "pmax": 15.75,
+   "dem": {
+    "D1": [
+     {
+      "a": 15,
+      "label": "D",
+      "solid": true
+     }
+    ],
+    "D2": [
+     {
+      "a": 15,
+      "label": "D",
+      "solid": true
+     }
+    ]
+   },
+   "sup": {
+    "S1": [
+     {
+      "c": 3,
+      "label": "S",
+      "solid": true
+     }
+    ],
+    "Stech": [
+     {
+      "c": 3,
+      "label": "S₁",
+      "solid": false
+     },
+     {
+      "c": 0,
+      "label": "S₂",
+      "solid": true
+     }
+    ],
+    "Sfinal": [
+     {
+      "c": 0,
+      "label": "S₂",
+      "solid": false
+     },
+     {
+      "c": -3.0,
+      "label": "S₃",
+      "solid": true
+     }
+    ]
+   }
+  },
+  "firm": {
+   "pmax": 15.75
+  },
+  "points": {
+   "E1": {
+    "q": 120,
+    "p": 9.0
+   },
+   "E2": {
+    "q": 150,
+    "p": 7.5
+   },
+   "E3": {
+    "q": 180,
+    "p": 6.0
+   }
+  },
+  "steps": [
+   {
+    "prompt": "Which curve moves, and which way?",
+    "options": [
+     "Supply shifts right",
+     "Demand shifts right",
+     "Demand shifts left",
+     "Supply shifts left"
+    ],
+    "correct": 0,
+    "explain": "A cost-cutting method that every firm adopts lowers the cost of making each unit, so firms will supply more at every price: SUPPLY shifts right. Buyers have not changed their minds about the good at all, so demand stays exactly where it is.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D1",
+      "sup": "Stech",
+      "pts": [
+       "E1"
+      ],
+      "arrow": "SR",
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Where does the market settle in the SHORT run, before the number of firms can change?",
+    "options": [
+     "P = $7.50, Q = 150",
+     "P = $9, Q = 150",
+     "P = $7.50, Q = 120",
+     "P = $6, Q = 180"
+    ],
+    "correct": 0,
+    "explain": "The shifted supply curve meets the unchanged demand curve at $7.50 and 150 thousand bulbs a day. Both price and quantity move, which is why neither of the middle two options can be right. The number of firms is fixed for now, so this is as far as the short run goes.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D1",
+      "sup": "Stech",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "p0",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Take a typical firm in this industry at the new price of $7.50. Is it earning positive economic profit, taking a loss, or breaking even?",
+    "options": [
+     "Positive economic profit — price is above its minimum ATC",
+     "An economic loss — price is below its minimum ATC",
+     "Zero economic profit — price is exactly its minimum ATC",
+     "It cannot be said without knowing how much of the firm’s cost is fixed"
+    ],
+    "correct": 0,
+    "explain": "Its cost curves have already moved: the new method puts its minimum ATC at $6. At $7.50 the price line sits above that, so the typical firm is making an economic profit. The gap between the price line and ATC at the firm’s chosen quantity is the per-unit profit, and the shaded rectangle is the total. Whether it keeps producing in the short run is the operate-or-shut-down question from the last module; all this step asks is which side of minimum ATC the price is on.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D1",
+      "sup": "Stech",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Free entry and exit is one of the four conditions. What does that profit set off, and what does it do to market supply?",
+    "options": [
+     "New firms enter, which shifts market supply to the right",
+     "Some firms exit, which shifts market supply to the left",
+     "New firms enter, which shifts market supply to the left",
+     "The number of firms stays put; the existing firms simply adjust their own output"
+    ],
+    "correct": 0,
+    "explain": "A better-than-normal return is a signal, and with no barriers to entry, outside firms act on it so new firms enter. More sellers at every price IS a rightward shift of market supply; fewer sellers is a leftward one. Watch the second pair of options: entry and a leftward shift cannot go together.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D1",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": "SR",
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "What finally brings the entry to a halt?",
+    "options": [
+     "Price falls until it equals the typical firm’s minimum ATC, leaving zero economic profit",
+     "Price falls until it equals the typical firm’s average VARIABLE cost",
+     "It stops once every remaining firm is producing at full capacity",
+     "It stops when the industry runs out of firms willing to enter"
+    ],
+    "correct": 0,
+    "explain": "The signal is the thing that has to disappear. As long as there is economic profit to be had, more firms keep coming; as long as there are losses, more keep going. Movement stops only where economic profit is exactly zero, and that is where price equals minimum ATC. Average variable cost is the shut-down test, not the entry-and-exit test, and it sits below ATC.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D1",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": "profit",
+      "mark": "minatc",
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "This is a constant-cost industry. As entry expands the industry it, what happens to EVERY firm’s ATC curve?",
+    "options": [
+     "It stays at $6 — the method already moved it, and expansion itself does not move input prices",
+     "It shifts UP, because more firms compete for the same inputs",
+     "It shifts DOWN, because suppliers reach economies of scale of their own",
+     "It shifts for the firms that just arrived, but not for the ones already there"
+    ],
+    "correct": 0,
+    "explain": "This is a constant-cost industry: the inputs it uses are a small enough part of their own markets that adding firms does not bid their prices up. Every firm’s ATC curve is exactly where it started, so the break-even price is still $6. The last option is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
+    "panel": "firm",
+    "view": {
+     "market": {
+      "dem": "D1",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2"
+      ],
+      "arrow": null,
+      "lrs": false
+     },
+     "firm": {
+      "price": "psr",
+      "atc": "atcS",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Entry goes on until price equals that break-even level. Where does the market end up in the LONG run?",
+    "options": [
+     "P = $6, Q = 180",
+     "P = $6, Q = 150",
+     "P = $7.50, Q = 180",
+     "P = $9, Q = 120"
+    ],
+    "correct": 0,
+    "explain": "Price has to come to rest at $6, the new minimum ATC, because that is the only price at which economic profit is zero. Read the quantity off the demand curve the market is now on: at $6 buyers take 180 thousand bulbs a day. The short-run supply curve has shifted right far enough to pass through that point.",
+    "panel": "market",
+    "view": {
+     "market": {
+      "dem": "D1",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   },
+   {
+    "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
+    "options": [
+     "Lower — $6 against the original $9",
+     "The same — $9 before and $6 after",
+     "Higher — $7.50 against the original $9",
+     "Higher, because the industry ended up producing more than before"
+    ],
+    "correct": 0,
+    "explain": "It ends at $6, below the $9 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The last option is the trap: quantity did end up higher, but quantity is not what decides the long-run price — the break-even level of ATC is.",
+    "panel": "both",
+    "view": {
+     "market": {
+      "dem": "D1",
+      "sup": "Sfinal",
+      "pts": [
+       "E1",
+       "E2",
+       "E3"
+      ],
+      "arrow": null,
+      "lrs": true
+     },
+     "firm": {
+      "price": "plr",
+      "atc": "atc1",
+      "shade": null,
+      "mark": null,
+      "arrow": null
+     }
+    }
+   }
+  ]
+ }
+];
+
+/* ================= GEOMETRY =================
+   Firm costs, from a single total cost function:
+       TC(q)  = A*q + k*q*(q - QM)^2
+       ATC(q) = TC/q = A + k*(q - QM)^2          minimum A at q = QM
+       MC(q)  = dTC/dq = A + k*(3q^2 - 4*QM*q + QM^2)
+   MC(QM) = A, so MC passes through the bottom of ATC exactly. */
+const QM = 10;
+function kFor(A){ return A / 90; }
+function atcAt(q, A){ const k = kFor(A); return A + k * (q - QM) * (q - QM); }
+function mcAt(q, A){ const k = kFor(A); return A + k * (3*q*q - 4*QM*q + QM*QM); }
+/* Where the firm produces: the upward branch of MC meeting the price line. */
+function qStar(P, A){
+  const k = kFor(A);
+  const disc = 4*QM*QM - 12*(A - P)/k;
+  if(disc < 0) return QM;
+  return (4*QM + Math.sqrt(disc)) / 6;
+}
+
+const PAD = { l:46, r:16, t:14, b:34 };
+function plot(svg){
+  const vb = svg.getAttribute('viewBox').split(' ').map(Number);
+  return { w:vb[2], h:vb[3], x0:PAD.l, x1:vb[2]-PAD.r, y0:vb[3]-PAD.b, y1:PAD.t };
+}
+function mk(tag, attrs, text){
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  if(text !== undefined) e.textContent = text;
+  return e;
+}
+function axisValue(svg, p, where, at, text){
+  /* Two equilibria can sit at one price (a constant-cost industry ends where
+     it began), and the same tick was then painted twice in the same spot. */
+  const seen = svg.__axisSeen || (svg.__axisSeen = new Set());
+  const stamp = where + '|' + Math.round(at * 10) + '|' + text;
+  if(seen.has(stamp)) return;
+  seen.add(stamp);
+  if(where === 'y')
+    svg.appendChild(mk('text', {x:p.x0 - 5, y:at + 3.5, 'text-anchor':'end',
+      'font-size':9.5, 'font-weight':700, fill:'#6B5D4C'}, text));
+  else
+    svg.appendChild(mk('text', {x:at, y:p.y0 + 12, 'text-anchor':'middle',
+      'font-size':9.5, 'font-weight':700, fill:'#6B5D4C'}, text));
+}
+function axes(svg, p, xLabel, yLabel){
+  svg.appendChild(mk('line', {x1:p.x0, y1:p.y0, x2:p.x1, y2:p.y0, stroke:'#2B2118', 'stroke-width':1.6}));
+  svg.appendChild(mk('line', {x1:p.x0, y1:p.y0, x2:p.x0, y2:p.y1, stroke:'#2B2118', 'stroke-width':1.6}));
+  svg.appendChild(mk('text', {x:(p.x0+p.x1)/2, y:p.y0+26, 'text-anchor':'middle',
+                              'font-size':11.5, 'font-weight':700, fill:'#6B5D4C'}, xLabel));
+  const yx = 14, yy = (p.y0+p.y1)/2;
+  svg.appendChild(mk('text', {x:yx, y:yy, 'text-anchor':'middle', 'font-size':11.5, 'font-weight':700,
+                              fill:'#6B5D4C', transform:`rotate(-90 ${yx} ${yy})`}, yLabel));
+}
+/* Keep a straight line inside the box: P = a + slope*Q over Q in [0, qmax]. */
+function segment(a, slope, qmax, pmax){
+  const cand = [0, qmax];
+  if(Math.abs(slope) > 1e-12){ cand.push((pmax - a)/slope, (0 - a)/slope); }
+  const ok = cand.filter(q => q >= -1e-7 && q <= qmax + 1e-7 &&
+                              a + slope*q >= -1e-7 && a + slope*q <= pmax + 1e-7)
+                 .sort((x,y) => x - y);
+  if(ok.length < 2) return null;
+  return [ok[0], ok[ok.length-1]];
+}
+
+/* ================= THE MARKET PANEL ================= */
+function drawMarket(problem, view){
+  const svg = document.getElementById('marketSvg');
+  svg.innerHTML = '';
+  svg.__axisSeen = null;
+  const m = problem.market, p = plot(svg);
+  const qmax = m.qmax, pmax = m.pmax;
+  const X = q => p.x0 + (q/qmax)*(p.x1 - p.x0);
+  const Y = v => p.y0 - (v/pmax)*(p.y0 - p.y1);
+  axes(svg, p, 'Quantity (' + problem.unit + ')', 'Price ($)');
+
+  /* Labels are queued rather than drawn here: see placeLabels below. */
+  const labelQ = [];
+  const line = (a, slope, color, dash, label, width) => {
+    const s = segment(a, slope, qmax, pmax);
+    if(!s) return;
+    svg.appendChild(mk('line', {x1:X(s[0]), y1:Y(a + slope*s[0]), x2:X(s[1]), y2:Y(a + slope*s[1]),
+      stroke:color, 'stroke-width':width || 2.4, 'stroke-dasharray':dash || 'none',
+      'stroke-linecap':'round'}));
+    if(label){
+      const q = s[1], v = a + slope*q;
+      labelQ.push({text:label, color:color,
+        x:Math.min(X(q) + 5, p.x1 - 2),
+        y:Math.min(Math.max(Y(v) - 4, p.y1 + 11), p.y0 - 5)});
+    }
+  };
+  /* Every curve is labelled at its own right-hand end, so curves that finish in
+     the same corner -- LRS and the two demand curves in a decreasing-cost
+     market -- stack their labels on one another. Keep the highest where it is
+     and push the ones below it down, but only where they actually overlap
+     horizontally: a curve that leaves through the top or the bottom of the box
+     is labelled somewhere else entirely and must not be dragged along. */
+  const placeLabels = () => {
+    const GAP = 12.5;
+    labelQ.sort((u, v) => u.y - v.y);
+    const placed = [];
+    labelQ.forEach(l => {
+      l.w = l.text.length * 7 + 3;          /* labels are right-anchored */
+      for(let pass = 0; pass < 12; pass++){
+        let moved = false;
+        placed.forEach(q => {
+          const apart = (l.x - l.w > q.x) || (q.x - q.w > l.x);
+          if(!apart && Math.abs(l.y - q.y) < GAP){ l.y = q.y + GAP; moved = true; }
+        });
+        if(!moved) break;
+      }
+      l.y = Math.min(l.y, p.y0 - 5);
+      placed.push(l);
+      svg.appendChild(mk('text', {x:l.x, y:l.y, 'text-anchor':'end',
+        'font-size':11.5, 'font-weight':800, fill:l.color}, l.text));
+    });
+  };
+
+  /* Long-run supply: the price at which the typical firm breaks even, at each
+     size of industry. It is anchored at the industry's ORIGINAL size paired
+     with the min ATC that holds AFTER the shock -- not with the original
+     price. The two are the same number whenever the shock hit demand, but a
+     technology shock cuts min ATC before a single firm enters, and anchoring
+     on the old price would draw a downward-sloping LRS through a
+     constant-cost industry. */
+  if(view.lrs){
+    const base = problem.atcShock;
+    const lrSlope = (problem.plr - base) / ((problem.qlr - problem.q0) || 1);
+    const a = base - lrSlope*problem.q0;
+    line(a, Math.abs(problem.plr - base) < 1e-9 ? 0 : lrSlope, '#4A5FB0', '7 5', 'LRS', 2);
+  }
+  /* Demand and supply are each drawn from a named state, so a page that shows
+     two supply shifts -- a technology one and then entry's -- labels them S1,
+     S2, S3 rather than pretending there was only ever one move. */
+  (m.dem[view.dem] || m.dem.D1).forEach(cv =>
+    line(cv.a, -1/m.bd, '#2F6F62', cv.solid ? 'none' : '5 4', cv.label, cv.solid ? 2.4 : 1.8));
+  (m.sup[view.sup] || m.sup.S1).forEach(cv =>
+    line(cv.c, 1/m.bs, '#C1542C', cv.solid ? 'none' : '5 4', cv.label, cv.solid ? 2.4 : 1.8));
+  placeLabels();
+
+  (view.pts || []).forEach(name => {
+    const pt = problem.points[name];
+    if(!pt) return;
+    const last = name === (view.pts || [])[(view.pts || []).length - 1];
+    svg.appendChild(mk('line', {x1:X(pt.q), y1:Y(pt.p), x2:X(pt.q), y2:p.y0,
+      stroke:'#2B2118', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:last ? .55 : .3}));
+    svg.appendChild(mk('line', {x1:p.x0, y1:Y(pt.p), x2:X(pt.q), y2:Y(pt.p),
+      stroke:'#2B2118', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:last ? .55 : .3}));
+    svg.appendChild(mk('circle', {cx:X(pt.q), cy:Y(pt.p), r:last ? 5.5 : 4.5,
+      fill:last ? '#2B2118' : '#9C8E7A'}));
+    svg.appendChild(mk('text', {x:X(pt.q) + 7, y:Y(pt.p) - 7, 'font-size':11.5, 'font-weight':800,
+      fill:'#2B2118'}, name.replace('E1','E₁').replace('E2','E₂').replace('E3','E₃')));
+    axisValue(svg, p, 'y', Y(pt.p), '$' + (+pt.p.toFixed(2)));
+    axisValue(svg, p, 'x', X(pt.q), String(pt.q));
+  });
+
+  if(view.arrow){
+    const dir = view.arrow[1] === 'R' ? 1 : -1;
+    const y = view.arrow[0] === 'D' ? p.y1 + 46 : p.y0 - 42;
+    const cx = (p.x0 + p.x1)/2;
+    const col = view.arrow[0] === 'D' ? '#2F6F62' : '#C1542C';
+    svg.appendChild(mk('line', {x1:cx - 26*dir, y1:y, x2:cx + 26*dir, y2:y,
+      stroke:col, 'stroke-width':3, 'stroke-linecap':'round'}));
+    svg.appendChild(mk('path', {d:`M ${cx + 26*dir} ${y} l ${-9*dir} -6 l 0 12 z`, fill:col}));
+  }
+}
+
+/* ================= THE FIRM PANEL ================= */
+function drawFirm(problem, view){
+  const svg = document.getElementById('firmSvg');
+  svg.innerHTML = '';
+  svg.__axisSeen = null;
+  const f = problem.firm, p = plot(svg);
+  const qmax = 17, pmax = f.pmax;
+  const X = q => p.x0 + (q/qmax)*(p.x1 - p.x0);
+  const Y = v => p.y0 - (v/pmax)*(p.y0 - p.y1);
+  axes(svg, p, 'Firm output', 'Price / cost ($)');
+
+  const A_now = view.atc === 'atc1' ? problem.atc1 : (view.atc === 'atc0' ? problem.atc0 : problem.atcShock);
+  /* The price fields are DISPLAY strings ("7.50"), so they coerce silently in
+     arithmetic but have no toFixed. Make it a number once, here. */
+  const price = +(view.price === 'psr' ? problem.psr : (view.price === 'plr' ? problem.plr : problem.p0));
+
+  const curve = (fn, A, color, dash, label, width, labelNudge) => {
+    const pts = [];
+    for(let q = 4.6; q <= qmax; q += 0.2){
+      const v = fn(q, A);
+      if(v >= 0 && v <= pmax) pts.push(X(q).toFixed(1) + ',' + Y(v).toFixed(1));
+    }
+    if(pts.length < 2) return;
+    svg.appendChild(mk('polyline', {points:pts.join(' '), fill:'none', stroke:color,
+      'stroke-width':width || 2.4, 'stroke-dasharray':dash || 'none', 'stroke-linejoin':'round'}));
+    if(label){
+      /* ATC is labelled at its LEFT end. Its right end sits at almost exactly
+         the height of the price line, and the two labels collided there. */
+      const atLeft = label.indexOf('ATC') === 0;
+      const ref = (atLeft ? pts[0] : pts[pts.length-1]).split(',');
+      svg.appendChild(mk('text', {
+        x: atLeft ? Math.max(+ref[0] - 2, p.x0 + 2) : Math.min(+ref[0] + 4, p.x1 - 2),
+        y: +ref[1] - 6 + (labelNudge || 0),
+        'text-anchor': atLeft ? 'start' : 'end',
+        'font-size':11.5, 'font-weight':800, fill:color}, label));
+    }
+  };
+
+  /* the profit or loss rectangle, drawn before the curves so they stay on top */
+  if(view.shade){
+    const qs = qStar(price, A_now), a = atcAt(qs, A_now);
+    const top = Y(Math.max(price, a)), bot = Y(Math.min(price, a));
+    svg.appendChild(mk('rect', {x:p.x0, y:top, width:X(qs) - p.x0, height:Math.max(bot - top, 1),
+      fill:view.shade === 'profit' ? '#E5F2E9' : '#FBEAEA',
+      stroke:view.shade === 'profit' ? '#2F7D4F' : '#C23B3B', 'stroke-width':1}));
+  }
+
+  if(view.atc === 'both'){
+    const atcUp = problem.atc1 > problem.atcShock;
+    curve(atcAt, problem.atcShock, '#6B5D4C', '5 4', 'ATC₁', 1.8, atcUp ? 14 : -14);
+    curve(mcAt,  problem.atcShock, '#C1542C', '5 4', null, 1.6);
+    curve(atcAt, problem.atc1, '#2B2118', 'none', 'ATC₂', 2.4, atcUp ? -14 : 14);
+    curve(mcAt,  problem.atc1, '#C1542C', 'none', 'MC');
+  } else {
+    curve(atcAt, A_now, '#2B2118', 'none', 'ATC');
+    curve(mcAt,  A_now, '#C1542C', 'none', 'MC');
+  }
+
+  /* the price line IS the firm's demand, marginal revenue and average revenue */
+  svg.appendChild(mk('line', {x1:p.x0, y1:Y(price), x2:p.x1, y2:Y(price),
+    stroke:'#2F6F62', 'stroke-width':2.4}));
+  svg.appendChild(mk('text', {x:p.x1 - 2, y:Y(price) + 13, 'text-anchor':'end',
+    'font-size':10.5, 'font-weight':800, fill:'#2F6F62'}, 'P = D = MR = AR'));
+  axisValue(svg, p, 'y', Y(price), '$' + (+price.toFixed(2)));
+  const levels = view.atc === 'both' ? [problem.atcShock, problem.atc1] : [A_now];
+  levels.forEach(L => { if(Math.abs(L - price) > pmax*0.045) axisValue(svg, p, 'y', Y(L), '$' + (+L.toFixed(2))); });
+
+  if(view.mark === 'minatc' || view.shade){
+    const A_show = view.atc === 'both' ? problem.atc1 : A_now;
+    svg.appendChild(mk('circle', {cx:X(QM), cy:Y(A_show), r:4, fill:'#2B2118'}));
+    svg.appendChild(mk('text', {x:X(QM) + 6, y:Y(A_show) + 13, 'font-size':10.5,
+      'font-weight':800, fill:'#2B2118'}, 'min ATC'));
+  }
+  if(view.arrow){
+    const dir = view.arrow === 'UP' ? -1 : 1;
+    const cx = p.x0 + 34, y = Y(problem.atcShock);
+    svg.appendChild(mk('line', {x1:cx, y1:y, x2:cx, y2:y + 26*dir,
+      stroke:'#4A5FB0', 'stroke-width':3, 'stroke-linecap':'round'}));
+    svg.appendChild(mk('path', {d:`M ${cx} ${y + 26*dir} l -6 ${9*-dir} l 12 0 z`, fill:'#4A5FB0'}));
+  }
+}
+
+/* ================= STATE ================= */
+let problemOrder = [], problemIndex = 0, stepIndex = 0, optionOrder = [];
+let answered = false, helpMode = true;
+let score = { correct:0, total:0 };
+let perProblem = {};
+
+function shuffledIndices(n){
+  const a = [...Array(n).keys()];
+  for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; }
+  return a;
+}
+function currentProblem(){ return PROBLEMS[problemOrder[problemIndex]]; }
+function currentStep(){ return currentProblem().steps[stepIndex]; }
+function totalSteps(){ return PROBLEMS.reduce((s,p) => s + p.steps.length, 0); }
+
+/* Banding uses the ROUNDED percentage, the same number shown beside it.
+   Raw-score ranges over this 72-question bank, checked in verify_lr_bands.py:
+     Mastered 65-72 | Strong 58-64 | Developing 51-57 | Shaky 40-50 | below 40
+   Guessing on 4 options averages 18/72, which lands in the bottom band. */
+const BANDS = [
+  { min:90, label:'Mastered', tone:'good',
+    note:'You can run the whole chain: shock, short-run price, the firm’s profit read, entry or exit, and where the long-run price lands. Treat this topic as secure.' },
+  { min:80, label:'Strong', tone:'good',
+    note:'Solid command of the chain. Look at the industries below where you dropped marks, then run it again.' },
+  { min:70, label:'Developing', tone:'mid',
+    note:'The chain is mostly there but a link is slipping. The breakdown below shows which industries to go back to.' },
+  { min:55, label:'Shaky', tone:'poor',
+    note:'Enough links are going wrong to cost you marks. Review what entry and exit do to supply, and what each cost structure does to ATC.' },
+  { min:0, label:'Needs Review', tone:'poor',
+    note:'Go back to the long-run notes first — entry and exit, zero economic profit, and the three cost structures. More practice without review will not close a gap this size.' },
+];
+
+/* ================= RENDER ================= */
+function init(){
+  problemOrder = shuffledIndices(PROBLEMS.length);
+  problemIndex = 0;
+  score = { correct:0, total:0 };
+  perProblem = {};
+  PROBLEMS.forEach(p => perProblem[p.id] = { correct:0, total:0 });
+  hideResults();
+  loadProblem();
+}
+
+function loadProblem(){
+  stepIndex = 0;
+  const problem = currentProblem();
+  document.getElementById('methodBadge').textContent = problem.method;
+  document.getElementById('scenarioText').textContent = problem.scenario;
+  document.getElementById('problemCount').textContent =
+    `Problem ${problemIndex + 1} of ${PROBLEMS.length}`;
+  document.getElementById('termsText').innerHTML = problem.terms;
+  document.getElementById('reviewText').innerHTML = problem.review;
+  applyDifficulty();
+  loadStep();
+}
+
+function loadStep(){
+  answered = false;
+  const problem = currentProblem(), step = currentStep();
+  document.getElementById('stepCount').textContent =
+    `Step ${stepIndex + 1} of ${problem.steps.length}`;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('promptText').textContent = step.prompt;
+  document.getElementById('feedback').classList.remove('show');
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  const lastStep = stepIndex === problem.steps.length - 1;
+  const lastProblem = problemIndex === PROBLEMS.length - 1;
+  nextBtn.textContent = !lastStep ? 'Next step' : (lastProblem ? 'See your results' : 'Next problem');
+
+  drawFirm(problem, step.view.firm);
+  drawMarket(problem, step.view.market);
+  readouts(problem, step);
+  document.getElementById('firmCard').classList.toggle('active', step.panel === 'firm' || step.panel === 'both');
+  document.getElementById('marketCard').classList.toggle('active', step.panel === 'market' || step.panel === 'both');
+  document.getElementById('firmWhich').textContent = (step.panel === 'firm' || step.panel === 'both') ? 'this step' : '';
+  document.getElementById('marketWhich').textContent = (step.panel === 'market' || step.panel === 'both') ? 'this step' : '';
+
+  /* The answer sits first in the source on every step, so the options MUST be
+     shuffled here or it would be in slot 1 every time. */
+  optionOrder = shuffledIndices(step.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(orig => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.type = 'button';
+    btn.textContent = step.options[orig];
+    btn.addEventListener('click', () => handleAnswer(step, orig, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+function readouts(problem, step){
+  const v = step.view;
+  const mk2 = (label, value) => `<div class="chip"><span class="label">${label}</span><span class="value">${value}</span></div>`;
+  let m = mk2('Start', `$${problem.p0} · Q ${problem.q0}`);
+  if((v.market.pts || []).includes('E2')) m += mk2('Short run', `$${problem.psr} · Q ${problem.qsr}`);
+  if((v.market.pts || []).includes('E3')) m += mk2('Long run', `$${problem.plr} · Q ${problem.qlr}`);
+  document.getElementById('marketReadout').innerHTML = m;
+
+  const A = v.firm.atc === 'atc1' ? problem.atc1 : (v.firm.atc === 'atc0' ? problem.atc0 : problem.atcShock);
+  const price = v.firm.price === 'psr' ? problem.psr : (v.firm.price === 'plr' ? problem.plr : problem.p0);
+  let f = mk2('Price the firm faces', `$${price}`) + mk2('Its minimum ATC', `$${v.firm.atc === 'both' ? problem.atc1 : A}`);
+  if(v.firm.shade) f += mk2(v.firm.shade === 'profit' ? 'Economic profit' : 'Economic loss', v.firm.shade === 'profit' ? 'positive' : 'negative');
+  document.getElementById('firmReadout').innerHTML = f;
+}
+
+function handleAnswer(step, chosen, btnEl){
+  if(answered) return;
+  answered = true;
+  const isCorrect = chosen === step.correct;
+  score.total++;
+  if(isCorrect) score.correct++;
+  const pid = currentProblem().id;
+  perProblem[pid].total++;
+  if(isCorrect) perProblem[pid].correct++;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === step.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect ? 'Correct.' : 'Not quite.';
+  verdict.className = 'feedback-verdict ' + (isCorrect ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = step.explain;
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  const problem = currentProblem();
+  if(stepIndex < problem.steps.length - 1){
+    stepIndex++;
+    loadStep();
+  } else if(problemIndex < PROBLEMS.length - 1){
+    problemIndex++;
+    loadProblem();
+  } else {
+    showResults();          // bank finished -- stop here rather than wrapping round
+  }
+});
+
+/* ================= DIFFICULTY ================= */
+function applyDifficulty(){
+  document.getElementById('reviewText').style.display = helpMode ? '' : 'none';
+  document.getElementById('difficultyNote').textContent = helpMode
+    ? 'Method reminders stay on screen.'
+    : 'Notation only — the method reminders are hidden.';
+  document.getElementById('easyBtn').classList.toggle('active', helpMode);
+  document.getElementById('hardBtn').classList.toggle('active', !helpMode);
+}
+document.getElementById('easyBtn').addEventListener('click', () => { helpMode = true;  applyDifficulty(); });
+document.getElementById('hardBtn').addEventListener('click', () => { helpMode = false; applyDifficulty(); });
+
+/* ================= RESULTS ================= */
+function hideResults(){
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('quizPanel').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('difficultyRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+}
+
+function showResults(){
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('quizPanel').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+  document.getElementById('difficultyRow').style.display = 'none';
+
+  const pct = score.total ? Math.round(score.correct / score.total * 100) : 0;
+  const band = BANDS.find(b => pct >= b.min) || BANDS[BANDS.length - 1];
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  ·  ${pct}%`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  /* listed in the fixed teaching order, not the shuffled order they saw */
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  PROBLEMS.forEach(p => {
+    const t = perProblem[p.id];
+    if(!t || !t.total) return;
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${p.topic}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  if(typeof window.scrollTo === 'function') window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
