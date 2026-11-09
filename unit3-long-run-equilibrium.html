@@ -6746,12 +6746,12 @@ function liner(svg, p, X, Y, qmax, pmax, fontSize){
         y:Math.min(Math.max(Y(v) - 4, p.y1 + 11), p.y0 - 5)});
     }
   };
-  /* Every curve is labelled at its own right-hand end, so curves that finish in
+  /* Every curve is labeled at its own right-hand end, so curves that finish in
      the same corner -- LRS and the two demand curves in a decreasing-cost
      market -- stack their labels on one another. Keep the highest where it is
      and push the ones below it down, but only where they actually overlap
      horizontally: a curve that leaves through the top or the bottom of the box
-     is labelled somewhere else entirely and must not be dragged along. */
+     is labeled somewhere else entirely and must not be dragged along. */
   const placeLabels = () => {
     const GAP = 12.5;
     labelQ.sort((u, v) => u.y - v.y);
@@ -6862,7 +6862,7 @@ function drawFirm(problem, view){
     svg.appendChild(mk('polyline', {points:pts.join(' '), fill:'none', stroke:color,
       'stroke-width':width || 2.4, 'stroke-dasharray':dash || 'none', 'stroke-linejoin':'round'}));
     if(label){
-      /* ATC is labelled at its LEFT end. Its right end sits at almost exactly
+      /* ATC is labeled at its LEFT end. Its right end sits at almost exactly
          the height of the price line, and the two labels collided there. */
       const atLeft = label.indexOf('ATC') === 0;
       const ref = (atLeft ? pts[0] : pts[pts.length-1]).split(',');

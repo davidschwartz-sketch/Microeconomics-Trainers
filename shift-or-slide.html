@@ -446,7 +446,7 @@
 
   /* ---- growth track ----
      Lightness climbs at every stage (0.08 -> 0.19 -> 0.35 -> 0.61 relative
-     luminance), so the stage is readable without seeing colour at all. The
+     luminance), so the stage is readable without seeing color at all. The
      name, the icon and the caption say it in words as well. */
   .growth{display:none; margin:-4px 0 14px;}
   .growth.show{display:block;}
@@ -852,7 +852,7 @@ function positionLabel(el, intercept, slope, side){
 
 /* The primed label belongs to the curve that MOVED, the plain one to where that
    curve started. Both used to be positioned with the NEW intercept, so they
-   stacked on the shifted curve and the dashed original went unlabelled -- and
+   stacked on the shifted curve and the dashed original went unlabeled -- and
    Diagnose never positioned the primed label at all, so it sat at the SVG
    origin, outside the plot. */
 function placeCurveLabels(k, c, moved){
@@ -1006,9 +1006,9 @@ function runStepAnimation(card){
 }
 
 /* One curve shifts while the other is pinned. Because the pinned curve never
-   moves, every equilibrium along the way still sits ON it -- so the travelling
+   moves, every equilibrium along the way still sits ON it -- so the traveling
    point IS the slide along the other curve, and it is drawn in the movement
-   colour to say so. */
+   color to say so. */
 function animateLink(card){
   const startK = BASE_K, startC = BASE_C;
   let endK = BASE_K, endC = BASE_C;
@@ -1315,7 +1315,7 @@ const ICONS = {
 };
 
 /* Ordered by the points at which each one starts. `toast` is absent on the
-   first two: the change at YELLOW_AT is a colour change only. */
+   first two: the change at YELLOW_AT is a color change only. */
 const GROWTH_STAGES = [
   { at: 0,         key:'planted',   name:'Planted',            icon:'seedling' },
   { at: YELLOW_AT, key:'sprouting', name:'Sprouting',          icon:'vine' },

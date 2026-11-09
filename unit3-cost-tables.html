@@ -36,6 +36,16 @@
   header h1{font-size:1.6rem; margin:0 0 6px; letter-spacing:-0.01em;}
   header p{margin:0; color:var(--ink-soft); font-size:0.97rem; max-width:76ch;}
 
+  .difficulty-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
+  .difficulty-label{font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft);}
+  .seg{display:inline-flex; border:1px solid var(--border); border-radius:999px; overflow:hidden; background:var(--surface);}
+  .seg button{
+    background:none; border:none; cursor:pointer; font:inherit; font-size:13px; font-weight:700;
+    padding:6px 14px; color:var(--ink-soft);
+  }
+  .seg button.active{background:var(--accent); color:#2B2118;}
+  .difficulty-note{font-size:12.5px; color:var(--ink-soft); font-style:italic;}
+
   .meta-row{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 10px; margin-bottom:12px;}
   .count-group{display:flex; gap:8px; flex-wrap:wrap;}
   .pill{
@@ -205,6 +215,15 @@
     from the same handful of identities &mdash; fill the table in and the relationships between them stop
     being a list to memorize.</p>
   </header>
+
+  <div class="difficulty-row" id="difficultyRow">
+    <span class="difficulty-label">Difficulty</span>
+    <span class="seg">
+      <button id="lvl1Btn" class="active" type="button">Helpful Review</button>
+      <button id="lvl2Btn" type="button">AP Exam Difficulty</button>
+    </span>
+    <span class="difficulty-note" id="difficultyNote">The identities stay on screen.</span>
+  </div>
 
   <div class="meta-row" id="metaRow">
     <div class="count-group">
@@ -449,7 +468,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is AVERAGE FIXED COST at 4 dozen?",
@@ -484,7 +504,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is AVERAGE VARIABLE COST at 4 dozen?",
@@ -519,7 +540,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is AVERAGE TOTAL COST at 4 dozen?",
@@ -554,7 +576,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is MARGINAL COST at 5 dozen — the cost of that last dozen?",
@@ -589,15 +612,16 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "The table is complete. What does the AFC column do as output rises, and why?",
     "options": [
      "It falls at every step, because one unchanging $36 is divided among more units",
-     "It falls at first and then rises, the same U shape as ATC",
+     "It falls to $7.20 and then rises, the same U shape as ATC",
      "It stays at $36, because fixed cost never changes",
-     "It falls only while marginal cost is below it"
+     "It falls only while marginal cost is below it, so it levels off after 3 dozen"
     ],
     "correct": 0,
     "explain": "AFC = TFC ÷ Q with a numerator that never moves, so it can only fall, and it gets closer and closer to zero without ever reaching it. It has no U shape of its own. That is also why ATC and AVC drift together as output grows: the gap between them IS average fixed cost.",
@@ -624,7 +648,8 @@ const PROBLEMS = [
       "afc"
      ]
     ],
-    "note": null
+    "note": null,
+    "ident": false
    }
   ]
  },
@@ -782,7 +807,8 @@ const PROBLEMS = [
       "tc"
      ]
     ],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is TOTAL VARIABLE COST at 3 batches?",
@@ -821,7 +847,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is AVERAGE TOTAL COST at 4 batches?",
@@ -856,7 +883,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is AVERAGE FIXED COST at 4 batches?",
@@ -891,7 +919,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is AVERAGE VARIABLE COST at 4 batches? There are two ways to get it.",
@@ -926,7 +955,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is MARGINAL COST at 2 batches?",
@@ -961,7 +991,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    }
   ]
  },
@@ -1126,7 +1157,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is TOTAL FIXED COST for the car wash?",
@@ -1186,7 +1218,8 @@ const PROBLEMS = [
       "afc"
      ]
     ],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is TOTAL VARIABLE COST at 4 dozen?",
@@ -1225,7 +1258,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is TOTAL COST at 4 dozen?",
@@ -1264,7 +1298,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is MARGINAL COST at 5 dozen?",
@@ -1299,7 +1334,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    }
   ]
  },
@@ -1463,7 +1499,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is TOTAL COST at 4 gallons?",
@@ -1502,7 +1539,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is AVERAGE FIXED COST at 5 gallons?",
@@ -1537,7 +1575,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is AVERAGE TOTAL COST at 5 gallons?",
@@ -1572,15 +1611,16 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "Look down the finished ATC and AVC columns. What is true of the gap between them?",
     "options": [
-     "It shrinks as output rises, because the gap is AFC and AFC is falling",
-     "It grows as output rises, because fixed cost is spread more thinly",
-     "It stays at $24, the fixed cost of the cart",
-     "It shrinks until ATC reaches its minimum and then widens again"
+     "It shrinks as output rises — from $24.00 at 1 gallon to $4.80 at 5 gallons — because the gap IS AFC",
+     "It grows as output rises, from $4.80 to $24.00, because fixed cost is spread more thinly",
+     "It stays at $24, the fixed cost of the cart, at every output",
+     "It shrinks until ATC reaches its minimum at 5 gallons and then widens again"
     ],
     "correct": 0,
     "explain": "ATC − AVC = AFC exactly, at every quantity. AFC falls towards zero, so the two curves close in on each other without ever meeting. Here the gap goes from $24.00 at 1 gallon down to $4.80 at 5 gallons.",
@@ -1627,7 +1667,8 @@ const PROBLEMS = [
       "avc"
      ]
     ],
-    "note": null
+    "note": null,
+    "ident": false
    }
   ]
  },
@@ -1784,7 +1825,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": "Working UP from marginals is a different motion from working DOWN from totals. Each new TVC is the one above it plus that row’s MC."
+    "note": "Working UP from marginals is a different motion from working DOWN from totals. Each new TVC is the one above it plus that row’s MC.",
+    "ident": false
    },
    {
     "prompt": "Keep going. What is TOTAL VARIABLE COST at 2 bookshelves?",
@@ -1815,7 +1857,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is TOTAL COST at 4 bookshelves?",
@@ -1854,7 +1897,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is AVERAGE VARIABLE COST at 4 bookshelves?",
@@ -1889,7 +1933,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is AVERAGE FIXED COST at 4 bookshelves?",
@@ -1924,7 +1969,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is AVERAGE TOTAL COST at 4 bookshelves?",
@@ -1959,7 +2005,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    }
   ]
  },
@@ -2056,7 +2103,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "And TOTAL COST at 50 cases?",
@@ -2075,7 +2123,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is TOTAL VARIABLE COST at 50 cases?",
@@ -2102,7 +2151,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is the AVERAGE marginal cost per case between 20 cases and 50 cases?",
@@ -2121,7 +2171,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": "These quantities are 30 apart, not one apart, so this is an AVERAGE rate over the stretch — not the marginal cost of any particular case. Real marginal cost moves from unit to unit, and this number flattens all of that out."
+    "note": "These quantities are 30 apart, not one apart, so this is an AVERAGE rate over the stretch — not the marginal cost of any particular case. Real marginal cost moves from unit to unit, and this number flattens all of that out.",
+    "ident": false
    },
    {
     "prompt": "What is the average marginal cost per case over the first stretch, from 0 cases to 20 cases?",
@@ -2140,7 +2191,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    }
   ]
  },
@@ -2289,7 +2341,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is TOTAL FIXED COST?",
@@ -2333,7 +2386,8 @@ const PROBLEMS = [
       "tc"
      ]
     ],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is TOTAL VARIABLE COST at 4 walks?",
@@ -2372,7 +2426,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is AVERAGE TOTAL COST at 4 walks?",
@@ -2407,7 +2462,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What are AVERAGE FIXED COST and AVERAGE VARIABLE COST at 4 walks?",
@@ -2462,14 +2518,15 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "The table is complete. Reading down the ATC column, at how many walks is ATC at its LOWEST?",
     "options": [
      "4 walks, where ATC is $15.00",
      "5 walks, where ATC is $15.60",
-     "2 walks, where MC is at its lowest",
+     "2 walks, where MC is at its lowest, $6.00",
      "3 walks, where ATC is $17.00"
     ],
     "correct": 0,
@@ -2481,7 +2538,8 @@ const PROBLEMS = [
       "atc"
      ]
     ],
-    "note": null
+    "note": null,
+    "ident": true
    }
   ]
  },
@@ -2726,7 +2784,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "Now find MARGINAL COST at 3 dozen.",
@@ -2745,7 +2804,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "Now find TOTAL VARIABLE COST at 4 dozen.",
@@ -2764,7 +2824,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "Last one: AVERAGE FIXED COST at 5 dozen.",
@@ -2783,7 +2844,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "Which of these is NOT a way to get a missing cell, no matter which cell it is?",
@@ -2797,7 +2859,8 @@ const PROBLEMS = [
     "explain": "The change in an AVERAGE is not a marginal. MC is the change in a TOTAL, ΔTC ÷ ΔQ. In this table ATC goes from $22.00 to $20.00 between 3 dozen and 4 dozen, a change of -$2.00, while the actual MC of that unit is $14.00 — not close. The other three are all sound: they are the identities read in whichever direction you need.",
     "fills": [],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    }
   ]
  },
@@ -3090,7 +3153,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "At how many dozen is AVERAGE VARIABLE COST at its lowest?",
@@ -3098,7 +3162,7 @@ const PROBLEMS = [
      "3 — AVC is $8.00 there",
      "1 — AVC is $10.00 there",
      "6 — AVC is $11.00 there",
-     "3 — where MC is at its lowest"
+     "4 — AVC is $8.25 there"
     ],
     "correct": 0,
     "explain": "Read the column: $10.00, $9.00, $8.00, $8.25, $9.00, $11.00. The lowest is $8.00 at 3 dozen.",
@@ -3109,13 +3173,14 @@ const PROBLEMS = [
       "avc"
      ]
     ],
-    "note": null
+    "note": null,
+    "ident": true
    },
    {
     "prompt": "And at how many dozen is AVERAGE TOTAL COST at its lowest?",
     "options": [
      "5 — ATC is $13.80 there",
-     "3 — the same place AVC bottoms out",
+     "3 — ATC is $16.00 there, the same place AVC bottoms out",
      "6 — ATC is $15.00 there",
      "4 — ATC is $14.25 there"
     ],
@@ -3128,18 +3193,19 @@ const PROBLEMS = [
       "atc"
      ]
     ],
-    "note": null
+    "note": null,
+    "ident": true
    },
    {
     "prompt": "Compare MC with AVC on either side of 3 dozen.",
     "options": [
-     "MC is below AVC up to 3 dozen and above it from 4 dozen on",
-     "MC is above AVC the whole way across the table",
-     "MC equals AVC at every quantity, since neither includes fixed cost",
-     "MC is below AVC the whole way across the table"
+     "MC is below AVC at 2 dozen and 3 dozen, and above it from 4 dozen on",
+     "MC is above AVC from 2 dozen on, and below it only at 1 dozen",
+     "MC equals AVC at every quantity from 1 dozen to 6 dozen",
+     "MC is below AVC at every quantity from 2 dozen to 6 dozen"
     ],
     "correct": 0,
-    "explain": "At 3 dozen, MC is $6.00 against AVC of $8.00 — below it. At 4 dozen, MC is $9.00 against AVC of $8.25 — above it. So MC passes through AVC right where AVC turns around.",
+    "explain": "At 3 dozen, MC is $6.00 against AVC of $8.00 — below it. At 4 dozen, MC is $9.00 against AVC of $8.25 — above it. So MC passes through AVC right where AVC turns around. Note where the comparison has to start: at 1 dozen the two are not close, they are EQUAL, both $10.00. That is true of every cost table there has ever been — with nothing produced before it, the first unit’s cost IS the whole of variable cost, so MC and AVC are the same number there by definition.",
     "fills": [],
     "mark": [
      [
@@ -3159,7 +3225,8 @@ const PROBLEMS = [
       "mc"
      ]
     ],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "The same thing happens with ATC. Why does MC cross ATC and AVC exactly at their minimum points?",
@@ -3190,7 +3257,8 @@ const PROBLEMS = [
       "mc"
      ]
     ],
-    "note": null
+    "note": null,
+    "ident": false
    }
   ]
  },
@@ -3357,7 +3425,8 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "What is MARGINAL COST at 3 repairs?",
@@ -3396,15 +3465,16 @@ const PROBLEMS = [
      ]
     ],
     "mark": [],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "Read the finished MC column. At how many repairs does MARGINAL COST start RISING?",
     "options": [
      "5 — MC falls to $10.00 at 4 repairs and is $14.00 here",
-     "4 — that is where MC is at its lowest",
-     "1 — MC rises from the very first repair",
-     "6 — MC only rises at the very last row"
+     "4 — that is where MC is at its lowest, $10.00",
+     "1 — MC rises from the very first repair, $20.00",
+     "6 — MC only rises at the very last row, $24.00"
     ],
     "correct": 0,
     "explain": "MC runs $20.00, $16.00, $12.00, $10.00, $14.00, $24.00. It falls to its lowest, $10.00, at 4 repairs, and the next repair costs more than the one before it: $14.00 at 5 repairs. That is the first repair for which marginal cost is rising.",
@@ -3419,7 +3489,8 @@ const PROBLEMS = [
       "mc"
      ]
     ],
-    "note": null
+    "note": null,
+    "ident": true
    },
    {
     "prompt": "MC falls while the extra worker-hours are getting MORE productive and rises once they get less so. So 5 repairs is the same output at which the shop’s marginal product of labor would start ___",
@@ -3438,15 +3509,16 @@ const PROBLEMS = [
       "mc"
      ]
     ],
-    "note": null
+    "note": null,
+    "ident": false
    },
    {
     "prompt": "Does any of that affect the TFC column?",
     "options": [
      "No — TFC is $45 at every output, including zero, so it adds nothing to MC",
-     "Yes — TFC falls per unit, which is why MC falls at first",
-     "Yes — TFC is part of TC, so part of every MC is fixed cost",
-     "No — TFC is zero in the short run"
+     "Yes — TFC falls per unit from $45.00 to $7.50, which is why MC falls at first",
+     "Yes — TFC is part of TC, so a share of the $45 sits inside every MC figure",
+     "No — TFC is $0 in the short run"
     ],
     "correct": 0,
     "explain": "MC is a CHANGE in total cost, and the fixed $45 does not change, so it contributes exactly zero to every marginal cost. That is why ΔTC and ΔTVC give the same MC column. What falls per unit is AFC, which is a different thing from MC altogether.",
@@ -3481,7 +3553,8 @@ const PROBLEMS = [
       "tfc"
      ]
     ],
-    "note": null
+    "note": null,
+    "ident": false
    }
   ]
  }
@@ -3624,6 +3697,10 @@ function updateTableProgress(){
 let problemOrder = [], problemIndex = 0, stepIndex = 0;
 let optionOrder = [], answered = false;
 let score = 0, asked = 0;
+/* 1 = Helpful Review, 2 = AP Exam Difficulty. The second takes the identity
+   box away: TC = TFC + TVC, the three averages, MC, and the line about what
+   separates an average from a marginal. */
+let level = 1;
 let perProblem = [];           /* right-answer count, indexed as PROBLEMS is */
 
 function shuffle(a){
@@ -3644,6 +3721,7 @@ function loadProblem(){
   document.getElementById('methodBadge').textContent = p.badge;
   document.getElementById('scenarioText').textContent = p.scenario;
   document.getElementById('contextBox').innerHTML = TERMS;
+  applyDifficulty();
   const flag = document.getElementById('flagLine');
   if(p.flag){ flag.textContent = p.flag; flag.style.display = ''; }
   else { flag.style.display = 'none'; flag.textContent = ''; }
@@ -3692,6 +3770,25 @@ function lastProblem(){ return problemIndex === PROBLEMS.length - 1; }
 function updateScore(){
   document.getElementById('scoreBadge').textContent = 'Score: ' + score + ' / ' + asked;
 }
+
+/* ===================== difficulty ===================== */
+const LEVEL_NOTE = {
+  1: 'The identities stay on screen.',
+  2: 'No identities \u2014 bring them with you, the way the exam expects.'
+};
+function applyDifficulty(){
+  document.getElementById('contextBox').style.display = level === 1 ? '' : 'none';
+  document.getElementById('difficultyNote').textContent = LEVEL_NOTE[level];
+  [1, 2].forEach(n =>
+    document.getElementById('lvl' + n + 'Btn').classList.toggle('active', level === n));
+}
+[1, 2].forEach(n =>
+  document.getElementById('lvl' + n + 'Btn').addEventListener('click', () => {
+    /* Nothing about the question changes, so there is nothing to re-render
+       and nothing to re-score: the box is simply shown or hidden. */
+    level = n;
+    applyDifficulty();
+  }));
 
 /* ===================== answering ===================== */
 function choose(oi, btn){
@@ -3767,6 +3864,7 @@ function showResults(){
   document.getElementById('quizPanel').style.display = 'none';
   document.getElementById('metaRow').style.display = 'none';
   document.getElementById('resetRow').style.display = 'none';
+  document.getElementById('difficultyRow').style.display = 'none';
   const panel = document.getElementById('resultsPanel');
   panel.classList.add('show');
 
@@ -3805,6 +3903,7 @@ function startRun(){
   document.getElementById('quizPanel').style.display = '';
   document.getElementById('metaRow').style.display = '';
   document.getElementById('resetRow').style.display = '';
+  document.getElementById('difficultyRow').style.display = '';
   loadProblem();
 }
 
