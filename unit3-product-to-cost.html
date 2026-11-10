@@ -1,0 +1,2672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Working Examples: Product and Cost</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+    --teal: #2F6F62;
+    --orange: #C1542C;
+    --indigo: #4A5FB0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:980px; margin:0 auto; padding:28px 16px 56px;}
+
+  header{border-bottom:2px solid var(--border); padding-bottom:18px; margin-bottom:18px;}
+  header h1{font-size:1.6rem; margin:0 0 6px; letter-spacing:-0.01em;}
+  header p{margin:0; color:var(--ink-soft); font-size:0.97rem; max-width:76ch;}
+
+  .difficulty-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
+  .difficulty-label{font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft);}
+  .seg{display:inline-flex; border:1px solid var(--border); border-radius:999px; overflow:hidden; background:var(--surface);}
+  .seg button{
+    background:none; border:none; cursor:pointer; font:inherit; font-size:13px; font-weight:700;
+    padding:6px 14px; color:var(--ink-soft);
+  }
+  .seg button.active{background:var(--accent); color:#2B2118;}
+  .difficulty-note{font-size:12.5px; color:var(--ink-soft); font-style:italic;}
+
+  .meta-row{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 10px; margin-bottom:12px;}
+  .count-group{display:flex; gap:8px; flex-wrap:wrap;}
+  .pill{
+    background:var(--surface-alt); border:1px solid var(--border); border-radius:999px;
+    padding:4px 12px; font-size:12.5px; font-weight:700; color:var(--ink-soft); white-space:nowrap;
+  }
+  .score-badge{
+    background:#FAEFD6; border:1px solid #EAD4A0; color:#7A5A16;
+    border-radius:999px; padding:4px 12px; font-size:12.5px; font-weight:800; white-space:nowrap;
+  }
+
+  .panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:22px 24px; margin-bottom:16px;
+  }
+  .method-badge{
+    display:inline-block; background:#FAEFD6; border:1px solid #EAD4A0; color:#7A5A16;
+    font-size:11px; font-weight:800; letter-spacing:.07em; text-transform:uppercase;
+    padding:4px 11px; border-radius:999px; margin-bottom:12px;
+  }
+  .scenario{font-size:15.5px; margin-bottom:14px;}
+  .context{
+    background:var(--surface-alt); border:1px solid var(--border); border-radius:12px;
+    padding:13px 16px; margin-bottom:16px; font-size:13.5px; color:var(--ink-soft);
+  }
+  .context b{color:var(--ink);}
+  .flagline{
+    border-left:3px solid var(--indigo); background:#F2F4FB; border-radius:0 9px 9px 0;
+    padding:10px 14px; margin-bottom:16px; font-size:13.5px; color:var(--ink-soft);
+  }
+
+  /* ---- the cost table ---- */
+  .table-card{
+    border:1px solid var(--border); border-radius:12px; padding:12px 14px 10px;
+    margin-bottom:18px; background:var(--surface);
+  }
+  .table-head{
+    display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+    font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--ink-soft); margin-bottom:8px;
+  }
+  .table-head .progress{font-size:10.5px; color:var(--accent);}
+  .table-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-behavior:smooth;}
+  .scroll-hint{
+    display:none; font-size:11.5px; font-style:italic; color:var(--ink-soft); margin-bottom:6px;
+  }
+  @media (prefers-reduced-motion: reduce){ .table-scroll{scroll-behavior:auto;} }
+  table.cost{border-collapse:collapse; width:100%; min-width:430px; font-size:14px;
+             font-variant-numeric:tabular-nums;}
+  table.cost th, table.cost td{
+    border:1px solid var(--border); padding:7px 6px; text-align:center; white-space:nowrap;
+  }
+  table.cost thead th{
+    background:var(--surface-alt); font-size:12px; font-weight:800; letter-spacing:.03em;
+    color:var(--ink); padding:6px 6px 7px;
+  }
+  table.cost thead th small{
+    display:block; font-size:9.5px; font-weight:600; letter-spacing:0;
+    text-transform:none; color:var(--ink-soft); margin-top:1px;
+  }
+  table.cost th.qhead{background:var(--surface-alt);}
+  table.cost td.q{font-weight:800; background:#FDFAF4;}
+  table.cost td.val{font-weight:650;}
+  table.cost td.blank{background:#FBF6EE;}
+  table.cost td.blank::after{content:"?"; color:#C3B49A; font-weight:800;}
+  table.cost td.undef{color:#C3B49A;}
+  table.cost td.marked{box-shadow:inset 0 0 0 2px var(--accent); background:#FDF6E6;}
+  table.cost td.flash-fill{animation:cellFill 1.5s ease-out 1;}
+  table.cost td.flash-mark{animation:cellMark 1.5s ease-out 1;}
+  @keyframes cellFill{
+    0%{background:var(--correct-soft); box-shadow:inset 0 0 0 2px var(--correct);}
+    70%{background:var(--correct-soft); box-shadow:inset 0 0 0 2px var(--correct);}
+    100%{background:transparent; box-shadow:none;}
+  }
+  @keyframes cellMark{
+    0%{background:#FAEFD6;}
+    70%{background:#FAEFD6;}
+    100%{background:transparent;}
+  }
+  .table-legend{
+    margin-top:9px; font-size:11.5px; color:var(--ink-soft); line-height:1.6;
+  }
+  .table-legend b{color:var(--ink);}
+
+  .prompt{font-size:17px; font-weight:650; margin:4px 0 14px; line-height:1.4;}
+  .options{display:flex; flex-direction:column; gap:9px;}
+  .choice-btn{
+    text-align:left; font:inherit; font-size:14.5px; font-weight:650; cursor:pointer;
+    background:var(--surface); border:1.5px solid var(--border); border-radius:11px;
+    padding:12px 15px; color:var(--ink); transition:border-color .13s ease, background .13s ease;
+  }
+  .choice-btn:hover:not(:disabled){border-color:var(--accent);}
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{background:var(--correct-soft); border-color:var(--correct); color:var(--correct);}
+  .choice-btn.incorrect{background:var(--incorrect-soft); border-color:var(--incorrect); color:var(--incorrect);}
+
+  .feedback{display:none; margin-top:14px;}
+  .feedback.show{display:block;}
+  .feedback-verdict{font-size:14.5px; font-weight:800; margin-bottom:6px;}
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    background:var(--surface-alt); border-left:3px solid var(--accent);
+    border-radius:0 9px 9px 0; padding:12px 15px; font-size:14px; color:var(--ink-soft);
+  }
+
+  .controls{display:flex; justify-content:flex-end; gap:10px; margin-top:16px;}
+  .btn{
+    font:inherit; font-size:14px; font-weight:700; border-radius:10px;
+    padding:10px 18px; cursor:pointer; border:1px solid var(--border);
+  }
+  .btn-primary{background:var(--ink); color:var(--surface); border-color:var(--ink);}
+  .btn-primary:hover:not(:disabled){background:#453427;}
+  .btn:disabled{opacity:.4; cursor:default;}
+
+  .reset-row{margin-top:10px; text-align:right;}
+  .link-btn{
+    background:none; border:none; color:var(--ink-soft); font:inherit; font-size:13px;
+    text-decoration:underline; cursor:pointer; padding:0;
+  }
+
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px;}
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{font-size:34px; font-weight:800; letter-spacing:-0.02em; margin-bottom:10px;}
+  .results-note{font-size:15px; color:var(--ink-soft); margin-bottom:20px;}
+  table.results-table{width:100%; border-collapse:collapse; font-size:14px;}
+  table.results-table th, table.results-table td{padding:9px 12px; border-bottom:1px solid var(--border); text-align:left;}
+  table.results-table th{
+    font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft);
+    font-weight:700; background:var(--surface-alt);
+  }
+  table.results-table th.score-head, table.results-table td.topic-score{text-align:right; white-space:nowrap;}
+  table.results-table td.topic-cell{font-weight:600; color:var(--ink);}
+  table.results-table td.topic-score{font-weight:700;}
+  table.results-table td.topic-score.full{color:var(--correct);}
+  table.results-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px; color:var(--ink-soft); font-style:italic; line-height:1.5;
+    border-top:1px solid var(--border); padding-top:14px; margin:18px 0 20px;
+  }
+  .assumptions{
+    font-size:12px; color:var(--ink-soft); line-height:1.5;
+    border-top:1px dashed var(--border); padding-top:11px; margin-top:16px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    table.cost td.flash-fill, table.cost td.flash-mark{animation:none;}
+    .choice-btn{transition:none;}
+  }
+  @media (max-width:560px){
+    .app{padding:20px 12px 48px;}
+    .panel{padding:18px 15px;}
+    table.cost{font-size:13px;}
+    table.cost th, table.cost td{padding:6px 4px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <h1>Working Examples: Product and Cost</h1>
+    <p>A firm&rsquo;s cost curves are its production curves turned upside down and priced at the wage.
+    Fill in the missing cells and the mirror shows itself &mdash; including the one thing students most
+    often run together: the output where the <em>marginal</em> curves turn is not the output where the
+    <em>average</em> ones do.</p>
+  </header>
+
+  <div class="difficulty-row" id="difficultyRow">
+    <span class="difficulty-label">Difficulty</span>
+    <span class="seg">
+      <button id="lvl1Btn" class="active" type="button">Helpful Review</button>
+      <button id="lvl2Btn" type="button">AP Exam Difficulty</button>
+    </span>
+    <span class="difficulty-note" id="difficultyNote">The identities stay on screen.</span>
+  </div>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="pill" id="problemCount">Problem 1 of 8</span>
+      <span class="pill" id="stepCount">Step 1 of 6</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="panel" id="quizPanel">
+    <span class="method-badge" id="methodBadge"></span>
+    <div class="scenario" id="scenarioText">Loading&hellip;</div>
+    <div class="context" id="contextBox"></div>
+    <div class="flagline" id="flagLine" style="display:none;"></div>
+
+    <div class="table-card" id="tableCard">
+      <div class="table-head">
+        <span id="tableTitle">The cost table</span>
+        <span class="progress" id="tableProgress"></span>
+      </div>
+      <div class="scroll-hint" id="scrollHint">Swipe the table sideways to see every column.</div>
+      <div class="table-scroll">
+        <table class="cost" id="costTable"></table>
+      </div>
+      <div class="table-legend" id="tableLegend"></div>
+    </div>
+
+    <div class="prompt" id="promptText"></div>
+    <div class="options" id="optionsWrap"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-verdict" id="feedbackVerdict"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn" disabled>Next step</button>
+    </div>
+
+    <p class="assumptions">Short-run tables only: labor is the one input that varies, and it is paid a
+    constant wage, which is what makes MC = wage &divide; MPL and AVC = wage &divide; APL exact rather than
+    approximate. Product figures print to one decimal place and costs to the cent, so dividing the printed
+    wage by a printed cost gives the printed product figure. Real schedules are rarely this tidy; the
+    relationships between the columns are the point, not the numbers themselves.</p>
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <table class="results-table">
+      <thead><tr><th>Business and what it asked you to do</th><th class="score-head">Score</th></tr></thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+
+    <p class="results-caveat">These bands say whether the productivity-cost mirror is secure &mdash; they
+    are not an AP score prediction. The exam covers every unit, counts free response for a third of the grade, and gives
+    you no feedback until it is over. Treat a strong result here as one skill secured, not as a score.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Run it again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Restart from problem 1</button>
+  </footer>
+
+</div>
+<script>
+const PROBLEMS = [
+ {
+  "id": "P1",
+  "biz": "Green Ridge Landscaping",
+  "kind": "tp_mpl",
+  "badge": "PRODUCTION · TOTAL PRODUCT INTO MARGINAL",
+  "gave": "a total product schedule, nothing else",
+  "scenario": "Green Ridge Landscaping runs one truck and one set of mowers. Those do not change; the size of the crew does. This is the short run, and the first question it raises is how much each extra pair of hands actually adds.",
+  "flag": "",
+  "tableTitle": "Green Ridge Landscaping — lawns mowed a day",
+  "idx": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "idxname": "Workers",
+  "idxnote": "crew members",
+  "cols": [
+   "tp",
+   "mpl"
+  ],
+  "cells": {
+   "tp": [
+    "0",
+    "10",
+    "22",
+    "36",
+    "46",
+    "52",
+    "55",
+    "56"
+   ],
+   "mpl": [
+    null,
+    "10.0",
+    "12.0",
+    "14.0",
+    "10.0",
+    "6.0",
+    "3.0",
+    "1.0"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "tp"
+   ],
+   [
+    1,
+    "tp"
+   ],
+   [
+    2,
+    "tp"
+   ],
+   [
+    3,
+    "tp"
+   ],
+   [
+    4,
+    "tp"
+   ],
+   [
+    5,
+    "tp"
+   ],
+   [
+    6,
+    "tp"
+   ],
+   [
+    7,
+    "tp"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Green Ridge Landscaping mows lawns with one truck and one set of mowers — the equipment is fixed, only the crew changes. What is the MARGINAL PRODUCT of the 2nd crew member?",
+    "options": [
+     "12.0",
+     "22.0",
+     "11.0",
+     "14.0"
+    ],
+    "correct": 0,
+    "explain": "MPL is the CHANGE in total product: 22 − 10 = 12.0 extra lawns. Not the total, and not the total divided by the crew — that would be average product.",
+    "fills": [
+     [
+      1,
+      "mpl"
+     ],
+     [
+      2,
+      "mpl"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "And the MARGINAL PRODUCT of the 4th crew member?",
+    "options": [
+     "10.0",
+     "14.0",
+     "11.5",
+     "46.0"
+    ],
+    "correct": 0,
+    "explain": "46 − 36 = 10.0. Notice what the column has done so far: 10.0, then 12.0, then 14.0, and now back down to 10.0. The early crew members made each other MORE productive — they could split the mowing, the edging and the hauling instead of one person doing all three.",
+    "fills": [
+     [
+      3,
+      "mpl"
+     ],
+     [
+      4,
+      "mpl"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "Finish the column. What is the marginal product of the 6th crew member?",
+    "options": [
+     "3.0",
+     "6.0",
+     "1.0",
+     "9.2"
+    ],
+    "correct": 0,
+    "explain": "55 − 52 = 3.0. Output is still rising — the 6th and 7th members do add lawns — but each one adds less than the one before.",
+    "fills": [
+     [
+      5,
+      "mpl"
+     ],
+     [
+      6,
+      "mpl"
+     ],
+     [
+      7,
+      "mpl"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "Reading down the finished MPL column, at how many crew members is marginal product at its HIGHEST?",
+    "options": [
+     "3 — marginal product is 14.0 there",
+     "2 — marginal product is 12.0 there",
+     "7 — total product is highest there",
+     "4 — marginal product is 10.0 there"
+    ],
+    "correct": 0,
+    "explain": "The column runs 10.0, 12.0, 14.0, 10.0, 6.0, 3.0, 1.0. The highest is 14.0, at 3 crew members. Total product keeps climbing to the end of the table, but that is a different question: total product rising and marginal product falling happen together for most of this table.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "mpl"
+     ]
+    ],
+    "note": null,
+    "ident": true
+   },
+   {
+    "prompt": "At how many crew members do DIMINISHING RETURNS set in — the first one that adds less than the one before?",
+    "options": [
+     "4 — that member adds 10.0 against the 14.0 the one before added",
+     "3 — that is where marginal product is highest",
+     "1 — the first one, since every extra worker crowds the others",
+     "7 — the last one, where marginal product is smallest"
+    ],
+    "correct": 0,
+    "explain": "Diminishing returns begin at the FIRST crew member whose own addition is smaller than the previous one’s. That is 4 crew members: 10.0 against 14.0. Up to 3 crew members each extra member made the crew more productive, which is why marginal product rose before it fell. The hump is the point — marginal product does not have to fall from the very first worker.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "mpl"
+     ],
+     [
+      4,
+      "mpl"
+     ]
+    ],
+    "note": null,
+    "ident": true
+   },
+   {
+    "prompt": "Which of these does \"diminishing marginal returns\" actually claim?",
+    "options": [
+     "Each extra worker adds LESS than the one before — output still rises, just more slowly",
+     "Output falls as more workers are added",
+     "Each extra worker is worse at the job than the one before",
+     "The firm is losing money on each extra worker"
+    ],
+    "correct": 0,
+    "explain": "Total product is still rising at every row of this table — look at the TP column, it never turns down. What falls is the SIZE of each addition. The workers are not less able either; they are sharing the same fixed truck and mowers, so each new one has less equipment to work with. And nothing here says anything about revenue, so profit is not what diminishing returns is about.",
+    "fills": [],
+    "mark": [
+     [
+      1,
+      "mpl"
+     ],
+     [
+      2,
+      "mpl"
+     ],
+     [
+      3,
+      "mpl"
+     ],
+     [
+      4,
+      "mpl"
+     ],
+     [
+      5,
+      "mpl"
+     ],
+     [
+      6,
+      "mpl"
+     ],
+     [
+      7,
+      "mpl"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   }
+  ]
+ },
+ {
+  "id": "P2",
+  "biz": "Hearth & Loaf Bakery",
+  "kind": "tp_mpl_apl",
+  "badge": "PRODUCTION · THE WHOLE PRODUCT CHAIN",
+  "gave": "a total product schedule, both derived columns",
+  "scenario": "Hearth & Loaf Bakery has one oven. The bakers come and go. Both the marginal and the average columns are missing, and the two do not peak in the same place — which is the whole reason the cost curves have two different low points.",
+  "flag": "",
+  "tableTitle": "Hearth & Loaf Bakery — loaves a day",
+  "idx": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "idxname": "Workers",
+  "idxnote": "bakers",
+  "cols": [
+   "tp",
+   "mpl",
+   "apl"
+  ],
+  "cells": {
+   "tp": [
+    "0",
+    "8",
+    "20",
+    "36",
+    "50",
+    "58",
+    "60"
+   ],
+   "mpl": [
+    null,
+    "8.0",
+    "12.0",
+    "16.0",
+    "14.0",
+    "8.0",
+    "2.0"
+   ],
+   "apl": [
+    null,
+    "8.0",
+    "10.0",
+    "12.0",
+    "12.5",
+    "11.6",
+    "10.0"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "tp"
+   ],
+   [
+    1,
+    "tp"
+   ],
+   [
+    2,
+    "tp"
+   ],
+   [
+    3,
+    "tp"
+   ],
+   [
+    4,
+    "tp"
+   ],
+   [
+    5,
+    "tp"
+   ],
+   [
+    6,
+    "tp"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Hearth & Loaf Bakery bakes in one oven — fixed — with a varying number of bakers. What is the MARGINAL PRODUCT of the 3rd baker?",
+    "options": [
+     "16.0",
+     "12.0",
+     "36.0",
+     "14.0"
+    ],
+    "correct": 0,
+    "explain": "MPL = the change in total product = 36 − 20 = 16.0 loaves. The whole column fills the same way, and it rises to a peak before it falls.",
+    "fills": [
+     [
+      1,
+      "mpl"
+     ],
+     [
+      2,
+      "mpl"
+     ],
+     [
+      3,
+      "mpl"
+     ],
+     [
+      4,
+      "mpl"
+     ],
+     [
+      5,
+      "mpl"
+     ],
+     [
+      6,
+      "mpl"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "What is the AVERAGE PRODUCT of labor at 2 bakers?",
+    "options": [
+     "10.0",
+     "12.0",
+     "20.0",
+     "8.0"
+    ],
+    "correct": 0,
+    "explain": "APL = total product ÷ workers = 20 ÷ 2 = 10.0 loaves per baker. This is a DIFFERENT question from marginal product: average product shares all the output out over everyone, while marginal product asks what the last baker alone added.",
+    "fills": [
+     [
+      1,
+      "apl"
+     ],
+     [
+      2,
+      "apl"
+     ],
+     [
+      3,
+      "apl"
+     ],
+     [
+      4,
+      "apl"
+     ],
+     [
+      5,
+      "apl"
+     ],
+     [
+      6,
+      "apl"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "At how many bakers does MARGINAL product peak?",
+    "options": [
+     "3 — MPL is 16.0 there",
+     "4 — MPL is 14.0 there",
+     "2 — MPL is 12.0 there",
+     "6 — MPL is 2.0 there"
+    ],
+    "correct": 0,
+    "explain": "MPL runs 8.0, 12.0, 16.0, 14.0, 8.0, 2.0, highest at 3 bakers. Total product is still climbing after that — look at the TP column — so this is the point where each EXTRA baker starts adding less, not the point where the bakery stops getting bigger.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "mpl"
+     ]
+    ],
+    "note": null,
+    "ident": true
+   },
+   {
+    "prompt": "And at how many bakers does AVERAGE product peak?",
+    "options": [
+     "4 — APL is 12.5 there",
+     "3 — the same place marginal product peaked",
+     "6 — APL is 10.0 there",
+     "1 — APL is 8.0 there"
+    ],
+    "correct": 0,
+    "explain": "APL runs 8.0, 10.0, 12.0, 12.5, 11.6, 10.0, highest at 4 bakers — one baker LATER than marginal product peaked. The two peaks are at different places, and that gap is the whole reason the cost curves have two different low points.",
+    "fills": [],
+    "mark": [
+     [
+      4,
+      "apl"
+     ]
+    ],
+    "note": null,
+    "ident": true
+   },
+   {
+    "prompt": "Marginal product has already started falling at 4 bakers. Why is average product still RISING there?",
+    "options": [
+     "Because that baker still adds MORE than the average, so he pulls the average up even though he adds less than the baker before him",
+     "Because average product always lags one worker behind marginal product",
+     "Because total product is still rising, and average product follows total product",
+     "Because the oven has not reached its capacity yet"
+    ],
+    "correct": 0,
+    "explain": "It is the arithmetic of averages, the same as a batting average: you only need to beat the average to raise it, not to beat your own last at-bat. At 4 bakers the extra baker adds 14.0 against an average of 12.0 — above it, so the average rises to 12.5. At 5 bakers the extra baker adds only 8.0 against an average of 12.5, and the average falls. Average product peaks exactly where marginal product crosses it.",
+    "fills": [],
+    "mark": [
+     [
+      4,
+      "mpl"
+     ],
+     [
+      4,
+      "apl"
+     ],
+     [
+      5,
+      "mpl"
+     ],
+     [
+      5,
+      "apl"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "Those two peaks are about to become two different low points on the cost side. Which pairing is right?",
+    "options": [
+     "Peak MARGINAL product pairs with lowest MARGINAL cost; peak AVERAGE product pairs with lowest AVERAGE variable cost",
+     "Peak marginal product pairs with lowest average variable cost; peak average product pairs with lowest marginal cost",
+     "Both peaks pair with the lowest average total cost",
+     "Neither peak has anything to do with the cost curves"
+    ],
+    "correct": 0,
+    "explain": "Marginal with marginal, average with average. At a constant wage, MC = wage ÷ MPL and AVC = wage ÷ APL, so whatever makes a product figure as large as possible makes its matching cost figure as small as possible. Two peaks at different places therefore give two minimums at different places — the outputs the rest of this module calls Q* and Q′.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "mpl"
+     ],
+     [
+      4,
+      "apl"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   }
+  ]
+ },
+ {
+  "id": "P3",
+  "biz": "Ink & Iron Print Shop",
+  "kind": "mc_from_mpl",
+  "badge": "THE MIRROR · MARGINAL PRODUCT INTO MARGINAL COST",
+  "gave": "a marginal product schedule and a wage",
+  "scenario": "Ink & Iron Print Shop pays a flat $24.00 a day per printer and varies nothing else. With the wage fixed, every movement in marginal cost has to come from somewhere in production.",
+  "flag": "",
+  "tableTitle": "Ink & Iron Print Shop — posters a day",
+  "idx": [
+   10,
+   20,
+   30,
+   40,
+   50,
+   60,
+   70
+  ],
+  "idxname": "Output",
+  "idxnote": "posters a day",
+  "cols": [
+   "mpl",
+   "mc"
+  ],
+  "cells": {
+   "mpl": [
+    "4.0",
+    "6.0",
+    "8.0",
+    "12.0",
+    "10.0",
+    "6.0",
+    "3.0"
+   ],
+   "mc": [
+    "$6.00",
+    "$4.00",
+    "$3.00",
+    "$2.00",
+    "$2.40",
+    "$4.00",
+    "$8.00"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "mpl"
+   ],
+   [
+    1,
+    "mpl"
+   ],
+   [
+    2,
+    "mpl"
+   ],
+   [
+    3,
+    "mpl"
+   ],
+   [
+    4,
+    "mpl"
+   ],
+   [
+    5,
+    "mpl"
+   ],
+   [
+    6,
+    "mpl"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Ink & Iron Print Shop pays each printer $24.00 a day, and the only input it varies is labor. What is MARGINAL COST at 20 posters?",
+    "options": [
+     "$4.00",
+     "$0.25",
+     "$144.00",
+     "$6.00"
+    ],
+    "correct": 0,
+    "explain": "MC = wage ÷ MPL = $24.00 ÷ 6.0 = $4.00. Think about why: one more printer costs $24.00 and brings 6.0 more posters, so each of those posters cost $24.00 ÷ 6.0 to make.",
+    "fills": [
+     [
+      0,
+      "mc"
+     ],
+     [
+      1,
+      "mc"
+     ],
+     [
+      2,
+      "mc"
+     ],
+     [
+      3,
+      "mc"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "Finish the column. What is marginal cost at 60 posters?",
+    "options": [
+     "$4.00",
+     "$0.25",
+     "$2.40",
+     "$144.00"
+    ],
+    "correct": 0,
+    "explain": "$24.00 ÷ 6.0 = $4.00. The wage never changes down this column — every movement in MC comes from the movement in marginal product.",
+    "fills": [
+     [
+      4,
+      "mc"
+     ],
+     [
+      5,
+      "mc"
+     ],
+     [
+      6,
+      "mc"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "At which output is MARGINAL COST at its minimum?",
+    "options": [
+     "40 — MC is $2.00 there",
+     "30 — MC is $3.00 there",
+     "50 — MC is $2.40 there",
+     "10 — the smallest output, so the least has been spent"
+    ],
+    "correct": 0,
+    "explain": "MC runs $6.00, $4.00, $3.00, $2.00, $2.40, $4.00, $8.00, lowest at 40 posters — which is exactly where marginal product is at its highest (12.0). That is not a coincidence: MC = wage ÷ MPL, and dividing a fixed wage by the biggest number gives the smallest answer.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "mc"
+     ],
+     [
+      3,
+      "mpl"
+     ]
+    ],
+    "note": null,
+    "ident": true
+   },
+   {
+    "prompt": "That output — where marginal product peaks and marginal cost bottoms — is which of the two the module keeps distinguishing?",
+    "options": [
+     "Q* — where the MARGINAL curves turn: marginal product at its highest, marginal cost at its lowest",
+     "Q′ — where the AVERAGE curves turn: average product at its highest, average variable cost at its lowest",
+     "Neither — it is the output where average and marginal cost cross",
+     "Both — they are two names for the same output"
+    ],
+    "correct": 0,
+    "explain": "Q* is defined as the output where the MARGINAL pair turns: marginal product at its highest and marginal cost at its lowest, which are the same output by the identity MC = wage ÷ MPL. Q′ is the AVERAGE pair — peak average product, lowest average variable cost — and it sits at a LARGER output. They are not two names for one thing, and neither of them is where ATC and MC cross.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "mc"
+     ],
+     [
+      3,
+      "mpl"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "Over the first stretch of this table, marginal cost FALLS as output rises. What is that, in product terms?",
+    "options": [
+     "Marginal product rising — extra printers are making each other more productive, so each extra poster costs less",
+     "Diminishing marginal returns — which is what makes early output cheap",
+     "Economies of scale — the shop is spreading its fixed costs over more posters",
+     "The wage falling as the shop hires more printers"
+    ],
+    "correct": 0,
+    "explain": "Falling marginal cost IS rising marginal product, priced at the wage. The first few printers let the shop specialize — one on setup, one on the press, one on finishing — so each adds more than the last and each extra poster costs less. Diminishing returns is the OPPOSITE, and it is what turns MC back upward after Q*. Economies of scale is a long-run idea about every input changing, and spreading fixed cost is AFC, which is not in MC at all. The wage is constant here by assumption.",
+    "fills": [],
+    "mark": [
+     [
+      0,
+      "mpl"
+     ],
+     [
+      1,
+      "mpl"
+     ],
+     [
+      2,
+      "mpl"
+     ],
+     [
+      3,
+      "mpl"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   }
+  ]
+ },
+ {
+  "id": "P4",
+  "biz": "Bubble Row Car Wash",
+  "kind": "avc_from_apl",
+  "badge": "THE MIRROR · AVERAGE PRODUCT INTO AVERAGE COST",
+  "gave": "an average product schedule and a wage",
+  "scenario": "Bubble Row Car Wash pays $18.00 a day per attendant. Its average product column is on the table; its average variable cost column is not.",
+  "flag": "",
+  "tableTitle": "Bubble Row Car Wash — washes a day",
+  "idx": [
+   10,
+   20,
+   30,
+   40,
+   50,
+   60,
+   70
+  ],
+  "idxname": "Output",
+  "idxnote": "washes a day",
+  "cols": [
+   "apl",
+   "avc"
+  ],
+  "cells": {
+   "apl": [
+    "2.0",
+    "3.0",
+    "4.0",
+    "4.8",
+    "5.0",
+    "4.8",
+    "4.5"
+   ],
+   "avc": [
+    "$9.00",
+    "$6.00",
+    "$4.50",
+    "$3.75",
+    "$3.60",
+    "$3.75",
+    "$4.00"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "apl"
+   ],
+   [
+    1,
+    "apl"
+   ],
+   [
+    2,
+    "apl"
+   ],
+   [
+    3,
+    "apl"
+   ],
+   [
+    4,
+    "apl"
+   ],
+   [
+    5,
+    "apl"
+   ],
+   [
+    6,
+    "apl"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Bubble Row Car Wash pays each attendant $18.00 a day and varies nothing but labor. What is AVERAGE VARIABLE COST at 30 washes?",
+    "options": [
+     "$4.50",
+     "$0.22",
+     "$72.00",
+     "$6.00"
+    ],
+    "correct": 0,
+    "explain": "AVC = wage ÷ APL = $18.00 ÷ 4.0 = $4.50. Each attendant costs $18.00 and washes 4.0 cars on average, so the labor cost per car is $18.00 ÷ 4.0.",
+    "fills": [
+     [
+      0,
+      "avc"
+     ],
+     [
+      1,
+      "avc"
+     ],
+     [
+      2,
+      "avc"
+     ],
+     [
+      3,
+      "avc"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "Finish the column. What is average variable cost at 60 washes?",
+    "options": [
+     "$3.75",
+     "$3.60",
+     "$0.27",
+     "$86.40"
+    ],
+    "correct": 0,
+    "explain": "$18.00 ÷ 4.8 = $3.75. Average variable cost is the mirror of average product in exactly the way marginal cost is the mirror of marginal product.",
+    "fills": [
+     [
+      4,
+      "avc"
+     ],
+     [
+      5,
+      "avc"
+     ],
+     [
+      6,
+      "avc"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "At which output is AVERAGE VARIABLE COST at its minimum?",
+    "options": [
+     "50 — AVC is $3.60 there",
+     "40 — AVC is $3.75 there",
+     "60 — AVC is $3.75 there",
+     "70 — the largest output on the table"
+    ],
+    "correct": 0,
+    "explain": "AVC runs $9.00, $6.00, $4.50, $3.75, $3.60, $3.75, $4.00, lowest at 50 washes — the same output where average product peaks at 5.0. Same identity, read backwards: AVC = wage ÷ APL.",
+    "fills": [],
+    "mark": [
+     [
+      4,
+      "avc"
+     ],
+     [
+      4,
+      "apl"
+     ]
+    ],
+    "note": null,
+    "ident": true
+   },
+   {
+    "prompt": "That output — where average product peaks and average variable cost bottoms — is which one?",
+    "options": [
+     "Q′ — where the AVERAGE curves turn: average product at its highest, average variable cost at its lowest",
+     "Q* — where the MARGINAL curves turn: marginal product at its highest, marginal cost at its lowest",
+     "Neither — it is the output where average and marginal cost cross",
+     "Both — they are two names for the same output"
+    ],
+    "correct": 0,
+    "explain": "Q′ is the AVERAGE pair: peak average product, lowest average variable cost. Q* is the MARGINAL pair, and it sits at a SMALLER output than Q′ — always, because marginal product has to peak and start falling before it can drop below the average and start pulling it down.",
+    "fills": [],
+    "mark": [
+     [
+      4,
+      "avc"
+     ],
+     [
+      4,
+      "apl"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "Without computing anything: where on this table does Q* lie?",
+    "options": [
+     "To the LEFT of Q′ — at a smaller output, because the marginal curves always turn before the averages do",
+     "To the RIGHT of Q′ — marginal cost keeps falling after average variable cost has turned",
+     "At the same output as Q′ — the two minimums coincide",
+     "It cannot be said without the marginal cost column"
+    ],
+    "correct": 0,
+    "explain": "Average variable cost keeps falling for as long as the next unit costs less than the running average, which stays true for a while after marginal cost has bottomed out and begun climbing. So marginal cost turns first and Q* sits to the left of Q′ — in every table of this shape, without needing the numbers. You would need the MC column to say WHERE Q* is, but not which side it is on.",
+    "fills": [],
+    "mark": [
+     [
+      4,
+      "avc"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   }
+  ]
+ },
+ {
+  "id": "P5",
+  "biz": "Stone Hollow Vineyard",
+  "kind": "anchor",
+  "badge": "THE MIRROR · TURNING COST BACK INTO PRODUCTIVITY",
+  "gave": "the two cost columns and a $30 wage",
+  "scenario": "Stone Hollow Vineyard’s accountant works in dollars and has handed over the cost columns only. The wage is $30.00 a week per picker. Turning cost back into productivity is the same identity read in the other direction — and once both product columns are back, the two peak outputs are visible side by side.",
+  "flag": "",
+  "tableTitle": "Stone Hollow Vineyard — cases of wine a week",
+  "idx": [
+   10,
+   20,
+   30,
+   40,
+   50,
+   60,
+   70,
+   80
+  ],
+  "idxname": "Output",
+  "idxnote": "cases of wine a week",
+  "cols": [
+   "mc",
+   "mpl",
+   "avc",
+   "apl"
+  ],
+  "cells": {
+   "mc": [
+    "$5.00",
+    "$3.00",
+    "$2.00",
+    "$2.50",
+    "$4.00",
+    "$6.00",
+    "$8.50",
+    "$11.00"
+   ],
+   "mpl": [
+    "6.0",
+    "10.0",
+    "15.0",
+    "12.0",
+    "7.5",
+    "5.0",
+    "3.5",
+    "2.7"
+   ],
+   "avc": [
+    "$5.00",
+    "$4.00",
+    "$3.33",
+    "$3.13",
+    "$3.30",
+    "$3.75",
+    "$4.43",
+    "$5.25"
+   ],
+   "apl": [
+    "6.0",
+    "7.5",
+    "9.0",
+    "9.6",
+    "9.1",
+    "8.0",
+    "6.8",
+    "5.7"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "mc"
+   ],
+   [
+    1,
+    "mc"
+   ],
+   [
+    2,
+    "mc"
+   ],
+   [
+    3,
+    "mc"
+   ],
+   [
+    4,
+    "mc"
+   ],
+   [
+    5,
+    "mc"
+   ],
+   [
+    6,
+    "mc"
+   ],
+   [
+    7,
+    "mc"
+   ],
+   [
+    0,
+    "avc"
+   ],
+   [
+    1,
+    "avc"
+   ],
+   [
+    2,
+    "avc"
+   ],
+   [
+    3,
+    "avc"
+   ],
+   [
+    4,
+    "avc"
+   ],
+   [
+    5,
+    "avc"
+   ],
+   [
+    6,
+    "avc"
+   ],
+   [
+    7,
+    "avc"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Stone Hollow Vineyard pays each picker $30.00 a week. Its accountant has handed over the cost columns and nothing else. Turning cost back into productivity: what is MARGINAL PRODUCT at 30 cases?",
+    "options": [
+     "15.0",
+     "9.0",
+     "0.1",
+     "60.0"
+    ],
+    "correct": 0,
+    "explain": "Rearrange MC = wage ÷ MPL into MPL = wage ÷ MC = $30.00 ÷ $2.00 = 15.0 cases. The whole column comes back the same way. This is the identity run in reverse — cost tables and production tables carry the same information.",
+    "fills": [
+     [
+      0,
+      "mpl"
+     ],
+     [
+      1,
+      "mpl"
+     ],
+     [
+      2,
+      "mpl"
+     ],
+     [
+      3,
+      "mpl"
+     ],
+     [
+      4,
+      "mpl"
+     ],
+     [
+      5,
+      "mpl"
+     ],
+     [
+      6,
+      "mpl"
+     ],
+     [
+      7,
+      "mpl"
+     ]
+    ],
+    "mark": [],
+    "note": "The product columns are rounded to one decimal place, the way the original table was. Dividing the printed wage by the printed cost gives the printed product figure.",
+    "ident": false
+   },
+   {
+    "prompt": "Now the average side. What is AVERAGE PRODUCT of labor at 40 cases?",
+    "options": [
+     "9.6",
+     "12.0",
+     "0.1",
+     "93.8"
+    ],
+    "correct": 0,
+    "explain": "APL = wage ÷ AVC = $30.00 ÷ $3.13 = 9.6 cases per picker. The same move as the column before it, average instead of marginal — and the two columns now peak at different outputs, which is what the rest of this problem is about.",
+    "fills": [
+     [
+      0,
+      "apl"
+     ],
+     [
+      1,
+      "apl"
+     ],
+     [
+      2,
+      "apl"
+     ],
+     [
+      3,
+      "apl"
+     ],
+     [
+      4,
+      "apl"
+     ],
+     [
+      5,
+      "apl"
+     ],
+     [
+      6,
+      "apl"
+     ],
+     [
+      7,
+      "apl"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "The table is complete. At which output is MARGINAL COST at its lowest?",
+    "options": [
+     "30 — MC is $2.00 and MPL peaks at 15.0",
+     "40 — MC is $2.50 there",
+     "20 — MC is $3.00 there",
+     "80 — MC is $11.00 there"
+    ],
+    "correct": 0,
+    "explain": "MC runs $5.00, $3.00, $2.00, $2.50, $4.00, $6.00, $8.50, $11.00. It bottoms at 30 cases, and marginal product peaks there at 15.0. Marginal with marginal — one is the wage divided by the other, so the smallest cost and the largest product have to land on the same row.",
+    "fills": [],
+    "mark": [
+     [
+      2,
+      "mc"
+     ],
+     [
+      2,
+      "mpl"
+     ]
+    ],
+    "note": null,
+    "ident": true
+   },
+   {
+    "prompt": "And at which output is AVERAGE PRODUCT at its highest?",
+    "options": [
+     "40 — APL is 9.6 and AVC bottoms at $3.13",
+     "30 — the same output where marginal cost bottoms",
+     "50 — APL is 9.1 there",
+     "80 — APL is 5.7 there"
+    ],
+    "correct": 0,
+    "explain": "APL peaks at 40 cases at 9.6, and average variable cost bottoms there at $3.13. Average with average — and a LARGER output than the marginal pair turned at.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "avc"
+     ],
+     [
+      3,
+      "apl"
+     ]
+    ],
+    "note": null,
+    "ident": true
+   },
+   {
+    "prompt": "Label them. The output where marginal cost bottoms and marginal product peaks is:",
+    "options": [
+     "Q* — where the MARGINAL curves turn: marginal product at its highest, marginal cost at its lowest",
+     "Q′ — where the AVERAGE curves turn: average product at its highest, average variable cost at its lowest",
+     "Neither — it is the output where average and marginal cost cross",
+     "Both — they are two names for the same output"
+    ],
+    "correct": 0,
+    "explain": "Q*, at 30 cases in this table. The marginal pair, turning together because MC = wage ÷ MPL makes one the upside-down of the other.",
+    "fills": [],
+    "mark": [
+     [
+      2,
+      "mc"
+     ],
+     [
+      2,
+      "mpl"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "And the output where average variable cost bottoms and average product peaks is:",
+    "options": [
+     "Q′ — where the AVERAGE curves turn: average product at its highest, average variable cost at its lowest",
+     "Q* — where the MARGINAL curves turn: marginal product at its highest, marginal cost at its lowest",
+     "Neither — it is the output where average and marginal cost cross",
+     "Both — they are two names for the same output"
+    ],
+    "correct": 0,
+    "explain": "Q′, at 40 cases. The average pair, turning together because AVC = wage ÷ APL. It sits 10 cases to the right of Q*: the marginal pair turned back at 30 and the average pair only turns here. That gap is the one thing about these two outputs worth remembering.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "avc"
+     ],
+     [
+      3,
+      "apl"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "Why do Q* and Q′ land on different outputs at all?",
+    "options": [
+     "Because a marginal figure turns before the average it is pulling: marginal cost can rise for a while and still be below average variable cost, which keeps the average falling",
+     "Because the wage is applied to marginal product and average product at different points in the week",
+     "Because fixed cost is in average variable cost but not in marginal cost",
+     "Because Q′ is measured in output per worker while Q* is measured in output"
+    ],
+    "correct": 0,
+    "explain": "Between 30 and 40 cases, marginal cost is climbing — $2.00 up to $2.50 — but it is still BELOW average variable cost, so each extra case is still cheaper than the running average and the average keeps falling. Only once marginal cost rises past average variable cost does the average turn, and that happens at 40. It is the batting-average rule again, which is why Q* is always to the left of Q′. Fixed cost is beside the point: it is in neither MC nor AVC.",
+    "fills": [],
+    "mark": [
+     [
+      2,
+      "mc"
+     ],
+     [
+      2,
+      "mpl"
+     ],
+     [
+      3,
+      "avc"
+     ],
+     [
+      3,
+      "apl"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   }
+  ]
+ },
+ {
+  "id": "P6",
+  "biz": "Chainring Bike Repair",
+  "kind": "mpl_from_mc",
+  "badge": "THE MIRROR · MARGINAL COST BACK INTO PRODUCT",
+  "gave": "a marginal cost column and a wage",
+  "scenario": "Chainring Bike Repair pays $36.00 a day per mechanic. All that survives of its records is the marginal cost column, and the task is to get the productivity back out of it.",
+  "flag": "",
+  "tableTitle": "Chainring Bike Repair — repairs a day",
+  "idx": [
+   10,
+   20,
+   30,
+   40,
+   50,
+   60,
+   70
+  ],
+  "idxname": "Output",
+  "idxnote": "repairs a day",
+  "cols": [
+   "mc",
+   "mpl"
+  ],
+  "cells": {
+   "mc": [
+    "$9.00",
+    "$6.00",
+    "$4.00",
+    "$3.00",
+    "$4.50",
+    "$7.20",
+    "$12.00"
+   ],
+   "mpl": [
+    "4.0",
+    "6.0",
+    "9.0",
+    "12.0",
+    "8.0",
+    "5.0",
+    "3.0"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "mc"
+   ],
+   [
+    1,
+    "mc"
+   ],
+   [
+    2,
+    "mc"
+   ],
+   [
+    3,
+    "mc"
+   ],
+   [
+    4,
+    "mc"
+   ],
+   [
+    5,
+    "mc"
+   ],
+   [
+    6,
+    "mc"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Chainring Bike Repair pays each mechanic $36.00 a day. All you have is the marginal cost column — turn it back into productivity. What is MARGINAL PRODUCT at 30 repairs?",
+    "options": [
+     "9.0",
+     "0.1",
+     "144.0",
+     "12.0"
+    ],
+    "correct": 0,
+    "explain": "MC = wage ÷ MPL rearranges to MPL = wage ÷ MC = $36.00 ÷ $4.00 = 9.0 repairs. Divide the wage BY the cost, not the other way round: a low marginal cost means a HIGH marginal product, which is the whole point of the mirror.",
+    "fills": [
+     [
+      0,
+      "mpl"
+     ],
+     [
+      1,
+      "mpl"
+     ],
+     [
+      2,
+      "mpl"
+     ],
+     [
+      3,
+      "mpl"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "Finish the column. What is marginal product at 60 repairs?",
+    "options": [
+     "5.0",
+     "0.2",
+     "8.0",
+     "259.2"
+    ],
+    "correct": 0,
+    "explain": "$36.00 ÷ $7.20 = 5.0. Marginal cost has more than doubled across the back half of this table, which says marginal product has more than halved.",
+    "fills": [
+     [
+      4,
+      "mpl"
+     ],
+     [
+      5,
+      "mpl"
+     ],
+     [
+      6,
+      "mpl"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "At which output is MARGINAL PRODUCT at its highest?",
+    "options": [
+     "40 — MPL is 12.0, from the lowest marginal cost on the table, $3.00",
+     "30 — MPL is 9.0 there",
+     "50 — MPL is 8.0 there",
+     "70 — marginal cost is highest there, so the shop is working hardest"
+    ],
+    "correct": 0,
+    "explain": "The smallest marginal cost on the table, $3.00, gives the largest marginal product, 12.0, at 40 repairs. A high marginal cost is a LOW marginal product, not a high one — it means the shop is getting little back for the wage it just paid.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "mc"
+     ],
+     [
+      3,
+      "mpl"
+     ]
+    ],
+    "note": null,
+    "ident": true
+   },
+   {
+    "prompt": "So that output is which one?",
+    "options": [
+     "Q* — where the MARGINAL curves turn: marginal product at its highest, marginal cost at its lowest",
+     "Q′ — where the AVERAGE curves turn: average product at its highest, average variable cost at its lowest",
+     "Neither — it is the output where average and marginal cost cross",
+     "Both — they are two names for the same output"
+    ],
+    "correct": 0,
+    "explain": "Q*, the marginal pair. Nothing in this problem showed average variable cost or average product at all, so Q′ is not even visible here — but it exists, and it is at a larger output.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "mc"
+     ],
+     [
+      3,
+      "mpl"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "Which statement describes this table correctly?",
+    "options": [
+     "Rising marginal cost is diminishing marginal product expressed in dollars",
+     "Rising marginal cost means the shop is paying its mechanics more as it expands",
+     "Rising marginal cost means total product is falling",
+     "Rising marginal cost and diminishing marginal product are unrelated — one is about cost and one is about output"
+    ],
+    "correct": 0,
+    "explain": "They are the same fact in two currencies. The wage is fixed at $36.00, so the only thing that can move marginal cost is marginal product, and MC = wage ÷ MPL means they move in opposite directions. The wage is constant by assumption, and total product is still rising everywhere on this table — what is falling is the size of each addition.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "mc"
+     ],
+     [
+      4,
+      "mc"
+     ],
+     [
+      6,
+      "mc"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   }
+  ]
+ },
+ {
+  "id": "P7",
+  "biz": "Clearwater Furniture Workshop",
+  "kind": "diagnostic",
+  "badge": "THE MIRROR · Q* OR Q′?",
+  "gave": "a nearly complete table, and the Q* / Q′ trap",
+  "scenario": "Clearwater Furniture Workshop has filled nearly all of its table in. Two cells are missing — and then the questions stop being arithmetic and start being about which of the two peak outputs a description is pointing at.",
+  "flag": "",
+  "tableTitle": "Clearwater Furniture Workshop — chairs a week",
+  "idx": [
+   10,
+   20,
+   30,
+   40,
+   50,
+   60,
+   70
+  ],
+  "idxname": "Output",
+  "idxnote": "chairs a week",
+  "cols": [
+   "mc",
+   "mpl",
+   "avc",
+   "apl"
+  ],
+  "cells": {
+   "mc": [
+    "$10.00",
+    "$5.00",
+    "$4.00",
+    "$2.50",
+    "$4.00",
+    "$8.00",
+    "$20.00"
+   ],
+   "mpl": [
+    "4.0",
+    "8.0",
+    "10.0",
+    "16.0",
+    "10.0",
+    "5.0",
+    "2.0"
+   ],
+   "avc": [
+    "$10.00",
+    "$7.50",
+    "$6.33",
+    "$5.38",
+    "$5.10",
+    "$5.58",
+    "$7.64"
+   ],
+   "apl": [
+    "4.0",
+    "5.3",
+    "6.3",
+    "7.4",
+    "7.8",
+    "7.2",
+    "5.2"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "mc"
+   ],
+   [
+    1,
+    "mc"
+   ],
+   [
+    2,
+    "mc"
+   ],
+   [
+    3,
+    "mc"
+   ],
+   [
+    4,
+    "mc"
+   ],
+   [
+    5,
+    "mc"
+   ],
+   [
+    6,
+    "mc"
+   ],
+   [
+    0,
+    "mpl"
+   ],
+   [
+    1,
+    "mpl"
+   ],
+   [
+    2,
+    "mpl"
+   ],
+   [
+    4,
+    "mpl"
+   ],
+   [
+    5,
+    "mpl"
+   ],
+   [
+    6,
+    "mpl"
+   ],
+   [
+    0,
+    "avc"
+   ],
+   [
+    1,
+    "avc"
+   ],
+   [
+    2,
+    "avc"
+   ],
+   [
+    3,
+    "avc"
+   ],
+   [
+    4,
+    "avc"
+   ],
+   [
+    5,
+    "avc"
+   ],
+   [
+    6,
+    "avc"
+   ],
+   [
+    0,
+    "apl"
+   ],
+   [
+    1,
+    "apl"
+   ],
+   [
+    2,
+    "apl"
+   ],
+   [
+    3,
+    "apl"
+   ],
+   [
+    5,
+    "apl"
+   ],
+   [
+    6,
+    "apl"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Clearwater Furniture Workshop has nearly filled its table in. Two cells are missing. What is MARGINAL PRODUCT at 40 chairs?",
+    "options": [
+     "16.0",
+     "7.4",
+     "10.0",
+     "100.0"
+    ],
+    "correct": 0,
+    "explain": "MPL = wage ÷ MC = $40.00 ÷ $2.50 = 16.0 chairs — the largest figure in the column, because $2.50 is the smallest marginal cost on the table.",
+    "fills": [
+     [
+      3,
+      "mpl"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "And AVERAGE PRODUCT at 50 chairs?",
+    "options": [
+     "7.8",
+     "10.0",
+     "7.4",
+     "204.0"
+    ],
+    "correct": 0,
+    "explain": "APL = wage ÷ AVC = $40.00 ÷ $5.10 = 7.8 chairs per joiner — the largest figure in that column, because $5.10 is the smallest average variable cost.",
+    "fills": [
+     [
+      4,
+      "apl"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "Now classify, without computing anything. \"The output where the firm’s marginal cost is lowest\" — that is:",
+    "options": [
+     "Q* — where the MARGINAL curves turn: marginal product at its highest, marginal cost at its lowest",
+     "Q′ — where the AVERAGE curves turn: average product at its highest, average variable cost at its lowest",
+     "Neither — it is the output where average and marginal cost cross",
+     "Both — they are two names for the same output"
+    ],
+    "correct": 0,
+    "explain": "Marginal cost is a MARGINAL figure, so its minimum is Q*, which on this table is 40 chairs. The quickest route through every question of this kind: find the word \"marginal\" or the word \"average\" in the description, and pair it with the Q that carries the same word.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "mc"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "\"The output where a worker’s average output peaks\" — that is:",
+    "options": [
+     "Q′ — where the AVERAGE curves turn: average product at its highest, average variable cost at its lowest",
+     "Q* — where the MARGINAL curves turn: marginal product at its highest, marginal cost at its lowest",
+     "Neither — it is the output where average and marginal cost cross",
+     "Both — they are two names for the same output"
+    ],
+    "correct": 0,
+    "explain": "Output per worker is average product, an AVERAGE figure, so its peak is Q′ — 50 chairs here. The wording is the trap: \"a worker’s output\" sounds like it might be about one extra worker, which would be marginal product, but \"average output\" settles it.",
+    "fills": [],
+    "mark": [
+     [
+      4,
+      "apl"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "\"The output where average variable cost is at its minimum\" — that is:",
+    "options": [
+     "Q′ — where the AVERAGE curves turn: average product at its highest, average variable cost at its lowest",
+     "Q* — where the MARGINAL curves turn: marginal product at its highest, marginal cost at its lowest",
+     "Neither — it is the output where average and marginal cost cross",
+     "Both — they are two names for the same output"
+    ],
+    "correct": 0,
+    "explain": "Average variable cost is an AVERAGE figure, so Q′ again — the same 50 chairs where average product peaked, because AVC = wage ÷ APL.",
+    "fills": [],
+    "mark": [
+     [
+      4,
+      "avc"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "Last one. Which of the two sits at the SMALLER output, and why?",
+    "options": [
+     "Q*, because a marginal figure turns before the average it is pulling along",
+     "Q′, because average variable cost starts falling before marginal cost does",
+     "Neither — which one comes first depends on the wage",
+     "Neither — which one comes first depends on how big fixed cost is"
+    ],
+    "correct": 0,
+    "explain": "Q* is at 40 chairs and Q′ at 50. Marginal cost bottoms out first and then climbs for a while STILL BELOW average variable cost, which keeps the average falling. Only when marginal cost passes the average does the average turn. The wage sets the level of every cost figure but not where any of them turn, and fixed cost is in neither MC nor AVC.",
+    "fills": [],
+    "mark": [
+     [
+      3,
+      "mc"
+     ],
+     [
+      4,
+      "avc"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   }
+  ]
+ },
+ {
+  "id": "P8",
+  "biz": "Fern Hollow Greenhouse",
+  "kind": "scale",
+  "badge": "PRODUCTION · RETURNS, AND RETURNS TO SCALE",
+  "gave": "one fixed greenhouse, and then a second one",
+  "scenario": "Fern Hollow Greenhouse grows seedlings under glass. For most of this problem the glass is fixed and only the growers change. At the end it gets a second greenhouse, which is a different question entirely.",
+  "flag": "",
+  "tableTitle": "Fern Hollow Greenhouse — flats of seedlings a week",
+  "idx": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "idxname": "Workers",
+  "idxnote": "growers",
+  "cols": [
+   "tp",
+   "mpl"
+  ],
+  "cells": {
+   "tp": [
+    "0",
+    "20",
+    "44",
+    "60",
+    "68",
+    "70"
+   ],
+   "mpl": [
+    null,
+    "20.0",
+    "24.0",
+    "16.0",
+    "8.0",
+    "2.0"
+   ]
+  },
+  "given": [
+   [
+    0,
+    "tp"
+   ],
+   [
+    1,
+    "tp"
+   ],
+   [
+    2,
+    "tp"
+   ],
+   [
+    3,
+    "tp"
+   ],
+   [
+    4,
+    "tp"
+   ],
+   [
+    5,
+    "tp"
+   ]
+  ],
+  "steps": [
+   {
+    "prompt": "Fern Hollow Greenhouse grows seedlings in ONE greenhouse — the house is fixed, only the growers change. What is the marginal product of the 2nd grower?",
+    "options": [
+     "24.0",
+     "22.0",
+     "44.0",
+     "16.0"
+    ],
+    "correct": 0,
+    "explain": "MPL = 44 − 20 = 24.0 flats. Two growers can split the sowing and the watering, so the second adds more than the first did.",
+    "fills": [
+     [
+      1,
+      "mpl"
+     ],
+     [
+      2,
+      "mpl"
+     ],
+     [
+      3,
+      "mpl"
+     ],
+     [
+      4,
+      "mpl"
+     ],
+     [
+      5,
+      "mpl"
+     ]
+    ],
+    "mark": [],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "At how many growers do diminishing returns set in?",
+    "options": [
+     "3 — that grower adds 16.0 against the 24.0 before",
+     "2 — that is where marginal product is highest",
+     "1 — the very first grower",
+     "5 — the last grower, who adds least"
+    ],
+    "correct": 0,
+    "explain": "The first grower whose addition is smaller than the previous one’s is the 3 growers: 16.0 against 24.0. From there the greenhouse is getting crowded — the same benches and the same light shared among more people.",
+    "fills": [],
+    "mark": [
+     [
+      2,
+      "mpl"
+     ],
+     [
+      3,
+      "mpl"
+     ]
+    ],
+    "note": null,
+    "ident": true
+   },
+   {
+    "prompt": "Going from 2 growers to 4 growers in the SAME greenhouse takes output from 44 to 68 flats. Doubling the growers has not doubled the output. What is that?",
+    "options": [
+     "Diminishing marginal returns — a SHORT-RUN result, and only because the greenhouse stayed fixed",
+     "Decreasing returns to scale — the operation gets less efficient as it grows",
+     "Diseconomies of scale — the cost per flat rises as output rises",
+     "Nothing in particular — output is simply hard to predict"
+    ],
+    "correct": 0,
+    "explain": "Only ONE input changed. That is what makes this the short run and what makes the result diminishing returns: the extra growers are sharing a greenhouse that did not grow with them. Returns to scale is a different question entirely — it asks what happens when EVERY input changes together — and diseconomies of scale is its cost-side name. Neither can be read off a table where the greenhouse is nailed down.",
+    "fills": [],
+    "mark": [
+     [
+      2,
+      "tp"
+     ],
+     [
+      4,
+      "tp"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "Now suppose the greenhouse opens a second greenhouse at the same time, so growers AND greenhouses both double, and output comes to 88 flats — exactly double. What is THAT?",
+    "options": [
+     "Constant returns to scale — a LONG-RUN result, because every input scaled together",
+     "Diminishing marginal returns, measured over a longer period",
+     "Increasing returns to scale, since output rose",
+     "A contradiction — diminishing returns says output cannot double"
+    ],
+    "correct": 0,
+    "explain": "Double every input, double the output: constant returns to scale. It does not contradict diminishing returns at all, because the two statements are about different experiments. Diminishing returns holds one input FIXED and adds more of another; returns to scale moves them ALL. Output exactly doubling is constant, not increasing — increasing returns would mean more than 88 flats.",
+    "fills": [],
+    "mark": [
+     [
+      2,
+      "tp"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   },
+   {
+    "prompt": "So \"diminishing marginal returns\" is a statement about:",
+    "options": [
+     "The short run — adding more of one input while at least one other is held fixed",
+     "The long run — what happens to output when the firm expands everything",
+     "Any time period — it is simply what happens as a firm gets bigger",
+     "The number of firms in the industry, not the inputs of one firm"
+    ],
+    "correct": 0,
+    "explain": "Diminishing returns needs a fixed input to be about. Take the fixed input away — let the greenhouse expand too — and the statement has nothing to bite on, which is exactly why the long-run question is a different one with a different name. Keep the two apart: one fixed input and you are in the short run talking about returns; all inputs moving and you are in the long run talking about scale.",
+    "fills": [],
+    "mark": [
+     [
+      1,
+      "mpl"
+     ],
+     [
+      2,
+      "mpl"
+     ],
+     [
+      3,
+      "mpl"
+     ],
+     [
+      4,
+      "mpl"
+     ],
+     [
+      5,
+      "mpl"
+     ]
+    ],
+    "note": null,
+    "ident": false
+   }
+  ]
+ }
+];
+const BANDS = [
+ {
+  "min": 90,
+  "label": "Mastered",
+  "tone": "good",
+  "note": "The mirror is second nature: you are moving from product to cost and back, and you are keeping Q* and Q′ apart."
+ },
+ {
+  "min": 80,
+  "label": "Strong",
+  "tone": "good",
+  "note": "Solid. Look at which rows you missed — it is usually one direction of the identity, or the two peak outputs running together."
+ },
+ {
+  "min": 70,
+  "label": "Developing",
+  "tone": "mid",
+  "note": "The arithmetic is mostly there. The gap is usually Q* against Q′: marginal pairs with marginal and average pairs with average, and the marginal pair always turns first."
+ },
+ {
+  "min": 55,
+  "label": "Shaky",
+  "tone": "poor",
+  "note": "Go back to the two definitions before running this again. MPL is the CHANGE in total product; APL is total product DIVIDED by workers. Everything else in the module is those two divided into the wage."
+ },
+ {
+  "min": 0,
+  "label": "Needs Review",
+  "tone": "poor",
+  "note": "Start from what a marginal is and what an average is. A marginal is what one more worker adds; an average shares all the output over everyone. Nearly every question here turns on telling those two apart."
+ }
+];
+const TERMS = "<b>MPL</b> marginal product of labor = &Delta;TP &divide; &Delta;L &mdash; what one more worker adds. <b>APL</b> average product of labor = TP &divide; L &mdash; output per worker.<br><b>MC</b> = wage &divide; MPL &middot; <b>AVC</b> = wage &divide; APL. With labor the only variable input and the wage constant, these are exact: total variable cost IS the wage bill.<br><b>Q*</b> = the output where MPL peaks and MC bottoms &mdash; the MARGINAL pair. <b>Q&prime;</b> = the output where APL peaks and AVC bottoms &mdash; the AVERAGE pair. They are different outputs, and Q* is always the smaller of the two.<br>An <b>average</b> is a total shared out over everyone. A <b>marginal</b> is what one more adds. Marginal pairs with marginal, average pairs with average.";
+const LEGEND = "A cell you work out flashes <b>green</b> as it fills. A <b>gold outline</b> marks the cells a question is asking you to look at. A dash means the figure does not exist at that row &mdash; with no workers there is no previous row to subtract from and nothing to divide by.";
+
+const COLNAME = {tp:'TP', mpl:'MPL', apl:'APL', mc:'MC', avc:'AVC'};
+const COLFULL = {tp:'total product', mpl:'marginal product', apl:'average product',
+                 mc:'marginal cost', avc:'avg variable cost'};
+
+function cellId(qi, col){ return 'c-' + qi + '-' + col; }
+function cellAt(qi, col){ return document.getElementById(cellId(qi, col)); }
+
+/* Build the grid with every derivable cell blank. The cells the problem hands
+   over are filled straight afterwards, without a flash: they were never
+   anybody's work. */
+function renderTable(p){
+  const tbl = document.getElementById('costTable');
+  let h = '<thead><tr><th class="qhead" scope="col">' + p.idxname + '<small>' + p.idxnote + '</small></th>';
+  p.cols.forEach(c => { h += '<th scope="col">' + COLNAME[c] + '<small>' + COLFULL[c] + '</small></th>'; });
+  h += '</tr></thead><tbody>';
+  p.idx.forEach((q, qi) => {
+    h += '<tr><td class="q">' + q + '</td>';
+    p.cols.forEach(c => {
+      const v = p.cells[c][qi];
+      /* null means the cell has no value at all, not that it is hidden:
+         with no workers there is no previous row to subtract from and nothing
+         to divide by. */
+      h += '<td id="' + cellId(qi, c) + '" class="' + (v === null ? 'undef' : 'blank') + '">'
+         + (v === null ? '—' : '') + '</td>';
+    });
+    h += '</tr>';
+  });
+  tbl.innerHTML = h + '</tbody>';
+  p.given.forEach(g => fillCell(p, g[0], g[1], false));
+  clearMarks();
+  updateTableProgress(p);
+  updateScrollHint();
+}
+
+function fillCell(p, qi, col, flash){
+  const td = cellAt(qi, col);
+  if(!td) return;
+  const v = p.cells[col][qi];
+  if(v === null) return;
+  td.textContent = v;
+  td.classList.remove('blank');
+  td.classList.add('val');
+  if(flash) startFlash(td, 'flash-fill');
+}
+
+/* The class is taken off again when the animation ends, so a cell is only
+   ever marked as flashing while it really is. Without this the class lingers
+   for the rest of the run and any test that looks for it passes vacuously. */
+function startFlash(td, cls){
+  td.classList.remove(cls);
+  void td.offsetWidth;              /* restart the animation on a re-fill */
+  td.classList.add(cls);
+  const off = e => { if(e.animationName){ td.classList.remove(cls); td.removeEventListener('animationend', off); } };
+  td.addEventListener('animationend', off);
+}
+
+function clearMarks(){
+  [...document.querySelectorAll('#costTable td.marked, #costTable td.flash-mark')]
+    .forEach(td => td.classList.remove('marked', 'flash-mark'));
+}
+
+function markCells(cells, flash){
+  cells.forEach(m => {
+    const td = cellAt(m[0], m[1]);
+    if(!td) return;
+    td.classList.add('marked');
+    if(flash) startFlash(td, 'flash-mark');
+  });
+}
+
+/* On a narrow screen the table scrolls inside its card. Say so when it does,
+   and bring a cell that has just been filled or marked into view, so the
+   student is not told the answer has landed somewhere they cannot see. */
+function updateScrollHint(){
+  const wrap = document.querySelector('.table-scroll');
+  const hint = document.getElementById('scrollHint');
+  if(!wrap || !hint) return;
+  hint.style.display = wrap.scrollWidth > wrap.clientWidth + 1 ? 'block' : 'none';
+}
+
+function scrollCellIntoView(cells){
+  const wrap = document.querySelector('.table-scroll');
+  if(!wrap || wrap.scrollWidth <= wrap.clientWidth + 1 || !cells.length) return;
+  const td = cellAt(cells[0][0], cells[0][1]);
+  if(!td) return;
+  const r = td.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+  if(r.left < w.left) wrap.scrollLeft += r.left - w.left - 12;
+  else if(r.right > w.right) wrap.scrollLeft += r.right - w.right + 12;
+}
+
+function blanksLeft(){
+  return document.querySelectorAll('#costTable td.blank').length;
+}
+
+function updateTableProgress(){
+  const n = blanksLeft();
+  document.getElementById('tableProgress').textContent =
+    n === 0 ? 'Table complete' : (n === 1 ? '1 cell to fill' : n + ' cells to fill');
+}
+
+/* ===================== state ===================== */
+let problemOrder = [], problemIndex = 0, stepIndex = 0;
+let optionOrder = [], answered = false;
+let score = 0, asked = 0;
+/* 1 = Helpful Review, 2 = AP Exam Difficulty. The second takes the identity
+   box away: the definitions of MPL and APL, the two mirror identities, and
+   the line about what separates an average from a marginal. */
+let level = 1;
+let perProblem = [];           /* right-answer count, indexed as PROBLEMS is */
+
+function shuffle(a){
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function currentProblem(){ return PROBLEMS[problemOrder[problemIndex]]; }
+function currentStep(){ return currentProblem().steps[stepIndex]; }
+function totalSteps(){ return PROBLEMS.reduce((s, p) => s + p.steps.length, 0); }
+
+/* ===================== rendering ===================== */
+function loadProblem(){
+  const p = currentProblem();
+  document.getElementById('methodBadge').textContent = p.badge;
+  document.getElementById('scenarioText').textContent = p.scenario;
+  document.getElementById('contextBox').innerHTML = TERMS;
+  applyDifficulty();
+  const flag = document.getElementById('flagLine');
+  if(p.flag){ flag.textContent = p.flag; flag.style.display = ''; }
+  else { flag.style.display = 'none'; flag.textContent = ''; }
+  document.getElementById('tableTitle').textContent = p.tableTitle;
+  document.getElementById('tableLegend').innerHTML = LEGEND;
+  renderTable(p);
+  stepIndex = 0;
+  loadStep();
+}
+
+function loadStep(){
+  const p = currentProblem(), st = currentStep();
+  answered = false;
+  clearMarks();
+  document.getElementById('problemCount').textContent =
+    'Problem ' + (problemIndex + 1) + ' of ' + PROBLEMS.length;
+  document.getElementById('stepCount').textContent =
+    'Step ' + (stepIndex + 1) + ' of ' + p.steps.length;
+  document.getElementById('promptText').textContent = st.prompt;
+
+  optionOrder = shuffle(st.options.map((_, i) => i));
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(oi => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'choice-btn';
+    b.textContent = st.options[oi];
+    b.addEventListener('click', () => choose(oi, b));
+    wrap.appendChild(b);
+  });
+
+  document.getElementById('feedback').classList.remove('show');
+  document.getElementById('feedbackExplain').textContent = '';
+  const next = document.getElementById('nextBtn');
+  next.disabled = true;
+  next.textContent = lastStepOfProblem() ? (lastProblem() ? 'See results' : 'Next problem')
+                                         : 'Next step';
+  updateScore();
+  updateTableProgress();
+}
+
+function lastStepOfProblem(){ return stepIndex === currentProblem().steps.length - 1; }
+function lastProblem(){ return problemIndex === PROBLEMS.length - 1; }
+
+function updateScore(){
+  document.getElementById('scoreBadge').textContent = 'Score: ' + score + ' / ' + asked;
+}
+
+/* ===================== difficulty ===================== */
+const LEVEL_NOTE = {
+  1: 'The identities stay on screen.',
+  2: 'No identities \u2014 bring them with you, the way the exam expects.'
+};
+function applyDifficulty(){
+  document.getElementById('contextBox').style.display = level === 1 ? '' : 'none';
+  document.getElementById('difficultyNote').textContent = LEVEL_NOTE[level];
+  [1, 2].forEach(n =>
+    document.getElementById('lvl' + n + 'Btn').classList.toggle('active', level === n));
+}
+[1, 2].forEach(n =>
+  document.getElementById('lvl' + n + 'Btn').addEventListener('click', () => {
+    /* Nothing about the question changes, so there is nothing to re-render
+       and nothing to re-score: the box is simply shown or hidden. */
+    level = n;
+    applyDifficulty();
+  }));
+
+/* ===================== answering ===================== */
+function choose(oi, btn){
+  if(answered) return;
+  answered = true;
+  const p = currentProblem(), st = currentStep();
+  const right = oi === st.correct;
+  asked++;
+  if(right){
+    score++;
+    perProblem[problemOrder[problemIndex]]++;
+  }
+
+  [...document.querySelectorAll('#optionsWrap .choice-btn')].forEach((b, i) => {
+    b.disabled = true;
+    if(optionOrder[i] === st.correct) b.classList.add('correct');
+  });
+  if(!right) btn.classList.add('incorrect');
+
+  /* The table moves whether the answer was right or wrong: a student who got
+     it wrong still needs the finished table to work from. */
+  st.fills.forEach(f => fillCell(p, f[0], f[1], true));
+  markCells(st.mark, true);
+  updateTableProgress();
+  scrollCellIntoView(st.fills.length ? st.fills : st.mark);
+
+  const fb = document.getElementById('feedback');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.className = 'feedback-verdict ' + (right ? 'correct' : 'incorrect');
+  verdict.textContent = right ? 'Correct.'
+                              : 'Not quite — the answer is ' + st.options[st.correct] + '.';
+  document.getElementById('feedbackExplain').textContent =
+    st.explain + (st.note ? '  ' + st.note : '');
+  fb.classList.add('show');
+
+  document.getElementById('nextBtn').disabled = false;
+  updateScore();
+}
+
+/* ===================== moving on ===================== */
+function next(){
+  if(!answered) return;
+  if(!lastStepOfProblem()){
+    stepIndex++;
+    loadStep();
+    scrollToPrompt();
+    return;
+  }
+  if(!lastProblem()){
+    problemIndex++;
+    loadProblem();
+    scrollToTop();
+    return;
+  }
+  showResults();
+}
+
+function scrollToPrompt(){
+  try{ window.scrollTo({top: document.getElementById('promptText').offsetTop - 90,
+                        behavior: 'smooth'}); }catch(e){}
+}
+function scrollToTop(){
+  try{ window.scrollTo({top: 0, behavior: 'smooth'}); }catch(e){}
+}
+
+/* ===================== the analysis ===================== */
+function bandFor(pct){
+  for(const b of BANDS) if(pct >= b.min) return b;
+  return BANDS[BANDS.length - 1];
+}
+
+function showResults(){
+  document.getElementById('quizPanel').style.display = 'none';
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+  document.getElementById('difficultyRow').style.display = 'none';
+  const panel = document.getElementById('resultsPanel');
+  panel.classList.add('show');
+
+  const n = totalSteps();
+  const pct = Math.round(100 * score / n);
+  const b = bandFor(pct);
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.className = 'results-band ' + b.tone;
+  bandEl.textContent = b.label;
+  document.getElementById('resultsScore').textContent = score + ' / ' + n + '  ·  ' + pct + '%';
+  document.getElementById('resultsNote').textContent = b.note;
+
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  PROBLEMS.forEach((p, i) => {
+    const got = perProblem[i], outOf = p.steps.length;
+    const tr = document.createElement('tr');
+    const td1 = document.createElement('td');
+    td1.className = 'topic-cell';
+    td1.textContent = p.biz + ' — ' + p.gave;
+    const td2 = document.createElement('td');
+    td2.className = 'topic-score' + (got === outOf ? ' full' : (got <= outOf / 2 ? ' low' : ''));
+    td2.textContent = got + ' / ' + outOf;
+    tr.appendChild(td1); tr.appendChild(td2);
+    body.appendChild(tr);
+  });
+  scrollToTop();
+}
+
+/* ===================== start ===================== */
+function startRun(){
+  problemOrder = shuffle(PROBLEMS.map((_, i) => i));
+  perProblem = PROBLEMS.map(() => 0);
+  problemIndex = 0; stepIndex = 0; score = 0; asked = 0;
+  document.getElementById('resultsPanel').classList.remove('show');
+  document.getElementById('quizPanel').style.display = '';
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('difficultyRow').style.display = '';
+  loadProblem();
+}
+
+window.addEventListener('resize', updateScrollHint);
+document.getElementById('nextBtn').addEventListener('click', next);
+document.getElementById('resetBtn').addEventListener('click', () => { startRun(); scrollToTop(); });
+document.getElementById('againBtn').addEventListener('click', () => { startRun(); scrollToTop(); });
+startRun();
+</script>
+</body>
+</html>
