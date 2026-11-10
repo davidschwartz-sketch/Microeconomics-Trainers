@@ -372,21 +372,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 14.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 23.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
      "p": 6.0,
      "q": 170.0,
+     "ref": {
+      "p": 6.0,
+      "q": 80.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": -2.5,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -396,21 +409,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 14.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 23.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
-     "p": 12.0,
-     "q": 110.0,
+     "p": 10.5,
+     "q": 125.0,
+     "ref": {
+      "p": 6.0,
+      "q": 80.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
-       "c": 6.5,
+       "c": 4.25,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -420,73 +446,100 @@ const PROBLEMS = [
     {
      "dem": [
       {
-       "a": 23.0,
-       "label": "D₁",
-       "solid": false
-      },
-      {
-       "a": 18.5,
-       "label": "D₂",
-       "solid": true
-      }
-     ],
-     "p": 7.5,
-     "q": 110.0,
-     "sup": [
-      {
-       "c": 2.0,
-       "label": "S",
-       "solid": true
-      }
-     ],
-     "why": "demand moved instead of supply"
-    },
-    {
-     "dem": [
-      {
-       "a": 23.0,
-       "label": "D",
-       "solid": true
-      }
-     ],
-     "p": 4.5,
-     "q": 185.0,
-     "sup": [
-      {
-       "c": 2.0,
-       "label": "S₁",
-       "solid": false
-      },
-      {
-       "c": -4.75,
-       "label": "S₂",
-       "solid": true
-      }
-     ],
-     "why": "supply overshot the break-even price"
-    }
-   ],
-   "pmax": 16.8,
-   "qmax": 240.5,
-   "sr": [
-    {
-     "dem": [
-      {
        "a": 14.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 23.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 9.0,
      "q": 140.0,
+     "ref": {
+      "p": 6.0,
+      "q": 80.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": false,
+       "label": "S",
+       "solid": true
+      }
+     ],
+     "why": "nothing moved at all — the market stayed where the short run left it"
+    },
+    {
+     "dem": [
+      {
+       "a": 14.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 23.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 7.0,
+     "q": 160.0,
+     "ref": {
+      "p": 6.0,
+      "q": 80.0
+     },
+     "sup": [
+      {
+       "c": 2.0,
+       "faint": true,
+       "label": "S₁",
+       "solid": false
+      },
+      {
+       "c": -1.0,
+       "faint": false,
+       "label": "S₂",
+       "solid": true
+      }
+     ],
+     "why": "supply moved the right way but stopped at the wrong price"
+    }
+   ],
+   "pmax": 14.7,
+   "qmax": 221.0,
+   "sr": [
+    {
+     "dem": [
+      {
+       "a": 14.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 23.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 9.0,
+     "q": 140.0,
+     "ref": {
+      "p": 6.0,
+      "q": 80.0
+     },
+     "sup": [
+      {
+       "c": 2.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -497,25 +550,33 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 14.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 23.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 6.0,
      "q": 170.0,
+     "ref": {
+      "p": 6.0,
+      "q": 80.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": -2.5,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -526,20 +587,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 14.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 9.5,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 4.5,
      "q": 50.0,
+     "ref": {
+      "p": 6.0,
+      "q": 80.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -550,20 +618,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 14.0,
+       "faint": false,
        "label": "D",
        "solid": true
       }
      ],
      "p": 9.0,
      "q": 50.0,
+     "ref": {
+      "p": 6.0,
+      "q": 80.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 6.5,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -842,10 +917,10 @@ const PROBLEMS = [
    {
     "prompt": "This is a constant-cost industry. As entry expands the industry, what happens to EVERY firm’s ATC curve?",
     "options": [
-     "It stays exactly where it is — minimum ATC is still $6",
-     "It shifts UP — minimum ATC moves from $6 to $7",
-     "It shifts DOWN — minimum ATC moves from $6 to $5",
-     "It moves to $7 for the firms that just arrived and stays at $6 for the ones already there"
+     "It stays exactly where it is — a change in this industry’s size does not move input prices",
+     "It shifts UP — every firm’s minimum ATC rises",
+     "It shifts DOWN — every firm’s minimum ATC falls",
+     "It shifts for the firms that just arrived, but not for the ones already there"
     ],
     "correct": 0,
     "explain": "This is a constant-cost industry: the inputs it uses are a small enough part of their own markets that adding firms does not bid their prices up. Every firm’s ATC curve is exactly where it started, so the break-even price is still $6. The option that splits the firms is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
@@ -942,19 +1017,19 @@ const PROBLEMS = [
     "ap": {
      "set": "lr",
      "prompt": "Which diagram shows where this market ends up in the LONG run, once entry and exit have finished?",
-     "explain": "Entry shifts SUPPLY to the right, and it stops only when price reaches the new break-even level of $6 — which puts the market at $6 and 170 thousand jars a week. Of the other three pictures, one shifts supply the wrong way, one shifts demand instead (nothing has happened to what buyers want), and one carries supply straight past the break-even price, which cannot last: at a price that low the typical firm would be taking a loss and firms would start leaving again."
+     "explain": "Entry shifts SUPPLY to the right, and it stops only when price reaches the new break-even level of $6 — which puts the market at $6 and 170 thousand jars a week. Every picture carries the starting point E₁ and a dotted line across at the price the market began from, and that line is what tells the pictures apart: the market began in long-run equilibrium, so that price IS the firm’s OLD minimum ATC. The long run ends at the NEW minimum ATC, and here that sits exactly ON the line. Of the other three, one shifts supply the wrong way, one leaves both curves where the short run left them, and one shifts supply the right way but comes to rest on the wrong side of that line."
     }
    },
    {
     "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
     "options": [
-     "The same — $6 before and $6 after",
-     "Higher — $7 against the original $6",
-     "Lower — $5 against the original $6",
-     "It settles at the short-run price of $9 — entry and exit have already finished their work"
+     "The same — back at the price it started from",
+     "Higher than the price it started from",
+     "Lower than the price it started from",
+     "It cannot be told from this — it depends on how big the shock was, not on whether the industry is constant-, increasing- or decreasing-cost"
     ],
     "correct": 0,
-    "explain": "It comes back to $6, exactly where it started: entry drove the short-run price of $9 all the way back. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The short-run price of $9 is the trap: that was the price before any firm had entered or left, and the whole point of the long run is that it does not stay there.",
+    "explain": "It comes back to $6, exactly where it started: entry drove the short-run price of $9 all the way back. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The size of the shock is a red herring: a bigger shift of demand would draw in more firms and leave the industry larger, but it would not change which way the break-even price moved — only how far. The short-run price of $9 is not the answer either; that was the price before a single firm had entered or left.",
     "panel": "both",
     "pre": {
      "market": {
@@ -1079,21 +1154,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 20.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 11.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
      "p": 8.0,
      "q": 30.0,
+     "ref": {
+      "p": 8.0,
+      "q": 120.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 6.5,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -1103,21 +1191,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 20.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 11.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
-     "p": 2.0,
-     "q": 90.0,
+     "p": 3.5,
+     "q": 75.0,
+     "ref": {
+      "p": 8.0,
+      "q": 120.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
-       "c": -2.5,
+       "c": -0.25,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -1127,50 +1228,70 @@ const PROBLEMS = [
     {
      "dem": [
       {
-       "a": 11.0,
+       "a": 20.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
-       "a": 6.5,
+       "a": 11.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
-     "p": 3.5,
-     "q": 30.0,
+     "p": 5.0,
+     "q": 60.0,
+     "ref": {
+      "p": 8.0,
+      "q": 120.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
      ],
-     "why": "demand moved instead of supply"
+     "why": "nothing moved at all — the market stayed where the short run left it"
     },
     {
      "dem": [
       {
+       "a": 20.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 11.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
-     "p": 9.5,
-     "q": 15.0,
+     "p": 9.0,
+     "q": 20.0,
+     "ref": {
+      "p": 8.0,
+      "q": 120.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
-       "c": 8.75,
+       "c": 8.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
      ],
-     "why": "supply overshot the break-even price"
+     "why": "supply moved the right way but stopped at the wrong price"
     }
    ],
    "pmax": 13.299999999999999,
@@ -1180,20 +1301,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 20.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 11.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 5.0,
      "q": 60.0,
+     "ref": {
+      "p": 8.0,
+      "q": 120.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -1204,25 +1332,33 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 20.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 11.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 8.0,
      "q": 30.0,
+     "ref": {
+      "p": 8.0,
+      "q": 120.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 6.5,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -1233,20 +1369,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 20.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 24.5,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 9.5,
      "q": 150.0,
+     "ref": {
+      "p": 8.0,
+      "q": 120.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -1257,20 +1400,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 20.0,
+       "faint": false,
        "label": "D",
        "solid": true
       }
      ],
      "p": 5.0,
      "q": 150.0,
+     "ref": {
+      "p": 8.0,
+      "q": 120.0
+     },
      "sup": [
       {
        "c": 2.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": -2.5,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -1549,10 +1699,10 @@ const PROBLEMS = [
    {
     "prompt": "This is a constant-cost industry. As exit shrinks the industry, what happens to EVERY firm’s ATC curve?",
     "options": [
-     "It stays exactly where it is — minimum ATC is still $8",
-     "It shifts UP — minimum ATC moves from $8 to $9",
-     "It shifts DOWN — minimum ATC moves from $8 to $7",
-     "It moves to $9 for the firms that just arrived and stays at $8 for the ones already there"
+     "It stays exactly where it is — a change in this industry’s size does not move input prices",
+     "It shifts UP — every firm’s minimum ATC rises",
+     "It shifts DOWN — every firm’s minimum ATC falls",
+     "It shifts for the firms that just arrived, but not for the ones already there"
     ],
     "correct": 0,
     "explain": "This is a constant-cost industry: the inputs it uses are a small enough part of their own markets that losing firms does not bid their prices down. Every firm’s ATC curve is exactly where it started, so the break-even price is still $8. The option that splits the firms is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
@@ -1649,19 +1799,19 @@ const PROBLEMS = [
     "ap": {
      "set": "lr",
      "prompt": "Which diagram shows where this market ends up in the LONG run, once entry and exit have finished?",
-     "explain": "Exit shifts SUPPLY to the left, and it stops only when price reaches the new break-even level of $8 — which puts the market at $8 and 30 hundred wash-loads a day. Of the other three pictures, one shifts supply the wrong way, one shifts demand instead (nothing has happened to what buyers want), and one carries supply straight past the break-even price, which cannot last: at a price that low the typical firm would be taking a loss and firms would start leaving again."
+     "explain": "Exit shifts SUPPLY to the left, and it stops only when price reaches the new break-even level of $8 — which puts the market at $8 and 30 hundred wash-loads a day. Every picture carries the starting point E₁ and a dotted line across at the price the market began from, and that line is what tells the pictures apart: the market began in long-run equilibrium, so that price IS the firm’s OLD minimum ATC. The long run ends at the NEW minimum ATC, and here that sits exactly ON the line. Of the other three, one shifts supply the wrong way, one leaves both curves where the short run left them, and one shifts supply the right way but comes to rest on the wrong side of that line."
     }
    },
    {
     "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
     "options": [
-     "The same — $8 before and $8 after",
-     "Higher — $9 against the original $8",
-     "Lower — $7 against the original $8",
-     "It settles at the short-run price of $5 — entry and exit have already finished their work"
+     "The same — back at the price it started from",
+     "Higher than the price it started from",
+     "Lower than the price it started from",
+     "It cannot be told from this — it depends on how big the shock was, not on whether the industry is constant-, increasing- or decreasing-cost"
     ],
     "correct": 0,
-    "explain": "It comes back to $8, exactly where it started: exit drove the short-run price of $5 all the way back. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The short-run price of $5 is the trap: that was the price before any firm had entered or left, and the whole point of the long run is that it does not stay there.",
+    "explain": "It comes back to $8, exactly where it started: exit drove the short-run price of $5 all the way back. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The size of the shock is a red herring: a bigger shift of demand would draw in more firms and leave the industry larger, but it would not change which way the break-even price moved — only how far. The short-run price of $5 is not the answer either; that was the price before a single firm had entered or left.",
     "panel": "both",
     "pre": {
      "market": {
@@ -1786,21 +1936,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 32.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 48.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
      "p": 16.0,
      "q": 160.0,
+     "ref": {
+      "p": 20.0,
+      "q": 60.0
+     },
      "sup": [
       {
        "c": 8.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": -16.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -1810,21 +1973,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 32.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 48.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
-     "p": 40.0,
-     "q": 40.0,
+     "p": 34.0,
+     "q": 70.0,
+     "ref": {
+      "p": 20.0,
+      "q": 60.0
+     },
      "sup": [
       {
        "c": 8.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
-       "c": 32.0,
+       "c": 20.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -1834,73 +2010,100 @@ const PROBLEMS = [
     {
      "dem": [
       {
-       "a": 48.0,
-       "label": "D₁",
-       "solid": false
-      },
-      {
-       "a": 40.0,
-       "label": "D₂",
-       "solid": true
-      }
-     ],
-     "p": 24.0,
-     "q": 80.0,
-     "sup": [
-      {
-       "c": 8.0,
-       "label": "S",
-       "solid": true
-      }
-     ],
-     "why": "demand moved instead of supply"
-    },
-    {
-     "dem": [
-      {
-       "a": 48.0,
-       "label": "D",
-       "solid": true
-      }
-     ],
-     "p": 10.0,
-     "q": 190.0,
-     "sup": [
-      {
-       "c": 8.0,
-       "label": "S₁",
-       "solid": false
-      },
-      {
-       "c": -28.0,
-       "label": "S₂",
-       "solid": true
-      }
-     ],
-     "why": "supply overshot the break-even price"
-    }
-   ],
-   "pmax": 56.0,
-   "qmax": 247.0,
-   "sr": [
-    {
-     "dem": [
-      {
        "a": 32.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 48.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 28.0,
      "q": 100.0,
+     "ref": {
+      "p": 20.0,
+      "q": 60.0
+     },
      "sup": [
       {
        "c": 8.0,
+       "faint": false,
+       "label": "S",
+       "solid": true
+      }
+     ],
+     "why": "nothing moved at all — the market stayed where the short run left it"
+    },
+    {
+     "dem": [
+      {
+       "a": 32.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 48.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 24.0,
+     "q": 120.0,
+     "ref": {
+      "p": 20.0,
+      "q": 60.0
+     },
+     "sup": [
+      {
+       "c": 8.0,
+       "faint": true,
+       "label": "S₁",
+       "solid": false
+      },
+      {
+       "c": 0.0,
+       "faint": false,
+       "label": "S₂",
+       "solid": true
+      }
+     ],
+     "why": "supply moved the right way but stopped at the wrong price"
+    }
+   ],
+   "pmax": 47.6,
+   "qmax": 208.0,
+   "sr": [
+    {
+     "dem": [
+      {
+       "a": 32.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 48.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 28.0,
+     "q": 100.0,
+     "ref": {
+      "p": 20.0,
+      "q": 60.0
+     },
+     "sup": [
+      {
+       "c": 8.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -1911,25 +2114,33 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 32.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 48.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 16.0,
      "q": 160.0,
+     "ref": {
+      "p": 20.0,
+      "q": 60.0
+     },
      "sup": [
       {
        "c": 8.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": -16.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -1940,20 +2151,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 32.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 24.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 16.0,
      "q": 40.0,
+     "ref": {
+      "p": 20.0,
+      "q": 60.0
+     },
      "sup": [
       {
        "c": 8.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -1964,20 +2182,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 32.0,
+       "faint": false,
        "label": "D",
        "solid": true
       }
      ],
      "p": 24.0,
      "q": 40.0,
+     "ref": {
+      "p": 20.0,
+      "q": 60.0
+     },
      "sup": [
       {
        "c": 8.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 16.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -2256,10 +2481,10 @@ const PROBLEMS = [
    {
     "prompt": "This is a decreasing-cost industry. As entry expands the industry, what happens to EVERY firm’s ATC curve?",
     "options": [
-     "It shifts DOWN — minimum ATC moves from $20 to $16",
-     "It stays exactly where it is — minimum ATC is still $20",
-     "It shifts UP — minimum ATC moves from $20 to $24",
-     "It moves to $16 for the firms that just arrived and stays at $20 for the ones already there"
+     "It shifts DOWN — every firm’s minimum ATC falls",
+     "It stays exactly where it is — a change in this industry’s size does not move input prices",
+     "It shifts UP — every firm’s minimum ATC rises",
+     "It shifts for the firms that just arrived, but not for the ones already there"
     ],
     "correct": 0,
     "explain": "A decreasing-cost industry’s costs move AGAINST its size. A bigger industry supports specialized suppliers and shared infrastructure that reach their own economies of scale, so input prices fall, and every firm’s cost curves move down. The break-even price moves from $20 to $16. The option that splits the firms is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
@@ -2356,19 +2581,19 @@ const PROBLEMS = [
     "ap": {
      "set": "lr",
      "prompt": "Which diagram shows where this market ends up in the LONG run, once entry and exit have finished?",
-     "explain": "Entry shifts SUPPLY to the right, and it stops only when price reaches the new break-even level of $16 — which puts the market at $16 and 160 repairs a day. Of the other three pictures, one shifts supply the wrong way, one shifts demand instead (nothing has happened to what buyers want), and one carries supply straight past the break-even price, which cannot last: at a price that low the typical firm would be taking a loss and firms would start leaving again."
+     "explain": "Entry shifts SUPPLY to the right, and it stops only when price reaches the new break-even level of $16 — which puts the market at $16 and 160 repairs a day. Every picture carries the starting point E₁ and a dotted line across at the price the market began from, and that line is what tells the pictures apart: the market began in long-run equilibrium, so that price IS the firm’s OLD minimum ATC. The long run ends at the NEW minimum ATC, and here that sits BELOW the line. Of the other three, one shifts supply the wrong way, one leaves both curves where the short run left them, and one shifts supply the right way but comes to rest on the wrong side of that line."
     }
    },
    {
     "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
     "options": [
-     "Lower — $16 against the original $20",
-     "The same — $20 before and $20 after",
-     "Higher — $24 against the original $20",
-     "It settles at the short-run price of $28 — entry and exit have already finished their work"
+     "Lower than the price it started from",
+     "The same — back at the price it started from",
+     "Higher than the price it started from",
+     "It cannot be told from this — it depends on how big the shock was, not on whether the industry is constant-, increasing- or decreasing-cost"
     ],
     "correct": 0,
-    "explain": "It ends at $16, below the $20 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The short-run price of $28 is the trap: that was the price before any firm had entered or left, and the whole point of the long run is that it does not stay there.",
+    "explain": "It ends at $16, below the $20 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The size of the shock is a red herring: a bigger shift of demand would draw in more firms and leave the industry larger, but it would not change which way the break-even price moved — only how far. The short-run price of $28 is not the answer either; that was the price before a single firm had entered or left.",
     "panel": "both",
     "pre": {
      "market": {
@@ -2493,21 +2718,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 12.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 21.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
      "p": 7.0,
      "q": 700.0,
+     "ref": {
+      "p": 6.0,
+      "q": 300.0
+     },
      "sup": [
       {
        "c": 3.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 0.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -2517,21 +2755,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 12.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 21.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
-     "p": 11.0,
-     "q": 500.0,
+     "p": 10.0,
+     "q": 550.0,
+     "ref": {
+      "p": 6.0,
+      "q": 300.0
+     },
      "sup": [
       {
        "c": 3.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
-       "c": 6.0,
+       "c": 4.5,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -2541,73 +2792,100 @@ const PROBLEMS = [
     {
      "dem": [
       {
-       "a": 21.0,
-       "label": "D₁",
-       "solid": false
-      },
-      {
-       "a": 16.5,
-       "label": "D₂",
-       "solid": true
-      }
-     ],
-     "p": 7.5,
-     "q": 450.0,
-     "sup": [
-      {
-       "c": 3.0,
-       "label": "S",
-       "solid": true
-      }
-     ],
-     "why": "demand moved instead of supply"
-    },
-    {
-     "dem": [
-      {
-       "a": 21.0,
-       "label": "D",
-       "solid": true
-      }
-     ],
-     "p": 6.0,
-     "q": 750.0,
-     "sup": [
-      {
-       "c": 3.0,
-       "label": "S₁",
-       "solid": false
-      },
-      {
-       "c": -1.5,
-       "label": "S₂",
-       "solid": true
-      }
-     ],
-     "why": "supply overshot the break-even price"
-    }
-   ],
-   "pmax": 15.4,
-   "qmax": 975.0,
-   "sr": [
-    {
-     "dem": [
-      {
        "a": 12.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 21.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 9.0,
      "q": 600.0,
+     "ref": {
+      "p": 6.0,
+      "q": 300.0
+     },
      "sup": [
       {
        "c": 3.0,
+       "faint": false,
+       "label": "S",
+       "solid": true
+      }
+     ],
+     "why": "nothing moved at all — the market stayed where the short run left it"
+    },
+    {
+     "dem": [
+      {
+       "a": 12.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 21.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 5.0,
+     "q": 800.0,
+     "ref": {
+      "p": 6.0,
+      "q": 300.0
+     },
+     "sup": [
+      {
+       "c": 3.0,
+       "faint": true,
+       "label": "S₁",
+       "solid": false
+      },
+      {
+       "c": -3.0,
+       "faint": false,
+       "label": "S₂",
+       "solid": true
+      }
+     ],
+     "why": "supply moved the right way but stopped at the wrong price"
+    }
+   ],
+   "pmax": 14.0,
+   "qmax": 1040.0,
+   "sr": [
+    {
+     "dem": [
+      {
+       "a": 12.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 21.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 9.0,
+     "q": 600.0,
+     "ref": {
+      "p": 6.0,
+      "q": 300.0
+     },
+     "sup": [
+      {
+       "c": 3.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -2618,25 +2896,33 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 12.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 21.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 7.0,
      "q": 700.0,
+     "ref": {
+      "p": 6.0,
+      "q": 300.0
+     },
      "sup": [
       {
        "c": 3.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 0.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -2647,20 +2933,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 12.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 7.5,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 4.5,
      "q": 150.0,
+     "ref": {
+      "p": 6.0,
+      "q": 300.0
+     },
      "sup": [
       {
        "c": 3.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -2671,20 +2964,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 12.0,
+       "faint": false,
        "label": "D",
        "solid": true
       }
      ],
      "p": 9.0,
      "q": 150.0,
+     "ref": {
+      "p": 6.0,
+      "q": 300.0
+     },
      "sup": [
       {
        "c": 3.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 7.5,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -2963,10 +3263,10 @@ const PROBLEMS = [
    {
     "prompt": "This is an increasing-cost industry. As entry expands the industry, what happens to EVERY firm’s ATC curve?",
     "options": [
-     "It shifts UP — minimum ATC moves from $6 to $7",
-     "It stays exactly where it is — minimum ATC is still $6",
-     "It shifts DOWN — minimum ATC moves from $6 to $5",
-     "It moves to $7 for the firms that just arrived and stays at $6 for the ones already there"
+     "It shifts UP — every firm’s minimum ATC rises",
+     "It stays exactly where it is — a change in this industry’s size does not move input prices",
+     "It shifts DOWN — every firm’s minimum ATC falls",
+     "It shifts for the firms that just arrived, but not for the ones already there"
     ],
     "correct": 0,
     "explain": "An increasing-cost industry’s costs move WITH its size. More firms compete for the same land, labor and materials, so input prices are bid up, and that lifts every firm’s cost curves up. The break-even price moves from $6 to $7. The option that splits the firms is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
@@ -3063,19 +3363,19 @@ const PROBLEMS = [
     "ap": {
      "set": "lr",
      "prompt": "Which diagram shows where this market ends up in the LONG run, once entry and exit have finished?",
-     "explain": "Entry shifts SUPPLY to the right, and it stops only when price reaches the new break-even level of $7 — which puts the market at $7 and 700 tons a week. Of the other three pictures, one shifts supply the wrong way, one shifts demand instead (nothing has happened to what buyers want), and one carries supply straight past the break-even price, which cannot last: at a price that low the typical firm would be taking a loss and firms would start leaving again."
+     "explain": "Entry shifts SUPPLY to the right, and it stops only when price reaches the new break-even level of $7 — which puts the market at $7 and 700 tons a week. Every picture carries the starting point E₁ and a dotted line across at the price the market began from, and that line is what tells the pictures apart: the market began in long-run equilibrium, so that price IS the firm’s OLD minimum ATC. The long run ends at the NEW minimum ATC, and here that sits ABOVE the line. Of the other three, one shifts supply the wrong way, one leaves both curves where the short run left them, and one shifts supply the right way but comes to rest on the wrong side of that line."
     }
    },
    {
     "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
     "options": [
-     "Higher — $7 against the original $6",
-     "The same — $6 before and $6 after",
-     "Lower — $5 against the original $6",
-     "It settles at the short-run price of $9 — entry and exit have already finished their work"
+     "Higher than the price it started from",
+     "The same — back at the price it started from",
+     "Lower than the price it started from",
+     "It cannot be told from this — it depends on how big the shock was, not on whether the industry is constant-, increasing- or decreasing-cost"
     ],
     "correct": 0,
-    "explain": "It ends at $7, above the $6 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The short-run price of $9 is the trap: that was the price before any firm had entered or left, and the whole point of the long run is that it does not stay there.",
+    "explain": "It ends at $7, above the $6 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The size of the shock is a red herring: a bigger shift of demand would draw in more firms and leave the industry larger, but it would not change which way the break-even price moved — only how far. The short-run price of $9 is not the answer either; that was the price before a single firm had entered or left.",
     "panel": "both",
     "pre": {
      "market": {
@@ -3200,21 +3500,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 80.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 125.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
      "p": 46.0,
      "q": 79.0,
+     "ref": {
+      "p": 40.0,
+      "q": 40.0
+     },
      "sup": [
       {
        "c": 20.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 6.5,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -3224,21 +3537,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 80.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 125.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
-     "p": 64.0,
-     "q": 61.0,
+     "p": 59.5,
+     "q": 65.5,
+     "ref": {
+      "p": 40.0,
+      "q": 40.0
+     },
      "sup": [
       {
        "c": 20.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
-       "c": 33.5,
+       "c": 26.75,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -3248,73 +3574,100 @@ const PROBLEMS = [
     {
      "dem": [
       {
-       "a": 125.0,
-       "label": "D₁",
-       "solid": false
-      },
-      {
-       "a": 102.5,
-       "label": "D₂",
-       "solid": true
-      }
-     ],
-     "p": 47.5,
-     "q": 55.0,
-     "sup": [
-      {
-       "c": 20.0,
-       "label": "S",
-       "solid": true
-      }
-     ],
-     "why": "demand moved instead of supply"
-    },
-    {
-     "dem": [
-      {
-       "a": 125.0,
-       "label": "D",
-       "solid": true
-      }
-     ],
-     "p": 41.5,
-     "q": 83.5,
-     "sup": [
-      {
-       "c": 20.0,
-       "label": "S₁",
-       "solid": false
-      },
-      {
-       "c": -0.25,
-       "label": "S₂",
-       "solid": true
-      }
-     ],
-     "why": "supply overshot the break-even price"
-    }
-   ],
-   "pmax": 89.6,
-   "qmax": 108.55,
-   "sr": [
-    {
-     "dem": [
-      {
        "a": 80.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 125.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 55.0,
      "q": 70.0,
+     "ref": {
+      "p": 40.0,
+      "q": 40.0
+     },
      "sup": [
       {
        "c": 20.0,
+       "faint": false,
+       "label": "S",
+       "solid": true
+      }
+     ],
+     "why": "nothing moved at all — the market stayed where the short run left it"
+    },
+    {
+     "dem": [
+      {
+       "a": 80.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 125.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 34.0,
+     "q": 91.0,
+     "ref": {
+      "p": 40.0,
+      "q": 40.0
+     },
+     "sup": [
+      {
+       "c": 20.0,
+       "faint": true,
+       "label": "S₁",
+       "solid": false
+      },
+      {
+       "c": -11.5,
+       "faint": false,
+       "label": "S₂",
+       "solid": true
+      }
+     ],
+     "why": "supply moved the right way but stopped at the wrong price"
+    }
+   ],
+   "pmax": 83.3,
+   "qmax": 118.3,
+   "sr": [
+    {
+     "dem": [
+      {
+       "a": 80.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 125.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 55.0,
+     "q": 70.0,
+     "ref": {
+      "p": 40.0,
+      "q": 40.0
+     },
+     "sup": [
+      {
+       "c": 20.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -3325,25 +3678,33 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 80.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 125.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 46.0,
      "q": 79.0,
+     "ref": {
+      "p": 40.0,
+      "q": 40.0
+     },
      "sup": [
       {
        "c": 20.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 6.5,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -3354,20 +3715,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 80.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 57.5,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 32.5,
      "q": 25.0,
+     "ref": {
+      "p": 40.0,
+      "q": 40.0
+     },
      "sup": [
       {
        "c": 20.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -3378,20 +3746,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 80.0,
+       "faint": false,
        "label": "D",
        "solid": true
       }
      ],
      "p": 55.0,
      "q": 25.0,
+     "ref": {
+      "p": 40.0,
+      "q": 40.0
+     },
      "sup": [
       {
        "c": 20.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 42.5,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -3670,10 +4045,10 @@ const PROBLEMS = [
    {
     "prompt": "This is an increasing-cost industry. As entry expands the industry, what happens to EVERY firm’s ATC curve?",
     "options": [
-     "It shifts UP — minimum ATC moves from $40 to $46",
-     "It stays exactly where it is — minimum ATC is still $40",
-     "It shifts DOWN — minimum ATC moves from $40 to $34",
-     "It moves to $46 for the firms that just arrived and stays at $40 for the ones already there"
+     "It shifts UP — every firm’s minimum ATC rises",
+     "It stays exactly where it is — a change in this industry’s size does not move input prices",
+     "It shifts DOWN — every firm’s minimum ATC falls",
+     "It shifts for the firms that just arrived, but not for the ones already there"
     ],
     "correct": 0,
     "explain": "An increasing-cost industry’s costs move WITH its size. More firms compete for the same land, labor and materials, so input prices are bid up, and that lifts every firm’s cost curves up. The break-even price moves from $40 to $46. The option that splits the firms is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
@@ -3770,19 +4145,19 @@ const PROBLEMS = [
     "ap": {
      "set": "lr",
      "prompt": "Which diagram shows where this market ends up in the LONG run, once entry and exit have finished?",
-     "explain": "Entry shifts SUPPLY to the right, and it stops only when price reaches the new break-even level of $46 — which puts the market at $46 and 79 service calls a month. Of the other three pictures, one shifts supply the wrong way, one shifts demand instead (nothing has happened to what buyers want), and one carries supply straight past the break-even price, which cannot last: at a price that low the typical firm would be taking a loss and firms would start leaving again."
+     "explain": "Entry shifts SUPPLY to the right, and it stops only when price reaches the new break-even level of $46 — which puts the market at $46 and 79 service calls a month. Every picture carries the starting point E₁ and a dotted line across at the price the market began from, and that line is what tells the pictures apart: the market began in long-run equilibrium, so that price IS the firm’s OLD minimum ATC. The long run ends at the NEW minimum ATC, and here that sits ABOVE the line. Of the other three, one shifts supply the wrong way, one leaves both curves where the short run left them, and one shifts supply the right way but comes to rest on the wrong side of that line."
     }
    },
    {
     "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
     "options": [
-     "Higher — $46 against the original $40",
-     "The same — $40 before and $40 after",
-     "Lower — $34 against the original $40",
-     "It settles at the short-run price of $55 — entry and exit have already finished their work"
+     "Higher than the price it started from",
+     "The same — back at the price it started from",
+     "Lower than the price it started from",
+     "It cannot be told from this — it depends on how big the shock was, not on whether the industry is constant-, increasing- or decreasing-cost"
     ],
     "correct": 0,
-    "explain": "It ends at $46, above the $40 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The short-run price of $55 is the trap: that was the price before any firm had entered or left, and the whole point of the long run is that it does not stay there.",
+    "explain": "It ends at $46, above the $40 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The size of the shock is a red herring: a bigger shift of demand would draw in more firms and leave the industry larger, but it would not change which way the break-even price moved — only how far. The short-run price of $55 is not the answer either; that was the price before a single firm had entered or left.",
     "panel": "both",
     "pre": {
      "market": {
@@ -3832,39 +4207,39 @@ const PROBLEMS = [
   "unit": "hundred pounds a day",
   "topic": "Commercial lobster fishing — increasing cost, demand falls",
   "method": "Demand shock · the long-run chain",
-  "scenario": "This commercial lobster fishing industry is in long-run equilibrium: price is $12, the typical firm is breaking even, and 80 hundred pounds a day change hands. A widely reported health advisory about shellfish is published.",
+  "scenario": "This commercial lobster fishing industry is in long-run equilibrium: price is $12, the typical firm is breaking even, and 100 hundred pounds a day change hands. A widely reported health advisory about shellfish is published.",
   "terms": "<b>ATC</b> = average total cost. <b>MC</b> = marginal cost. <b>min ATC</b> = the lowest point on the ATC curve, which is the firm’s break-even price. <b>LRS</b> = long-run supply. <b>P*</b> and <b>Q*</b> = equilibrium price and quantity.",
   "review": "<b>Economic profit</b> counts the owner’s next-best use of their own money as a cost, so zero economic profit still means a normal return. The chain: the shock moves one curve and the market finds a new SHORT-run price. Compare that price with the typical firm’s min ATC — above it is economic profit, below it is a loss. Profit draws entry and shifts market supply right; loss forces exit and shifts it left. That continues until economic profit is zero again, which is where price equals min ATC. Whether that final price is the same as, higher than, or lower than the original depends on what changing the industry’s SIZE does to input prices: nothing in a constant-cost industry, pushes them the same way in an increasing-cost one, pushes them the opposite way in a decreasing-cost one.",
   "p0": "12",
-  "q0": 80,
+  "q0": 100,
   "psr": "8",
-  "qsr": 40,
+  "qsr": 60,
   "plr": "10",
-  "qlr": 20,
+  "qlr": 40,
   "atc0": 12.0,
   "atcShock": 12.0,
   "atc1": 10.0,
   "market": {
    "bd": 10,
    "bs": 10,
-   "qmax": 102.4,
+   "qmax": 128.0,
    "pmax": 21.0,
    "dem": {
     "D1": [
      {
-      "a": 20,
+      "a": 22,
       "label": "D",
       "solid": true
      }
     ],
     "D2": [
      {
-      "a": 20,
+      "a": 22,
       "label": "D₁",
       "solid": false
      },
      {
-      "a": 12,
+      "a": 14,
       "label": "D₂",
       "solid": true
      }
@@ -3873,26 +4248,26 @@ const PROBLEMS = [
    "sup": {
     "S1": [
      {
-      "c": 4,
+      "c": 2,
       "label": "S",
       "solid": true
      }
     ],
     "Stech": [
      {
-      "c": 4,
+      "c": 2,
       "label": "S",
       "solid": true
      }
     ],
     "Sfinal": [
      {
-      "c": 4,
+      "c": 2,
       "label": "S₁",
       "solid": false
      },
      {
-      "c": 8.0,
+      "c": 6.0,
       "label": "S₂",
       "solid": true
      }
@@ -3907,21 +4282,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
-       "a": 12.0,
-       "label": "D",
+       "a": 22.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 14.0,
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
      "p": 10.0,
-     "q": 20.0,
+     "q": 40.0,
+     "ref": {
+      "p": 12.0,
+      "q": 100.0
+     },
      "sup": [
       {
-       "c": 4.0,
+       "c": 2.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
-       "c": 8.0,
+       "c": 6.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -3931,21 +4319,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
-       "a": 12.0,
-       "label": "D",
+       "a": 22.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 14.0,
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
-     "p": 6.0,
-     "q": 60.0,
+     "p": 7.0,
+     "q": 70.0,
+     "ref": {
+      "p": 12.0,
+      "q": 100.0
+     },
      "sup": [
       {
-       "c": 4.0,
+       "c": 2.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 0.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -3955,73 +4356,100 @@ const PROBLEMS = [
     {
      "dem": [
       {
-       "a": 12.0,
+       "a": 22.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
-       "a": 8.0,
-       "label": "D₂",
-       "solid": true
-      }
-     ],
-     "p": 6.0,
-     "q": 20.0,
-     "sup": [
-      {
-       "c": 4.0,
-       "label": "S",
-       "solid": true
-      }
-     ],
-     "why": "demand moved instead of supply"
-    },
-    {
-     "dem": [
-      {
-       "a": 12.0,
-       "label": "D",
-       "solid": true
-      }
-     ],
-     "p": 11.0,
-     "q": 10.0,
-     "sup": [
-      {
-       "c": 4.0,
-       "label": "S₁",
-       "solid": false
-      },
-      {
-       "c": 10.0,
-       "label": "S₂",
-       "solid": true
-      }
-     ],
-     "why": "supply overshot the break-even price"
-    }
-   ],
-   "pmax": 19.599999999999998,
-   "qmax": 130.0,
-   "sr": [
-    {
-     "dem": [
-      {
-       "a": 20.0,
-       "label": "D₁",
-       "solid": false
-      },
-      {
-       "a": 12.0,
+       "a": 14.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 8.0,
-     "q": 40.0,
+     "q": 60.0,
+     "ref": {
+      "p": 12.0,
+      "q": 100.0
+     },
      "sup": [
       {
-       "c": 4.0,
+       "c": 2.0,
+       "faint": false,
+       "label": "S",
+       "solid": true
+      }
+     ],
+     "why": "nothing moved at all — the market stayed where the short run left it"
+    },
+    {
+     "dem": [
+      {
+       "a": 22.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 14.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 13.0,
+     "q": 10.0,
+     "ref": {
+      "p": 12.0,
+      "q": 100.0
+     },
+     "sup": [
+      {
+       "c": 2.0,
+       "faint": true,
+       "label": "S₁",
+       "solid": false
+      },
+      {
+       "c": 12.0,
+       "faint": false,
+       "label": "S₂",
+       "solid": true
+      }
+     ],
+     "why": "supply moved the right way but stopped at the wrong price"
+    }
+   ],
+   "pmax": 19.599999999999998,
+   "qmax": 156.0,
+   "sr": [
+    {
+     "dem": [
+      {
+       "a": 22.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 14.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 8.0,
+     "q": 60.0,
+     "ref": {
+      "p": 12.0,
+      "q": 100.0
+     },
+     "sup": [
+      {
+       "c": 2.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -4031,26 +4459,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
-       "a": 20.0,
+       "a": 22.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
-       "a": 12.0,
+       "a": 14.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 10.0,
-     "q": 20.0,
+     "q": 40.0,
+     "ref": {
+      "p": 12.0,
+      "q": 100.0
+     },
      "sup": [
       {
-       "c": 4.0,
+       "c": 2.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
-       "c": 8.0,
+       "c": 6.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -4060,21 +4496,28 @@ const PROBLEMS = [
     {
      "dem": [
       {
-       "a": 20.0,
+       "a": 22.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
-       "a": 24.0,
+       "a": 26.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 14.0,
-     "q": 100.0,
+     "q": 120.0,
+     "ref": {
+      "p": 12.0,
+      "q": 100.0
+     },
      "sup": [
       {
-       "c": 4.0,
+       "c": 2.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -4084,21 +4527,28 @@ const PROBLEMS = [
     {
      "dem": [
       {
-       "a": 20.0,
+       "a": 22.0,
+       "faint": false,
        "label": "D",
        "solid": true
       }
      ],
      "p": 10.0,
-     "q": 100.0,
+     "q": 120.0,
+     "ref": {
+      "p": 12.0,
+      "q": 100.0
+     },
      "sup": [
       {
-       "c": 4.0,
+       "c": 2.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
-       "c": 0.0,
+       "c": -2.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -4109,15 +4559,15 @@ const PROBLEMS = [
   },
   "points": {
    "E1": {
-    "q": 80,
+    "q": 100,
     "p": 12.0
    },
    "E2": {
-    "q": 40,
+    "q": 60,
     "p": 8.0
    },
    "E3": {
-    "q": 20,
+    "q": 40,
     "p": 10.0
    }
   },
@@ -4173,13 +4623,13 @@ const PROBLEMS = [
    {
     "prompt": "Where does the market settle in the SHORT run, before the number of firms can change?",
     "options": [
-     "P = $8, Q = 40",
-     "P = $12, Q = 40",
-     "P = $8, Q = 80",
-     "P = $10, Q = 20"
+     "P = $8, Q = 60",
+     "P = $12, Q = 60",
+     "P = $8, Q = 100",
+     "P = $10, Q = 40"
     ],
     "correct": 0,
-    "explain": "The new demand curve meets the unchanged short-run supply curve at $8 and 40 hundred pounds a day. Both price and quantity move, which is why neither of the middle two options can be right. The number of firms is fixed for now, so this is as far as the short run goes.",
+    "explain": "The new demand curve meets the unchanged short-run supply curve at $8 and 60 hundred pounds a day. Both price and quantity move, which is why neither of the middle two options can be right. The number of firms is fixed for now, so this is as far as the short run goes.",
     "panel": "market",
     "pre": {
      "market": {
@@ -4221,7 +4671,7 @@ const PROBLEMS = [
     "ap": {
      "set": "sr",
      "prompt": "Which diagram shows where this market settles in the SHORT run, before the number of firms can change?",
-     "explain": "Only demand moves here. Nothing has changed what it costs to make the good, and the number of firms is fixed in the short run, so supply stays exactly where it is. The short run ends where the new demand curve crosses the UNCHANGED supply curve, at $8 and 40 hundred pounds a day. Of the other three pictures, one moves both curves at once, one moves demand the wrong way, and one moves supply instead of demand — and that last one is the tempting mistake, because it can put the price somewhere believable while putting the quantity nowhere near it."
+     "explain": "Only demand moves here. Nothing has changed what it costs to make the good, and the number of firms is fixed in the short run, so supply stays exactly where it is. The short run ends where the new demand curve crosses the UNCHANGED supply curve, at $8 and 60 hundred pounds a day. Of the other three pictures, one moves both curves at once, one moves demand the wrong way, and one moves supply instead of demand — and that last one is the tempting mistake, because it can put the price somewhere believable while putting the quantity nowhere near it."
     }
    },
    {
@@ -4377,10 +4827,10 @@ const PROBLEMS = [
    {
     "prompt": "This is an increasing-cost industry. As exit shrinks the industry, what happens to EVERY firm’s ATC curve?",
     "options": [
-     "It shifts DOWN — minimum ATC moves from $12 to $10",
-     "It stays exactly where it is — minimum ATC is still $12",
-     "It shifts UP — minimum ATC moves from $12 to $14",
-     "It moves to $10 for the firms that just arrived and stays at $12 for the ones already there"
+     "It shifts DOWN — every firm’s minimum ATC falls",
+     "It stays exactly where it is — a change in this industry’s size does not move input prices",
+     "It shifts UP — every firm’s minimum ATC rises",
+     "It shifts for the firms that just arrived, but not for the ones already there"
     ],
     "correct": 0,
     "explain": "An increasing-cost industry’s costs move WITH its size. Fewer firms are competing for the same land, labor and materials, so input prices ease back, and that lifts every firm’s cost curves down. The break-even price moves from $12 to $10. The option that splits the firms is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
@@ -4427,13 +4877,13 @@ const PROBLEMS = [
    {
     "prompt": "Exit goes on until price equals that break-even level. Where does the market end up in the LONG run?",
     "options": [
-     "P = $10, Q = 20",
      "P = $10, Q = 40",
-     "P = $8, Q = 20",
-     "P = $12, Q = 80"
+     "P = $10, Q = 60",
+     "P = $8, Q = 40",
+     "P = $12, Q = 100"
     ],
     "correct": 0,
-    "explain": "Price has to come to rest at $10, the new minimum ATC, because that is the only price at which economic profit is zero. Read the quantity off the demand curve the market is now on: at $10 buyers take 20 hundred pounds a day. The short-run supply curve has shifted left far enough to pass through that point.",
+    "explain": "Price has to come to rest at $10, the new minimum ATC, because that is the only price at which economic profit is zero. Read the quantity off the demand curve the market is now on: at $10 buyers take 40 hundred pounds a day. The short-run supply curve has shifted left far enough to pass through that point.",
     "panel": "market",
     "pre": {
      "market": {
@@ -4477,19 +4927,19 @@ const PROBLEMS = [
     "ap": {
      "set": "lr",
      "prompt": "Which diagram shows where this market ends up in the LONG run, once entry and exit have finished?",
-     "explain": "Exit shifts SUPPLY to the left, and it stops only when price reaches the new break-even level of $10 — which puts the market at $10 and 20 hundred pounds a day. Of the other three pictures, one shifts supply the wrong way, one shifts demand instead (nothing has happened to what buyers want), and one carries supply straight past the break-even price, which cannot last: at a price that low the typical firm would be taking a loss and firms would start leaving again."
+     "explain": "Exit shifts SUPPLY to the left, and it stops only when price reaches the new break-even level of $10 — which puts the market at $10 and 40 hundred pounds a day. Every picture carries the starting point E₁ and a dotted line across at the price the market began from, and that line is what tells the pictures apart: the market began in long-run equilibrium, so that price IS the firm’s OLD minimum ATC. The long run ends at the NEW minimum ATC, and here that sits BELOW the line. Of the other three, one shifts supply the wrong way, one leaves both curves where the short run left them, and one shifts supply the right way but comes to rest on the wrong side of that line."
     }
    },
    {
     "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
     "options": [
-     "Lower — $10 against the original $12",
-     "The same — $12 before and $12 after",
-     "Higher — $14 against the original $12",
-     "It settles at the short-run price of $8 — entry and exit have already finished their work"
+     "Lower than the price it started from",
+     "The same — back at the price it started from",
+     "Higher than the price it started from",
+     "It cannot be told from this — it depends on how big the shock was, not on whether the industry is constant-, increasing- or decreasing-cost"
     ],
     "correct": 0,
-    "explain": "It ends at $10, below the $12 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The short-run price of $8 is the trap: that was the price before any firm had entered or left, and the whole point of the long run is that it does not stay there.",
+    "explain": "It ends at $10, below the $12 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The size of the shock is a red herring: a bigger shift of demand would draw in more firms and leave the industry larger, but it would not change which way the break-even price moved — only how far. The short-run price of $8 is not the answer either; that was the price before a single firm had entered or left.",
     "panel": "both",
     "pre": {
      "market": {
@@ -4614,21 +5064,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 25.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 37.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
      "p": 12.0,
      "q": 500.0,
+     "ref": {
+      "p": 15.0,
+      "q": 200.0
+     },
      "sup": [
       {
        "c": 5.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": -13.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -4638,21 +5101,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 25.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 37.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
-     "p": 30.0,
-     "q": 140.0,
+     "p": 25.5,
+     "q": 230.0,
+     "ref": {
+      "p": 15.0,
+      "q": 200.0
+     },
      "sup": [
       {
        "c": 5.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
-       "c": 23.0,
+       "c": 14.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -4662,73 +5138,100 @@ const PROBLEMS = [
     {
      "dem": [
       {
-       "a": 37.0,
-       "label": "D₁",
-       "solid": false
-      },
-      {
-       "a": 31.0,
-       "label": "D₂",
-       "solid": true
-      }
-     ],
-     "p": 18.0,
-     "q": 260.0,
-     "sup": [
-      {
-       "c": 5.0,
-       "label": "S",
-       "solid": true
-      }
-     ],
-     "why": "demand moved instead of supply"
-    },
-    {
-     "dem": [
-      {
-       "a": 37.0,
-       "label": "D",
-       "solid": true
-      }
-     ],
-     "p": 7.5,
-     "q": 590.0,
-     "sup": [
-      {
-       "c": 5.0,
-       "label": "S₁",
-       "solid": false
-      },
-      {
-       "c": -22.0,
-       "label": "S₂",
-       "solid": true
-      }
-     ],
-     "why": "supply overshot the break-even price"
-    }
-   ],
-   "pmax": 42.0,
-   "qmax": 767.0,
-   "sr": [
-    {
-     "dem": [
-      {
        "a": 25.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 37.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 21.0,
      "q": 320.0,
+     "ref": {
+      "p": 15.0,
+      "q": 200.0
+     },
      "sup": [
       {
        "c": 5.0,
+       "faint": false,
+       "label": "S",
+       "solid": true
+      }
+     ],
+     "why": "nothing moved at all — the market stayed where the short run left it"
+    },
+    {
+     "dem": [
+      {
+       "a": 25.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 37.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 18.0,
+     "q": 380.0,
+     "ref": {
+      "p": 15.0,
+      "q": 200.0
+     },
+     "sup": [
+      {
+       "c": 5.0,
+       "faint": true,
+       "label": "S₁",
+       "solid": false
+      },
+      {
+       "c": -1.0,
+       "faint": false,
+       "label": "S₂",
+       "solid": true
+      }
+     ],
+     "why": "supply moved the right way but stopped at the wrong price"
+    }
+   ],
+   "pmax": 35.7,
+   "qmax": 650.0,
+   "sr": [
+    {
+     "dem": [
+      {
+       "a": 25.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 37.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 21.0,
+     "q": 320.0,
+     "ref": {
+      "p": 15.0,
+      "q": 200.0
+     },
+     "sup": [
+      {
+       "c": 5.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -4739,25 +5242,33 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 25.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 37.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 12.0,
      "q": 500.0,
+     "ref": {
+      "p": 15.0,
+      "q": 200.0
+     },
      "sup": [
       {
        "c": 5.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": -13.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -4768,20 +5279,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 25.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 19.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 12.0,
      "q": 140.0,
+     "ref": {
+      "p": 15.0,
+      "q": 200.0
+     },
      "sup": [
       {
        "c": 5.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -4792,20 +5310,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 25.0,
+       "faint": false,
        "label": "D",
        "solid": true
       }
      ],
      "p": 18.0,
      "q": 140.0,
+     "ref": {
+      "p": 15.0,
+      "q": 200.0
+     },
      "sup": [
       {
        "c": 5.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 11.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -5084,10 +5609,10 @@ const PROBLEMS = [
    {
     "prompt": "This is a decreasing-cost industry. As entry expands the industry, what happens to EVERY firm’s ATC curve?",
     "options": [
-     "It shifts DOWN — minimum ATC moves from $15 to $12",
-     "It stays exactly where it is — minimum ATC is still $15",
-     "It shifts UP — minimum ATC moves from $15 to $18",
-     "It moves to $12 for the firms that just arrived and stays at $15 for the ones already there"
+     "It shifts DOWN — every firm’s minimum ATC falls",
+     "It stays exactly where it is — a change in this industry’s size does not move input prices",
+     "It shifts UP — every firm’s minimum ATC rises",
+     "It shifts for the firms that just arrived, but not for the ones already there"
     ],
     "correct": 0,
     "explain": "A decreasing-cost industry’s costs move AGAINST its size. A bigger industry supports specialized suppliers and shared infrastructure that reach their own economies of scale, so input prices fall, and every firm’s cost curves move down. The break-even price moves from $15 to $12. The option that splits the firms is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
@@ -5184,19 +5709,19 @@ const PROBLEMS = [
     "ap": {
      "set": "lr",
      "prompt": "Which diagram shows where this market ends up in the LONG run, once entry and exit have finished?",
-     "explain": "Entry shifts SUPPLY to the right, and it stops only when price reaches the new break-even level of $12 — which puts the market at $12 and 500 installations a month. Of the other three pictures, one shifts supply the wrong way, one shifts demand instead (nothing has happened to what buyers want), and one carries supply straight past the break-even price, which cannot last: at a price that low the typical firm would be taking a loss and firms would start leaving again."
+     "explain": "Entry shifts SUPPLY to the right, and it stops only when price reaches the new break-even level of $12 — which puts the market at $12 and 500 installations a month. Every picture carries the starting point E₁ and a dotted line across at the price the market began from, and that line is what tells the pictures apart: the market began in long-run equilibrium, so that price IS the firm’s OLD minimum ATC. The long run ends at the NEW minimum ATC, and here that sits BELOW the line. Of the other three, one shifts supply the wrong way, one leaves both curves where the short run left them, and one shifts supply the right way but comes to rest on the wrong side of that line."
     }
    },
    {
     "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
     "options": [
-     "Lower — $12 against the original $15",
-     "The same — $15 before and $15 after",
-     "Higher — $18 against the original $15",
-     "It settles at the short-run price of $21 — entry and exit have already finished their work"
+     "Lower than the price it started from",
+     "The same — back at the price it started from",
+     "Higher than the price it started from",
+     "It cannot be told from this — it depends on how big the shock was, not on whether the industry is constant-, increasing- or decreasing-cost"
     ],
     "correct": 0,
-    "explain": "It ends at $12, below the $15 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The short-run price of $21 is the trap: that was the price before any firm had entered or left, and the whole point of the long run is that it does not stay there.",
+    "explain": "It ends at $12, below the $15 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The size of the shock is a red herring: a bigger shift of demand would draw in more firms and leave the industry larger, but it would not change which way the break-even price moved — only how far. The short-run price of $21 is not the answer either; that was the price before a single firm had entered or left.",
     "panel": "both",
     "pre": {
      "market": {
@@ -5321,21 +5846,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 50.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 42.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
      "p": 33.0,
      "q": 45.0,
+     "ref": {
+      "p": 30.0,
+      "q": 100.0
+     },
      "sup": [
       {
        "c": 10.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 24.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -5345,21 +5883,34 @@ const PROBLEMS = [
     {
      "dem": [
       {
+       "a": 50.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
        "a": 42.0,
-       "label": "D",
+       "faint": false,
+       "label": "D₂",
        "solid": true
       }
      ],
-     "p": 19.0,
-     "q": 115.0,
+     "p": 22.5,
+     "q": 97.5,
+     "ref": {
+      "p": 30.0,
+      "q": 100.0
+     },
      "sup": [
       {
        "c": 10.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
-       "c": -4.0,
+       "c": 3.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -5369,73 +5920,100 @@ const PROBLEMS = [
     {
      "dem": [
       {
-       "a": 42.0,
-       "label": "D₁",
-       "solid": false
-      },
-      {
-       "a": 38.0,
-       "label": "D₂",
-       "solid": true
-      }
-     ],
-     "p": 24.0,
-     "q": 70.0,
-     "sup": [
-      {
-       "c": 10.0,
-       "label": "S",
-       "solid": true
-      }
-     ],
-     "why": "demand moved instead of supply"
-    },
-    {
-     "dem": [
-      {
-       "a": 42.0,
-       "label": "D",
-       "solid": true
-      }
-     ],
-     "p": 36.5,
-     "q": 27.5,
-     "sup": [
-      {
-       "c": 10.0,
-       "label": "S₁",
-       "solid": false
-      },
-      {
-       "c": 31.0,
-       "label": "S₂",
-       "solid": true
-      }
-     ],
-     "why": "supply overshot the break-even price"
-    }
-   ],
-   "pmax": 51.1,
-   "qmax": 149.5,
-   "sr": [
-    {
-     "dem": [
-      {
        "a": 50.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 42.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 26.0,
      "q": 80.0,
+     "ref": {
+      "p": 30.0,
+      "q": 100.0
+     },
      "sup": [
       {
        "c": 10.0,
+       "faint": false,
+       "label": "S",
+       "solid": true
+      }
+     ],
+     "why": "nothing moved at all — the market stayed where the short run left it"
+    },
+    {
+     "dem": [
+      {
+       "a": 50.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 42.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 27.0,
+     "q": 75.0,
+     "ref": {
+      "p": 30.0,
+      "q": 100.0
+     },
+     "sup": [
+      {
+       "c": 10.0,
+       "faint": true,
+       "label": "S₁",
+       "solid": false
+      },
+      {
+       "c": 12.0,
+       "faint": false,
+       "label": "S₂",
+       "solid": true
+      }
+     ],
+     "why": "supply moved the right way but stopped at the wrong price"
+    }
+   ],
+   "pmax": 46.2,
+   "qmax": 143.0,
+   "sr": [
+    {
+     "dem": [
+      {
+       "a": 50.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 42.0,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 26.0,
+     "q": 80.0,
+     "ref": {
+      "p": 30.0,
+      "q": 100.0
+     },
+     "sup": [
+      {
+       "c": 10.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -5446,25 +6024,33 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 50.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 42.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 33.0,
      "q": 45.0,
+     "ref": {
+      "p": 30.0,
+      "q": 100.0
+     },
      "sup": [
       {
        "c": 10.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 24.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -5475,20 +6061,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 50.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 54.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 32.0,
      "q": 110.0,
+     "ref": {
+      "p": 30.0,
+      "q": 100.0
+     },
      "sup": [
       {
        "c": 10.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -5499,20 +6092,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 50.0,
+       "faint": false,
        "label": "D",
        "solid": true
       }
      ],
      "p": 28.0,
      "q": 110.0,
+     "ref": {
+      "p": 30.0,
+      "q": 100.0
+     },
      "sup": [
       {
        "c": 10.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 6.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -5791,10 +6391,10 @@ const PROBLEMS = [
    {
     "prompt": "This is a decreasing-cost industry. As exit shrinks the industry, what happens to EVERY firm’s ATC curve?",
     "options": [
-     "It shifts UP — minimum ATC moves from $30 to $33",
-     "It stays exactly where it is — minimum ATC is still $30",
-     "It shifts DOWN — minimum ATC moves from $30 to $27",
-     "It moves to $33 for the firms that just arrived and stays at $30 for the ones already there"
+     "It shifts UP — every firm’s minimum ATC rises",
+     "It stays exactly where it is — a change in this industry’s size does not move input prices",
+     "It shifts DOWN — every firm’s minimum ATC falls",
+     "It shifts for the firms that just arrived, but not for the ones already there"
     ],
     "correct": 0,
     "explain": "A decreasing-cost industry’s costs move AGAINST its size. A shrinking industry loses the specialized suppliers and shared infrastructure it had grown, so input prices rise, and every firm’s cost curves move up. The break-even price moves from $30 to $33. The option that splits the firms is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
@@ -5891,19 +6491,19 @@ const PROBLEMS = [
     "ap": {
      "set": "lr",
      "prompt": "Which diagram shows where this market ends up in the LONG run, once entry and exit have finished?",
-     "explain": "Exit shifts SUPPLY to the left, and it stops only when price reaches the new break-even level of $33 — which puts the market at $33 and 45 racks a week. Of the other three pictures, one shifts supply the wrong way, one shifts demand instead (nothing has happened to what buyers want), and one carries supply straight past the break-even price, which cannot last: at a price that low the typical firm would be taking a loss and firms would start leaving again."
+     "explain": "Exit shifts SUPPLY to the left, and it stops only when price reaches the new break-even level of $33 — which puts the market at $33 and 45 racks a week. Every picture carries the starting point E₁ and a dotted line across at the price the market began from, and that line is what tells the pictures apart: the market began in long-run equilibrium, so that price IS the firm’s OLD minimum ATC. The long run ends at the NEW minimum ATC, and here that sits ABOVE the line. Of the other three, one shifts supply the wrong way, one leaves both curves where the short run left them, and one shifts supply the right way but comes to rest on the wrong side of that line."
     }
    },
    {
     "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
     "options": [
-     "Higher — $33 against the original $30",
-     "The same — $30 before and $30 after",
-     "Lower — $27 against the original $30",
-     "It settles at the short-run price of $26 — entry and exit have already finished their work"
+     "Higher than the price it started from",
+     "The same — back at the price it started from",
+     "Lower than the price it started from",
+     "It cannot be told from this — it depends on how big the shock was, not on whether the industry is constant-, increasing- or decreasing-cost"
     ],
     "correct": 0,
-    "explain": "It ends at $33, above the $30 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The short-run price of $26 is the trap: that was the price before any firm had entered or left, and the whole point of the long run is that it does not stay there.",
+    "explain": "It ends at $33, above the $30 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The size of the shock is a red herring: a bigger shift of demand would draw in more firms and leave the industry larger, but it would not change which way the break-even price moved — only how far. The short-run price of $26 is not the answer either; that was the price before a single firm had entered or left.",
     "panel": "both",
     "pre": {
      "market": {
@@ -6029,21 +6629,34 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 15.0,
+       "faint": false,
        "label": "D",
        "solid": true
       }
      ],
      "p": 6.0,
      "q": 180.0,
+     "ref": {
+      "p": 9.0,
+      "q": 120.0
+     },
      "sup": [
       {
-       "c": 0.0,
+       "c": 3.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
-       "c": -3.0,
+       "c": 0.0,
+       "faint": false,
        "label": "S₂",
+       "solid": false
+      },
+      {
+       "c": -3.0,
+       "faint": false,
+       "label": "S₃",
        "solid": true
       }
      ],
@@ -6053,21 +6666,34 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 15.0,
+       "faint": false,
        "label": "D",
        "solid": true
       }
      ],
-     "p": 9.0,
-     "q": 120.0,
+     "p": 8.25,
+     "q": 135.0,
+     "ref": {
+      "p": 9.0,
+      "q": 120.0
+     },
      "sup": [
       {
-       "c": 0.0,
+       "c": 3.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
-       "c": 3.0,
+       "c": 0.0,
+       "faint": false,
        "label": "S₂",
+       "solid": false
+      },
+      {
+       "c": 1.5,
+       "faint": false,
+       "label": "S₃",
        "solid": true
       }
      ],
@@ -6077,72 +6703,99 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 15.0,
-       "label": "D₁",
-       "solid": false
-      },
-      {
-       "a": 13.5,
-       "label": "D₂",
-       "solid": true
-      }
-     ],
-     "p": 6.75,
-     "q": 135.0,
-     "sup": [
-      {
-       "c": 0.0,
-       "label": "S",
-       "solid": true
-      }
-     ],
-     "why": "demand moved instead of supply"
-    },
-    {
-     "dem": [
-      {
-       "a": 15.0,
-       "label": "D",
-       "solid": true
-      }
-     ],
-     "p": 5.25,
-     "q": 195.0,
-     "sup": [
-      {
-       "c": 0.0,
-       "label": "S₁",
-       "solid": false
-      },
-      {
-       "c": -4.5,
-       "label": "S₂",
-       "solid": true
-      }
-     ],
-     "why": "supply overshot the break-even price"
-    }
-   ],
-   "pmax": 13.65,
-   "qmax": 253.5,
-   "sr": [
-    {
-     "dem": [
-      {
-       "a": 15.0,
+       "faint": false,
        "label": "D",
        "solid": true
       }
      ],
      "p": 7.5,
      "q": 150.0,
+     "ref": {
+      "p": 9.0,
+      "q": 120.0
+     },
      "sup": [
       {
        "c": 3.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 0.0,
+       "faint": false,
+       "label": "S₂",
+       "solid": true
+      }
+     ],
+     "why": "nothing moved at all — the market stayed where the short run left it"
+    },
+    {
+     "dem": [
+      {
+       "a": 15.0,
+       "faint": true,
+       "label": "D₁",
+       "solid": false
+      },
+      {
+       "a": 13.5,
+       "faint": false,
+       "label": "D₂",
+       "solid": true
+      }
+     ],
+     "p": 6.75,
+     "q": 135.0,
+     "ref": {
+      "p": 9.0,
+      "q": 120.0
+     },
+     "sup": [
+      {
+       "c": 3.0,
+       "faint": true,
+       "label": "S₁",
+       "solid": false
+      },
+      {
+       "c": 0.0,
+       "faint": false,
+       "label": "S₂",
+       "solid": true
+      }
+     ],
+     "why": "demand moved instead of supply"
+    }
+   ],
+   "pmax": 13.65,
+   "qmax": 234.0,
+   "sr": [
+    {
+     "dem": [
+      {
+       "a": 15.0,
+       "faint": false,
+       "label": "D",
+       "solid": true
+      }
+     ],
+     "p": 7.5,
+     "q": 150.0,
+     "ref": {
+      "p": 9.0,
+      "q": 120.0
+     },
+     "sup": [
+      {
+       "c": 3.0,
+       "faint": true,
+       "label": "S₁",
+       "solid": false
+      },
+      {
+       "c": 0.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -6153,25 +6806,33 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 15.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 18.0,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 9.0,
      "q": 180.0,
+     "ref": {
+      "p": 9.0,
+      "q": 120.0
+     },
      "sup": [
       {
        "c": 3.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 0.0,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -6182,20 +6843,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 15.0,
+       "faint": false,
        "label": "D",
        "solid": true
       }
      ],
      "p": 9.75,
      "q": 105.0,
+     "ref": {
+      "p": 9.0,
+      "q": 120.0
+     },
      "sup": [
       {
        "c": 3.0,
+       "faint": true,
        "label": "S₁",
        "solid": false
       },
       {
        "c": 4.5,
+       "faint": false,
        "label": "S₂",
        "solid": true
       }
@@ -6206,20 +6874,27 @@ const PROBLEMS = [
      "dem": [
       {
        "a": 15.0,
+       "faint": true,
        "label": "D₁",
        "solid": false
       },
       {
        "a": 13.5,
+       "faint": false,
        "label": "D₂",
        "solid": true
       }
      ],
      "p": 8.25,
      "q": 105.0,
+     "ref": {
+      "p": 9.0,
+      "q": 120.0
+     },
      "sup": [
       {
        "c": 3.0,
+       "faint": false,
        "label": "S",
        "solid": true
       }
@@ -6498,10 +7173,10 @@ const PROBLEMS = [
    {
     "prompt": "This is a constant-cost industry. As entry expands the industry, what happens to EVERY firm’s ATC curve?",
     "options": [
-     "It stays exactly where it is — minimum ATC is still $6",
-     "It shifts UP — minimum ATC moves from $6 to $7",
-     "It shifts DOWN — minimum ATC moves from $6 to $5",
-     "It moves to $7 for the firms that just arrived and stays at $6 for the ones already there"
+     "It stays exactly where it is — a change in this industry’s size does not move input prices",
+     "It shifts UP — every firm’s minimum ATC rises",
+     "It shifts DOWN — every firm’s minimum ATC falls",
+     "It shifts for the firms that just arrived, but not for the ones already there"
     ],
     "correct": 0,
     "explain": "This is a constant-cost industry: the inputs it uses are a small enough part of their own markets that adding firms does not bid their prices up. Every firm’s ATC curve is exactly where it started, so the break-even price is still $6. The option that splits the firms is never right: these are industry-wide input prices, so they reach every firm in the industry at once, old and new alike.",
@@ -6598,19 +7273,19 @@ const PROBLEMS = [
     "ap": {
      "set": "lr",
      "prompt": "Which diagram shows where this market ends up in the LONG run, once entry and exit have finished?",
-     "explain": "Entry shifts SUPPLY to the right, and it stops only when price reaches the new break-even level of $6 — which puts the market at $6 and 180 thousand bulbs a day. Of the other three pictures, one shifts supply the wrong way, one shifts demand instead (nothing has happened to what buyers want), and one carries supply straight past the break-even price, which cannot last: at a price that low the typical firm would be taking a loss and firms would start leaving again."
+     "explain": "Entry shifts SUPPLY to the right, and it stops only when price reaches the new break-even level of $6 — which puts the market at $6 and 180 thousand bulbs a day. Every picture carries the starting point E₁ and a dotted line across at the price the market began from, and that line is what tells the pictures apart: the market began in long-run equilibrium, so that price IS the firm’s OLD minimum ATC. The long run ends at the NEW minimum ATC, and here that sits BELOW the line. Of the other three, one shifts supply the wrong way, one leaves both curves where the short run left them, and one shifts supply the right way but comes to rest on the wrong side of that line."
     }
    },
    {
     "prompt": "Compared with the price before the shock, is the final long-run price the same, higher, or lower?",
     "options": [
-     "Lower — $6 against the original $9",
-     "The same — $9 before and $9 after",
-     "Higher — $12 against the original $9",
-     "It settles at the short-run price of $7.50 — entry and exit have already finished their work"
+     "Lower than the price it started from",
+     "The same — back at the price it started from",
+     "Higher than the price it started from",
+     "It cannot be told from this — it depends on how big the shock was, not on whether the industry is constant-, increasing- or decreasing-cost"
     ],
     "correct": 0,
-    "explain": "It ends at $6, below the $9 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The short-run price of $7.50 is the trap: that was the price before any firm had entered or left, and the whole point of the long run is that it does not stay there.",
+    "explain": "It ends at $6, below the $9 it started at. This is the question the exam asks, and the cost structure is the only thing that answers it: a constant-cost industry comes back to the price it started at, an increasing-cost industry ends up where costs went WITH its size, and a decreasing-cost industry ends up where costs went AGAINST its size. The size of the shock is a red herring: a bigger shift of demand would draw in more firms and leave the industry larger, but it would not change which way the break-even price moved — only how far. The short-run price of $7.50 is not the answer either; that was the price before a single firm had entered or left.",
     "panel": "both",
     "pre": {
      "market": {
@@ -6733,15 +7408,16 @@ function segment(a, slope, qmax, pmax){
 function liner(svg, p, X, Y, qmax, pmax, fontSize){
   /* Labels are queued rather than drawn here: see placeLabels below. */
   const labelQ = [];
-  const line = (a, slope, color, dash, label, width) => {
+  const line = (a, slope, color, dash, label, width, opacity) => {
     const s = segment(a, slope, qmax, pmax);
     if(!s) return;
     svg.appendChild(mk('line', {x1:X(s[0]), y1:Y(a + slope*s[0]), x2:X(s[1]), y2:Y(a + slope*s[1]),
       stroke:color, 'stroke-width':width || 2.4, 'stroke-dasharray':dash || 'none',
-      'stroke-linecap':'round'}));
+      'stroke-linecap':'round', opacity:opacity === undefined ? 1 : opacity}));
     if(label){
       const q = s[1], v = a + slope*q;
       labelQ.push({text:label, color:color,
+        opacity:opacity === undefined ? 1 : Math.max(opacity, 0.55),
         x:Math.min(X(q) + 5, p.x1 - 2),
         y:Math.min(Math.max(Y(v) - 4, p.y1 + 11), p.y0 - 5)});
     }
@@ -6769,7 +7445,8 @@ function liner(svg, p, X, Y, qmax, pmax, fontSize){
       l.y = Math.min(l.y, p.y0 - 5);
       placed.push(l);
       svg.appendChild(mk('text', halo({x:l.x, y:l.y, 'text-anchor':'end',
-        'font-size':fontSize, 'font-weight':800, fill:l.color}), l.text));
+        'font-size':fontSize, 'font-weight':800, fill:l.color,
+        opacity:l.opacity === undefined ? 1 : l.opacity}), l.text));
     });
   };
   return { line, placeLabels };
@@ -6940,12 +7617,29 @@ function drawMini(svg, problem, spec){
   svg.appendChild(mk('text', {x:yx, y:yy, 'text-anchor':'middle', 'font-size':9.5, 'font-weight':700,
                               fill:'#6B5D4C', transform:`rotate(-90 ${yx} ${yy})`}, 'Price'));
 
+  /* The price the market STARTED from, straight across the box. The market
+     began in long-run equilibrium, so this is the typical firm's old minimum
+     ATC -- the level a constant-cost industry comes back to, an
+     increasing-cost one ends above, a decreasing-cost one ends below. It is
+     drawn first so every curve sits on top of it. */
+  const refY = Y(spec.ref.p);
+  svg.appendChild(mk('line', {x1:p.x0, y1:refY, x2:p.x1, y2:refY,
+    stroke:'#2B2118', 'stroke-width':1.1, 'stroke-dasharray':'2 3', opacity:.55}));
+
   const { line, placeLabels } = liner(svg, p, X, Y, qmax, pmax, 10);
-  spec.dem.forEach(cv => line(cv.a, -1/m.bd, '#2F6F62', cv.solid ? 'none' : '4 3', cv.label,
-                              cv.solid ? 2.1 : 1.5));
-  spec.sup.forEach(cv => line(cv.c,  1/m.bs, '#C1542C', cv.solid ? 'none' : '4 3', cv.label,
-                              cv.solid ? 2.1 : 1.5));
+  /* A faint curve is the market's original one: context, not the candidate's
+     claim. The solid one is the claim. */
+  const style = cv => cv.faint ? ['3 3', 1.2, .42] : (cv.solid ? ['none', 2.1, 1] : ['4 3', 1.5, .85]);
+  spec.dem.forEach(cv => { const [dash, w, o] = style(cv);
+    line(cv.a, -1/m.bd, '#2F6F62', dash, cv.label, w, o); });
+  spec.sup.forEach(cv => { const [dash, w, o] = style(cv);
+    line(cv.c,  1/m.bs, '#C1542C', dash, cv.label, w, o); });
   placeLabels();
+
+  /* E1 itself, so the dotted line is explained rather than asserted. */
+  svg.appendChild(mk('circle', {cx:X(spec.ref.q), cy:refY, r:3.6, fill:'#9C8E7A'}));
+  svg.appendChild(mk('text', halo({x:X(spec.ref.q) + 5, y:refY - 5, 'font-size':9.5,
+    'font-weight':800, fill:'#6B5D4C'}), 'E\u2081'));
 
   svg.appendChild(mk('line', {x1:X(spec.q), y1:Y(spec.p), x2:X(spec.q), y2:p.y0,
     stroke:'#2B2118', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.5}));
