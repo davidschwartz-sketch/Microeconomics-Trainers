@@ -460,7 +460,7 @@ const PROBLEMS = [
     "options": [
      "3 — marginal product is 14.0 there",
      "2 — marginal product is 12.0 there",
-     "7 — total product is highest there",
+     "7 — marginal product is 1.0 there",
      "4 — marginal product is 10.0 there"
     ],
     "correct": 0,
@@ -478,13 +478,13 @@ const PROBLEMS = [
    {
     "prompt": "At how many crew members do DIMINISHING RETURNS set in — the first one that adds less than the one before?",
     "options": [
-     "4 — that member adds 10.0 against the 14.0 the one before added",
-     "3 — that is where marginal product is highest",
-     "1 — the first one, since every extra worker crowds the others",
-     "7 — the last one, where marginal product is smallest"
+     "4 — marginal product is 10.0 there",
+     "3 — marginal product is 14.0 there",
+     "5 — marginal product is 6.0 there",
+     "7 — marginal product is 1.0 there"
     ],
     "correct": 0,
-    "explain": "Diminishing returns begin at the FIRST crew member whose own addition is smaller than the previous one’s. That is 4 crew members: 10.0 against 14.0. Up to 3 crew members each extra member made the crew more productive, which is why marginal product rose before it fell. The hump is the point — marginal product does not have to fall from the very first worker.",
+    "explain": "Diminishing returns begin at the FIRST crew member whose own addition is smaller than the previous one’s — so this is a question about two rows at once, not one. That is 4 crew members: 10.0, against the 14.0 the member before added. Up to 3 crew members each extra member made the crew more productive, which is why marginal product rose before it fell. The hump is the point — marginal product does not have to fall from the very first worker.",
     "fills": [],
     "mark": [
      [
@@ -734,7 +734,7 @@ const PROBLEMS = [
     "prompt": "And at how many bakers does AVERAGE product peak?",
     "options": [
      "4 — APL is 12.5 there",
-     "3 — the same place marginal product peaked",
+     "3 — APL is 12.0 there",
      "6 — APL is 10.0 there",
      "1 — APL is 8.0 there"
     ],
@@ -753,10 +753,10 @@ const PROBLEMS = [
    {
     "prompt": "Marginal product has already started falling at 4 bakers. Why is average product still RISING there?",
     "options": [
-     "Because that baker still adds MORE than the average, so he pulls the average up even though he adds less than the baker before him",
+     "Because that baker still adds MORE than the average, so they pull the average up even though they add less than the baker before them",
      "Because average product always lags one worker behind marginal product",
      "Because total product is still rising, and average product follows total product",
-     "Because the oven has not reached its capacity yet"
+     "Because the oven has not reached its capacity yet, so there is still room for another baker to work at full speed"
     ],
     "correct": 0,
     "explain": "It is the arithmetic of averages, the same as a batting average: you only need to beat the average to raise it, not to beat your own last at-bat. At 4 bakers the extra baker adds 14.0 against an average of 12.0 — above it, so the average rises to 12.5. At 5 bakers the extra baker adds only 8.0 against an average of 12.5, and the average falls. Average product peaks exactly where marginal product crosses it.",
@@ -949,7 +949,7 @@ const PROBLEMS = [
      "40 — MC is $2.00 there",
      "30 — MC is $3.00 there",
      "50 — MC is $2.40 there",
-     "10 — the smallest output, so the least has been spent"
+     "10 — MC is $6.00 there"
     ],
     "correct": 0,
     "explain": "MC runs $6.00, $4.00, $3.00, $2.00, $2.40, $4.00, $8.00, lowest at 40 posters — which is exactly where marginal product is at its highest (12.0). That is not a coincidence: MC = wage ÷ MPL, and dividing a fixed wage by the biggest number gives the smallest answer.",
@@ -1166,7 +1166,7 @@ const PROBLEMS = [
      "50 — AVC is $3.60 there",
      "40 — AVC is $3.75 there",
      "60 — AVC is $3.75 there",
-     "70 — the largest output on the table"
+     "70 — AVC is $4.00 there"
     ],
     "correct": 0,
     "explain": "AVC runs $9.00, $6.00, $4.50, $3.75, $3.60, $3.75, $4.00, lowest at 50 washes — the same output where average product peaks at 5.0. Same identity, read backwards: AVC = wage ÷ APL.",
@@ -1465,7 +1465,7 @@ const PROBLEMS = [
    {
     "prompt": "The table is complete. At which output is MARGINAL COST at its lowest?",
     "options": [
-     "30 — MC is $2.00 and MPL peaks at 15.0",
+     "30 — MC is $2.00 there",
      "40 — MC is $2.50 there",
      "20 — MC is $3.00 there",
      "80 — MC is $11.00 there"
@@ -1489,8 +1489,8 @@ const PROBLEMS = [
    {
     "prompt": "And at which output is AVERAGE PRODUCT at its highest?",
     "options": [
-     "40 — APL is 9.6 and AVC bottoms at $3.13",
-     "30 — the same output where marginal cost bottoms",
+     "40 — APL is 9.6 there",
+     "30 — APL is 9.0 there",
      "50 — APL is 9.1 there",
      "80 — APL is 5.7 there"
     ],
@@ -1563,7 +1563,7 @@ const PROBLEMS = [
     "options": [
      "Because a marginal figure turns before the average it is pulling: marginal cost can rise for a while and still be below average variable cost, which keeps the average falling",
      "Because the wage is applied to marginal product and average product at different points in the week",
-     "Because fixed cost is in average variable cost but not in marginal cost",
+     "Because fixed cost is counted inside average variable cost but left out of marginal cost, which pulls the two minimums apart",
      "Because Q′ is measured in output per worker while Q* is measured in output"
     ],
     "correct": 0,
@@ -1730,10 +1730,10 @@ const PROBLEMS = [
    {
     "prompt": "At which output is MARGINAL PRODUCT at its highest?",
     "options": [
-     "40 — MPL is 12.0, from the lowest marginal cost on the table, $3.00",
+     "40 — MPL is 12.0 there",
      "30 — MPL is 9.0 there",
      "50 — MPL is 8.0 there",
-     "70 — marginal cost is highest there, so the shop is working hardest"
+     "70 — MPL is 3.0 there"
     ],
     "correct": 0,
     "explain": "The smallest marginal cost on the table, $3.00, gives the largest marginal product, 12.0, at 40 repairs. A high marginal cost is a LOW marginal product, not a high one — it means the shop is getting little back for the wage it just paid.",
@@ -2209,13 +2209,13 @@ const PROBLEMS = [
    {
     "prompt": "At how many growers do diminishing returns set in?",
     "options": [
-     "3 — that grower adds 16.0 against the 24.0 before",
-     "2 — that is where marginal product is highest",
-     "1 — the very first grower",
-     "5 — the last grower, who adds least"
+     "3 — marginal product is 16.0 there",
+     "2 — marginal product is 24.0 there",
+     "1 — marginal product is 20.0 there",
+     "5 — marginal product is 2.0 there"
     ],
     "correct": 0,
-    "explain": "The first grower whose addition is smaller than the previous one’s is the 3 growers: 16.0 against 24.0. From there the greenhouse is getting crowded — the same benches and the same light shared among more people.",
+    "explain": "The first grower whose addition is smaller than the previous one’s is the 3 growers: 16.0, against the 24.0 the grower before added. Note that this is not the same question as where marginal product is HIGHEST — that is the 2 growers, one row earlier. From 3 growers on the greenhouse is getting crowded: the same benches and the same light shared among more people.",
     "fills": [],
     "mark": [
      [
