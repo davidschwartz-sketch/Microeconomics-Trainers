@@ -398,6 +398,7 @@ const CARDS = [
    "qmax": 1000,
    "qmin": 200,
    "tfc": 24000,
+   "vFrom": null,
    "ymax": 300.0
   },
   "id": "C1",
@@ -412,15 +413,16 @@ const CARDS = [
    "A change in FIXED cost",
    "A change in VARIABLE cost"
   ],
-  "parallel": false,
   "prompt": "Is this a change in fixed cost or a change in variable cost?",
   "scen": "The county reassesses the Birchwood workshop and its property tax bill goes up by $4,800 a year. The shop builds the same cabinets, in the same building, with the same crew.",
   "shift": 4800.0,
+  "shiftShape": "shrinking",
   "still": [
    "MC",
    "AVC"
   ],
-  "type": "classify"
+  "type": "classify",
+  "vfrom": null
  },
  {
   "area": "Fixed or variable?",
@@ -447,6 +449,7 @@ const CARDS = [
    "qmax": 20000,
    "qmin": 4000,
    "tfc": 18000,
+   "vFrom": null,
    "ymax": 8.0
   },
   "id": "C2",
@@ -462,14 +465,15 @@ const CARDS = [
    "A change in VARIABLE cost",
    "A change in FIXED cost"
   ],
-  "parallel": true,
   "prompt": "Is this a change in fixed cost or a change in variable cost?",
   "scen": "The state puts a new excise tax of 60 cents on every pound of fish Harbor Point sells.",
   "shift": 0.6,
+  "shiftShape": "parallel",
   "still": [
    "AFC"
   ],
-  "type": "classify"
+  "type": "classify",
+  "vfrom": null
  },
  {
   "area": "Fixed or variable?",
@@ -496,6 +500,7 @@ const CARDS = [
    "qmax": 2000,
    "qmin": 400,
    "tfc": 9000,
+   "vFrom": null,
    "ymax": 36.0
   },
   "id": "C3",
@@ -510,15 +515,16 @@ const CARDS = [
    "A change in FIXED cost",
    "A change in VARIABLE cost"
   ],
-  "parallel": false,
   "prompt": "Is this a change in fixed cost or a change in variable cost?",
   "scen": "The town rewrites its ordinance and Copper Kettle’s annual business license fee rises by $1,600.",
   "shift": 1600.0,
+  "shiftShape": "shrinking",
   "still": [
    "MC",
    "AVC"
   ],
-  "type": "classify"
+  "type": "classify",
+  "vfrom": null
  },
  {
   "area": "Fixed or variable?",
@@ -545,6 +551,7 @@ const CARDS = [
    "qmax": 2000,
    "qmin": 400,
    "tfc": 9000,
+   "vFrom": null,
    "ymax": 36.0
   },
   "id": "C4",
@@ -560,14 +567,15 @@ const CARDS = [
    "A change in VARIABLE cost",
    "A change in FIXED cost"
   ],
-  "parallel": true,
   "prompt": "Is this a change in fixed cost or a change in variable cost?",
   "scen": "A poor apple harvest pushes up the price of fruit. Red Barn now spends $1.50 more on apples for every case of cider it presses.",
   "shift": 1.5,
+  "shiftShape": "parallel",
   "still": [
    "AFC"
   ],
-  "type": "classify"
+  "type": "classify",
+  "vfrom": null
  },
  {
   "area": "Fixed or variable?",
@@ -594,6 +602,7 @@ const CARDS = [
    "qmax": 1000,
    "qmin": 200,
    "tfc": 24000,
+   "vFrom": null,
    "ymax": 300.0
   },
   "id": "C5",
@@ -608,22 +617,23 @@ const CARDS = [
    "A change in FIXED cost",
    "A change in VARIABLE cost"
   ],
-  "parallel": false,
   "prompt": "Is this a change in fixed cost or a change in variable cost?",
   "scen": "Quarry Lane signs a three-year lease on a second cutting bay at $12,000 a year. The rent is owed in full whether the bay runs every day or sits idle.",
   "shift": 12000.0,
+  "shiftShape": "shrinking",
   "still": [
    "MC",
    "AVC"
   ],
-  "type": "classify"
+  "type": "classify",
+  "vfrom": null
  },
  {
   "area": "Fixed or variable?",
   "biz": "Sunrise Egg Farm",
   "caption": "A variable-cost change. MC, AVC and ATC all shift up by $0.60 — the same gap at every quantity. AFC does not move.",
   "correct": 0,
-  "explain": "The trap here is the word “wage.” What matters is not what the cost is called but whether it moves with output: these workers are paid for hours that rise and fall with the number of dozens packed, so the extra wage is charged, in effect, per dozen. (A salaried manager’s raise would be the other answer — the same money whatever the farm packs.) Every dozen now costs $0.60 more to make, so MC rises by $0.60, and because the cost varies with output AVC rises by the same $0.60. Total fixed cost has not moved, so AFC sits exactly where it was.",
+  "explain": "The packers are paid by the hour, and their hours rise and fall with the number of dozens the farm packs, so the extra wage is charged, in effect, per dozen: pack nothing and none of it is owed. Wages for production workers are the standard variable cost. What would make a wage fixed is paying it regardless of output — a salaried manager’s raise is the same money whether the farm packs four thousand dozen or twenty thousand. Every dozen now costs $0.60 more to make, so MC rises by $0.60, and because the cost varies with output AVC rises by the same $0.60. Total fixed cost has not moved, so AFC sits exactly where it was.",
   "gapQ": [
    5000,
    16000
@@ -643,6 +653,7 @@ const CARDS = [
    "qmax": 20000,
    "qmin": 4000,
    "tfc": 18000,
+   "vFrom": null,
    "ymax": 8.0
   },
   "id": "C6",
@@ -658,14 +669,15 @@ const CARDS = [
    "A change in VARIABLE cost",
    "A change in FIXED cost"
   ],
-  "parallel": true,
   "prompt": "Is this a change in fixed cost or a change in variable cost?",
   "scen": "The state minimum wage rises. Sunrise pays its packers by the hour, and their hours go up and down with how many dozen the farm packs — it works out to 60 cents more per dozen.",
   "shift": 0.6,
+  "shiftShape": "parallel",
   "still": [
    "AFC"
   ],
-  "type": "classify"
+  "type": "classify",
+  "vfrom": null
  },
  {
   "area": "Fixed or variable?",
@@ -692,6 +704,7 @@ const CARDS = [
    "qmax": 20000,
    "qmin": 4000,
    "tfc": 18000,
+   "vFrom": null,
    "ymax": 8.0
   },
   "id": "C7",
@@ -706,41 +719,43 @@ const CARDS = [
    "A change in FIXED cost",
    "A change in VARIABLE cost"
   ],
-  "parallel": false,
   "prompt": "Is this a change in fixed cost or a change in variable cost?",
   "scen": "Pine Needle’s fire insurance premium goes up by $6,400 for the year. Nothing about the mill’s pulp, power or crew changes.",
   "shift": 6400.0,
+  "shiftShape": "shrinking",
   "still": [
    "MC",
    "AVC"
   ],
-  "type": "classify"
+  "type": "classify",
+  "vfrom": null
  },
  {
   "area": "Fixed or variable?",
-  "biz": "Blue Awning Coffee Roasters",
-  "caption": "A variable-cost change. MC, AVC and ATC all shift up by $1.50 — the same gap at every quantity. AFC does not move.",
+  "biz": "Blue Nuts",
+  "caption": "A variable-cost change, but only on output above 800 crates — below that, nothing moved at all. MC steps up by $1.50 at 800, and the gap on ATC grows from nothing toward $1.50 as more of the output becomes overtime work. AFC does not move.",
   "correct": 0,
-  "explain": "Overtime is only paid because of the extra crates, and only on the extra crates. The cost appears when output rises and disappears when it falls — the definition of a variable cost, even though the money is going to labor rather than materials. Every crate now costs $1.50 more to make, so MC rises by $1.50, and because the cost varies with output AVC rises by the same $1.50. Total fixed cost has not moved, so AFC sits exactly where it was.",
+  "explain": "Overtime is paid only because of the extra crates, and only on the extra crates. Cost that appears when output rises and disappears when it falls is variable cost, even though the money is going to labor rather than materials. But notice what it does NOT do: it is not $1.50 on every crate. The first 800 crates are roasted inside the regular shift and cost exactly what they always did, so marginal cost is untouched up to 800 and STEPS UP by $1.50 from there on. Average variable cost climbs more slowly still — by $1.50 × (Q − 800) ÷ Q, which is nothing at 800 and $0.75 by 1,600 — because only part of the output is overtime work, and it approaches $1.50 without ever reaching it. Total fixed cost has not moved, so AFC sits exactly where it was.",
   "gapQ": [
    500,
    1600
   ],
   "gapTxt": [
-   "$1.50",
-   "$1.50"
+   "$0.00",
+   "$0.75"
   ],
   "gapV": [
-   1.5,
-   1.5
+   0.0,
+   0.75
   ],
   "graph": {
    "amin": 6.0,
    "c": 7.5e-06,
    "qa": 1200,
-   "qmax": 2000,
+   "qmax": 1800,
    "qmin": 400,
    "tfc": 9000,
+   "vFrom": 800,
    "ymax": 36.0
   },
   "id": "C8",
@@ -756,14 +771,15 @@ const CARDS = [
    "A change in VARIABLE cost",
    "A change in FIXED cost"
   ],
-  "parallel": true,
   "prompt": "Is this a change in fixed cost or a change in variable cost?",
-  "scen": "Demand is strong enough that Blue Awning now roasts past the end of the regular shift. Every crate roasted after that point carries about $1.50 of overtime pay.",
+  "scen": "Demand is strong enough that Blue Nuts now roasts past the end of the regular shift. The shift covers the first 800 crates; every crate roasted after that carries about $1.50 of overtime pay.",
   "shift": 1.5,
+  "shiftShape": "growing",
   "still": [
    "AFC"
   ],
-  "type": "classify"
+  "type": "classify",
+  "vfrom": 800
  },
  {
   "area": "Which curves move",
@@ -790,6 +806,7 @@ const CARDS = [
    "qmax": 2000,
    "qmin": 400,
    "tfc": 9000,
+   "vFrom": null,
    "ymax": 36.0
   },
   "id": "V1",
@@ -806,15 +823,16 @@ const CARDS = [
    "MC and AVC only — AFC and ATC stay where they are",
    "AFC only — MC, AVC and ATC stay where they are"
   ],
-  "parallel": false,
   "prompt": "Which of the firm’s cost curves shift as a result?",
   "scen": "The city raises Trestle Bridge’s annual brewing permit by $2,400. The brewery makes the same beer from the same ingredients.",
   "shift": 2400.0,
+  "shiftShape": "shrinking",
   "still": [
    "MC",
    "AVC"
   ],
-  "type": "curves"
+  "type": "curves",
+  "vfrom": null
  },
  {
   "area": "Which curves move",
@@ -841,6 +859,7 @@ const CARDS = [
    "qmax": 20000,
    "qmin": 4000,
    "tfc": 18000,
+   "vFrom": null,
    "ymax": 8.0
   },
   "id": "V2",
@@ -858,21 +877,22 @@ const CARDS = [
    "MC and AVC only — AFC and ATC stay where they are",
    "AFC only — MC, AVC and ATC stay where they are"
   ],
-  "parallel": true,
   "prompt": "Which of the firm’s cost curves shift as a result?",
   "scen": "Marigold’s sleeve-and-sticker packaging now costs 60 cents more for every bunch the farm cuts and wraps.",
   "shift": 0.6,
+  "shiftShape": "parallel",
   "still": [
    "AFC"
   ],
-  "type": "curves"
+  "type": "curves",
+  "vfrom": null
  },
  {
   "area": "Which curves move",
   "biz": "Steel Thread Tailoring",
   "caption": "A fixed-cost change. AFC and ATC shift up by $1,200 ÷ Q — $2.40 at 500 alterations, $0.75 at 1,600. MC and AVC do not move.",
   "correct": 0,
-  "explain": "Rent is owed on the shopfront whatever comes through the door, so this is fixed cost: total fixed cost rises by $1,200. AFC = TFC ÷ Q and ATC = AVC + AFC, so both of those carry fixed cost and both shift up — by $2.40 at 500 alterations, $0.75 at 1,600. MC and AVC are built out of variable cost alone, so neither one budges, and that is why a change like this cannot move the quantity the firm chooses to produce.",
+  "explain": "Rent is owed on the storefront whatever comes through the door, so this is fixed cost: total fixed cost rises by $1,200. AFC = TFC ÷ Q and ATC = AVC + AFC, so both of those carry fixed cost and both shift up — by $2.40 at 500 alterations, $0.75 at 1,600. MC and AVC are built out of variable cost alone, so neither one budges, and that is why a change like this cannot move the quantity the firm chooses to produce.",
   "gapQ": [
    500,
    1600
@@ -892,6 +912,7 @@ const CARDS = [
    "qmax": 2000,
    "qmin": 400,
    "tfc": 9000,
+   "vFrom": null,
    "ymax": 36.0
   },
   "id": "V3",
@@ -908,15 +929,16 @@ const CARDS = [
    "MC and AVC only — AFC and ATC stay where they are",
    "AFC only — MC, AVC and ATC stay where they are"
   ],
-  "parallel": false,
   "prompt": "Which of the firm’s cost curves shift as a result?",
-  "scen": "The rent on Steel Thread’s shopfront goes up by $1,200 a year.",
+  "scen": "The rent on Steel Thread’s storefront goes up by $1,200 a year.",
   "shift": 1200.0,
+  "shiftShape": "shrinking",
   "still": [
    "MC",
    "AVC"
   ],
-  "type": "curves"
+  "type": "curves",
+  "vfrom": null
  },
  {
   "area": "Which curves move",
@@ -943,6 +965,7 @@ const CARDS = [
    "qmax": 2000,
    "qmin": 400,
    "tfc": 9000,
+   "vFrom": null,
    "ymax": 36.0
   },
   "id": "V4",
@@ -960,14 +983,15 @@ const CARDS = [
    "MC and AVC only — AFC and ATC stay where they are",
    "AFC only — MC, AVC and ATC stay where they are"
   ],
-  "parallel": true,
   "prompt": "Which of the firm’s cost curves shift as a result?",
   "scen": "Clay & Kiln’s glaze supplier adds a surcharge of $1.50 on the glaze used for each finished piece.",
   "shift": 1.5,
+  "shiftShape": "parallel",
   "still": [
    "AFC"
   ],
-  "type": "curves"
+  "type": "curves",
+  "vfrom": null
  },
  {
   "area": "Which curves move",
@@ -994,6 +1018,7 @@ const CARDS = [
    "qmax": 20000,
    "qmin": 4000,
    "tfc": 18000,
+   "vFrom": null,
    "ymax": 8.0
   },
   "id": "V5",
@@ -1010,15 +1035,16 @@ const CARDS = [
    "MC and AVC only — AFC and ATC stay where they are",
    "AFC only — MC, AVC and ATC stay where they are"
   ],
-  "parallel": false,
   "prompt": "Which of the firm’s cost curves shift as a result?",
   "scen": "North Field qualifies for a farmland assessment and its property tax bill falls by $7,200 a year.",
   "shift": -7200.0,
+  "shiftShape": "shrinking",
   "still": [
    "MC",
    "AVC"
   ],
-  "type": "curves"
+  "type": "curves",
+  "vfrom": null
  },
  {
   "area": "Which curves move",
@@ -1045,6 +1071,7 @@ const CARDS = [
    "qmax": 20000,
    "qmin": 4000,
    "tfc": 18000,
+   "vFrom": null,
    "ymax": 8.0
   },
   "id": "V6",
@@ -1062,14 +1089,15 @@ const CARDS = [
    "MC and AVC only — AFC and ATC stay where they are",
    "AFC only — MC, AVC and ATC stay where they are"
   ],
-  "parallel": true,
   "prompt": "Which of the firm’s cost curves shift as a result?",
   "scen": "A 60-cent-per-bar cocoa levy is repealed, and Lantern Street stops paying it.",
   "shift": -0.6,
+  "shiftShape": "parallel",
   "still": [
    "AFC"
   ],
-  "type": "curves"
+  "type": "curves",
+  "vfrom": null
  },
  {
   "area": "Parallel or shrinking",
@@ -1096,6 +1124,7 @@ const CARDS = [
    "qmax": 2000,
    "qmin": 400,
    "tfc": 9000,
+   "vFrom": null,
    "ymax": 36.0
   },
   "id": "S1",
@@ -1111,15 +1140,16 @@ const CARDS = [
    "The same number of dollars at every quantity — a parallel shift",
    "No gap at low output, widening steadily as output rises"
   ],
-  "parallel": false,
   "prompt": "ATC is one of the curves that moves. By how many dollars does it shift at each quantity?",
   "scen": "Cobblestone’s shop insurance goes up by $1,600 for the year.",
   "shift": 1600.0,
+  "shiftShape": "shrinking",
   "still": [
    "MC",
    "AVC"
   ],
-  "type": "shape"
+  "type": "shape",
+  "vfrom": null
  },
  {
   "area": "Parallel or shrinking",
@@ -1146,6 +1176,7 @@ const CARDS = [
    "qmax": 2000,
    "qmin": 400,
    "tfc": 9000,
+   "vFrom": null,
    "ymax": 36.0
   },
   "id": "S2",
@@ -1162,14 +1193,15 @@ const CARDS = [
    "A large gap at low output that shrinks toward nothing as output rises",
    "No gap at low output, widening steadily as output rises"
   ],
-  "parallel": true,
   "prompt": "ATC is one of the curves that moves. By how many dollars does it shift at each quantity?",
   "scen": "Juniper Ridge switches to a heavier bottle, which adds $1.50 to the cost of every gallon it puts up.",
   "shift": 1.5,
+  "shiftShape": "parallel",
   "still": [
    "AFC"
   ],
-  "type": "shape"
+  "type": "shape",
+  "vfrom": null
  },
  {
   "area": "Parallel or shrinking",
@@ -1196,6 +1228,7 @@ const CARDS = [
    "qmax": 1000,
    "qmin": 200,
    "tfc": 24000,
+   "vFrom": null,
    "ymax": 300.0
   },
   "id": "S3",
@@ -1211,15 +1244,16 @@ const CARDS = [
    "The same number of dollars at every quantity — a parallel shift",
    "No gap at low output, widening steadily as output rises"
   ],
-  "parallel": false,
   "prompt": "ATC is one of the curves that moves. By how many dollars does it shift at each quantity?",
   "scen": "Driftwood leases a new shaping machine for $12,000 a year, payable whether or not it is switched on.",
   "shift": 12000.0,
+  "shiftShape": "shrinking",
   "still": [
    "MC",
    "AVC"
   ],
-  "type": "shape"
+  "type": "shape",
+  "vfrom": null
  },
  {
   "area": "Parallel or shrinking",
@@ -1246,6 +1280,7 @@ const CARDS = [
    "qmax": 20000,
    "qmin": 4000,
    "tfc": 18000,
+   "vFrom": null,
    "ymax": 8.0
   },
   "id": "S4",
@@ -1262,14 +1297,15 @@ const CARDS = [
    "A large gap at low output that shrinks toward nothing as output rises",
    "No gap at low output, widening steadily as output rises"
   ],
-  "parallel": true,
   "prompt": "ATC is one of the curves that moves. By how many dollars does it shift at each quantity?",
-  "scen": "Oats get dearer, and Tin Roof now spends 60 cents more on grain for every bag it fills.",
+  "scen": "Oats get more expensive, and Tin Roof now spends 60 cents more on grain for every bag it fills.",
   "shift": 0.6,
+  "shiftShape": "parallel",
   "still": [
    "AFC"
   ],
-  "type": "shape"
+  "type": "shape",
+  "vfrom": null
  },
  {
   "area": "Effect on Q*",
@@ -1296,6 +1332,7 @@ const CARDS = [
    "qmax": 2000,
    "qmin": 400,
    "tfc": 9000,
+   "vFrom": null,
    "ymax": 36.0
   },
   "id": "Q1",
@@ -1311,7 +1348,6 @@ const CARDS = [
    "It falls — the firm produces less than before",
    "It rises — the firm produces more than before"
   ],
-  "parallel": false,
   "price": 16.8,
   "priceTxt": "$16.80",
   "prompt": "What happens to the quantity that maximizes the firm’s profit?",
@@ -1319,12 +1355,14 @@ const CARDS = [
   "q1": 1600.0,
   "scen": "Willow Bend sells shrubs at the going market price of $16.80 and produces the quantity that maximizes its profit. Its property tax bill then rises by $2,400 a year. The market price does not change.",
   "shift": 2400.0,
+  "shiftShape": "shrinking",
   "still": [
    "MC",
    "AVC"
   ],
   "type": "qstar",
-  "verdict": "same"
+  "verdict": "same",
+  "vfrom": null
  },
  {
   "area": "Effect on Q*",
@@ -1351,6 +1389,7 @@ const CARDS = [
    "qmax": 1000,
    "qmin": 200,
    "tfc": 24000,
+   "vFrom": null,
    "ymax": 300.0
   },
   "id": "Q2",
@@ -1367,7 +1406,6 @@ const CARDS = [
    "It stays exactly where it was",
    "It rises — the firm produces more than before"
   ],
-  "parallel": true,
   "price": 174.0,
   "priceTxt": "$174.00",
   "prompt": "What happens to the quantity that maximizes the firm’s profit?",
@@ -1375,11 +1413,13 @@ const CARDS = [
   "q1": 726.5986323710904,
   "scen": "Anchor Bolt sells machined parts at the going market price of $174 and produces the quantity that maximizes its profit. A steel surcharge then adds $24 to the metal in every part. The market price does not change.",
   "shift": 24.0,
+  "shiftShape": "parallel",
   "still": [
    "AFC"
   ],
   "type": "qstar",
-  "verdict": "down"
+  "verdict": "down",
+  "vfrom": null
  },
  {
   "area": "Effect on Q*",
@@ -1406,6 +1446,7 @@ const CARDS = [
    "qmax": 2500,
    "qmin": 800,
    "tfc": 9000,
+   "vFrom": null,
    "ymax": 20.0
   },
   "id": "Q3",
@@ -1422,7 +1463,6 @@ const CARDS = [
    "It stays exactly where it was",
    "It falls — the firm produces less than before"
   ],
-  "parallel": true,
   "price": 11.76,
   "priceTxt": "$11.76",
   "prompt": "What happens to the quantity that maximizes the firm’s profit?",
@@ -1430,18 +1470,20 @@ const CARDS = [
   "q1": 2172.750685464933,
   "scen": "Ash Grove sells honey at the going market price of $11.76 a jar and produces the quantity that maximizes its profit. Its jar supplier then cuts its price, taking $2.00 off every jar the apiary fills. The market price does not change.",
   "shift": -2.0,
+  "shiftShape": "parallel",
   "still": [
    "AFC"
   ],
   "type": "qstar",
-  "verdict": "up"
+  "verdict": "up",
+  "vfrom": null
  },
  {
   "area": "Effect on the shutdown price",
   "biz": "Half Moon Ice Cream",
   "caption": "A fixed-cost change. AFC and ATC shift up by $6,400 ÷ Q — $1.28 at 5,000 tubs, $0.40 at 16,000. MC and AVC do not move.",
   "correct": 0,
-  "explain": "Shutting down in the short run is one comparison and one only: price against minimum AVC. A fixed-cost change leaves AVC exactly where it is, so the shutdown price stays at $2.00 a tub — a dearer lease does not change what one more tub costs to make, and the money is owed whether the firm operates or closes its doors for the period. Students expect any cost increase to push a firm toward shutdown; a purely fixed one never does, however large. (A big enough rise in fixed cost can still drive a firm out of the industry in the long run, but that is the exit decision — price against minimum ATC — not the shutdown decision.)",
+  "explain": "Shutting down in the short run is one comparison and one only: price against minimum AVC. A fixed-cost change leaves AVC exactly where it is, so the shutdown price stays at $2.00 a tub — a more expensive lease does not change what one more tub costs to make, and the money is owed whether the firm operates or closes its doors for the period. Students expect any cost increase to push a firm toward shutdown; a purely fixed one never does, however large. (A big enough rise in fixed cost can still drive a firm out of the industry in the long run, but that is the exit decision — price against minimum ATC — not the shutdown decision.)",
   "gapQ": [
    5000,
    16000
@@ -1461,6 +1503,7 @@ const CARDS = [
    "qmax": 20000,
    "qmin": 4000,
    "tfc": 18000,
+   "vFrom": null,
    "ymax": 8.0
   },
   "id": "D1",
@@ -1476,7 +1519,6 @@ const CARDS = [
    "It rises — the firm now needs a higher price to be worth operating",
    "It falls — the firm can now keep operating at a lower price"
   ],
-  "parallel": false,
   "prompt": "What happens to the price below which the firm would shut down in the short run?",
   "scen": "Half Moon’s landlord raises the rent on its creamery by $6,400 a year.",
   "sd0": 2.0,
@@ -1484,12 +1526,14 @@ const CARDS = [
   "sd1": 2.0,
   "sd1Txt": "$2.00",
   "shift": 6400.0,
+  "shiftShape": "shrinking",
   "still": [
    "MC",
    "AVC"
   ],
   "type": "shutdown",
-  "verdict": "same"
+  "verdict": "same",
+  "vfrom": null
  },
  {
   "area": "Effect on the shutdown price",
@@ -1516,6 +1560,7 @@ const CARDS = [
    "qmax": 1000,
    "qmin": 200,
    "tfc": 24000,
+   "vFrom": null,
    "ymax": 300.0
   },
   "id": "D2",
@@ -1532,19 +1577,20 @@ const CARDS = [
    "It stays exactly where it was",
    "It falls — the firm can now keep operating at a lower price"
   ],
-  "parallel": true,
   "prompt": "What happens to the price below which the firm would shut down in the short run?",
-  "scen": "Resin gets dearer, and Ridgeline now spends $24 more on it for every hull it lays up.",
+  "scen": "Resin gets more expensive, and Ridgeline now spends $24 more on it for every hull it lays up.",
   "sd0": 120.0,
   "sd0Txt": "$120.00",
   "sd1": 144.0,
   "sd1Txt": "$144.00",
   "shift": 24.0,
+  "shiftShape": "parallel",
   "still": [
    "AFC"
   ],
   "type": "shutdown",
-  "verdict": "up"
+  "verdict": "up",
+  "vfrom": null
  },
  {
   "area": "Effect on the shutdown price",
@@ -1571,6 +1617,7 @@ const CARDS = [
    "qmax": 2000,
    "qmin": 400,
    "tfc": 9000,
+   "vFrom": null,
    "ymax": 36.0
   },
   "id": "D3",
@@ -1586,7 +1633,6 @@ const CARDS = [
    "It rises — the firm now needs a higher price to be worth operating",
    "It falls — the firm can now keep operating at a lower price"
   ],
-  "parallel": false,
   "prompt": "What happens to the price below which the firm would shut down in the short run?",
   "scen": "Paper Crane renegotiates its lease and the rent on its press room falls by $1,200 a year.",
   "sd0": 6.0,
@@ -1594,12 +1640,14 @@ const CARDS = [
   "sd1": 6.0,
   "sd1Txt": "$6.00",
   "shift": -1200.0,
+  "shiftShape": "shrinking",
   "still": [
    "MC",
    "AVC"
   ],
   "type": "shutdown",
-  "verdict": "same"
+  "verdict": "same",
+  "vfrom": null
  },
  {
   "area": "Effect on the shutdown price",
@@ -1626,6 +1674,7 @@ const CARDS = [
    "qmax": 2000,
    "qmin": 400,
    "tfc": 9000,
+   "vFrom": null,
    "ymax": 36.0
   },
   "id": "D4",
@@ -1642,7 +1691,6 @@ const CARDS = [
    "It stays exactly where it was",
    "It rises — the firm now needs a higher price to be worth operating"
   ],
-  "parallel": true,
   "prompt": "What happens to the price below which the firm would shut down in the short run?",
   "scen": "An import duty of $1.20 a pound on raw cardamom is lifted, and Saffron Street stops paying it on the spice it mills.",
   "sd0": 6.0,
@@ -1650,11 +1698,13 @@ const CARDS = [
   "sd1": 4.8,
   "sd1Txt": "$4.80",
   "shift": -1.2,
+  "shiftShape": "parallel",
   "still": [
    "AFC"
   ],
   "type": "shutdown",
-  "verdict": "down"
+  "verdict": "down",
+  "vfrom": null
  }
 ];
 
@@ -1692,11 +1742,19 @@ function el(name, attrs, text){
    cost (dF) and how much to the cost of every unit (dV). */
 function curveFn(g, which, dF, dV){
   const tfc = g.tfc + dF;
-  const avc = q => g.amin + g.c * (q - g.qa) * (q - g.qa) + dV;
+  /* A per-unit change with a threshold -- overtime, paid only on the units
+     made after the regular shift ends -- raises TOTAL variable cost by
+     dV x (q - T), not dV x q. So marginal cost STEPS UP at T, while average
+     variable cost climbs toward dV without ever reaching it. With no
+     threshold both are simply dV at every output. */
+  const T = g.vFrom;
+  const vAdd = q => dV === 0 ? 0 : (T == null ? dV : dV * Math.max(0, q - T) / q);
+  const mAdd = q => dV === 0 ? 0 : (T == null ? dV : (q > T ? dV : 0));
+  const avc = q => g.amin + g.c * (q - g.qa) * (q - g.qa) + vAdd(q);
   if(which === 'AVC') return avc;
   if(which === 'AFC') return q => tfc / q;
   if(which === 'ATC') return q => avc(q) + tfc / q;
-  return q => g.amin + g.c * (3*q*q - 4*g.qa*q + g.qa*g.qa) + dV;   // MC
+  return q => g.amin + g.c * (3*q*q - 4*g.qa*q + g.qa*g.qa) + mAdd(q);   // MC
 }
 
 function makeScales(g){
@@ -1707,13 +1765,14 @@ function makeScales(g){
 }
 
 function polyFor(g, s, fn){
-  const pts = [];
   const STEPS = 160;
-  for(let i = 0; i <= STEPS; i++){
-    const q = g.qmin + (g.qmax - g.qmin) * i / STEPS;
-    pts.push(s.x(q).toFixed(2) + ',' + s.y(fn(q)).toFixed(2));
-  }
-  return pts.join(' ');
+  const qs = [];
+  for(let i = 0; i <= STEPS; i++) qs.push(g.qmin + (g.qmax - g.qmin) * i / STEPS);
+  /* MC jumps at an overtime threshold, so sample either side of it -- without
+     this the step is drawn as a slope across one sampling interval. */
+  if(g.vFrom != null) qs.push(g.vFrom - 1e-6, g.vFrom + 1e-6);
+  qs.sort((a, b) => a - b);
+  return qs.map(q => s.x(q).toFixed(2) + ',' + s.y(fn(q)).toFixed(2)).join(' ');
 }
 
 function niceTicks(max){
@@ -1766,10 +1825,11 @@ function drawGraph(card, revealed){
   });
   /* The gap quantities get their own ticks, but a tick within 30px of one
      already placed would just print two numbers on top of each other. */
-  const xwant = [...(card.gapQ || []), g.qmax, g.qmin, (g.qmin + g.qmax) / 2];
+  const xwant = [...(card.gapQ || []), g.vFrom, g.qmax, g.qmin, (g.qmin + g.qmax) / 2]
+    .filter(q => q != null);
   const xticks = [];
   xwant.forEach(q => {
-    if(xticks.every(k => Math.abs(s.x(k) - s.x(q)) > 30)) xticks.push(q);
+    if(xticks.every(k => Math.abs(s.x(k) - s.x(q)) > 34)) xticks.push(q);
   });
   xticks.sort((a, b) => a - b).forEach(q => {
     const x = s.x(q);
