@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Which Curves Move? &mdash; Fixed and Variable Cost Changes</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --teal: #2F6F62;
+    --orange: #C1542C;
+    --indigo: #4A5FB0;
+    --muted: #9C8E7A;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:1120px;margin:0 auto;}
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  .title-block h1{
+    font-size:28px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  .title-block p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+    max-width:64ch;
+  }
+
+  .identities{
+    background:var(--surface-alt);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:11px 14px;
+    margin-bottom:18px;
+    color:var(--ink-soft);
+    font-size:13.5px;
+    line-height:1.6;
+  }
+  .identities b{color:var(--ink);}
+  .identities code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:13px;
+    color:var(--ink);
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:2px 9px;
+    margin:3px 7px 3px 0;
+    display:inline-block;
+    white-space:nowrap;
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px 12px;
+    margin-bottom:14px;
+  }
+  .card-count{font-size:13px;font-weight:700;color:var(--ink-soft);}
+  .score-badge{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:4px 11px;
+    border-radius:999px;
+  }
+
+  .main{
+    display:grid;
+    grid-template-columns:1fr 1.02fr;
+    gap:22px;
+    align-items:start;
+  }
+  @media (max-width:860px){
+    .main{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px;
+  }
+
+  .area-badge{
+    display:inline-block;
+    background:#F2F8F6;
+    border:1px solid #CADAD5;
+    color:var(--teal);
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+    padding:4px 10px;
+    border-radius:999px;
+    margin-bottom:14px;
+  }
+  .biz-name{
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .scenario{
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:17px 18px;
+    font-size:16.5px;
+    font-weight:600;
+    line-height:1.45;
+    margin-bottom:16px;
+  }
+  .prompt{
+    font-size:17px;
+    font-weight:700;
+    line-height:1.4;
+    margin-bottom:16px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .choice-btn{
+    text-align:left;
+    padding:13px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){border-color:var(--accent);background:#FFFBF2;}
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{background:var(--correct-soft);border-color:var(--correct);color:var(--correct);}
+  .choice-btn.incorrect{background:var(--incorrect-soft);border-color:var(--incorrect);color:var(--incorrect);}
+
+  .feedback{display:none;margin-bottom:16px;}
+  .feedback.show{display:block;}
+  .feedback-verdict{font-weight:800;font-size:15px;margin-bottom:6px;}
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    padding:12px 14px;
+    border-radius:0 8px 8px 0;
+  }
+
+  .controls{display:flex;justify-content:flex-end;}
+  .btn{
+    padding:11px 20px;
+    border-radius:10px;
+    border:none;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover:not(:disabled){background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  /* --- graph panel --- */
+  .graph-panel{display:flex;flex-direction:column;}
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 14px;
+    margin-bottom:10px;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--ink-soft);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:16px;height:3px;border-radius:2px;display:inline-block;}
+  .graph-wrap svg{width:100%;height:auto;display:block;}
+  .graph-note{
+    margin-top:12px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:11px 13px;
+    min-height:62px;
+  }
+  .graph-note.waiting{font-style:italic;}
+  .graph-note b{color:var(--ink);}
+
+  /* --- results --- */
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{
+    font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;
+  }
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{font-size:34px;font-weight:800;letter-spacing:-0.02em;margin-bottom:10px;}
+  .results-note{font-size:15px;color:var(--ink-soft);margin-bottom:20px;}
+  .table-wrap{overflow-x:auto;margin-bottom:20px;}
+  table.data-table{width:100%;border-collapse:collapse;font-size:14.5px;}
+  table.data-table th, table.data-table td{
+    border:1px solid var(--border);padding:9px 11px;text-align:center;white-space:nowrap;
+  }
+  table.data-table th{
+    background:var(--surface-alt);font-weight:700;color:var(--ink-soft);font-size:12.5px;
+  }
+  table.data-table th.topic-head, table.data-table td.topic-cell{text-align:left;white-space:normal;}
+  table.data-table td.topic-cell{font-weight:600;color:var(--ink);}
+  table.data-table td.topic-score{font-weight:700;}
+  table.data-table td.topic-score.full{color:var(--correct);}
+  table.data-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px;color:var(--ink-soft);font-style:italic;line-height:1.5;
+    border-top:1px solid var(--border);padding-top:14px;margin:18px 0 20px;
+  }
+
+  footer.reset-row{margin-top:20px;display:flex;justify-content:flex-end;}
+  .link-btn{
+    background:none;border:none;color:var(--ink-soft);font-size:13px;
+    text-decoration:underline;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="title-block">
+      <h1>Which Curves Move?</h1>
+      <p>A change in fixed cost and a change in variable cost move different curves, in different
+      ways &mdash; and that one distinction decides what happens to output, to profit and to the
+      shutdown price.</p>
+    </div>
+  </header>
+
+  <div class="identities">
+    <b>The four curves.</b>
+    <code>AFC = TFC &divide; Q</code>
+    <code>AVC = TVC &divide; Q</code>
+    <code>ATC = AVC + AFC</code>
+    <code>MC = &Delta;TC &divide; &Delta;Q</code>
+    <br>Fixed cost appears in AFC and ATC; variable cost appears in AVC, ATC and MC. Read off which of
+    those a change touches and the rest follows.
+  </div>
+
+  <div class="meta-row" id="metaRow">
+    <span class="card-count" id="cardCount">Card 1 of 25</span>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="main" id="mainArea">
+
+    <div class="panel" id="quizPanel">
+      <span class="area-badge" id="areaTag"></span>
+      <div class="biz-name" id="bizName"></div>
+      <div class="scenario" id="scenarioText">Loading&hellip;</div>
+      <div class="prompt" id="promptText"></div>
+      <div class="options" id="optionsWrap"></div>
+
+      <div class="feedback" id="feedback">
+        <div class="feedback-verdict" id="feedbackVerdict"></div>
+        <div class="feedback-explain" id="feedbackExplain"></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-primary" id="nextBtn" disabled>Next card</button>
+      </div>
+    </div>
+
+    <div class="panel graph-panel" id="graphPanel">
+      <div class="legend">
+        <span><i class="swatch" style="background:#C1542C"></i>MC</span>
+        <span><i class="swatch" style="background:#2F6F62"></i>AVC</span>
+        <span><i class="swatch" style="background:#4A5FB0"></i>ATC</span>
+        <span><i class="swatch" style="background:#9C8E7A"></i>AFC</span>
+      </div>
+      <div class="graph-wrap">
+        <svg id="graph" viewBox="0 0 580 420" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Cost curves for this firm"></svg>
+      </div>
+      <div class="graph-note waiting" id="graphNote">Answer first &mdash; then this panel redraws
+      the curves that moved, leaving the ones that did not exactly where they are.</div>
+    </div>
+
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">Card type</th><th>Score</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <p class="results-caveat">These bands say whether the fixed-against-variable distinction is
+    secure &mdash; they are not an AP score prediction. Treat a strong result here as one idea
+    nailed down, not as a grade.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Start again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Start over</button>
+  </footer>
+
+</div>
+<script>
+/* ---------------------------------------------------------------------------
+   Every number below was derived and checked in verify_curves.py before it was
+   written here: each profile's curve parameters, each card's shift, both ATC
+   gap figures, every profit-maximizing quantity (the root of MC = P on the
+   rising branch, solved and re-substituted) and every shutdown price. The
+   identities the cards teach were asserted on all four profiles:
+
+       AVC(q) = amin + c(q - qa)^2        so AVC bottoms at qa
+       MC(q)  = amin + c(3q^2 - 4*qa*q + qa^2) = dTVC/dq, and MC(qa) = AVC(qa)
+       AFC(q) = TFC / q,  ATC(q) = AVC(q) + AFC(q)
+
+   The correct option is written FIRST in every card and shuffled into place on
+   screen, so a fixed slot cannot leak the answer.
+--------------------------------------------------------------------------- */
+const CARDS = [
+ {
+  "area": "Fixed or variable?",
+  "biz": "Birchwood Cabinetry",
+  "caption": "A fixed-cost change. AFC and ATC shift up by $4,800 ÷ Q — $19.20 at 250 cabinets, $6.00 at 800. MC and AVC do not move.",
+  "correct": 0,
+  "explain": "Property tax is owed on the building, not on the cabinets. Birchwood pays the extra $4,800 whether it builds one cabinet this year or a thousand, so nothing about the cost of making one more cabinet has changed. Total fixed cost rises by $4,800, so AFC and ATC rise with it — by $4,800 ÷ Q, which is $19.20 at 250 cabinets and only $6.00 at 800. MC and AVC are built out of variable cost alone, so neither of them feels this at all.",
+  "gapQ": [
+   250,
+   800
+  ],
+  "gapTxt": [
+   "$19.20",
+   "$6.00"
+  ],
+  "gapV": [
+   19.2,
+   6.0
+  ],
+  "graph": {
+   "amin": 120.0,
+   "c": 0.00015,
+   "qa": 600,
+   "qmax": 1000,
+   "qmin": 200,
+   "tfc": 24000,
+   "ymax": 300.0
+  },
+  "id": "C1",
+  "kind": "fixed",
+  "many": "cabinets",
+  "moved": [
+   "AFC",
+   "ATC"
+  ],
+  "one": "cabinet",
+  "options": [
+   "A change in FIXED cost",
+   "A change in VARIABLE cost"
+  ],
+  "parallel": false,
+  "prompt": "Is this a change in fixed cost or a change in variable cost?",
+  "scen": "The county reassesses the Birchwood workshop and its property tax bill goes up by $4,800 a year. The shop builds the same cabinets, in the same building, with the same crew.",
+  "shift": 4800.0,
+  "still": [
+   "MC",
+   "AVC"
+  ],
+  "type": "classify"
+ },
+ {
+  "area": "Fixed or variable?",
+  "biz": "Harbor Point Fish Market",
+  "caption": "A variable-cost change. MC, AVC and ATC all shift up by $0.60 — the same gap at every quantity. AFC does not move.",
+  "correct": 0,
+  "explain": "The tax is charged per pound, so it is only owed on pounds actually sold. Sell nothing and you owe nothing; sell one more pound and you owe 60 cents more. That is what makes it a variable cost. Every pound now costs $0.60 more to make, so MC rises by $0.60, and because the cost varies with output AVC rises by the same $0.60. Total fixed cost has not moved, so AFC sits exactly where it was.",
+  "gapQ": [
+   5000,
+   16000
+  ],
+  "gapTxt": [
+   "$0.60",
+   "$0.60"
+  ],
+  "gapV": [
+   0.6,
+   0.6
+  ],
+  "graph": {
+   "amin": 2.0,
+   "c": 7.5e-09,
+   "qa": 12000,
+   "qmax": 20000,
+   "qmin": 4000,
+   "tfc": 18000,
+   "ymax": 8.0
+  },
+  "id": "C2",
+  "kind": "variable",
+  "many": "pounds",
+  "moved": [
+   "MC",
+   "AVC",
+   "ATC"
+  ],
+  "one": "pound",
+  "options": [
+   "A change in VARIABLE cost",
+   "A change in FIXED cost"
+  ],
+  "parallel": true,
+  "prompt": "Is this a change in fixed cost or a change in variable cost?",
+  "scen": "The state puts a new excise tax of 60 cents on every pound of fish Harbor Point sells.",
+  "shift": 0.6,
+  "still": [
+   "AFC"
+  ],
+  "type": "classify"
+ },
+ {
+  "area": "Fixed or variable?",
+  "biz": "Copper Kettle Soap Works",
+  "caption": "A fixed-cost change. AFC and ATC shift up by $1,600 ÷ Q — $3.20 at 500 gift boxes, $1.00 at 1,600. MC and AVC do not move.",
+  "correct": 0,
+  "explain": "A license fee buys the right to trade for the year. It is the same $1,600 whether Copper Kettle fills four hundred gift boxes or two thousand, so it does not change what one more box costs to make. Total fixed cost rises by $1,600, so AFC and ATC rise with it — by $1,600 ÷ Q, which is $3.20 at 500 gift boxes and only $1.00 at 1,600. MC and AVC are built out of variable cost alone, so neither of them feels this at all.",
+  "gapQ": [
+   500,
+   1600
+  ],
+  "gapTxt": [
+   "$3.20",
+   "$1.00"
+  ],
+  "gapV": [
+   3.2,
+   1.0
+  ],
+  "graph": {
+   "amin": 6.0,
+   "c": 7.5e-06,
+   "qa": 1200,
+   "qmax": 2000,
+   "qmin": 400,
+   "tfc": 9000,
+   "ymax": 36.0
+  },
+  "id": "C3",
+  "kind": "fixed",
+  "many": "gift boxes",
+  "moved": [
+   "AFC",
+   "ATC"
+  ],
+  "one": "gift box",
+  "options": [
+   "A change in FIXED cost",
+   "A change in VARIABLE cost"
+  ],
+  "parallel": false,
+  "prompt": "Is this a change in fixed cost or a change in variable cost?",
+  "scen": "The town rewrites its ordinance and Copper Kettle’s annual business license fee rises by $1,600.",
+  "shift": 1600.0,
+  "still": [
+   "MC",
+   "AVC"
+  ],
+  "type": "classify"
+ },
+ {
+  "area": "Fixed or variable?",
+  "biz": "Red Barn Cider Mill",
+  "caption": "A variable-cost change. MC, AVC and ATC all shift up by $1.50 — the same gap at every quantity. AFC does not move.",
+  "correct": 0,
+  "explain": "Apples go into cases. Press one more case and you buy $1.50 more fruit; press none and you buy none. Cost that moves with output, one unit at a time, is variable cost. Every case now costs $1.50 more to make, so MC rises by $1.50, and because the cost varies with output AVC rises by the same $1.50. Total fixed cost has not moved, so AFC sits exactly where it was.",
+  "gapQ": [
+   500,
+   1600
+  ],
+  "gapTxt": [
+   "$1.50",
+   "$1.50"
+  ],
+  "gapV": [
+   1.5,
+   1.5
+  ],
+  "graph": {
+   "amin": 6.0,
+   "c": 7.5e-06,
+   "qa": 1200,
+   "qmax": 2000,
+   "qmin": 400,
+   "tfc": 9000,
+   "ymax": 36.0
+  },
+  "id": "C4",
+  "kind": "variable",
+  "many": "cases",
+  "moved": [
+   "MC",
+   "AVC",
+   "ATC"
+  ],
+  "one": "case",
+  "options": [
+   "A change in VARIABLE cost",
+   "A change in FIXED cost"
+  ],
+  "parallel": true,
+  "prompt": "Is this a change in fixed cost or a change in variable cost?",
+  "scen": "A poor apple harvest pushes up the price of fruit. Red Barn now spends $1.50 more on apples for every case of cider it presses.",
+  "shift": 1.5,
+  "still": [
+   "AFC"
+  ],
+  "type": "classify"
+ },
+ {
+  "area": "Fixed or variable?",
+  "biz": "Quarry Lane Stoneworks",
+  "caption": "A fixed-cost change. AFC and ATC shift up by $12,000 ÷ Q — $48.00 at 250 countertops, $15.00 at 800. MC and AVC do not move.",
+  "correct": 0,
+  "explain": "The lease payment is contractually owed whatever the bay produces, so it does not attach to any particular countertop. A cost you cannot avoid by producing less is a fixed cost. Total fixed cost rises by $12,000, so AFC and ATC rise with it — by $12,000 ÷ Q, which is $48.00 at 250 countertops and only $15.00 at 800. MC and AVC are built out of variable cost alone, so neither of them feels this at all.",
+  "gapQ": [
+   250,
+   800
+  ],
+  "gapTxt": [
+   "$48.00",
+   "$15.00"
+  ],
+  "gapV": [
+   48.0,
+   15.0
+  ],
+  "graph": {
+   "amin": 120.0,
+   "c": 0.00015,
+   "qa": 600,
+   "qmax": 1000,
+   "qmin": 200,
+   "tfc": 24000,
+   "ymax": 300.0
+  },
+  "id": "C5",
+  "kind": "fixed",
+  "many": "countertops",
+  "moved": [
+   "AFC",
+   "ATC"
+  ],
+  "one": "countertop",
+  "options": [
+   "A change in FIXED cost",
+   "A change in VARIABLE cost"
+  ],
+  "parallel": false,
+  "prompt": "Is this a change in fixed cost or a change in variable cost?",
+  "scen": "Quarry Lane signs a three-year lease on a second cutting bay at $12,000 a year. The rent is owed in full whether the bay runs every day or sits idle.",
+  "shift": 12000.0,
+  "still": [
+   "MC",
+   "AVC"
+  ],
+  "type": "classify"
+ },
+ {
+  "area": "Fixed or variable?",
+  "biz": "Sunrise Egg Farm",
+  "caption": "A variable-cost change. MC, AVC and ATC all shift up by $0.60 — the same gap at every quantity. AFC does not move.",
+  "correct": 0,
+  "explain": "The trap here is the word “wage.” What matters is not what the cost is called but whether it moves with output: these workers are paid for hours that rise and fall with the number of dozens packed, so the extra wage is charged, in effect, per dozen. (A salaried manager’s raise would be the other answer — the same money whatever the farm packs.) Every dozen now costs $0.60 more to make, so MC rises by $0.60, and because the cost varies with output AVC rises by the same $0.60. Total fixed cost has not moved, so AFC sits exactly where it was.",
+  "gapQ": [
+   5000,
+   16000
+  ],
+  "gapTxt": [
+   "$0.60",
+   "$0.60"
+  ],
+  "gapV": [
+   0.6,
+   0.6
+  ],
+  "graph": {
+   "amin": 2.0,
+   "c": 7.5e-09,
+   "qa": 12000,
+   "qmax": 20000,
+   "qmin": 4000,
+   "tfc": 18000,
+   "ymax": 8.0
+  },
+  "id": "C6",
+  "kind": "variable",
+  "many": "dozen",
+  "moved": [
+   "MC",
+   "AVC",
+   "ATC"
+  ],
+  "one": "dozen",
+  "options": [
+   "A change in VARIABLE cost",
+   "A change in FIXED cost"
+  ],
+  "parallel": true,
+  "prompt": "Is this a change in fixed cost or a change in variable cost?",
+  "scen": "The state minimum wage rises. Sunrise pays its packers by the hour, and their hours go up and down with how many dozen the farm packs — it works out to 60 cents more per dozen.",
+  "shift": 0.6,
+  "still": [
+   "AFC"
+  ],
+  "type": "classify"
+ },
+ {
+  "area": "Fixed or variable?",
+  "biz": "Pine Needle Paper Mill",
+  "caption": "A fixed-cost change. AFC and ATC shift up by $6,400 ÷ Q — $1.28 at 5,000 reams, $0.40 at 16,000. MC and AVC do not move.",
+  "correct": 0,
+  "explain": "The premium insures the mill, not the reams. It is billed for the year and owed in full even if the mill never starts a run, so producing one more ream costs exactly what it did before. Total fixed cost rises by $6,400, so AFC and ATC rise with it — by $6,400 ÷ Q, which is $1.28 at 5,000 reams and only $0.40 at 16,000. MC and AVC are built out of variable cost alone, so neither of them feels this at all.",
+  "gapQ": [
+   5000,
+   16000
+  ],
+  "gapTxt": [
+   "$1.28",
+   "$0.40"
+  ],
+  "gapV": [
+   1.28,
+   0.4
+  ],
+  "graph": {
+   "amin": 2.0,
+   "c": 7.5e-09,
+   "qa": 12000,
+   "qmax": 20000,
+   "qmin": 4000,
+   "tfc": 18000,
+   "ymax": 8.0
+  },
+  "id": "C7",
+  "kind": "fixed",
+  "many": "reams",
+  "moved": [
+   "AFC",
+   "ATC"
+  ],
+  "one": "ream",
+  "options": [
+   "A change in FIXED cost",
+   "A change in VARIABLE cost"
+  ],
+  "parallel": false,
+  "prompt": "Is this a change in fixed cost or a change in variable cost?",
+  "scen": "Pine Needle’s fire insurance premium goes up by $6,400 for the year. Nothing about the mill’s pulp, power or crew changes.",
+  "shift": 6400.0,
+  "still": [
+   "MC",
+   "AVC"
+  ],
+  "type": "classify"
+ },
+ {
+  "area": "Fixed or variable?",
+  "biz": "Blue Awning Coffee Roasters",
+  "caption": "A variable-cost change. MC, AVC and ATC all shift up by $1.50 — the same gap at every quantity. AFC does not move.",
+  "correct": 0,
+  "explain": "Overtime is only paid because of the extra crates, and only on the extra crates. The cost appears when output rises and disappears when it falls — the definition of a variable cost, even though the money is going to labor rather than materials. Every crate now costs $1.50 more to make, so MC rises by $1.50, and because the cost varies with output AVC rises by the same $1.50. Total fixed cost has not moved, so AFC sits exactly where it was.",
+  "gapQ": [
+   500,
+   1600
+  ],
+  "gapTxt": [
+   "$1.50",
+   "$1.50"
+  ],
+  "gapV": [
+   1.5,
+   1.5
+  ],
+  "graph": {
+   "amin": 6.0,
+   "c": 7.5e-06,
+   "qa": 1200,
+   "qmax": 2000,
+   "qmin": 400,
+   "tfc": 9000,
+   "ymax": 36.0
+  },
+  "id": "C8",
+  "kind": "variable",
+  "many": "crates",
+  "moved": [
+   "MC",
+   "AVC",
+   "ATC"
+  ],
+  "one": "crate",
+  "options": [
+   "A change in VARIABLE cost",
+   "A change in FIXED cost"
+  ],
+  "parallel": true,
+  "prompt": "Is this a change in fixed cost or a change in variable cost?",
+  "scen": "Demand is strong enough that Blue Awning now roasts past the end of the regular shift. Every crate roasted after that point carries about $1.50 of overtime pay.",
+  "shift": 1.5,
+  "still": [
+   "AFC"
+  ],
+  "type": "classify"
+ },
+ {
+  "area": "Which curves move",
+  "biz": "Trestle Bridge Brewing",
+  "caption": "A fixed-cost change. AFC and ATC shift up by $2,400 ÷ Q — $4.80 at 500 cases, $1.50 at 1,600. MC and AVC do not move.",
+  "correct": 0,
+  "explain": "A permit fee is fixed cost, so total fixed cost rises by $2,400. AFC = TFC ÷ Q and ATC = AVC + AFC, so both of those carry fixed cost and both shift up — by $4.80 at 500 cases, $1.50 at 1,600. MC and AVC are built out of variable cost alone, so neither one budges, and that is why a change like this cannot move the quantity the firm chooses to produce.",
+  "gapQ": [
+   500,
+   1600
+  ],
+  "gapTxt": [
+   "$4.80",
+   "$1.50"
+  ],
+  "gapV": [
+   4.8,
+   1.5
+  ],
+  "graph": {
+   "amin": 6.0,
+   "c": 7.5e-06,
+   "qa": 1200,
+   "qmax": 2000,
+   "qmin": 400,
+   "tfc": 9000,
+   "ymax": 36.0
+  },
+  "id": "V1",
+  "kind": "fixed",
+  "many": "cases",
+  "moved": [
+   "AFC",
+   "ATC"
+  ],
+  "one": "case",
+  "options": [
+   "AFC and ATC only — MC and AVC stay where they are",
+   "MC, AVC and ATC — AFC stays where it is",
+   "MC and AVC only — AFC and ATC stay where they are",
+   "AFC only — MC, AVC and ATC stay where they are"
+  ],
+  "parallel": false,
+  "prompt": "Which of the firm’s cost curves shift as a result?",
+  "scen": "The city raises Trestle Bridge’s annual brewing permit by $2,400. The brewery makes the same beer from the same ingredients.",
+  "shift": 2400.0,
+  "still": [
+   "MC",
+   "AVC"
+  ],
+  "type": "curves"
+ },
+ {
+  "area": "Which curves move",
+  "biz": "Marigold Flower Farm",
+  "caption": "A variable-cost change. MC, AVC and ATC all shift up by $0.60 — the same gap at every quantity. AFC does not move.",
+  "correct": 0,
+  "explain": "Packaging is bought per bunch, so this is variable cost: 60 cents more on every bunch. MC and AVC are both built out of variable cost, so both shift up by $0.60; ATC = AVC + AFC, so it shifts up by $0.60 as well. AFC = TFC ÷ Q, and total fixed cost has not changed, so AFC is the one curve that stays exactly where it is.",
+  "gapQ": [
+   5000,
+   16000
+  ],
+  "gapTxt": [
+   "$0.60",
+   "$0.60"
+  ],
+  "gapV": [
+   0.6,
+   0.6
+  ],
+  "graph": {
+   "amin": 2.0,
+   "c": 7.5e-09,
+   "qa": 12000,
+   "qmax": 20000,
+   "qmin": 4000,
+   "tfc": 18000,
+   "ymax": 8.0
+  },
+  "id": "V2",
+  "kind": "variable",
+  "many": "bunches",
+  "moved": [
+   "MC",
+   "AVC",
+   "ATC"
+  ],
+  "one": "bunch",
+  "options": [
+   "MC, AVC and ATC — AFC stays where it is",
+   "AFC and ATC only — MC and AVC stay where they are",
+   "MC and AVC only — AFC and ATC stay where they are",
+   "AFC only — MC, AVC and ATC stay where they are"
+  ],
+  "parallel": true,
+  "prompt": "Which of the firm’s cost curves shift as a result?",
+  "scen": "Marigold’s sleeve-and-sticker packaging now costs 60 cents more for every bunch the farm cuts and wraps.",
+  "shift": 0.6,
+  "still": [
+   "AFC"
+  ],
+  "type": "curves"
+ },
+ {
+  "area": "Which curves move",
+  "biz": "Steel Thread Tailoring",
+  "caption": "A fixed-cost change. AFC and ATC shift up by $1,200 ÷ Q — $2.40 at 500 alterations, $0.75 at 1,600. MC and AVC do not move.",
+  "correct": 0,
+  "explain": "Rent is owed on the shopfront whatever comes through the door, so this is fixed cost: total fixed cost rises by $1,200. AFC = TFC ÷ Q and ATC = AVC + AFC, so both of those carry fixed cost and both shift up — by $2.40 at 500 alterations, $0.75 at 1,600. MC and AVC are built out of variable cost alone, so neither one budges, and that is why a change like this cannot move the quantity the firm chooses to produce.",
+  "gapQ": [
+   500,
+   1600
+  ],
+  "gapTxt": [
+   "$2.40",
+   "$0.75"
+  ],
+  "gapV": [
+   2.4,
+   0.75
+  ],
+  "graph": {
+   "amin": 6.0,
+   "c": 7.5e-06,
+   "qa": 1200,
+   "qmax": 2000,
+   "qmin": 400,
+   "tfc": 9000,
+   "ymax": 36.0
+  },
+  "id": "V3",
+  "kind": "fixed",
+  "many": "alterations",
+  "moved": [
+   "AFC",
+   "ATC"
+  ],
+  "one": "alteration",
+  "options": [
+   "AFC and ATC only — MC and AVC stay where they are",
+   "MC, AVC and ATC — AFC stays where it is",
+   "MC and AVC only — AFC and ATC stay where they are",
+   "AFC only — MC, AVC and ATC stay where they are"
+  ],
+  "parallel": false,
+  "prompt": "Which of the firm’s cost curves shift as a result?",
+  "scen": "The rent on Steel Thread’s shopfront goes up by $1,200 a year.",
+  "shift": 1200.0,
+  "still": [
+   "MC",
+   "AVC"
+  ],
+  "type": "curves"
+ },
+ {
+  "area": "Which curves move",
+  "biz": "Clay & Kiln Pottery",
+  "caption": "A variable-cost change. MC, AVC and ATC all shift up by $1.50 — the same gap at every quantity. AFC does not move.",
+  "correct": 0,
+  "explain": "Glaze is used up piece by piece, so this is variable cost: $1.50 more on every piece. MC and AVC are both built out of variable cost, so both shift up by $1.50; ATC = AVC + AFC, so it shifts up by $1.50 as well. AFC = TFC ÷ Q, and total fixed cost has not changed, so AFC is the one curve that stays exactly where it is.",
+  "gapQ": [
+   500,
+   1600
+  ],
+  "gapTxt": [
+   "$1.50",
+   "$1.50"
+  ],
+  "gapV": [
+   1.5,
+   1.5
+  ],
+  "graph": {
+   "amin": 6.0,
+   "c": 7.5e-06,
+   "qa": 1200,
+   "qmax": 2000,
+   "qmin": 400,
+   "tfc": 9000,
+   "ymax": 36.0
+  },
+  "id": "V4",
+  "kind": "variable",
+  "many": "pieces",
+  "moved": [
+   "MC",
+   "AVC",
+   "ATC"
+  ],
+  "one": "piece",
+  "options": [
+   "MC, AVC and ATC — AFC stays where it is",
+   "AFC and ATC only — MC and AVC stay where they are",
+   "MC and AVC only — AFC and ATC stay where they are",
+   "AFC only — MC, AVC and ATC stay where they are"
+  ],
+  "parallel": true,
+  "prompt": "Which of the firm’s cost curves shift as a result?",
+  "scen": "Clay & Kiln’s glaze supplier adds a surcharge of $1.50 on the glaze used for each finished piece.",
+  "shift": 1.5,
+  "still": [
+   "AFC"
+  ],
+  "type": "curves"
+ },
+ {
+  "area": "Which curves move",
+  "biz": "North Field Hay Co.",
+  "caption": "A fixed-cost change. AFC and ATC shift down by $7,200 ÷ Q — $1.44 at 5,000 bales, $0.45 at 16,000. MC and AVC do not move.",
+  "correct": 0,
+  "explain": "Property tax is fixed cost, so total fixed cost falls by $7,200. The direction is down this time, but the curves involved are the same ones. AFC = TFC ÷ Q and ATC = AVC + AFC, so both of those carry fixed cost and both shift down — by $1.44 at 5,000 bales, $0.45 at 16,000. MC and AVC are built out of variable cost alone, so neither one budges, and that is why a change like this cannot move the quantity the firm chooses to produce.",
+  "gapQ": [
+   5000,
+   16000
+  ],
+  "gapTxt": [
+   "-$1.44",
+   "-$0.45"
+  ],
+  "gapV": [
+   -1.44,
+   -0.45
+  ],
+  "graph": {
+   "amin": 2.0,
+   "c": 7.5e-09,
+   "qa": 12000,
+   "qmax": 20000,
+   "qmin": 4000,
+   "tfc": 18000,
+   "ymax": 8.0
+  },
+  "id": "V5",
+  "kind": "fixed",
+  "many": "bales",
+  "moved": [
+   "AFC",
+   "ATC"
+  ],
+  "one": "bale",
+  "options": [
+   "AFC and ATC only — MC and AVC stay where they are",
+   "MC, AVC and ATC — AFC stays where it is",
+   "MC and AVC only — AFC and ATC stay where they are",
+   "AFC only — MC, AVC and ATC stay where they are"
+  ],
+  "parallel": false,
+  "prompt": "Which of the firm’s cost curves shift as a result?",
+  "scen": "North Field qualifies for a farmland assessment and its property tax bill falls by $7,200 a year.",
+  "shift": -7200.0,
+  "still": [
+   "MC",
+   "AVC"
+  ],
+  "type": "curves"
+ },
+ {
+  "area": "Which curves move",
+  "biz": "Lantern Street Chocolates",
+  "caption": "A variable-cost change. MC, AVC and ATC all shift down by $0.60 — the same gap at every quantity. AFC does not move.",
+  "correct": 0,
+  "explain": "The levy was charged per bar, so it was variable cost: every bar now costs 60 cents less. The direction is down, but the curves involved are the same ones. MC and AVC are both built out of variable cost, so both shift down by $0.60; ATC = AVC + AFC, so it shifts down by $0.60 as well. AFC = TFC ÷ Q, and total fixed cost has not changed, so AFC is the one curve that stays exactly where it is.",
+  "gapQ": [
+   5000,
+   16000
+  ],
+  "gapTxt": [
+   "-$0.60",
+   "-$0.60"
+  ],
+  "gapV": [
+   -0.6,
+   -0.6
+  ],
+  "graph": {
+   "amin": 2.0,
+   "c": 7.5e-09,
+   "qa": 12000,
+   "qmax": 20000,
+   "qmin": 4000,
+   "tfc": 18000,
+   "ymax": 8.0
+  },
+  "id": "V6",
+  "kind": "variable",
+  "many": "bars",
+  "moved": [
+   "MC",
+   "AVC",
+   "ATC"
+  ],
+  "one": "bar",
+  "options": [
+   "MC, AVC and ATC — AFC stays where it is",
+   "AFC and ATC only — MC and AVC stay where they are",
+   "MC and AVC only — AFC and ATC stay where they are",
+   "AFC only — MC, AVC and ATC stay where they are"
+  ],
+  "parallel": true,
+  "prompt": "Which of the firm’s cost curves shift as a result?",
+  "scen": "A 60-cent-per-bar cocoa levy is repealed, and Lantern Street stops paying it.",
+  "shift": -0.6,
+  "still": [
+   "AFC"
+  ],
+  "type": "curves"
+ },
+ {
+  "area": "Parallel or shrinking",
+  "biz": "Cobblestone Shoe Repair",
+  "caption": "A fixed-cost change. AFC and ATC shift up by $1,600 ÷ Q — $3.20 at 500 repairs, $1.00 at 1,600. MC and AVC do not move.",
+  "correct": 0,
+  "explain": "Insurance is fixed cost, so the whole $1,600 has to be spread over whatever the shop repairs that year. What lands on ATC is $1,600 ÷ Q: $3.20 at 500 repairs, but only $1.00 by 1,600 — a quarter of the burden, spread over four times the output. Divide a fixed sum by a bigger and bigger Q and the per-unit amount shrinks toward nothing, so a fixed-cost change is never a parallel shift: the old and new ATC curves squeeze together as output rises.",
+  "gapQ": [
+   500,
+   1600
+  ],
+  "gapTxt": [
+   "$3.20",
+   "$1.00"
+  ],
+  "gapV": [
+   3.2,
+   1.0
+  ],
+  "graph": {
+   "amin": 6.0,
+   "c": 7.5e-06,
+   "qa": 1200,
+   "qmax": 2000,
+   "qmin": 400,
+   "tfc": 9000,
+   "ymax": 36.0
+  },
+  "id": "S1",
+  "kind": "fixed",
+  "many": "repairs",
+  "moved": [
+   "AFC",
+   "ATC"
+  ],
+  "one": "repair",
+  "options": [
+   "A large gap at low output that shrinks toward nothing as output rises",
+   "The same number of dollars at every quantity — a parallel shift",
+   "No gap at low output, widening steadily as output rises"
+  ],
+  "parallel": false,
+  "prompt": "ATC is one of the curves that moves. By how many dollars does it shift at each quantity?",
+  "scen": "Cobblestone’s shop insurance goes up by $1,600 for the year.",
+  "shift": 1600.0,
+  "still": [
+   "MC",
+   "AVC"
+  ],
+  "type": "shape"
+ },
+ {
+  "area": "Parallel or shrinking",
+  "biz": "Juniper Ridge Maple Syrup",
+  "caption": "A variable-cost change. MC, AVC and ATC all shift up by $1.50 — the same gap at every quantity. AFC does not move.",
+  "correct": 0,
+  "explain": "The bottle is bought per gallon, so this is variable cost — the same $1.50 on the first gallon and on the last. The same $1.50 is added to every single gallon, so ATC shifts by $1.50 at 500 gallons and by $1.50 at 1,600 — the same gap everywhere. Nothing is being divided by Q, so nothing shrinks: AVC, MC and ATC all move up as parallel copies of themselves.",
+  "gapQ": [
+   500,
+   1600
+  ],
+  "gapTxt": [
+   "$1.50",
+   "$1.50"
+  ],
+  "gapV": [
+   1.5,
+   1.5
+  ],
+  "graph": {
+   "amin": 6.0,
+   "c": 7.5e-06,
+   "qa": 1200,
+   "qmax": 2000,
+   "qmin": 400,
+   "tfc": 9000,
+   "ymax": 36.0
+  },
+  "id": "S2",
+  "kind": "variable",
+  "many": "gallons",
+  "moved": [
+   "MC",
+   "AVC",
+   "ATC"
+  ],
+  "one": "gallon",
+  "options": [
+   "The same number of dollars at every quantity — a parallel shift",
+   "A large gap at low output that shrinks toward nothing as output rises",
+   "No gap at low output, widening steadily as output rises"
+  ],
+  "parallel": true,
+  "prompt": "ATC is one of the curves that moves. By how many dollars does it shift at each quantity?",
+  "scen": "Juniper Ridge switches to a heavier bottle, which adds $1.50 to the cost of every gallon it puts up.",
+  "shift": 1.5,
+  "still": [
+   "AFC"
+  ],
+  "type": "shape"
+ },
+ {
+  "area": "Parallel or shrinking",
+  "biz": "Driftwood Surfboards",
+  "caption": "A fixed-cost change. AFC and ATC shift up by $12,000 ÷ Q — $48.00 at 250 surfboards, $15.00 at 800. MC and AVC do not move.",
+  "correct": 0,
+  "explain": "A lease payment owed regardless of use is fixed cost, so the $12,000 has to be spread over the boards actually shaped. What lands on ATC is $12,000 ÷ Q: $48.00 at 250 surfboards, but only $15.00 by 800 — a quarter of the burden, spread over four times the output. Divide a fixed sum by a bigger and bigger Q and the per-unit amount shrinks toward nothing, so a fixed-cost change is never a parallel shift: the old and new ATC curves squeeze together as output rises.",
+  "gapQ": [
+   250,
+   800
+  ],
+  "gapTxt": [
+   "$48.00",
+   "$15.00"
+  ],
+  "gapV": [
+   48.0,
+   15.0
+  ],
+  "graph": {
+   "amin": 120.0,
+   "c": 0.00015,
+   "qa": 600,
+   "qmax": 1000,
+   "qmin": 200,
+   "tfc": 24000,
+   "ymax": 300.0
+  },
+  "id": "S3",
+  "kind": "fixed",
+  "many": "surfboards",
+  "moved": [
+   "AFC",
+   "ATC"
+  ],
+  "one": "surfboard",
+  "options": [
+   "A large gap at low output that shrinks toward nothing as output rises",
+   "The same number of dollars at every quantity — a parallel shift",
+   "No gap at low output, widening steadily as output rises"
+  ],
+  "parallel": false,
+  "prompt": "ATC is one of the curves that moves. By how many dollars does it shift at each quantity?",
+  "scen": "Driftwood leases a new shaping machine for $12,000 a year, payable whether or not it is switched on.",
+  "shift": 12000.0,
+  "still": [
+   "MC",
+   "AVC"
+  ],
+  "type": "shape"
+ },
+ {
+  "area": "Parallel or shrinking",
+  "biz": "Tin Roof Granola",
+  "caption": "A variable-cost change. MC, AVC and ATC all shift up by $0.60 — the same gap at every quantity. AFC does not move.",
+  "correct": 0,
+  "explain": "Oats go into bags, so this is variable cost — the same 60 cents on every bag, the first one and the hundred-thousandth. The same $0.60 is added to every single bag, so ATC shifts by $0.60 at 5,000 bags and by $0.60 at 16,000 — the same gap everywhere. Nothing is being divided by Q, so nothing shrinks: AVC, MC and ATC all move up as parallel copies of themselves.",
+  "gapQ": [
+   5000,
+   16000
+  ],
+  "gapTxt": [
+   "$0.60",
+   "$0.60"
+  ],
+  "gapV": [
+   0.6,
+   0.6
+  ],
+  "graph": {
+   "amin": 2.0,
+   "c": 7.5e-09,
+   "qa": 12000,
+   "qmax": 20000,
+   "qmin": 4000,
+   "tfc": 18000,
+   "ymax": 8.0
+  },
+  "id": "S4",
+  "kind": "variable",
+  "many": "bags",
+  "moved": [
+   "MC",
+   "AVC",
+   "ATC"
+  ],
+  "one": "bag",
+  "options": [
+   "The same number of dollars at every quantity — a parallel shift",
+   "A large gap at low output that shrinks toward nothing as output rises",
+   "No gap at low output, widening steadily as output rises"
+  ],
+  "parallel": true,
+  "prompt": "ATC is one of the curves that moves. By how many dollars does it shift at each quantity?",
+  "scen": "Oats get dearer, and Tin Roof now spends 60 cents more on grain for every bag it fills.",
+  "shift": 0.6,
+  "still": [
+   "AFC"
+  ],
+  "type": "shape"
+ },
+ {
+  "area": "Effect on Q*",
+  "biz": "Willow Bend Nursery",
+  "caption": "A fixed-cost change. AFC and ATC shift up by $2,400 ÷ Q — $4.80 at 500 shrubs, $1.50 at 1,600. MC and AVC do not move.",
+  "correct": 0,
+  "explain": "The firm produces where MC = MR = P. A fixed-cost change never touches MC, so the MC curve still crosses the $16.80 price line at the very same 1,600 shrubs — Q* does not move. What does change is profit: total cost is $2,400 higher at that unchanged quantity, so profit is exactly $2,400 lower, and the per-unit margin P − ATC narrows by $2,400 ÷ 1,600 = $1.50 a shrub. This is the whole point of the distinction: a fixed-cost change moves profit without moving output.",
+  "gapQ": [
+   500,
+   1600
+  ],
+  "gapTxt": [
+   "$4.80",
+   "$1.50"
+  ],
+  "gapV": [
+   4.8,
+   1.5
+  ],
+  "graph": {
+   "amin": 6.0,
+   "c": 7.5e-06,
+   "qa": 1200,
+   "qmax": 2000,
+   "qmin": 400,
+   "tfc": 9000,
+   "ymax": 36.0
+  },
+  "id": "Q1",
+  "kind": "fixed",
+  "many": "shrubs",
+  "moved": [
+   "AFC",
+   "ATC"
+  ],
+  "one": "shrub",
+  "options": [
+   "It stays exactly where it was",
+   "It falls — the firm produces less than before",
+   "It rises — the firm produces more than before"
+  ],
+  "parallel": false,
+  "price": 16.8,
+  "priceTxt": "$16.80",
+  "prompt": "What happens to the quantity that maximizes the firm’s profit?",
+  "q0": 1600,
+  "q1": 1600.0,
+  "scen": "Willow Bend sells shrubs at the going market price of $16.80 and produces the quantity that maximizes its profit. Its property tax bill then rises by $2,400 a year. The market price does not change.",
+  "shift": 2400.0,
+  "still": [
+   "MC",
+   "AVC"
+  ],
+  "type": "qstar",
+  "verdict": "same"
+ },
+ {
+  "area": "Effect on Q*",
+  "biz": "Anchor Bolt Machine Shop",
+  "caption": "A variable-cost change. MC, AVC and ATC all shift up by $24.00 — the same gap at every quantity. AFC does not move.",
+  "correct": 0,
+  "explain": "The firm produces where MC = MR = P. This change moves MC itself, by $24.00 at every output, so MC now meets the flat $174.00 price line somewhere else: about 727 parts instead of 800. A higher MC curve crosses a flat price line to the left of where the old one did, so Q* falls. Both output and profit change here — that is what separates a variable-cost change from a fixed-cost one, which would have left Q* untouched.",
+  "gapQ": [
+   250,
+   800
+  ],
+  "gapTxt": [
+   "$24.00",
+   "$24.00"
+  ],
+  "gapV": [
+   24.0,
+   24.0
+  ],
+  "graph": {
+   "amin": 120.0,
+   "c": 0.00015,
+   "qa": 600,
+   "qmax": 1000,
+   "qmin": 200,
+   "tfc": 24000,
+   "ymax": 300.0
+  },
+  "id": "Q2",
+  "kind": "variable",
+  "many": "parts",
+  "moved": [
+   "MC",
+   "AVC",
+   "ATC"
+  ],
+  "one": "part",
+  "options": [
+   "It falls — the firm produces less than before",
+   "It stays exactly where it was",
+   "It rises — the firm produces more than before"
+  ],
+  "parallel": true,
+  "price": 174.0,
+  "priceTxt": "$174.00",
+  "prompt": "What happens to the quantity that maximizes the firm’s profit?",
+  "q0": 800,
+  "q1": 726.5986323710904,
+  "scen": "Anchor Bolt sells machined parts at the going market price of $174 and produces the quantity that maximizes its profit. A steel surcharge then adds $24 to the metal in every part. The market price does not change.",
+  "shift": 24.0,
+  "still": [
+   "AFC"
+  ],
+  "type": "qstar",
+  "verdict": "down"
+ },
+ {
+  "area": "Effect on Q*",
+  "biz": "Ash Grove Beekeepers",
+  "caption": "A variable-cost change. MC, AVC and ATC all shift down by $2.00 — the same gap at every quantity. AFC does not move.",
+  "correct": 0,
+  "explain": "The firm produces where MC = MR = P. This change moves MC itself, by $2.00 at every output, so MC now meets the flat $11.76 price line somewhere else: about 2,173 jars instead of 2,000. A lower MC curve crosses a flat price line to the right of where the old one did, so Q* rises. Both output and profit change here — that is what separates a variable-cost change from a fixed-cost one, which would have left Q* untouched.",
+  "gapQ": [
+   1000,
+   2200
+  ],
+  "gapTxt": [
+   "-$2.00",
+   "-$2.00"
+  ],
+  "gapV": [
+   -2.0,
+   -2.0
+  ],
+  "graph": {
+   "amin": 6.0,
+   "c": 1.5e-06,
+   "qa": 1200,
+   "qmax": 2500,
+   "qmin": 800,
+   "tfc": 9000,
+   "ymax": 20.0
+  },
+  "id": "Q3",
+  "kind": "variable",
+  "many": "jars",
+  "moved": [
+   "MC",
+   "AVC",
+   "ATC"
+  ],
+  "one": "jar",
+  "options": [
+   "It rises — the firm produces more than before",
+   "It stays exactly where it was",
+   "It falls — the firm produces less than before"
+  ],
+  "parallel": true,
+  "price": 11.76,
+  "priceTxt": "$11.76",
+  "prompt": "What happens to the quantity that maximizes the firm’s profit?",
+  "q0": 2000,
+  "q1": 2172.750685464933,
+  "scen": "Ash Grove sells honey at the going market price of $11.76 a jar and produces the quantity that maximizes its profit. Its jar supplier then cuts its price, taking $2.00 off every jar the apiary fills. The market price does not change.",
+  "shift": -2.0,
+  "still": [
+   "AFC"
+  ],
+  "type": "qstar",
+  "verdict": "up"
+ },
+ {
+  "area": "Effect on the shutdown price",
+  "biz": "Half Moon Ice Cream",
+  "caption": "A fixed-cost change. AFC and ATC shift up by $6,400 ÷ Q — $1.28 at 5,000 tubs, $0.40 at 16,000. MC and AVC do not move.",
+  "correct": 0,
+  "explain": "Shutting down in the short run is one comparison and one only: price against minimum AVC. A fixed-cost change leaves AVC exactly where it is, so the shutdown price stays at $2.00 a tub — a dearer lease does not change what one more tub costs to make, and the money is owed whether the firm operates or closes its doors for the period. Students expect any cost increase to push a firm toward shutdown; a purely fixed one never does, however large. (A big enough rise in fixed cost can still drive a firm out of the industry in the long run, but that is the exit decision — price against minimum ATC — not the shutdown decision.)",
+  "gapQ": [
+   5000,
+   16000
+  ],
+  "gapTxt": [
+   "$1.28",
+   "$0.40"
+  ],
+  "gapV": [
+   1.28,
+   0.4
+  ],
+  "graph": {
+   "amin": 2.0,
+   "c": 7.5e-09,
+   "qa": 12000,
+   "qmax": 20000,
+   "qmin": 4000,
+   "tfc": 18000,
+   "ymax": 8.0
+  },
+  "id": "D1",
+  "kind": "fixed",
+  "many": "tubs",
+  "moved": [
+   "AFC",
+   "ATC"
+  ],
+  "one": "tub",
+  "options": [
+   "It stays exactly where it was",
+   "It rises — the firm now needs a higher price to be worth operating",
+   "It falls — the firm can now keep operating at a lower price"
+  ],
+  "parallel": false,
+  "prompt": "What happens to the price below which the firm would shut down in the short run?",
+  "scen": "Half Moon’s landlord raises the rent on its creamery by $6,400 a year.",
+  "sd0": 2.0,
+  "sd0Txt": "$2.00",
+  "sd1": 2.0,
+  "sd1Txt": "$2.00",
+  "shift": 6400.0,
+  "still": [
+   "MC",
+   "AVC"
+  ],
+  "type": "shutdown",
+  "verdict": "same"
+ },
+ {
+  "area": "Effect on the shutdown price",
+  "biz": "Ridgeline Canoe Works",
+  "caption": "A variable-cost change. MC, AVC and ATC all shift up by $24.00 — the same gap at every quantity. AFC does not move.",
+  "correct": 0,
+  "explain": "Shutting down in the short run is one comparison and one only: price against minimum AVC. This change shifts AVC up by $24.00 at every output, so its minimum moves with it, from $120.00 to $144.00 a hull. A price between those two figures used to cover variable cost and now does not — which is exactly what it means for the shutdown price to rise.",
+  "gapQ": [
+   250,
+   800
+  ],
+  "gapTxt": [
+   "$24.00",
+   "$24.00"
+  ],
+  "gapV": [
+   24.0,
+   24.0
+  ],
+  "graph": {
+   "amin": 120.0,
+   "c": 0.00015,
+   "qa": 600,
+   "qmax": 1000,
+   "qmin": 200,
+   "tfc": 24000,
+   "ymax": 300.0
+  },
+  "id": "D2",
+  "kind": "variable",
+  "many": "hulls",
+  "moved": [
+   "MC",
+   "AVC",
+   "ATC"
+  ],
+  "one": "hull",
+  "options": [
+   "It rises — the firm now needs a higher price to be worth operating",
+   "It stays exactly where it was",
+   "It falls — the firm can now keep operating at a lower price"
+  ],
+  "parallel": true,
+  "prompt": "What happens to the price below which the firm would shut down in the short run?",
+  "scen": "Resin gets dearer, and Ridgeline now spends $24 more on it for every hull it lays up.",
+  "sd0": 120.0,
+  "sd0Txt": "$120.00",
+  "sd1": 144.0,
+  "sd1Txt": "$144.00",
+  "shift": 24.0,
+  "still": [
+   "AFC"
+  ],
+  "type": "shutdown",
+  "verdict": "up"
+ },
+ {
+  "area": "Effect on the shutdown price",
+  "biz": "Paper Crane Stationery",
+  "caption": "A fixed-cost change. AFC and ATC shift down by $1,200 ÷ Q — $2.40 at 500 boxes, $0.75 at 1,600. MC and AVC do not move.",
+  "correct": 0,
+  "explain": "Shutting down in the short run is one comparison and one only: price against minimum AVC. A fixed-cost change leaves AVC exactly where it is, so the shutdown price stays at $6.00 a box — a cheaper lease does not change what one more box costs to make, and the money is owed whether the firm operates or closes its doors for the period. Students expect any cost increase to push a firm toward shutdown; a purely fixed one never does, however large. (A big enough rise in fixed cost can still drive a firm out of the industry in the long run, but that is the exit decision — price against minimum ATC — not the shutdown decision.)",
+  "gapQ": [
+   500,
+   1600
+  ],
+  "gapTxt": [
+   "-$2.40",
+   "-$0.75"
+  ],
+  "gapV": [
+   -2.4,
+   -0.75
+  ],
+  "graph": {
+   "amin": 6.0,
+   "c": 7.5e-06,
+   "qa": 1200,
+   "qmax": 2000,
+   "qmin": 400,
+   "tfc": 9000,
+   "ymax": 36.0
+  },
+  "id": "D3",
+  "kind": "fixed",
+  "many": "boxes",
+  "moved": [
+   "AFC",
+   "ATC"
+  ],
+  "one": "box",
+  "options": [
+   "It stays exactly where it was",
+   "It rises — the firm now needs a higher price to be worth operating",
+   "It falls — the firm can now keep operating at a lower price"
+  ],
+  "parallel": false,
+  "prompt": "What happens to the price below which the firm would shut down in the short run?",
+  "scen": "Paper Crane renegotiates its lease and the rent on its press room falls by $1,200 a year.",
+  "sd0": 6.0,
+  "sd0Txt": "$6.00",
+  "sd1": 6.0,
+  "sd1Txt": "$6.00",
+  "shift": -1200.0,
+  "still": [
+   "MC",
+   "AVC"
+  ],
+  "type": "shutdown",
+  "verdict": "same"
+ },
+ {
+  "area": "Effect on the shutdown price",
+  "biz": "Saffron Street Spice Mill",
+  "caption": "A variable-cost change. MC, AVC and ATC all shift down by $1.20 — the same gap at every quantity. AFC does not move.",
+  "correct": 0,
+  "explain": "Shutting down in the short run is one comparison and one only: price against minimum AVC. This change shifts AVC down by $1.20 at every output, so its minimum moves with it, from $6.00 to $4.80 a pound. A price between those two figures did not cover variable cost before and now does — which is exactly what it means for the shutdown price to fall.",
+  "gapQ": [
+   500,
+   1600
+  ],
+  "gapTxt": [
+   "-$1.20",
+   "-$1.20"
+  ],
+  "gapV": [
+   -1.2,
+   -1.2
+  ],
+  "graph": {
+   "amin": 6.0,
+   "c": 7.5e-06,
+   "qa": 1200,
+   "qmax": 2000,
+   "qmin": 400,
+   "tfc": 9000,
+   "ymax": 36.0
+  },
+  "id": "D4",
+  "kind": "variable",
+  "many": "pounds",
+  "moved": [
+   "MC",
+   "AVC",
+   "ATC"
+  ],
+  "one": "pound",
+  "options": [
+   "It falls — the firm can now keep operating at a lower price",
+   "It stays exactly where it was",
+   "It rises — the firm now needs a higher price to be worth operating"
+  ],
+  "parallel": true,
+  "prompt": "What happens to the price below which the firm would shut down in the short run?",
+  "scen": "An import duty of $1.20 a pound on raw cardamom is lifted, and Saffron Street stops paying it on the spice it mills.",
+  "sd0": 6.0,
+  "sd0Txt": "$6.00",
+  "sd1": 4.8,
+  "sd1Txt": "$4.80",
+  "shift": -1.2,
+  "still": [
+   "AFC"
+  ],
+  "type": "shutdown",
+  "verdict": "down"
+ }
+];
+
+const BANDS = [
+  { min: 90, label: 'Mastered', tone: 'good',
+    note: 'Secure. You can tell a fixed-cost change from a variable-cost one, name the curves each moves, and say what that does to output, profit and the shutdown price.' },
+  { min: 80, label: 'Strong', tone: 'good',
+    note: 'Good command of the distinction. Look at the card types below where you dropped marks, then run it again.' },
+  { min: 70, label: 'Developing', tone: 'mid',
+    note: 'The classification is mostly there, but at least one of the downstream consequences is not following from it yet. The breakdown below shows which.' },
+  { min: 55, label: 'Shaky', tone: 'poor',
+    note: 'Enough of this is unsettled to cost you marks on questions you could otherwise answer. Review which curves carry fixed cost and which carry variable cost before drilling again.' },
+  { min: 0, label: 'Needs Review', tone: 'poor',
+    note: 'Go back to the four cost identities first. More practice without review will not close a gap this size.' },
+];
+
+/* ======================================================================
+   The diagram
+   ====================================================================== */
+const SVGNS = 'http://www.w3.org/2000/svg';
+const PAD = { l: 62, r: 46, t: 18, b: 48 };
+const VW = 580, VH = 420;
+const PLOT_W = VW - PAD.l - PAD.r;
+const PLOT_H = VH - PAD.t - PAD.b;
+const COLOR = { MC: '#C1542C', AVC: '#2F6F62', ATC: '#4A5FB0', AFC: '#9C8E7A' };
+
+function el(name, attrs, text){
+  const e = document.createElementNS(SVGNS, name);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  if(text !== undefined) e.textContent = text;
+  return e;
+}
+
+/* Each curve as a function of q, given how much has been added to total fixed
+   cost (dF) and how much to the cost of every unit (dV). */
+function curveFn(g, which, dF, dV){
+  const tfc = g.tfc + dF;
+  const avc = q => g.amin + g.c * (q - g.qa) * (q - g.qa) + dV;
+  if(which === 'AVC') return avc;
+  if(which === 'AFC') return q => tfc / q;
+  if(which === 'ATC') return q => avc(q) + tfc / q;
+  return q => g.amin + g.c * (3*q*q - 4*g.qa*q + g.qa*g.qa) + dV;   // MC
+}
+
+function makeScales(g){
+  return {
+    x: q => PAD.l + (q - g.qmin) / (g.qmax - g.qmin) * PLOT_W,
+    y: v => PAD.t + PLOT_H - v / g.ymax * PLOT_H,
+  };
+}
+
+function polyFor(g, s, fn){
+  const pts = [];
+  const STEPS = 160;
+  for(let i = 0; i <= STEPS; i++){
+    const q = g.qmin + (g.qmax - g.qmin) * i / STEPS;
+    pts.push(s.x(q).toFixed(2) + ',' + s.y(fn(q)).toFixed(2));
+  }
+  return pts.join(' ');
+}
+
+function niceTicks(max){
+  const raw = max / 5;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(v => v >= raw) || mag * 10;
+  const out = [];
+  for(let v = step; v <= max + 1e-9; v += step) out.push(v);
+  return out;
+}
+
+function money(v){
+  const neg = v < 0;
+  const a = Math.abs(v);
+  const s = a.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return (neg ? '-' : '') + '$' + s;
+}
+function commas(n){ return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+/* Keep a column of labels from sitting on top of each other. */
+function spread(labels, minGap){
+  labels.sort((a, b) => a.y - b.y);
+  for(let i = 1; i < labels.length; i++){
+    if(labels[i].y - labels[i-1].y < minGap) labels[i].y = labels[i-1].y + minGap;
+  }
+  const over = labels.length ? labels[labels.length-1].y - (PAD.t + PLOT_H) : 0;
+  if(over > 0) labels.forEach(l => l.y -= over);
+  return labels;
+}
+
+function drawGraph(card, revealed){
+  const svg = document.getElementById('graph');
+  svg.innerHTML = '';
+  const g = card.graph, s = makeScales(g);
+  const dF = card.kind === 'fixed' ? card.shift : 0;
+  const dV = card.kind === 'variable' ? card.shift : 0;
+
+  /* axes */
+  svg.appendChild(el('line', { x1: PAD.l, y1: PAD.t, x2: PAD.l, y2: PAD.t + PLOT_H,
+                               stroke: '#2B2118', 'stroke-width': 1.6 }));
+  svg.appendChild(el('line', { x1: PAD.l, y1: PAD.t + PLOT_H, x2: PAD.l + PLOT_W,
+                               y2: PAD.t + PLOT_H, stroke: '#2B2118', 'stroke-width': 1.6 }));
+  niceTicks(g.ymax).forEach(v => {
+    const y = s.y(v);
+    svg.appendChild(el('line', { x1: PAD.l - 4, y1: y, x2: PAD.l, y2: y,
+                                 stroke: '#6B5D4C', 'stroke-width': 1 }));
+    svg.appendChild(el('text', { x: PAD.l - 7, y: y + 4, 'text-anchor': 'end',
+                                 'font-size': 11, fill: '#6B5D4C' },
+                       '$' + commas(v)));
+  });
+  /* The gap quantities get their own ticks, but a tick within 30px of one
+     already placed would just print two numbers on top of each other. */
+  const xwant = [...(card.gapQ || []), g.qmax, g.qmin, (g.qmin + g.qmax) / 2];
+  const xticks = [];
+  xwant.forEach(q => {
+    if(xticks.every(k => Math.abs(s.x(k) - s.x(q)) > 30)) xticks.push(q);
+  });
+  xticks.sort((a, b) => a - b).forEach(q => {
+    const x = s.x(q);
+    svg.appendChild(el('line', { x1: x, y1: PAD.t + PLOT_H, x2: x, y2: PAD.t + PLOT_H + 4,
+                                 stroke: '#6B5D4C', 'stroke-width': 1 }));
+    svg.appendChild(el('text', { x: x, y: PAD.t + PLOT_H + 17, 'text-anchor': 'middle',
+                                 'font-size': 11, fill: '#6B5D4C' }, commas(q)));
+  });
+  svg.appendChild(el('text', { x: PAD.l + PLOT_W / 2, y: VH - 8, 'text-anchor': 'middle',
+                               'font-size': 12, 'font-weight': 700, fill: '#6B5D4C' },
+                     card.many.charAt(0).toUpperCase() + card.many.slice(1) + ' per year'));
+  svg.appendChild(el('text', { x: 14, y: PAD.t + PLOT_H / 2, 'text-anchor': 'middle',
+                               'font-size': 12, 'font-weight': 700, fill: '#6B5D4C',
+                               transform: `rotate(-90 14 ${PAD.t + PLOT_H / 2})` },
+                     'Dollars per ' + card.one));
+
+  /* curves: the ones that stay put are drawn once; the ones that move are
+     drawn faint in their old position and solid in their new one. */
+  const labels = [];
+  const order = ['AFC', 'AVC', 'ATC', 'MC'];
+  order.forEach(which => {
+    const moves = revealed && card.moved.indexOf(which) >= 0;
+    if(moves){
+      svg.appendChild(el('polyline', { points: polyFor(g, s, curveFn(g, which, 0, 0)),
+        fill: 'none', stroke: COLOR[which], 'stroke-width': 1.3,
+        'stroke-dasharray': '3 3', opacity: .4,
+        'data-curve': which, 'data-state': 'old' }));
+    }
+    const fn = curveFn(g, which, moves ? dF : 0, moves ? dV : 0);
+    svg.appendChild(el('polyline', { points: polyFor(g, s, fn), fill: 'none',
+      stroke: COLOR[which], 'stroke-width': which === 'AFC' ? 1.6 : 2.4,
+      'stroke-dasharray': 'none', opacity: 1,
+      'data-curve': which, 'data-state': 'now' }));
+    labels.push({ which: which, text: which + (moves ? '′' : ''),
+                  y: s.y(fn(g.qmax)), color: COLOR[which] });
+  });
+  spread(labels, 14).forEach(l => {
+    svg.appendChild(el('text', { x: PAD.l + PLOT_W + 4, y: l.y + 4, 'font-size': 12.5,
+      'font-weight': 800, fill: l.color, 'data-role': 'curve-label',
+      'data-curve': l.which }, l.text));
+  });
+
+  /* --- what the reveal adds on top --- */
+  if(revealed && (card.type === 'classify' || card.type === 'curves' || card.type === 'shape')){
+    const oldATC = curveFn(g, 'ATC', 0, 0), newATC = curveFn(g, 'ATC', dF, dV);
+    card.gapQ.forEach((q, i) => {
+      const x = s.x(q), y0 = s.y(oldATC(q)), y1 = s.y(newATC(q));
+      svg.appendChild(el('line', { x1: x, y1: y0, x2: x, y2: y1,
+        stroke: '#2B2118', 'stroke-width': 1.4 }));
+      [y0, y1].forEach(y => svg.appendChild(el('line', { x1: x - 4, y1: y, x2: x + 4, y2: y,
+        stroke: '#2B2118', 'stroke-width': 1.4 })));
+      svg.appendChild(el('text', { x: x + 7, y: (y0 + y1) / 2 + 4, 'font-size': 12,
+        'font-weight': 800, fill: '#2B2118', 'data-role': 'gap' },
+        card.gapTxt[i].replace('-', '−')));
+    });
+  }
+  if(card.type === 'qstar'){
+    const yP = s.y(card.price);
+    svg.appendChild(el('line', { x1: PAD.l, y1: yP, x2: PAD.l + PLOT_W, y2: yP,
+      stroke: '#2B2118', 'stroke-width': 1.4, 'stroke-dasharray': '6 4', opacity: .75 }));
+    svg.appendChild(el('text', { x: PAD.l + 6, y: yP - 6, 'font-size': 12, 'font-weight': 800,
+      fill: '#2B2118', 'data-role': 'price' }, 'P = MR = ' + card.priceTxt));
+    const marks = [{ q: card.q0, t: 'Q*' }];
+    if(revealed && card.q1 !== card.q0) marks.push({ q: card.q1, t: 'Q*′' });
+    marks.forEach(m => {
+      const x = s.x(m.q);
+      svg.appendChild(el('line', { x1: x, y1: yP, x2: x, y2: PAD.t + PLOT_H,
+        stroke: '#2B2118', 'stroke-width': 1.2, 'stroke-dasharray': '3 3', opacity: .7 }));
+      svg.appendChild(el('circle', { cx: x, cy: yP, r: 4.5, fill: '#2B2118' }));
+      svg.appendChild(el('text', { x: x, y: PAD.t + PLOT_H + 32, 'text-anchor': 'middle',
+        'font-size': 12, 'font-weight': 800, fill: '#2B2118', 'data-role': 'qstar' }, m.t));
+    });
+  }
+  if(revealed && card.type === 'shutdown'){
+    /* The shutdown price IS minimum AVC, so both markers are drawn in AVC's
+       own color and pinned to the output where AVC bottoms. */
+    const lines = [{ v: card.sd0, t: 'shutdown price was ' + card.sd0Txt, dash: '5 4', op: .55 }];
+    if(card.sd1 !== card.sd0)
+      lines.push({ v: card.sd1, t: 'now ' + card.sd1Txt, dash: 'none', op: .95 });
+    else
+      lines[0].t = 'shutdown price ' + card.sd0Txt + ', unchanged';
+    lines.forEach(ln => {
+      const y = s.y(ln.v);
+      svg.appendChild(el('line', { x1: PAD.l, y1: y, x2: PAD.l + PLOT_W, y2: y,
+        stroke: COLOR.AVC, 'stroke-width': 1.5, 'stroke-dasharray': ln.dash, opacity: ln.op }));
+      svg.appendChild(el('circle', { cx: s.x(g.qa), cy: y, r: 4, fill: COLOR.AVC,
+        opacity: ln.op }));
+    });
+    /* A dollar or two of shift is only a few pixels on a panel scaled for ATC,
+       so the two captions would collide if both were hung above their line.
+       The higher line takes the space above, the lower line the space below. */
+    const hi = lines.reduce((a, b) => b.v > a.v ? b : a);
+    lines.forEach(ln => {
+      const y = s.y(ln.v);
+      svg.appendChild(el('text', { x: PAD.l + 6, y: ln === hi ? y - 7 : y + 15,
+        'font-size': 12, 'font-weight': 800, fill: COLOR.AVC,
+        opacity: Math.min(1, ln.op + .2), 'data-role': 'shutdown' }, ln.t));
+    });
+    if(lines.length > 1){
+      const x = s.x(g.qa), y0 = s.y(card.sd0), y1 = s.y(card.sd1);
+      svg.appendChild(el('line', { x1: x, y1: y0, x2: x, y2: y1,
+        stroke: '#2B2118', 'stroke-width': 1.4 }));
+      [y0, y1].forEach(y => svg.appendChild(el('line', { x1: x - 4, y1: y, x2: x + 4, y2: y,
+        stroke: '#2B2118', 'stroke-width': 1.4 })));
+      svg.appendChild(el('text', { x: x + 7, y: (y0 + y1) / 2 + 4, 'font-size': 12,
+        'font-weight': 800, fill: '#2B2118' },
+        (card.shift < 0 ? '\u2212' : '') + money(Math.abs(card.shift))));
+    }
+  }
+}
+
+/* ======================================================================
+   The quiz
+   ====================================================================== */
+let order = [];
+let index = 0;
+let answered = false;
+let optionOrder = [];
+let score = { correct: 0, total: 0 };
+let perArea = {};
+
+const AREAS = [...new Set(CARDS.map(c => c.area))];
+
+function shuffledIndices(n){
+  const arr = [...Array(n).keys()];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function init(){
+  order = shuffledIndices(CARDS.length);
+  index = 0;
+  score = { correct: 0, total: 0 };
+  perArea = {};
+  AREAS.forEach(a => perArea[a] = { correct: 0, total: 0 });
+  showQuiz();
+  loadCard();
+}
+
+function loadCard(){
+  answered = false;
+  const card = CARDS[order[index]];
+  document.getElementById('cardCount').textContent = `Card ${index + 1} of ${CARDS.length}`;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('areaTag').textContent = card.area;
+  document.getElementById('bizName').textContent = card.biz;
+  document.getElementById('scenarioText').textContent = card.scen;
+  document.getElementById('promptText').textContent = card.prompt;
+  document.getElementById('feedback').classList.remove('show');
+
+  const note = document.getElementById('graphNote');
+  note.classList.add('waiting');
+  note.textContent = 'Answer first — then this panel redraws the curves that moved, leaving '
+                   + 'the ones that did not exactly where they are.';
+  drawGraph(card, false);
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  nextBtn.textContent = index === CARDS.length - 1 ? 'See your results' : 'Next card';
+
+  optionOrder = shuffledIndices(card.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(origIndex => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = card.options[origIndex];
+    btn.addEventListener('click', () => handleAnswer(card, origIndex, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+function handleAnswer(card, chosenIndex, btnEl){
+  if(answered) return;
+  answered = true;
+
+  const isCorrect = chosenIndex === card.correct;
+  score.total++;
+  if(isCorrect) score.correct++;
+  const tally = perArea[card.area];
+  tally.total++;
+  if(isCorrect) tally.correct++;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === card.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect ? 'Correct.'
+    : `Not quite — the answer is “${card.options[card.correct]}.”`;
+  verdict.className = 'feedback-verdict ' + (isCorrect ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = card.explain;
+
+  /* The diagram is only redrawn with the shift once the answer is in, so it
+     never shows what the card is asking for. */
+  drawGraph(card, true);
+  const note = document.getElementById('graphNote');
+  note.classList.remove('waiting');
+  note.textContent = card.caption;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if(index < CARDS.length - 1){ index++; loadCard(); }
+  else showResults();
+});
+
+function showQuiz(){
+  document.getElementById('mainArea').style.display = '';
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+}
+
+function showResults(){
+  document.getElementById('mainArea').style.display = 'none';
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(100 * score.correct / score.total);
+  const band = BANDS.find(b => pct >= b.min);
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  (${pct}%)`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  AREAS.forEach(a => {
+    const t = perArea[a];
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${a}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
