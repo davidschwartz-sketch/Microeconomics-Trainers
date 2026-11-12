@@ -1,0 +1,2504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scale and the Long Run &mdash; LRATC, Returns to Scale and MES</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --teal: #2F6F62;
+    --orange: #C1542C;
+    --indigo: #4A5FB0;
+    --muted: #9C8E7A;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:1180px;margin:0 auto;}
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  .title-block h1{font-size:28px;font-weight:800;letter-spacing:-0.01em;margin:0 0 4px;}
+  .title-block p{margin:0;color:var(--ink-soft);font-size:14.5px;max-width:66ch;}
+
+  .identities{
+    background:var(--surface-alt);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:11px 14px;
+    margin-bottom:18px;
+    color:var(--ink-soft);
+    font-size:13.5px;
+    line-height:1.65;
+  }
+  .identities b{color:var(--ink);}
+  .identities .term{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:2px 9px;
+    margin:3px 7px 3px 0;
+    display:inline-block;
+    color:var(--ink);
+    font-weight:600;
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px 14px;
+    margin-bottom:14px;
+  }
+  .count-group{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+  .card-count{font-size:13px;font-weight:700;color:var(--ink-soft);}
+  .step-count{font-size:13px;font-weight:700;color:var(--teal);}
+  .score-badge{
+    font-size:13px;font-weight:700;color:var(--accent);
+    background:#FBF1DC;border:1px solid #EAD4A0;padding:4px 11px;border-radius:999px;
+  }
+
+  .main{display:grid;grid-template-columns:1fr 1.06fr;gap:22px;align-items:start;}
+  @media (max-width:900px){.main{grid-template-columns:1fr;}}
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px;
+  }
+
+  .biz-name{
+    font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:6px;
+  }
+  .blurb{
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:15px 17px;
+    font-size:15px;
+    line-height:1.5;
+    color:var(--ink);
+    margin-bottom:16px;
+  }
+  .prompt{font-size:17px;font-weight:700;line-height:1.4;margin-bottom:16px;}
+
+  .options{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+  .choice-btn{
+    text-align:left;padding:13px 16px;border-radius:10px;border:1.5px solid var(--border);
+    background:var(--surface);font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){border-color:var(--accent);background:#FFFBF2;}
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{background:var(--correct-soft);border-color:var(--correct);color:var(--correct);}
+  .choice-btn.incorrect{background:var(--incorrect-soft);border-color:var(--incorrect);color:var(--incorrect);}
+
+  .feedback{display:none;margin-bottom:16px;}
+  .feedback.show{display:block;}
+  .feedback-verdict{font-weight:800;font-size:15px;margin-bottom:6px;}
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;color:var(--ink-soft);background:var(--surface-alt);
+    border-left:3px solid var(--accent);padding:12px 14px;border-radius:0 8px 8px 0;
+  }
+
+  .controls{display:flex;justify-content:flex-end;}
+  .btn{padding:11px 20px;border-radius:10px;border:none;font-size:14.5px;font-weight:700;cursor:pointer;}
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover:not(:disabled){background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  /* ---- the panel ---- */
+  .table-wrap{overflow-x:auto;margin-bottom:16px;}
+  table.data-table{width:100%;border-collapse:collapse;font-size:14.5px;}
+  table.data-table th, table.data-table td{
+    border:1px solid var(--border);padding:9px 11px;text-align:center;white-space:nowrap;
+  }
+  table.data-table th{background:var(--surface-alt);font-weight:700;color:var(--ink-soft);font-size:12.5px;}
+  table.data-table th.corner{background:var(--surface-alt);text-align:left;}
+  table.data-table td.row-label{font-weight:700;text-align:left;color:var(--ink-soft);}
+  table.data-table td.best{
+    background:var(--correct-soft);color:var(--correct);font-weight:800;
+    box-shadow:inset 0 0 0 1px var(--correct);
+  }
+  table.data-table td.dim{color:var(--muted);}
+  table.data-table tr.marked td.row-label{color:var(--ink);}
+
+  .legend{
+    display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:10px;
+    font-size:12.5px;font-weight:700;color:var(--ink-soft);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:16px;height:3px;border-radius:2px;display:inline-block;}
+  .swatch.dash{background:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 7px);}
+  .graph-wrap svg{width:100%;height:auto;display:block;}
+  .graph-note{
+    margin-top:12px;font-size:13.5px;color:var(--ink-soft);background:var(--surface-alt);
+    border:1px solid var(--border);border-radius:10px;padding:11px 13px;min-height:56px;
+  }
+  .graph-note.waiting{font-style:italic;}
+
+  /* ---- results ---- */
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{font-size:34px;font-weight:800;letter-spacing:-0.02em;margin-bottom:10px;}
+  .results-note{font-size:15px;color:var(--ink-soft);margin-bottom:20px;}
+  table.data-table th.topic-head, table.data-table td.topic-cell{text-align:left;white-space:normal;}
+  table.data-table td.topic-cell{font-weight:600;color:var(--ink);}
+  table.data-table td.topic-score{font-weight:700;}
+  table.data-table td.topic-score.full{color:var(--correct);}
+  table.data-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px;color:var(--ink-soft);font-style:italic;line-height:1.5;
+    border-top:1px solid var(--border);padding-top:14px;margin:18px 0 20px;
+  }
+
+  footer.reset-row{margin-top:20px;display:flex;justify-content:flex-end;}
+  .link-btn{
+    background:none;border:none;color:var(--ink-soft);font-size:13px;
+    text-decoration:underline;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="title-block">
+      <h1>Scale and the Long Run</h1>
+      <p>In the long run the size of the plant is a choice, not a given. Which size is cheapest
+      depends on how much you want to make &mdash; and the long-run average total cost curve is
+      what you get by always choosing the best one.</p>
+    </div>
+  </header>
+
+  <div class="identities">
+    <b>Four ideas.</b>
+    <span class="term">Returns to scale</span>
+    <span class="term">LRATC = the lower envelope</span>
+    <span class="term">Economies and diseconomies of scale</span>
+    <span class="term">Minimum efficient scale</span>
+    <br>Scale every input together and output may more than double, exactly double, or less than
+    double. Each possible plant has its own U-shaped short-run ATC; the long-run curve runs
+    underneath all of them, <b>touching each at the one output that plant is best for</b> &mdash;
+    not at that plant&rsquo;s own lowest point. Its falling stretch is economies of scale, its
+    rising stretch diseconomies, and minimum efficient scale is the <b>smallest</b> output at which
+    it reaches its lowest value.
+  </div>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="card-count" id="problemCount">Problem 1 of 8</span>
+      <span class="step-count" id="stepCount">Step 1 of 8</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="main" id="mainArea">
+
+    <div class="panel" id="quizPanel">
+      <div class="biz-name" id="bizName"></div>
+      <div class="blurb" id="blurbText">Loading&hellip;</div>
+      <div class="prompt" id="promptText"></div>
+      <div class="options" id="optionsWrap"></div>
+
+      <div class="feedback" id="feedback">
+        <div class="feedback-verdict" id="feedbackVerdict"></div>
+        <div class="feedback-explain" id="feedbackExplain"></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-primary" id="nextBtn" disabled>Next step</button>
+      </div>
+    </div>
+
+    <div class="panel" id="graphPanel">
+      <div class="table-wrap" id="tableWrap"></div>
+      <div class="legend" id="legend"></div>
+      <div class="graph-wrap">
+        <svg id="graph" viewBox="0 0 580 420" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Long-run and short-run cost curves"></svg>
+      </div>
+      <div class="graph-note waiting" id="graphNote"></div>
+    </div>
+
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">Problem</th><th>Score</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <p class="results-caveat">These bands say whether the long-run picture is secure &mdash; they
+    are not an AP score prediction. Treat a strong result here as one idea nailed down, not as a
+    grade.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Start again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Start over</button>
+  </footer>
+
+</div>
+<script>
+/* ---------------------------------------------------------------------------
+   Every number below was derived and asserted in verify_scale.py, and every
+   step was built and guarded in scale_steps.py, before either was written here.
+
+   THE CONSTRUCTION, in one line: the long-run curve L is written down first and
+   each short-run curve is built around it as
+
+       S_k(q) = L(q) + (q - k)^2 * g_k(q)        with g_k(q) > 0
+
+   which makes S_k meet L at k, with the same slope, and lie strictly above it
+   at every other output. So L really is the lower envelope -- tangent to each
+   plant at one output -- rather than the minimum of a handful of U-curves,
+   which is a kinked curve and a different object. For the anchor problem the
+   g_k were solved so that the three curves also pass through all nine of the
+   deck's own figures exactly.
+
+   The correct option is written FIRST in every step; the page shuffles them.
+--------------------------------------------------------------------------- */
+const PROBLEMS = [
+ {
+  "biz": "Stone Hollow Vineyard",
+  "blurb": "Stone Hollow can plant one, two or three plots of vines. Each plot size has its own cost per barrel, and which one is cheapest depends on how many barrels it wants.",
+  "env": {
+   "A": 5.0,
+   "B": 2.5e-05,
+   "flat": false,
+   "plants": [
+    {
+     "c": -4.375e-05,
+     "d": 0.0675,
+     "hi": 760.0,
+     "k": 200.0,
+     "lo": 150.0,
+     "name": "1 plot",
+     "ownQ": 217.976,
+     "ownSide": "right",
+     "ownTxt": "$5.91",
+     "ownV": 5.91424596183552,
+     "tanTxt": "$6.00",
+     "tanV": 6.0
+    },
+    {
+     "c": 3.75e-05,
+     "d": 0.0075,
+     "hi": 760.0,
+     "k": 400.0,
+     "lo": 150.0,
+     "name": "2 plots",
+     "ownQ": 400.0,
+     "ownSide": "at",
+     "ownTxt": "$5.00",
+     "ownV": 5.0,
+     "tanTxt": "$5.00",
+     "tanV": 5.0
+    },
+    {
+     "c": 0.0001,
+     "d": -0.01,
+     "hi": 760.0,
+     "k": 600.0,
+     "lo": 150.0,
+     "name": "3 plots",
+     "ownQ": 552.894,
+     "ownSide": "left",
+     "ownTxt": "$5.77",
+     "ownV": 5.766178077111748,
+     "tanTxt": "$6.00",
+     "tanV": 6.0
+    }
+   ],
+   "q1": 400.0,
+   "q2": 400.0,
+   "qmax": 760,
+   "qmin": 150,
+   "qstar": 400.0,
+   "ymax": 23.762442105263155,
+   "ymin": 3.6101894736842106
+  },
+  "id": "L1",
+  "mes": {
+   "plant": "2 plots",
+   "q": 400,
+   "v": "$5"
+  },
+  "optLabel": "the %s vineyard",
+  "panel": "table+curves",
+  "plantLabel": "Plots planted",
+  "qlabel": "Barrels a year",
+  "table": {
+   "cells": {
+    "200": [
+     "$6",
+     "$9",
+     "$14"
+    ],
+    "400": [
+     "$10",
+     "$5",
+     "$8"
+    ],
+    "600": [
+     "$17",
+     "$8",
+     "$6"
+    ]
+   },
+   "cheapest": {
+    "200": 0,
+    "400": 1,
+    "600": 2
+   },
+   "cols": [
+    "1 plot",
+    "2 plots",
+    "3 plots"
+   ],
+   "rows": [
+    200,
+    400,
+    600
+   ]
+  },
+  "unit": "barrel",
+  "units": "barrels"
+ },
+ {
+  "biz": "Kingfisher Bottling Co.",
+  "blurb": "Kingfisher can run two, three, four or five bottling lines. The grid shows what a crate costs at each output on each number of lines.",
+  "env": {
+   "cols": [
+    "2 lines",
+    "3 lines",
+    "4 lines",
+    "5 lines"
+   ],
+   "points": [
+    {
+     "best": 0,
+     "q": 300,
+     "vals": [
+      12.0,
+      14.5,
+      19.0,
+      26.0
+     ]
+    },
+    {
+     "best": 1,
+     "q": 600,
+     "vals": [
+      15.0,
+      8.25,
+      10.5,
+      14.0
+     ]
+    },
+    {
+     "best": 2,
+     "q": 900,
+     "vals": [
+      21.0,
+      11.0,
+      7.0,
+      9.0
+     ]
+    },
+    {
+     "best": 3,
+     "q": 1200,
+     "vals": [
+      29.0,
+      16.0,
+      9.5,
+      8.25
+     ]
+    }
+   ],
+   "qmax": 1200,
+   "qmin": 300,
+   "ymax": 31.32,
+   "ymin": 0.0
+  },
+  "id": "L2",
+  "mes": {
+   "plant": "4 lines",
+   "q": 900,
+   "v": "$7.00"
+  },
+  "optLabel": "the %s plant",
+  "panel": "table+grid",
+  "plantLabel": "Lines running",
+  "qlabel": "Crates a day",
+  "table": {
+   "cells": {
+    "1200": [
+     "$29.00",
+     "$16.00",
+     "$9.50",
+     "$8.25"
+    ],
+    "300": [
+     "$12.00",
+     "$14.50",
+     "$19.00",
+     "$26.00"
+    ],
+    "600": [
+     "$15.00",
+     "$8.25",
+     "$10.50",
+     "$14.00"
+    ],
+    "900": [
+     "$21.00",
+     "$11.00",
+     "$7.00",
+     "$9.00"
+    ]
+   },
+   "cheapest": {
+    "1200": 3,
+    "300": 0,
+    "600": 1,
+    "900": 2
+   },
+   "cols": [
+    "2 lines",
+    "3 lines",
+    "4 lines",
+    "5 lines"
+   ],
+   "rows": [
+    300,
+    600,
+    900,
+    1200
+   ]
+  },
+  "unit": "crate",
+  "units": "crates"
+ },
+ {
+  "biz": "Larkspur Laundromat",
+  "blurb": "Larkspur has drawn the cost curves for three sizes of machine bank, with its long-run average total cost curve running underneath them. There is no table here — everything you need is on the diagram.",
+  "env": {
+   "A": 3.0,
+   "B": 1.6666666666666667e-05,
+   "flat": false,
+   "plants": [
+    {
+     "c": 1.6666666666666667e-05,
+     "d": 0.0,
+     "hi": 560.0,
+     "k": 300.0,
+     "lo": 280.0,
+     "name": "12 machines",
+     "ownQ": 450.0,
+     "ownSide": "right",
+     "ownTxt": "$3.75",
+     "ownV": 3.75,
+     "tanTxt": "$4.50",
+     "tanV": 4.5
+    },
+    {
+     "c": 1.6666666666666667e-05,
+     "d": 0.0,
+     "hi": 860.0,
+     "k": 600.0,
+     "lo": 340.0,
+     "name": "24 machines",
+     "ownQ": 600.0,
+     "ownSide": "at",
+     "ownTxt": "$3.00",
+     "ownV": 3.0,
+     "tanTxt": "$3.00",
+     "tanV": 3.0
+    },
+    {
+     "c": 1.6666666666666667e-05,
+     "d": 0.0,
+     "hi": 920.0,
+     "k": 900.0,
+     "lo": 640.0,
+     "name": "36 machines",
+     "ownQ": 750.0,
+     "ownSide": "left",
+     "ownTxt": "$3.75",
+     "ownV": 3.75,
+     "tanTxt": "$4.50",
+     "tanV": 4.5
+    }
+   ],
+   "q1": 600.0,
+   "q2": 600.0,
+   "qmax": 920,
+   "qmin": 280,
+   "qstar": 600.0,
+   "ymax": 5.433599999999999,
+   "ymin": 2.819733333333333
+  },
+  "id": "L3",
+  "mes": {
+   "plant": "24 machines",
+   "q": 600,
+   "v": "$3.00"
+  },
+  "optLabel": "the %s bank",
+  "panel": "curves",
+  "plantLabel": "Machines installed",
+  "qlabel": "Loads a week",
+  "unit": "load",
+  "units": "loads"
+ },
+ {
+  "biz": "Northgate Dairy",
+  "blurb": "Two candidate long-run curves have been drawn through the same three tank sizes. Curve A touches each short-run curve once. Curve B runs through the lowest point of each one. Only one of them is the long-run average total cost curve.",
+  "env": {
+   "A": 4.0,
+   "B": 1e-05,
+   "flat": false,
+   "plants": [
+    {
+     "c": 5e-06,
+     "d": 0.0,
+     "hi": 850.0,
+     "k": 400.0,
+     "lo": 400.0,
+     "name": "small tank",
+     "ownQ": 800.0,
+     "ownSide": "right",
+     "ownTxt": "$5.20",
+     "ownV": 5.2,
+     "tanTxt": "$7.60",
+     "tanV": 7.6
+    },
+    {
+     "c": 5e-06,
+     "d": 0.0,
+     "hi": 1450.0,
+     "k": 1000.0,
+     "lo": 550.0,
+     "name": "medium tank",
+     "ownQ": 1000.0,
+     "ownSide": "at",
+     "ownTxt": "$4.00",
+     "ownV": 4.0,
+     "tanTxt": "$4.00",
+     "tanV": 4.0
+    },
+    {
+     "c": 5e-06,
+     "d": 0.0,
+     "hi": 1600.0,
+     "k": 1600.0,
+     "lo": 1150.0,
+     "name": "large tank",
+     "ownQ": 1200.0,
+     "ownSide": "left",
+     "ownTxt": "$5.20",
+     "ownV": 5.2,
+     "tanTxt": "$7.60",
+     "tanV": 7.6
+    }
+   ],
+   "q1": 1000.0,
+   "q2": 1000.0,
+   "qmax": 1600,
+   "qmin": 400,
+   "qstar": 1000.0,
+   "wrong": [
+    {
+     "gapTxt": "$0.80",
+     "lv": 4.4,
+     "lvTxt": "$4.40",
+     "plant": "small tank",
+     "q": 800,
+     "txt": "$5.20",
+     "v": 5.2
+    },
+    {
+     "gapTxt": "$0.00",
+     "lv": 4.0,
+     "lvTxt": "$4.00",
+     "plant": "medium tank",
+     "q": 1000,
+     "txt": "$4.00",
+     "v": 4.0
+    },
+    {
+     "gapTxt": "$0.80",
+     "lv": 4.4,
+     "lvTxt": "$4.40",
+     "plant": "large tank",
+     "q": 1200,
+     "txt": "$5.20",
+     "v": 5.2
+    }
+   ],
+   "ymax": 7.888,
+   "ymin": 3.712
+  },
+  "id": "L4",
+  "mes": {
+   "plant": "medium tank",
+   "q": 1000,
+   "v": "$4.00"
+  },
+  "optLabel": "the %s",
+  "panel": "curves2",
+  "plantLabel": "Pasteurizer",
+  "qlabel": "Cases a day",
+  "unit": "case",
+  "units": "cases"
+ },
+ {
+  "biz": "Ferryman Freight",
+  "blurb": "Ferryman can scale up only one way: every truck comes with a driver, and the pair costs $6,000 a month. Doubling the fleet doubles every input it uses.",
+  "id": "L5",
+  "mes": {
+   "plant": "16 trucks",
+   "q": 3000,
+   "v": "$16.00"
+  },
+  "optLabel": "%s",
+  "panel": "table",
+  "plantLabel": "Trucks",
+  "qlabel": "Deliveries a month",
+  "rows": [
+   {
+    "atc": "$20.00",
+    "out": 1200,
+    "outTxt": "1,200",
+    "ratio": null,
+    "returns": null,
+    "slope": null,
+    "tc": "$24,000",
+    "trucks": 4
+   },
+   {
+    "atc": "$16.00",
+    "out": 3000,
+    "outTxt": "3,000",
+    "ratio": "5/2",
+    "returns": "increasing",
+    "slope": "falls",
+    "tc": "$48,000",
+    "trucks": 8
+   },
+   {
+    "atc": "$16.00",
+    "out": 6000,
+    "outTxt": "6,000",
+    "ratio": "2/1",
+    "returns": "constant",
+    "slope": "is flat",
+    "tc": "$96,000",
+    "trucks": 16
+   },
+   {
+    "atc": "$19.20",
+    "out": 10000,
+    "outTxt": "10,000",
+    "ratio": "5/3",
+    "returns": "decreasing",
+    "slope": "rises",
+    "tc": "$192,000",
+    "trucks": 32
+   }
+  ],
+  "table": {
+   "cells": {
+    "16": [
+     "6,000",
+     "$96,000",
+     "$16.00"
+    ],
+    "32": [
+     "10,000",
+     "$192,000",
+     "$19.20"
+    ],
+    "4": [
+     "1,200",
+     "$24,000",
+     "$20.00"
+    ],
+    "8": [
+     "3,000",
+     "$48,000",
+     "$16.00"
+    ]
+   },
+   "cheapest": {},
+   "cols": [
+    "Deliveries a month",
+    "Total cost",
+    "Cost per delivery"
+   ],
+   "rowLabel": "Trucks and drivers",
+   "rows": [
+    4,
+    8,
+    16,
+    32
+   ]
+  },
+  "unit": "delivery",
+  "units": "deliveries"
+ },
+ {
+  "biz": "Windrow Textiles",
+  "blurb": "Windrow has grown from one small workroom to four plants. Each of the things below happened somewhere along the way. The diagram is a plain long-run average total cost curve — falling, then flat, then rising — with nothing marked on it yet.",
+  "env": {
+   "A": 14.0,
+   "B": 2e-06,
+   "flat": true,
+   "plants": [],
+   "q1": 50000.0,
+   "q2": 80000.0,
+   "qmax": 110000,
+   "qmin": 20000,
+   "qstar": 50000.0,
+   "schematic": true,
+   "ymax": 1958.0,
+   "ymin": 0.0
+  },
+  "id": "L6",
+  "mes": {
+   "plant": "",
+   "q": 0,
+   "v": ""
+  },
+  "optLabel": "%s",
+  "panel": "schematic",
+  "plantLabel": "",
+  "qlabel": "Garments a year",
+  "unit": "garment",
+  "units": "garments"
+ },
+ {
+  "biz": "Riverbend Packaging",
+  "blurb": "Riverbend’s long-run average total cost does not come to a single sharp point. It falls, then runs level across a stretch of outputs, then rises.",
+  "env": {
+   "A": 2.5,
+   "B": 5e-09,
+   "flat": true,
+   "plants": [
+    {
+     "c": 2e-08,
+     "d": 0.0,
+     "hi": 37000.0,
+     "k": 25000.0,
+     "lo": 20000.0,
+     "name": "1 line",
+     "ownQ": 28000.0,
+     "ownSide": "right",
+     "ownTxt": "$3.40",
+     "ownV": 3.4,
+     "tanTxt": "$3.63",
+     "tanV": 3.625
+    },
+    {
+     "c": 2e-08,
+     "d": 0.0,
+     "hi": 52000.0,
+     "k": 40000.0,
+     "lo": 28000.0,
+     "name": "2 lines",
+     "ownQ": 40000.0,
+     "ownSide": "at",
+     "ownTxt": "$2.50",
+     "ownV": 2.5,
+     "tanTxt": "$2.50",
+     "tanV": 2.5
+    },
+    {
+     "c": 2e-08,
+     "d": 0.0,
+     "hi": 67000.0,
+     "k": 55000.0,
+     "lo": 43000.0,
+     "name": "3 lines",
+     "ownQ": 55000.0,
+     "ownSide": "at",
+     "ownTxt": "$2.50",
+     "ownV": 2.5,
+     "tanTxt": "$2.50",
+     "tanV": 2.5
+    },
+    {
+     "c": 2e-08,
+     "d": 0.0,
+     "hi": 82000.0,
+     "k": 70000.0,
+     "lo": 58000.0,
+     "name": "4 lines",
+     "ownQ": 70000.0,
+     "ownSide": "at",
+     "ownTxt": "$2.50",
+     "ownV": 2.5,
+     "tanTxt": "$2.50",
+     "tanV": 2.5
+    }
+   ],
+   "q1": 40000.0,
+   "q2": 70000.0,
+   "qmax": 90000,
+   "qmin": 20000,
+   "qstar": 40000.0,
+   "ymax": 6.388,
+   "ymin": 2.212
+  },
+  "flatRange": [
+   40000,
+   70000
+  ],
+  "id": "L7",
+  "mes": {
+   "plant": "2 lines",
+   "q": 40000,
+   "v": "$2.50"
+  },
+  "optLabel": "the %s",
+  "panel": "table+curves",
+  "plantLabel": "Lines installed",
+  "qlabel": "Cartons a year",
+  "table": {
+   "cells": {
+    "20000": [
+     "$4.50"
+    ],
+    "30000": [
+     "$3.00"
+    ],
+    "40000": [
+     "$2.50"
+    ],
+    "55000": [
+     "$2.50"
+    ],
+    "70000": [
+     "$2.50"
+    ],
+    "80000": [
+     "$3.00"
+    ],
+    "90000": [
+     "$4.50"
+    ]
+   },
+   "cheapest": {
+    "40000": 0,
+    "55000": 0,
+    "70000": 0
+   },
+   "cols": [
+    "Long-run ATC"
+   ],
+   "rowLabel": "Cartons a year",
+   "rows": [
+    20000,
+    30000,
+    40000,
+    55000,
+    70000,
+    80000,
+    90000
+   ]
+  },
+  "unit": "carton",
+  "units": "cartons"
+ },
+ {
+  "biz": "Saltmarsh Salt Works",
+  "blurb": "How big an efficient plant has to be, compared with how much the market buys, puts a ceiling on how many firms an industry can hold. Saltmarsh sells into a market that buys 400,000 tons of salt a year.",
+  "cases": [
+   {
+    "firms": 50,
+    "mes": "8,000",
+    "mesQ": 8000,
+    "verdict": "many small firms"
+   },
+   {
+    "firms": 2,
+    "mes": "200,000",
+    "mesQ": 200000,
+    "verdict": "a few large firms"
+   }
+  ],
+  "demand": "400,000",
+  "demandQ": 400000,
+  "id": "L8",
+  "mes": {
+   "plant": "",
+   "q": 0,
+   "v": ""
+  },
+  "optLabel": "%s",
+  "panel": "market",
+  "plantLabel": "",
+  "qlabel": "Tons a year",
+  "unit": "ton",
+  "units": "tons"
+ }
+];
+const STEPS = {
+ "L1": [
+  {
+   "correct": 0,
+   "explain": "Read across the 200-barrel row and take the smallest figure: $6 on one plot, against $9 on two and $14 on three. Two or three plots cost more per barrel at this output because they are more land, trellis and equipment than 200 barrels can keep busy, and all of it still has to be paid for out of those 200 barrels.",
+   "note": "Panel: the cheapest figure marked at 200, a tangency point marked at 200.",
+   "options": [
+    "the 1-plot vineyard — $6 a barrel",
+    "the 2-plot vineyard — $9 a barrel",
+    "the 3-plot vineyard — $14 a barrel"
+   ],
+   "prompt": "Stone Hollow wants 200 barrels a year. Which planting is cheapest for that output?",
+   "view": {
+    "curves": [
+     "1 plot"
+    ],
+    "markRows": [
+     200
+    ],
+    "tan": [
+     200
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Two plots, at $5. Notice what happened to the one-plot vineyard: it went from the cheapest option at 200 barrels to $10 at 400, because squeezing 400 barrels out of a single plot means working it far past the output it was sized for.",
+   "note": "Panel: the cheapest figure marked at 400, a tangency point marked at 400.",
+   "options": [
+    "the 2-plot vineyard — $5 a barrel",
+    "the 1-plot vineyard — $10 a barrel",
+    "the 3-plot vineyard — $8 a barrel"
+   ],
+   "prompt": "Now it wants 400 barrels. Which planting is cheapest for THAT output?",
+   "view": {
+    "curves": [
+     "1 plot",
+     "2 plots"
+    ],
+    "markRows": [
+     200,
+     400
+    ],
+    "tan": [
+     200,
+     400
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Three plots, at $6. Each output has its own cheapest planting, and as the output rises the cheapest planting gets bigger: one plot at 200 barrels, two at 400, three at 600.",
+   "note": "Panel: the cheapest figure marked at 600, a tangency point marked at 600.",
+   "options": [
+    "the 3-plot vineyard — $6 a barrel",
+    "the 2-plot vineyard — $8 a barrel",
+    "the 1-plot vineyard — $17 a barrel"
+   ],
+   "prompt": "And at 600 barrels?",
+   "view": {
+    "curves": "all",
+    "markRows": [
+     200,
+     400,
+     600
+    ],
+    "tan": [
+     200,
+     400,
+     600
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "In the long run every input can be varied, which here means the number of plots is a choice rather than a given. So the long-run cost of any output is the cost of producing it with the best-sized vineyard for that output — the lowest figure in the row. Trace those out and you have the long-run average total cost curve, the lower envelope of the short-run curves.",
+   "note": "Panel: the long-run curve drawn.",
+   "options": [
+    "Its long-run average total cost curve",
+    "Its short-run average total cost curve",
+    "Its average fixed cost curve",
+    "Its marginal cost curve"
+   ],
+   "prompt": "So the cheapest cost per barrel available is $6 at 200 barrels, $5 at 400 and $6 at 600. Taken together, what are those three figures?",
+   "view": {
+    "curves": "all",
+    "env": true,
+    "markRows": [
+     200,
+     400,
+     600
+    ],
+    "tan": [
+     200,
+     400,
+     600
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "The long-run curve runs $6, $5, $6, so it bottoms in the middle, at 400 barrels on two plots. That is not just the cheapest cell in its own row — it is the cheapest cell anywhere on the table.",
+   "note": "Panel: minimum efficient scale ringed.",
+   "options": [
+    "400 barrels on 2 plots — $5 a barrel",
+    "200 barrels on 1 plot — $6 a barrel",
+    "600 barrels on 3 plots — $6 a barrel",
+    "600 barrels on 2 plots — $8 a barrel"
+   ],
+   "prompt": "Across the whole table, at which output and with how many plots is a barrel cheapest?",
+   "view": {
+    "curves": "all",
+    "env": true,
+    "markRows": [
+     200,
+     400,
+     600
+    ],
+    "mes": true,
+    "tan": [
+     200,
+     400,
+     600
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Minimum efficient scale is the smallest output at which long-run average total cost reaches its lowest value — here 400 barrels a year, at $5. A vineyard below it has not finished exhausting its economies of scale and pays more per barrel than it has to, however well it is run.",
+   "note": "Panel: nothing new to draw for this step.",
+   "options": [
+    "Minimum efficient scale",
+    "Constant returns to scale",
+    "Diminishing marginal returns",
+    "The shutdown point"
+   ],
+   "prompt": "That output has a name. What is it?",
+   "view": {
+    "curves": "all",
+    "env": true,
+    "markRows": [
+     200,
+     400,
+     600
+    ],
+    "mes": true,
+    "tan": [
+     200,
+     400,
+     600
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "The comparison is with the cheapest way to make 600 barrels, which is three plots at $6 — not with the cheapest cell on the whole table. $17 minus $6 is $11 a barrel, and on 600 barrels that is $6,600 a year thrown away on a vineyard that is the wrong size for the output it is being asked to produce.",
+   "note": "Panel: nothing new to draw for this step.",
+   "options": [
+    "$11 a barrel — $17 instead of $6",
+    "$12 a barrel — $17 instead of $5",
+    "$9 a barrel — $17 instead of $8",
+    "$3 a barrel — $17 instead of $14"
+   ],
+   "prompt": "Suppose Stone Hollow wants 600 barrels but has only one plot of vines. How much more is it paying per barrel than it needs to?",
+   "view": {
+    "curves": [
+     "1 plot",
+     "3 plots"
+    ],
+    "env": true,
+    "markRows": [
+     600
+    ],
+    "tan": [
+     600
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "This is the trap the whole diagram is built to expose. At 200 barrels the one-plot curve is still falling, so its own lowest point is further right, at about 218 barrels and $5.91. It touches the long-run curve at 200 anyway, because 200 is the output for which one plot is the best size of vineyard to have built — and being the best plant for an output is not the same as that output being the plant’s own best. Only one planting here touches the long-run curve at its own minimum: the two-plot vineyard, whose minimum IS the long-run minimum.",
+   "note": "Panel: tangency points marked at 200 and 400, 1 plot and 3 plots’ own lowest points circled.",
+   "options": [
+    "No — on its own it runs cheapest at about 218 barrels",
+    "No — on its own it runs cheapest at about 180 barrels",
+    "Yes — 200 barrels, because a short-run curve always touches the long-run curve at its own lowest point",
+    "Yes — 200 barrels, because that is where the long-run curve itself is lowest"
+   ],
+   "prompt": "On the diagram the one-plot curve touches the long-run curve at 200 barrels. Is 200 barrels the one-plot vineyard’s own cheapest output?",
+   "view": {
+    "curves": "all",
+    "env": true,
+    "own": [
+     "1 plot",
+     "3 plots"
+    ],
+    "tan": [
+     200,
+     400,
+     600
+    ]
+   }
+  }
+ ],
+ "L2": [
+  {
+   "correct": 0,
+   "explain": "The 2-line plant, at $12.00 a crate. Too few lines and each one is run past the output it was built for; too many and there is more line sitting there than 300 crates can keep busy. Either way the crates carry the cost.",
+   "note": "Panel: the cheapest figure marked at 300.",
+   "options": [
+    "the 2-line plant — $12.00 a crate",
+    "the 3-line plant — $14.50 a crate",
+    "the 4-line plant — $19.00 a crate",
+    "the 5-line plant — $26.00 a crate"
+   ],
+   "prompt": "At 300 crates a day, which number of lines is cheapest?",
+   "view": {
+    "markRows": [
+     300
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "The 3-line plant, at $8.25 a crate. Too few lines and each one is run past the output it was built for; too many and there is more line sitting there than 600 crates can keep busy. Either way the crates carry the cost.",
+   "note": "Panel: the cheapest figure marked at 600.",
+   "options": [
+    "the 3-line plant — $8.25 a crate",
+    "the 2-line plant — $15.00 a crate",
+    "the 4-line plant — $10.50 a crate",
+    "the 5-line plant — $14.00 a crate"
+   ],
+   "prompt": "At 600 crates a day, which number of lines is cheapest?",
+   "view": {
+    "markRows": [
+     300,
+     600
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "The 4-line plant, at $7.00 a crate. Too few lines and each one is run past the output it was built for; too many and there is more line sitting there than 900 crates can keep busy. Either way the crates carry the cost.",
+   "note": "Panel: the cheapest figure marked at 900.",
+   "options": [
+    "the 4-line plant — $7.00 a crate",
+    "the 2-line plant — $21.00 a crate",
+    "the 3-line plant — $11.00 a crate",
+    "the 5-line plant — $9.00 a crate"
+   ],
+   "prompt": "At 900 crates a day, which number of lines is cheapest?",
+   "view": {
+    "markRows": [
+     300,
+     600,
+     900
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "The 5-line plant, at $8.25 a crate. Too few lines and each one is run past the output it was built for; too many and there is more line sitting there than 1,200 crates can keep busy. Either way the crates carry the cost.",
+   "note": "Panel: the cheapest figure marked at 1,200.",
+   "options": [
+    "the 5-line plant — $8.25 a crate",
+    "the 2-line plant — $29.00 a crate",
+    "the 3-line plant — $16.00 a crate",
+    "the 4-line plant — $9.50 a crate"
+   ],
+   "prompt": "At 1,200 crates a day, which number of lines is cheapest?",
+   "view": {
+    "markRows": [
+     300,
+     600,
+     900,
+     1200
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Those four figures are the long-run average total cost curve, and they bottom at 900 crates a day at $7.00. That is the smallest output at which a crate costs as little as it ever will, which is what minimum efficient scale means. Below it Kingfisher still has economies of scale left to collect; above it, a crate starts costing more again.",
+   "note": "Panel: the cheapest figures joined up, minimum efficient scale ringed.",
+   "options": [
+    "900 crates a day — $7.00 each",
+    "300 crates a day — $12.00 each",
+    "600 crates a day — $8.25 each",
+    "1,200 crates a day — $8.25 each"
+   ],
+   "prompt": "The cheapest figure in each row runs $12.00, $8.25, $7.00, $8.25. Which output is Kingfisher’s minimum efficient scale?",
+   "view": {
+    "env": true,
+    "markRows": [
+     300,
+     600,
+     900,
+     1200
+    ],
+    "mes": true
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "The comparison is with the cheapest way to make 600 crates, which is three lines at $8.25. $14.00 minus $8.25 is $5.75 a crate. It is tempting to compare against $7.00, the lowest figure on the whole grid, but that cost is only available at 900 crates a day — it is not on offer to a plant that wants 600.",
+   "note": "Panel: nothing new to draw for this step.",
+   "options": [
+    "$5.75 a crate — $14.00 instead of $8.25",
+    "$7.00 a crate — $14.00 instead of $7.00",
+    "$3.50 a crate — $14.00 instead of $10.50",
+    "$2.00 a crate — $14.00 instead of $12.00"
+   ],
+   "prompt": "Kingfisher is bottling 600 crates a day on five lines, at $14.00 a crate. How much is that above the lowest cost available at that output?",
+   "view": {
+    "env": true,
+    "markRows": [
+     600
+    ]
+   }
+  }
+ ],
+ "L3": [
+  {
+   "correct": 0,
+   "explain": "The twelve-machine bank, at $4.50 a load. Its curve meets the long-run curve at exactly 300 loads and every other bank sits above the long-run curve there. A bank of twenty-four or thirty-six machines can wash 300 loads, but much of it stands idle and the loads still have to cover it.",
+   "note": "Panel: the long-run curve drawn, a tangency point marked at 300.",
+   "options": [
+    "the 12-machine bank — $4.50 a load",
+    "the 24-machine bank — $3.00 a load",
+    "the 36-machine bank — $4.50 a load"
+   ],
+   "prompt": "At 300 loads a week, which bank of machines sits on the long-run curve — that is, which one washes 300 loads most cheaply?",
+   "view": {
+    "curves": [
+     "12 machines"
+    ],
+    "env": true,
+    "tan": [
+     300
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Economies of scale ARE the downward-sloping stretch of the long-run curve: bigger scale, lower cost per load. Here that runs out at 600 loads a week. Spreading the plumbing and the premises over more loads, buying detergent by the drum and having staff specialize are the mechanisms; the falling curve is what they look like.",
+   "note": "Panel: the economies-of-scale stretch shaded.",
+   "options": [
+    "Everything below 600 loads a week, where the long-run curve is falling",
+    "Everything above 600 loads a week, where the long-run curve is rising",
+    "Everything below 300 loads a week, where the smallest bank is cheapest",
+    "The whole range from 300 to 900 loads a week, because the long-run curve is U-shaped throughout"
+   ],
+   "prompt": "Over which stretch of output is Larkspur still collecting economies of scale?",
+   "view": {
+    "band": "eos",
+    "curves": "all",
+    "env": true
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Past 600 loads a week the long-run curve turns up, and a rising long-run curve is what diseconomies of scale look like. Nothing physical has gone wrong with the machines — what grows is the cost of running the operation: more sites to supervise, more scheduling, more people between the owner and the work.",
+   "note": "Panel: the diseconomies-of-scale stretch shaded.",
+   "options": [
+    "Above 600 loads a week",
+    "Above 300 loads a week",
+    "Above 450 loads a week",
+    "Above 900 loads a week"
+   ],
+   "prompt": "And where do diseconomies of scale begin?",
+   "view": {
+    "band": "dis",
+    "curves": "all",
+    "env": true
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Minimum efficient scale is the smallest output at which the long-run curve reaches its lowest value: 600 loads a week, at $3.00. The twenty-four-machine bank is the one that gets there, and it is the single bank on this diagram whose own lowest point is also a point on the long-run curve.",
+   "note": "Panel: a tangency point marked at 600, minimum efficient scale ringed.",
+   "options": [
+    "600 loads a week — $3.00 a load",
+    "300 loads a week — $4.50 a load",
+    "900 loads a week — $4.50 a load",
+    "480 loads a week — $3.24 a load"
+   ],
+   "prompt": "What is Larkspur’s minimum efficient scale?",
+   "view": {
+    "curves": "all",
+    "env": true,
+    "mes": true,
+    "tan": [
+     600
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Look at where the twelve-machine curve bottoms: about 450 loads a week, at $3.75. At 300 loads it is still on the way down. It touches the long-run curve at 300 anyway, because 300 is the output for which twelve machines are the right size of bank to have installed. Drawing the long-run curve through each bank’s own lowest point is the standard mistake, and it gives the wrong curve everywhere except at the one bank whose minimum is the long-run minimum.",
+   "note": "Panel: a tangency point marked at 300, 12 machines’ own lowest point circled.",
+   "options": [
+    "No — on its own, twelve machines run cheapest at about 450 loads a week",
+    "No — on its own, twelve machines run cheapest at about 150 loads a week",
+    "Yes — 300 loads, because every bank touches the long-run curve at its own lowest point",
+    "Yes — 300 loads, because that is where the long-run curve itself is lowest"
+   ],
+   "prompt": "The twelve-machine bank touches the long-run curve at 300 loads. Is 300 loads the twelve-machine bank’s own cheapest output?",
+   "view": {
+    "curves": "all",
+    "env": true,
+    "own": [
+     "12 machines"
+    ],
+    "tan": [
+     300
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "The twelve-machine bank is at $3.75 there, but the long-run curve is lower, so a different-sized bank washes that many loads for less. \"Cheapest output for this bank\" and \"cheapest bank for this output\" are two different questions, and this is the output where they come apart most clearly. The long-run curve can never lie ABOVE a short-run curve, which rules out the second answer on principle: the long run always has at least the options the short run has.",
+   "note": "Panel: nothing new to draw for this step.",
+   "options": [
+    "No — the long-run curve is below it there, so some other bank size does it for less",
+    "No — the long-run curve is above it there, so twelve machines beat the long run",
+    "Yes — that is where twelve machines are cheapest, so nothing can beat it",
+    "Yes — the long-run curve passes through every bank’s lowest point"
+   ],
+   "prompt": "At about 450 loads a week — where the twelve-machine bank is at its own cheapest — is twelve machines the cheapest way to wash that many loads?",
+   "view": {
+    "curves": [
+     "12 machines"
+    ],
+    "env": true,
+    "own": [
+     "12 machines"
+    ]
+   }
+  }
+ ],
+ "L4": [
+  {
+   "correct": 0,
+   "explain": "Curve B joins up the bottom of each tank’s own cost curve. That feels right and is wrong. The long-run curve answers \"what is the least a case can cost, if I may build any size of tank I like?\" — which means touching each short-run curve at the output for which that tank is the best size, not at the output that happens to be that tank’s own cheapest. Curve A does that.",
+   "note": "Panel: the long-run curve drawn, curve B added, through each short-run curve’s own lowest point.",
+   "options": [
+    "It runs through the lowest point of each short-run curve instead of touching each one where that tank is the cheapest way to produce",
+    "It runs through the highest point of each short-run curve instead of the lowest point where that tank is the cheapest way to produce",
+    "It touches each short-run curve at two outputs instead of at the one output where that tank is the cheapest way to produce",
+    "It stays below every short-run curve instead of touching each one where that tank is the cheapest way to produce"
+   ],
+   "prompt": "Curve B is the one drawn wrong. What is wrong with it?",
+   "view": {
+    "curves": "all",
+    "env": true,
+    "wrong": true
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Curve A is at $4.40 there and curve B at $5.20, so curve B is $0.80 a case too high at that output. Every figure on curve B except one is too high in the same way.",
+   "note": "Panel: small tank’s own lowest point circled.",
+   "options": [
+    "$4.40 a case",
+    "$5.20 a case",
+    "$4.00 a case",
+    "$7.60 a case"
+   ],
+   "prompt": "At 800 cases a day curve B puts the cost at $5.20. What does curve A — the real long-run curve — say about 800 cases?",
+   "view": {
+    "curves": "all",
+    "env": true,
+    "own": [
+     "small tank"
+    ],
+    "wrong": true
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "A long-run curve is supposed to be the floor — the least an output can cost when the plant size is still a choice. Curve B sits above that floor, so at almost every output it names a cost the dairy could undercut simply by building a tank of a different size. That is why the error matters: it is not a cosmetic slip, it misstates what is achievable.",
+   "note": "Panel: nothing new to draw for this step.",
+   "options": [
+    "Costs that the dairy could actually beat, by building a different-sized tank",
+    "Costs that no dairy could ever reach, however it sized its tank",
+    "Costs for the short run rather than for the long run, at every output",
+    "Costs that are right at every output but plotted against the wrong quantities"
+   ],
+   "prompt": "So curve B sits above curve A nearly everywhere. What is curve B therefore claiming?",
+   "view": {
+    "curves": "all",
+    "env": true,
+    "wrong": true
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "The two curves meet only at 1,000 cases, at $4.00. That is the one place where \"the best output for this tank\" and \"the best tank for this output\" are the same thing, because the medium tank is the size whose own minimum sits at the bottom of the long-run curve. Every other tank touches the long-run curve somewhere other than its own lowest point, which is exactly why curve B goes wrong everywhere else.",
+   "note": "Panel: a tangency point marked at 1,000, minimum efficient scale ringed.",
+   "options": [
+    "1,000 cases — the medium tank’s own lowest point is also the lowest point of the long-run curve",
+    "400 cases — the small tank’s own lowest point is also the lowest point of the long-run curve",
+    "800 cases — the small tank’s own lowest point is also the lowest point of the long-run curve",
+    "1,600 cases — the large tank’s own lowest point is also the lowest point of the long-run curve"
+   ],
+   "prompt": "There is exactly one output where the two curves agree. Which, and why?",
+   "view": {
+    "curves": "all",
+    "env": true,
+    "mes": true,
+    "tan": [
+     1000
+    ],
+    "wrong": true
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "The large tank, because its curve touches the long-run curve at exactly 1,600 cases — that is what makes it the right size for that output. Note that it is NOT the tank with the lowest cost of the three; the medium tank reaches $4.00 at its own best output. But the medium tank cannot produce 1,600 cases that cheaply, and the question is which tank to build for the output the dairy actually wants.",
+   "note": "Panel: a tangency point marked at 1,600.",
+   "options": [
+    "the large tank",
+    "the medium tank",
+    "the small tank"
+   ],
+   "prompt": "A dairy that wants 1,600 cases a day should build which tank?",
+   "view": {
+    "curves": [
+     "large tank"
+    ],
+    "env": true,
+    "tan": [
+     1600
+    ]
+   }
+  }
+ ],
+ "L5": [
+  {
+   "correct": 0,
+   "explain": "Every input doubled and output went from 1,200 to 3,000, which is more than double. That is increasing returns to scale. Diminishing marginal returns is the standing trap on these: it is a SHORT-run idea, about adding more of one input to a fixed amount of another. Here nothing is fixed — trucks and drivers go up together — so the question is returns to scale, not returns to a variable input.",
+   "note": "Panel: the rows for 4 and 8 highlighted.",
+   "options": [
+    "Increasing returns to scale — doubling every input more than doubles output",
+    "Constant returns to scale — doubling every input exactly doubles output",
+    "Decreasing returns to scale — doubling every input less than doubles output",
+    "Diminishing marginal returns — adding one input to a fixed amount of another"
+   ],
+   "prompt": "Ferryman doubles its fleet from 4 trucks to 8, and deliveries go from 1,200 a month to 3,000. What returns to scale is that?",
+   "view": {
+    "markRows": [
+     4,
+     8
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Total cost doubles with the fleet, from $24,000 to $48,000. Output went to 3,000, so the cost per delivery is $48,000 ÷ 3,000 = $16.00, against $20.00 before. That is the whole bridge from returns to scale to the shape of the long-run curve: increasing returns to scale means long-run average total cost falls.",
+   "note": "Panel: nothing new to draw for this step.",
+   "options": [
+    "It falls to $16.00 a delivery",
+    "It rises to $16.00 a delivery",
+    "It stays at $20.00 a delivery",
+    "It falls to $10.00 a delivery"
+   ],
+   "prompt": "And what does that do to the cost per delivery?",
+   "view": {
+    "markCols": [
+     2
+    ],
+    "markRows": [
+     4,
+     8
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Every input doubled and output went from 3,000 to 6,000, which is exactly double. That is constant returns to scale. Diminishing marginal returns is the standing trap on these: it is a SHORT-run idea, about adding more of one input to a fixed amount of another. Here nothing is fixed — trucks and drivers go up together — so the question is returns to scale, not returns to a variable input.",
+   "note": "Panel: the rows for 16 highlighted.",
+   "options": [
+    "Constant returns to scale — doubling every input exactly doubles output",
+    "Increasing returns to scale — doubling every input more than doubles output",
+    "Decreasing returns to scale — doubling every input less than doubles output",
+    "Diminishing marginal returns — adding one input to a fixed amount of another"
+   ],
+   "prompt": "Ferryman doubles its fleet from 8 trucks to 16, and deliveries go from 3,000 a month to 6,000. What returns to scale is that?",
+   "view": {
+    "markRows": [
+     8,
+     16
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Total cost doubles with the fleet, from $48,000 to $96,000. Output went to 6,000, so the cost per delivery is $96,000 ÷ 6,000 = $16.00, against $16.00 before. That is the whole bridge from returns to scale to the shape of the long-run curve: constant returns to scale means long-run average total cost is flat.",
+   "note": "Panel: nothing new to draw for this step.",
+   "options": [
+    "It stays at $16.00 a delivery",
+    "It falls to $16.00 a delivery",
+    "It rises to $16.00 a delivery",
+    "It falls to $8.00 a delivery"
+   ],
+   "prompt": "And what does that do to the cost per delivery?",
+   "view": {
+    "markCols": [
+     2
+    ],
+    "markRows": [
+     8,
+     16
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Every input doubled and output went from 6,000 to 10,000, which is less than double. That is decreasing returns to scale. Diminishing marginal returns is the standing trap on these: it is a SHORT-run idea, about adding more of one input to a fixed amount of another. Here nothing is fixed — trucks and drivers go up together — so the question is returns to scale, not returns to a variable input.",
+   "note": "Panel: the rows for 32 highlighted.",
+   "options": [
+    "Decreasing returns to scale — doubling every input less than doubles output",
+    "Increasing returns to scale — doubling every input more than doubles output",
+    "Constant returns to scale — doubling every input exactly doubles output",
+    "Diminishing marginal returns — adding one input to a fixed amount of another"
+   ],
+   "prompt": "Ferryman doubles its fleet from 16 trucks to 32, and deliveries go from 6,000 a month to 10,000. What returns to scale is that?",
+   "view": {
+    "markRows": [
+     16,
+     32
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Total cost doubles with the fleet, from $96,000 to $192,000. Output went to 10,000, so the cost per delivery is $192,000 ÷ 10,000 = $19.20, against $16.00 before. That is the whole bridge from returns to scale to the shape of the long-run curve: decreasing returns to scale means long-run average total cost rises.",
+   "note": "Panel: nothing new to draw for this step.",
+   "options": [
+    "It rises to $19.20 a delivery",
+    "It falls to $19.20 a delivery",
+    "It stays at $16.00 a delivery",
+    "It falls to $8.00 a delivery"
+   ],
+   "prompt": "And what does that do to the cost per delivery?",
+   "view": {
+    "markCols": [
+     2
+    ],
+    "markRows": [
+     16,
+     32
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Cost per delivery bottoms at $16.00, and it gets there at 3,000 deliveries and stays there at 6,000. Minimum efficient scale is the SMALLEST output that reaches the minimum, so it is 3,000. A firm at 6,000 deliveries has no cost advantage at all over one at 3,000 — it just had to buy twice the fleet to get there.",
+   "note": "Panel: the rows for 8 highlighted, minimum efficient scale ringed.",
+   "options": [
+    "3,000 deliveries a month — the smallest scale that reaches $16.00",
+    "6,000 deliveries a month — the largest scale that reaches $16.00",
+    "1,200 deliveries a month — the smallest scale on the table",
+    "10,000 deliveries a month — the largest scale on the table"
+   ],
+   "prompt": "Of the four scales on the table, which is Ferryman’s minimum efficient scale?",
+   "view": {
+    "markCols": [
+     2
+    ],
+    "markRows": [
+     8,
+     16
+    ],
+    "mes": true
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Nothing was scaled here. The fleet is fixed and only drivers were added, so this is the short-run story: diminishing marginal returns to labor, with trucks as the fixed input. Returns to scale asks a different question — what happens when EVERY input moves together — and it is the only one of the two that has anything to say about the shape of the long-run curve, because in the long run nothing is fixed.",
+   "note": "Panel: nothing new to draw for this step.",
+   "options": [
+    "Diminishing marginal returns — adding one input to a fixed amount of another",
+    "Increasing returns to scale — doubling every input more than doubles output",
+    "Constant returns to scale — doubling every input exactly doubles output",
+    "Decreasing returns to scale — doubling every input less than doubles output"
+   ],
+   "prompt": "Ferryman stops buying trucks. Instead it puts a second and then a third driver on each truck it already owns, running them in shifts. Deliveries rise, but each extra driver adds fewer deliveries than the one before. What is that?",
+   "view": {
+    "markRows": []
+   }
+  }
+ ],
+ "L6": [
+  {
+   "correct": 0,
+   "explain": "Buying inputs more cheaply because you buy more of them is one of the standard sources of economies of scale. The saving is per garment, at every output, so it pulls the long-run curve down — which is what the falling stretch IS.",
+   "note": "Panel: the economies-of-scale stretch shaded.",
+   "options": [
+    "Economies of scale — the falling stretch of the long-run curve",
+    "Diseconomies of scale — the rising stretch of the long-run curve",
+    "Constant returns to scale — the flat stretch of the long-run curve",
+    "Diminishing marginal returns — a short-run idea, not a stretch of the long-run curve"
+   ],
+   "prompt": "Windrow starts buying raw cotton by the container-load and gets a bulk price its old one-bale orders never qualified for.",
+   "view": {
+    "band": "eos"
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Coordination is the classic source of diseconomies of scale. Nothing is wrong with the machines or the workers; what grows faster than output is the cost of running the organization itself. A long-run curve that turns upward is this, drawn.",
+   "note": "Panel: the diseconomies-of-scale stretch shaded.",
+   "options": [
+    "Diseconomies of scale — the rising stretch of the long-run curve",
+    "Economies of scale — the falling stretch of the long-run curve",
+    "Constant returns to scale — the flat stretch of the long-run curve",
+    "Diminishing marginal returns — a short-run idea, not a stretch of the long-run curve"
+   ],
+   "prompt": "With four plants now running, Windrow’s managers keep duplicating each other’s work and a decision that used to take a morning takes three weeks.",
+   "view": {
+    "band": "dis"
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Spreading an indivisible cost over more output is the simplest of the economies of scale. Note the contrast with average FIXED cost in the short run: there the plant is given and AFC falls along one curve. Here the firm chose to build bigger, and the whole long-run curve is lower because of it.",
+   "note": "Panel: the economies-of-scale stretch shaded.",
+   "options": [
+    "Economies of scale — the falling stretch of the long-run curve",
+    "Diseconomies of scale — the rising stretch of the long-run curve",
+    "Constant returns to scale — the flat stretch of the long-run curve",
+    "Diminishing marginal returns — a short-run idea, not a stretch of the long-run curve"
+   ],
+   "prompt": "The license for the pattern-design software costs the same as it always did, but it is now spread over ten times as many garments.",
+   "view": {
+    "band": "eos"
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Specialization is the oldest item on the list — Adam Smith’s pin factory. It only becomes possible at scale, because you need enough volume to keep a worker busy on one operation all day, and it lowers cost per garment at every output once it is available.",
+   "note": "Panel: nothing shaded — this one is not a stretch of the long-run curve at all.",
+   "options": [
+    "Economies of scale — the falling stretch of the long-run curve",
+    "Diseconomies of scale — the rising stretch of the long-run curve",
+    "Constant returns to scale — the flat stretch of the long-run curve",
+    "Diminishing marginal returns — a short-run idea, not a stretch of the long-run curve"
+   ],
+   "prompt": "Instead of each worker sewing a whole garment, every worker now does one operation and does it all day.",
+   "view": {
+    "band": "eos"
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Another layer of management is pure overhead that scale forced on the firm. Output rose, but cost rose faster, so cost per garment went up: the rising stretch of the long-run curve.",
+   "note": "Panel: the diseconomies-of-scale stretch shaded.",
+   "options": [
+    "Diseconomies of scale — the rising stretch of the long-run curve",
+    "Economies of scale — the falling stretch of the long-run curve",
+    "Constant returns to scale — the flat stretch of the long-run curve",
+    "Diminishing marginal returns — a short-run idea, not a stretch of the long-run curve"
+   ],
+   "prompt": "The cutting floor has outgrown what one supervisor can see, so Windrow adds a second layer of management between the floor and the owner.",
+   "view": {
+    "band": "dis"
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Double the inputs, double the cost; double the output, so cost per garment is unchanged. That is constant returns to scale, and on the diagram it is the flat stretch between the falling and rising parts. Plenty of industries have a wide flat stretch, which is why firms of quite different sizes can coexist in them.",
+   "note": "Panel: the constant-returns stretch shaded.",
+   "options": [
+    "Constant returns to scale — the flat stretch of the long-run curve",
+    "Economies of scale — the falling stretch of the long-run curve",
+    "Diseconomies of scale — the rising stretch of the long-run curve",
+    "Diminishing marginal returns — a short-run idea, not a stretch of the long-run curve"
+   ],
+   "prompt": "Windrow doubles every input it uses — floor space, machines, cutters, sewers — and output comes out exactly double. Cost per garment does not move.",
+   "view": {
+    "band": "flat"
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Here one input is fixed, so this is not about scale at all: it is diminishing marginal returns, the short-run idea. The test is simple — if something is being held fixed, it is a short-run story about one input; if everything moves together, it is a long-run story about scale.",
+   "note": "Panel: nothing shaded — this one is not a stretch of the long-run curve at all.",
+   "options": [
+    "Diminishing marginal returns — a short-run idea, not a stretch of the long-run curve",
+    "Economies of scale — the falling stretch of the long-run curve",
+    "Diseconomies of scale — the rising stretch of the long-run curve",
+    "Constant returns to scale — the flat stretch of the long-run curve"
+   ],
+   "prompt": "Windrow adds a third shift to a plant it is NOT enlarging — the same floor, the same machines, more workers — and each extra worker adds less output than the one before.",
+   "view": {
+    "band": null
+   }
+  }
+ ],
+ "L7": [
+  {
+   "correct": 0,
+   "explain": "$2.50 a carton, and the table reaches it more than once rather than at a single output. That is the first sign that this long-run curve does not come to a sharp point at the bottom: it falls, then runs level for a stretch, and only after that turns up. Wherever the bottom is flat, \"what is the lowest cost\" and \"which output achieves it\" stop being the same question, because several outputs achieve it.",
+   "note": "Panel: the cheapest figure marked at 40,000, 55,000 and 70,000.",
+   "options": [
+    "$2.50",
+    "$3.00",
+    "$4.50",
+    "$2.00"
+   ],
+   "prompt": "What is the lowest cost per carton anywhere on the table?",
+   "view": {
+    "curves": "all",
+    "markRows": [
+     40000,
+     55000,
+     70000
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Three: 40,000, 55,000 and 70,000 cartons all come in at $2.50. Between those outputs the long-run curve is flat, not sloping — a plant anywhere in that stretch produces just as cheaply as a plant anywhere else in it.",
+   "note": "Panel: the long-run curve drawn, the constant-returns stretch shaded.",
+   "options": [
+    "Three — at 40,000, 55,000 and 70,000 cartons",
+    "One — at 55,000 cartons only",
+    "Two — at 40,000 and 70,000 cartons",
+    "Four — at 30,000, 40,000, 55,000 and 70,000 cartons"
+   ],
+   "prompt": "At how many of the outputs shown does the long-run curve reach $2.50?",
+   "view": {
+    "band": "flat",
+    "curves": "all",
+    "env": true,
+    "markRows": [
+     40000,
+     55000,
+     70000
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Cost per carton is unchanged across the stretch, which is what constant returns to scale look like on a cost curve: scale everything up and output scales up in step, so the cost of a carton does not move. Below 40,000 the curve is still falling (economies of scale); above 70,000 it rises (diseconomies).",
+   "note": "Panel: nothing new to draw for this step.",
+   "options": [
+    "Constant returns to scale — the flat stretch of the long-run curve",
+    "Economies of scale — the falling stretch of the long-run curve",
+    "Diseconomies of scale — the rising stretch of the long-run curve",
+    "Diminishing marginal returns — a short-run idea, not a stretch of the long-run curve"
+   ],
+   "prompt": "What are the returns to scale across that stretch, between 40,000 and 70,000 cartons?",
+   "view": {
+    "band": "flat",
+    "curves": "all",
+    "env": true,
+    "markRows": [
+     40000,
+     55000,
+     70000
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "This is the half of the definition that gets dropped. Minimum efficient scale is the SMALLEST output at which long-run average total cost reaches its minimum — not any output in the flat stretch, and not the middle of it. Here that is 40,000 cartons. With a single sharp minimum the word \"smallest\" does no work, which is why it is easy to forget it is there; with a flat bottom it decides the answer.",
+   "note": "Panel: minimum efficient scale ringed.",
+   "options": [
+    "40,000 cartons — the smallest output that reaches the lowest cost",
+    "55,000 cartons — the middle of the flat stretch",
+    "70,000 cartons — the largest output that reaches the lowest cost",
+    "90,000 cartons — the largest output on the table"
+   ],
+   "prompt": "So what is Riverbend’s minimum efficient scale?",
+   "view": {
+    "band": "flat",
+    "curves": "all",
+    "env": true,
+    "markRows": [
+     40000
+    ],
+    "mes": true
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Both plants make a carton for $2.50, so neither has a cost advantage. The difference is what it took to get there: the 55,000-carton plant needed more capacity for no saving. That is what makes 40,000 the EFFICIENT scale — the least you have to build to be as cheap as anyone. It also matters for industry structure: a market only has room for so many plants of the minimum efficient size.",
+   "note": "Panel: the cheapest figure marked at 55,000.",
+   "options": [
+    "A plant at 55,000 has no cost advantage over one at 40,000, and had to be built bigger to get there",
+    "A plant at 55,000 has a cost disadvantage against one at 40,000, because it is past the flat stretch",
+    "A plant at 55,000 has not yet exhausted its economies of scale, unlike one at 40,000",
+    "A plant at 55,000 is already into diseconomies of scale, unlike one at 40,000"
+   ],
+   "prompt": "Why is 55,000 cartons not the answer, given that a carton costs $2.50 there too?",
+   "view": {
+    "band": "flat",
+    "curves": "all",
+    "env": true,
+    "markRows": [
+     40000,
+     55000
+    ],
+    "mes": true
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "30,000 cartons is below the 40,000 needed for minimum efficient scale, and a carton costs $3.00 there against $2.50 at scale — $0.50 a carton more. On 30,000 cartons that is $15,000 a year, and it is not inefficiency in any everyday sense: the plant may be run perfectly. It is simply too small to have collected all the economies of scale available in this industry.",
+   "note": "Panel: the cheapest figure marked at 30,000.",
+   "options": [
+    "It is below minimum efficient scale, paying $0.50 a carton more than it needs to",
+    "It is below minimum efficient scale, paying $2.00 a carton more than it needs to",
+    "It is above minimum efficient scale, paying $0.50 a carton more than it needs to",
+    "It is at minimum efficient scale, paying $0.00 a carton more than it needs to"
+   ],
+   "prompt": "Riverbend is currently running at 30,000 cartons a year. What is true of it?",
+   "view": {
+    "curves": "all",
+    "env": true,
+    "markRows": [
+     30000,
+     40000
+    ],
+    "mes": true
+   }
+  }
+ ],
+ "L8": [
+  {
+   "correct": 0,
+   "explain": "400,000 ÷ 8,000 = 50. An efficient plant here is a fiftieth of the market, so the market has room for fifty of them side by side, each one producing at the lowest cost the industry allows. Nothing stops a firm being bigger than minimum efficient scale, and nothing stops one being smaller — but a smaller one pays more per ton than its rivals, which is hard to survive for long.",
+   "note": "Panel: the first case shown.",
+   "options": [
+    "50",
+    "8",
+    "500",
+    "5"
+   ],
+   "prompt": "Saltmarsh’s minimum efficient scale is 8,000 tons a year, and the market buys 400,000 tons a year. How many plants of that size would the market hold?",
+   "view": {
+    "caseShown": 1
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "With room for fifty efficient plants, no firm needs to be large to be as cheap as anyone else, so expect a lot of comparatively small firms. This is the forward link to market structure: minimum efficient scale measured against market size puts a ceiling on how many firms an industry can support at the lowest available cost.",
+   "note": "Panel: nothing new to draw for this step.",
+   "options": [
+    "Many relatively small firms, because an efficient plant is small next to the market",
+    "A few large firms, because an efficient plant is large next to the market",
+    "Many relatively small firms, because an efficient plant is large next to the market",
+    "A few large firms, because an efficient plant is small next to the market"
+   ],
+   "prompt": "So what should you expect this industry to look like?",
+   "view": {
+    "caseShown": 1,
+    "verdictShown": 1
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "400,000 ÷ 200,000 = 2. Nothing about demand changed — the market still buys the same 400,000 tons. What changed is how much output a plant has to produce before it is as cheap as it can be, and that alone cuts the number of efficient plants the market will hold from 50 to 2.",
+   "note": "Panel: the second case shown.",
+   "options": [
+    "2",
+    "20",
+    "200",
+    "4"
+   ],
+   "prompt": "Now suppose minimum efficient scale were 200,000 tons instead — the same market, a much bigger efficient plant. How many would the market hold?",
+   "view": {
+    "caseShown": 2
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Room for two efficient plants means two large firms, not fifty small ones — a third firm would have to run below minimum efficient scale and would carry a cost disadvantage against the other two. Same demand, same consumers, completely different industry, and the only thing that changed was the size of an efficient plant.",
+   "note": "Panel: nothing new to draw for this step.",
+   "options": [
+    "A few large firms, because an efficient plant is large next to the market",
+    "Many relatively small firms, because an efficient plant is small next to the market",
+    "Many relatively small firms, because an efficient plant is large next to the market",
+    "A few large firms, because an efficient plant is small next to the market"
+   ],
+   "prompt": "And that industry?",
+   "view": {
+    "caseShown": 2,
+    "verdictShown": 2
+   }
+  }
+ ]
+};
+
+const BANDS = [
+  { min: 90, label: 'Mastered', tone: 'good',
+    note: 'Secure. You can pick the cheapest plant for an output, trace the long-run curve through those choices, tell economies from diseconomies, and find minimum efficient scale even when the bottom is flat.' },
+  { min: 80, label: 'Strong', tone: 'good',
+    note: 'Good command of the long-run picture. Look at the problems below where you dropped marks, then run it again.' },
+  { min: 70, label: 'Developing', tone: 'mid',
+    note: 'The cheapest-plant reading is mostly there, but at least one of the ideas built on top of it is not following yet. The breakdown below shows which.' },
+  { min: 55, label: 'Shaky', tone: 'poor',
+    note: 'Enough of this is unsettled to cost you marks. Go back to what the long-run curve IS — the lowest cost available at each output once plant size is a choice — before drilling again.' },
+  { min: 0, label: 'Needs Review', tone: 'poor',
+    note: 'Start with the anchor problem and the diagram that goes with it. More practice without review will not close a gap this size.' },
+];
+
+/* ======================================================================
+   The diagram
+   ====================================================================== */
+const SVGNS = 'http://www.w3.org/2000/svg';
+const PAD = { l: 60, r: 72, t: 18, b: 48 };
+const VW = 580, VH = 420;
+const PW = VW - PAD.l - PAD.r;
+const PH = VH - PAD.t - PAD.b;
+const C_LR = '#2B2118', C_SR = '#4A5FB0', C_WRONG = '#C23B3B';
+const BAND = { eos: '#E4F0EC', flat: '#FBF1DC', dis: '#F8E8DF' };
+const BANDNAME = { eos: 'economies of scale', flat: 'constant returns', dis: 'diseconomies of scale' };
+
+function el(name, attrs, text){
+  const e = document.createElementNS(SVGNS, name);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  if(text !== undefined) e.textContent = text;
+  return e;
+}
+function commas(n){ return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+function money(v){
+  return '$' + (Math.abs(v) < 10 ? v.toFixed(2) : commas(Math.round(v * 100) / 100));
+}
+/* One axis, one format: a column reading $20, $15, $10, $5.00 looks like a
+   mistake. Cents only when the tick spacing is finer than a dollar. */
+function tickMoney(v, step){
+  return step < 1 ? '$' + v.toFixed(2) : '$' + commas(Math.round(v));
+}
+
+/* L(q): a parabola, or a curve with a flat bottom between q1 and q2 */
+function envFn(g){
+  return q => {
+    if(q < g.q1) return g.A + g.B * (g.q1 - q) * (g.q1 - q);
+    if(q > g.q2) return g.A + g.B * (q - g.q2) * (q - g.q2);
+    return g.A;
+  };
+}
+/* S_k(q) = L(q) + (q-k)^2 (c + d/q) */
+function plantFn(g, p){
+  const L = envFn(g);
+  return q => L(q) + (q - p.k) * (q - p.k) * (p.c + p.d / q);
+}
+
+function scales(g){
+  return {
+    x: q => PAD.l + (q - g.qmin) / (g.qmax - g.qmin) * PW,
+    y: v => PAD.t + PH - (v - g.ymin) / (g.ymax - g.ymin) * PH,
+  };
+}
+function poly(s, fn, lo, hi, steps){
+  const n = steps || 140, out = [];
+  for(let i = 0; i <= n; i++){
+    const q = lo + (hi - lo) * i / n;
+    out.push(s.x(q).toFixed(2) + ',' + s.y(fn(q)).toFixed(2));
+  }
+  return out.join(' ');
+}
+function ticks(max, min){
+  const raw = (max - min) / 5;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(v => v >= raw) || mag * 10;
+  const out = [];
+  for(let v = Math.ceil(min / step) * step; v <= max + 1e-9; v += step) out.push(v);
+  return out;
+}
+function spread(labels, gap){
+  labels.sort((a, b) => a.y - b.y);
+  for(let i = 1; i < labels.length; i++)
+    if(labels[i].y - labels[i-1].y < gap) labels[i].y = labels[i-1].y + gap;
+  const over = labels.length ? labels[labels.length-1].y - (PAD.t + PH) : 0;
+  if(over > 0) labels.forEach(l => l.y -= over);
+  return labels;
+}
+
+function axes(svg, g, opts){
+  svg.appendChild(el('line', { x1: PAD.l, y1: PAD.t, x2: PAD.l, y2: PAD.t + PH,
+                               stroke: C_LR, 'stroke-width': 1.6 }));
+  svg.appendChild(el('line', { x1: PAD.l, y1: PAD.t + PH, x2: PAD.l + PW, y2: PAD.t + PH,
+                               stroke: C_LR, 'stroke-width': 1.6 }));
+  const s = scales(g);
+  if(!g.schematic){
+    const yt = ticks(g.ymax, g.ymin);
+    const step = yt.length > 1 ? yt[1] - yt[0] : 1;
+    yt.forEach(v => {
+      const y = s.y(v);
+      svg.appendChild(el('line', { x1: PAD.l - 4, y1: y, x2: PAD.l, y2: y,
+                                   stroke: '#6B5D4C', 'stroke-width': 1 }));
+      svg.appendChild(el('text', { x: PAD.l - 7, y: y + 4, 'text-anchor': 'end',
+                                   'font-size': 11, fill: '#6B5D4C' }, tickMoney(v, step)));
+    });
+    const want = (opts.xticks || []).concat([g.qmin, g.qmax]);
+    const placed = [];
+    want.forEach(q => {
+      if(q == null || q < g.qmin || q > g.qmax) return;
+      if(placed.every(k => Math.abs(s.x(k) - s.x(q)) > 42)) placed.push(q);
+    });
+    placed.sort((a, b) => a - b).forEach(q => {
+      const x = s.x(q);
+      svg.appendChild(el('line', { x1: x, y1: PAD.t + PH, x2: x, y2: PAD.t + PH + 4,
+                                   stroke: '#6B5D4C', 'stroke-width': 1 }));
+      svg.appendChild(el('text', { x: x, y: PAD.t + PH + 17, 'text-anchor': 'middle',
+                                   'font-size': 11, fill: '#6B5D4C' }, commas(q)));
+    });
+  }
+  svg.appendChild(el('text', { x: PAD.l + PW / 2, y: VH - 8, 'text-anchor': 'middle',
+    'font-size': 12, 'font-weight': 700, fill: '#6B5D4C' }, opts.qlabel));
+  svg.appendChild(el('text', { x: 14, y: PAD.t + PH / 2, 'text-anchor': 'middle',
+    'font-size': 12, 'font-weight': 700, fill: '#6B5D4C',
+    transform: `rotate(-90 14 ${PAD.t + PH / 2})` }, opts.ylabel));
+  return s;
+}
+
+function drawCurves(svg, prob, view){
+  const g = prob.env, s = axes(svg, g, {
+    qlabel: prob.qlabel, ylabel: 'Cost per ' + prob.unit,
+    xticks: (g.plants || []).map(p => p.k).concat(g.flat ? [g.q1, g.q2] : [g.qstar]),
+  });
+  const L = envFn(g);
+
+  /* a shaded stretch, drawn first so everything else sits on top */
+  if(view.band){
+    const lo = view.band === 'eos' ? g.qmin : view.band === 'flat' ? g.q1 : g.q2;
+    const hi = view.band === 'eos' ? g.q1 : view.band === 'flat' ? g.q2 : g.qmax;
+    if(hi > lo){
+      svg.appendChild(el('rect', { x: s.x(lo), y: PAD.t, width: s.x(hi) - s.x(lo), height: PH,
+        fill: BAND[view.band], 'data-role': 'band', 'data-band': view.band }));
+      svg.appendChild(el('text', { x: (s.x(lo) + s.x(hi)) / 2, y: PAD.t + 14,
+        'text-anchor': 'middle', 'font-size': 11.5, 'font-weight': 800, fill: '#6B5D4C',
+        'data-role': 'bandLabel' }, BANDNAME[view.band]));
+    }
+  }
+
+  /* the short-run curves, each over the output range it is drawn for */
+  const labels = [];
+  (g.plants || []).forEach(p => {
+    const on = view.curves === 'all' || (view.curves || []).indexOf(p.name) >= 0;
+    const fn = plantFn(g, p);
+    svg.appendChild(el('polyline', { points: poly(s, fn, p.lo, p.hi), fill: 'none',
+      stroke: C_SR, 'stroke-width': on ? 2.3 : 1.3, opacity: on ? 1 : .3,
+      'data-curve': p.name, 'data-on': on ? '1' : '0' }));
+    if(on) labels.push({ y: s.y(fn(p.hi)), text: p.name, color: C_SR,
+                         role: 'plantLabel', size: 11.5, x: s.x(p.hi) + 4 });
+  });
+
+  /* the long-run curve */
+  if(view.env){
+    svg.appendChild(el('polyline', { points: poly(s, L, g.qmin, g.qmax, 220), fill: 'none',
+      stroke: C_LR, 'stroke-width': 3, 'data-role': 'lratc' }));
+    labels.push({ y: s.y(L(g.qmax)), text: prob.panel === 'curves2' ? 'curve A' : 'LRATC',
+                  color: C_LR, role: 'lratcLabel', size: 12.5 });
+  }
+
+  /* the wrong candidate: through each short-run curve's own lowest point */
+  if(view.wrong && g.wrong){
+    const pts = g.wrong.slice().sort((a, b) => a.q - b.q);
+    svg.appendChild(el('polyline', {
+      points: pts.map(w => s.x(w.q).toFixed(2) + ',' + s.y(w.v).toFixed(2)).join(' '),
+      fill: 'none', stroke: C_WRONG, 'stroke-width': 2.4, 'stroke-dasharray': '7 4',
+      'data-role': 'wrong' }));
+    pts.forEach(w => svg.appendChild(el('circle', { cx: s.x(w.q), cy: s.y(w.v), r: 4,
+      fill: C_WRONG, 'data-role': 'wrongDot' })));
+    const last = pts[pts.length - 1];
+    svg.appendChild(el('text', { x: s.x(last.q) + 8, y: s.y(last.v) - 6, 'font-size': 12.5,
+      'font-weight': 800, fill: C_WRONG, 'data-role': 'wrongLabel' }, 'B'));
+  }
+
+  /* tangency dots: where each plant meets the long-run curve */
+  (view.tan || []).forEach(k => {
+    svg.appendChild(el('circle', { cx: s.x(k), cy: s.y(L(k)), r: 5, fill: C_LR,
+      'data-role': 'tan', 'data-q': k }));
+  });
+
+  /* each plant's OWN lowest point, which is the thing it is easy to confuse */
+  (view.own || []).forEach(name => {
+    const p = (g.plants || []).find(x => x.name === name);
+    if(!p) return;
+    svg.appendChild(el('circle', { cx: s.x(p.ownQ), cy: s.y(p.ownV), r: 5, fill: 'none',
+      stroke: C_SR, 'stroke-width': 2.2, 'data-role': 'own', 'data-plant': name }));
+    svg.appendChild(el('line', { x1: s.x(p.ownQ), y1: s.y(p.ownV), x2: s.x(p.ownQ),
+      y2: PAD.t + PH, stroke: C_SR, 'stroke-width': 1, 'stroke-dasharray': '3 3', opacity: .6 }));
+    svg.appendChild(el('text', { x: s.x(p.ownQ), y: PAD.t + PH + 32, 'text-anchor': 'middle',
+      'font-size': 11.5, 'font-weight': 800, fill: C_SR, 'data-role': 'ownLabel' },
+      'own min'));
+  });
+
+  /* minimum efficient scale */
+  if(view.mes && prob.mes && prob.mes.q){
+    const q = prob.mes.q;
+    svg.appendChild(el('line', { x1: s.x(q), y1: s.y(L(q)), x2: s.x(q), y2: PAD.t + PH,
+      stroke: C_LR, 'stroke-width': 1.3, 'stroke-dasharray': '4 3', opacity: .75,
+      'data-role': 'mesDrop' }));
+    svg.appendChild(el('circle', { cx: s.x(q), cy: s.y(L(q)), r: 5.5, fill: 'none',
+      stroke: C_LR, 'stroke-width': 2.4, 'data-role': 'mes' }));
+    svg.appendChild(el('text', { x: s.x(q) + 8, y: s.y(L(q)) - 8, 'font-size': 12,
+      'font-weight': 800, fill: C_LR, 'data-role': 'mesLabel' }, 'MES'));
+  }
+
+  spread(labels, 15).forEach(l => svg.appendChild(el('text', {
+    x: l.x != null ? l.x : PAD.l + PW + 4, y: l.y + 4, 'font-size': l.size,
+    'font-weight': l.role === 'lratcLabel' ? 800 : 700, fill: l.color,
+    'data-role': l.role }, l.text)));
+}
+
+function drawGrid(svg, prob, view){
+  const g = prob.env;
+  const s = axes(svg, { qmin: g.qmin, qmax: g.qmax, ymin: g.ymin, ymax: g.ymax,
+                        q1: 0, q2: 0, A: 0, B: 0 },
+    { qlabel: prob.qlabel, ylabel: 'Cost per ' + prob.unit, xticks: g.points.map(p => p.q) });
+  const marked = new Set(view.markRows || []);
+  /* one light line per plant size through its own figures */
+  const gl = [];
+  g.cols.forEach((name, ci) => {
+    svg.appendChild(el('polyline', {
+      points: g.points.map(p => s.x(p.q).toFixed(2) + ',' + s.y(p.vals[ci]).toFixed(2)).join(' '),
+      fill: 'none', stroke: C_SR, 'stroke-width': 1.4, opacity: .35,
+      'data-curve': name }));
+    gl.push({ y: s.y(g.points[g.points.length-1].vals[ci]), text: name, color: C_SR,
+              role: 'plantLabel', size: 11, op: .75 });
+  });
+  /* every figure as a dot; the cheapest in a revealed column filled in */
+  g.points.forEach(p => {
+    p.vals.forEach((v, ci) => {
+      const best = ci === p.best, shown = marked.has(p.q);
+      svg.appendChild(el('circle', { cx: s.x(p.q), cy: s.y(v), r: best && shown ? 5 : 3.2,
+        fill: best && shown ? '#2F7D4F' : '#FFFFFF', stroke: best && shown ? '#2F7D4F' : C_SR,
+        'stroke-width': 1.6, 'data-role': best ? 'best' : 'cell', 'data-q': p.q }));
+    });
+  });
+  /* the envelope: the cheapest figure in each revealed column, joined up */
+  if(view.env){
+    const pts = g.points.filter(p => marked.has(p.q));
+    if(pts.length > 1)
+      svg.appendChild(el('polyline', {
+        points: pts.map(p => s.x(p.q).toFixed(2) + ',' + s.y(p.vals[p.best]).toFixed(2)).join(' '),
+        fill: 'none', stroke: C_LR, 'stroke-width': 3, 'data-role': 'lratc' }));
+    if(pts.length)
+      gl.push({ y: s.y(pts[pts.length-1].vals[pts[pts.length-1].best]), text: 'LRATC',
+                color: C_LR, role: 'lratcLabel', size: 12.5, op: 1 });
+  }
+  /* one de-collision pass over everything in the right gutter */
+  spread(gl, 15).forEach(l => svg.appendChild(el('text', {
+    x: s.x(g.points[g.points.length-1].q) + 6, y: l.y + 4, 'font-size': l.size,
+    'font-weight': l.role === 'lratcLabel' ? 800 : 700, fill: l.color, opacity: l.op,
+    'data-role': l.role }, l.text)));
+  if(view.mes && prob.mes){
+    const p = g.points.find(x => x.q === prob.mes.q);
+    svg.appendChild(el('circle', { cx: s.x(p.q), cy: s.y(p.vals[p.best]), r: 8, fill: 'none',
+      stroke: C_LR, 'stroke-width': 2.4, 'data-role': 'mes' }));
+    svg.appendChild(el('text', { x: s.x(p.q) + 11, y: s.y(p.vals[p.best]) - 9, 'font-size': 12,
+      'font-weight': 800, fill: C_LR, 'data-role': 'mesLabel' }, 'MES'));
+  }
+}
+
+function drawMarket(svg, prob, view){
+  /* Not a cost curve: the market itself, cut into plants of efficient size. */
+  const cs = prob.cases;
+  const top = 70, rowH = 112;
+  svg.appendChild(el('text', { x: VW / 2, y: 26, 'text-anchor': 'middle', 'font-size': 12.5,
+    'font-weight': 800, fill: '#6B5D4C' },
+    'The whole market: ' + prob.demand + ' ' + prob.units + ' a year'));
+  cs.forEach((c, i) => {
+    const y = top + i * rowH;
+    const on = !view.caseShown || view.caseShown === i + 1;
+    const x0 = 40, w = VW - 80;
+    svg.appendChild(el('rect', { x: x0, y: y, width: w, height: 46, fill: '#F4EBDA',
+      stroke: '#E7DCC6', 'stroke-width': 1, rx: 6, opacity: on ? 1 : .35 }));
+    for(let k = 1; k < c.firms; k++)
+      svg.appendChild(el('line', { x1: x0 + w * k / c.firms, y1: y, x2: x0 + w * k / c.firms,
+        y2: y + 46, stroke: '#C1542C', 'stroke-width': c.firms > 12 ? 0.7 : 1.4,
+        opacity: on ? .85 : .3 }));
+    svg.appendChild(el('text', { x: x0, y: y - 8, 'font-size': 12, 'font-weight': 800,
+      fill: on ? '#2B2118' : '#9C8E7A', 'data-role': 'marketLabel', 'data-case': i + 1 },
+      'Minimum efficient scale ' + c.mes + ' ' + prob.units + ' — '
+      + c.firms + ' plants fit'));
+    /* The verdict is the answer to the NEXT step, so it only appears once that
+       step has asked for it -- showing it alongside the bar gave it away. */
+    if(view.verdictShown === i + 1)
+      svg.appendChild(el('text', { x: x0 + w, y: y + 66, 'text-anchor': 'end', 'font-size': 11.5,
+        'font-style': 'italic', fill: '#6B5D4C', 'data-role': 'verdict',
+        'data-case': i + 1 }, c.verdict));
+  });
+}
+
+function drawPanel(prob, view){
+  const svg = document.getElementById('graph');
+  svg.innerHTML = '';
+  const legend = document.getElementById('legend');
+  legend.innerHTML = '';
+  if(prob.panel === 'table'){ svg.style.display = 'none'; legend.style.display = 'none'; return; }
+  svg.style.display = '';
+  legend.style.display = '';
+
+  const chips = [];
+  if(prob.panel === 'market'){
+    drawMarket(svg, prob, view);
+    chips.push(['#C1542C', 'one plant of minimum efficient scale', false]);
+  } else if(prob.panel === 'table+grid'){
+    drawGrid(svg, prob, view);
+    chips.push([C_SR, 'one number of lines', false], [C_LR, 'LRATC (cheapest at each output)', false]);
+  } else {
+    drawCurves(svg, prob, view);
+    if((prob.env.plants || []).length) chips.push([C_SR, 'short-run ATC, one per plant size', false]);
+    chips.push([C_LR, prob.panel === 'curves2' ? 'curve A' : 'LRATC', false]);
+    if(prob.panel === 'curves2') chips.push([C_WRONG, 'curve B', true]);
+  }
+  chips.forEach(([c, t, dash]) => {
+    const sp = document.createElement('span');
+    sp.innerHTML = `<i class="swatch${dash ? ' dash' : ''}" style="${dash ? 'color:' + c : 'background:' + c}"></i>`;
+    sp.appendChild(document.createTextNode(t));
+    legend.appendChild(sp);
+  });
+}
+
+function drawTable(prob, view){
+  const wrap = document.getElementById('tableWrap');
+  wrap.innerHTML = '';
+  if(!prob.table){ return; }
+  const t = prob.table;
+  const marked = new Set(view.markRows || []);
+  const markCols = new Set(view.markCols || []);
+  const tbl = document.createElement('table');
+  tbl.className = 'data-table';
+  const thead = document.createElement('thead');
+  const hr = document.createElement('tr');
+  hr.innerHTML = `<th class="corner">${t.rowLabel || prob.qlabel}</th>`
+    + t.cols.map(c => `<th>${c}</th>`).join('');
+  thead.appendChild(hr);
+  tbl.appendChild(thead);
+  const tb = document.createElement('tbody');
+  t.rows.forEach(r => {
+    const tr = document.createElement('tr');
+    if(marked.has(r)) tr.className = 'marked';
+    const best = t.cheapest[String(r)];
+    tr.innerHTML = `<td class="row-label">${commas(r)}</td>`
+      + t.cells[String(r)].map((v, i) => {
+          const cls = (marked.has(r) && best === i) ? 'best'
+                    : (markCols.size && !markCols.has(i)) ? 'dim' : '';
+          return `<td class="${cls}" data-q="${r}" data-col="${i}">${v}</td>`;
+        }).join('');
+    tb.appendChild(tr);
+  });
+  tbl.appendChild(tb);
+  wrap.appendChild(tbl);
+}
+
+/* ======================================================================
+   The step-through
+   ====================================================================== */
+let order = [], pIndex = 0, sIndex = 0, answered = false, optionOrder = [];
+let score = { correct: 0, total: 0 }, perProblem = {};
+
+function shuffledIndices(n){
+  const a = [...Array(n).keys()];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function currentProblem(){ return PROBLEMS[order[pIndex]]; }
+function currentSteps(){ return STEPS[currentProblem().id]; }
+function currentStep(){ return currentSteps()[sIndex]; }
+
+/* What the panel showed at the END of the previous step is what it shows
+   while this one is being answered -- so a step never displays its own answer. */
+function priorView(){
+  const steps = currentSteps();
+  return sIndex > 0 ? (steps[sIndex - 1].view || {}) : {};
+}
+
+function init(){
+  order = shuffledIndices(PROBLEMS.length);
+  pIndex = 0; sIndex = 0;
+  score = { correct: 0, total: 0 };
+  perProblem = {};
+  PROBLEMS.forEach(p => perProblem[p.id] = { correct: 0, total: 0 });
+  document.getElementById('mainArea').style.display = '';
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+  loadProblem();
+}
+
+function loadProblem(){
+  const p = currentProblem();
+  document.getElementById('bizName').textContent = p.biz;
+  document.getElementById('blurbText').textContent = p.blurb;
+  sIndex = 0;
+  loadStep();
+}
+
+function loadStep(){
+  answered = false;
+  const p = currentProblem(), st = currentStep();
+  document.getElementById('problemCount').textContent =
+    `Problem ${pIndex + 1} of ${order.length}`;
+  document.getElementById('stepCount').textContent =
+    `Step ${sIndex + 1} of ${currentSteps().length}`;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('promptText').textContent = st.prompt;
+  document.getElementById('feedback').classList.remove('show');
+
+  const prior = priorView();
+  drawTable(p, prior);
+  drawPanel(p, prior);
+  const note = document.getElementById('graphNote');
+  note.classList.add('waiting');
+  note.textContent = 'Answer, and the panel updates to show what the answer means.';
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  const lastStep = sIndex === currentSteps().length - 1;
+  const lastProblem = pIndex === order.length - 1;
+  nextBtn.textContent = !lastStep ? 'Next step'
+                      : !lastProblem ? 'Next problem' : 'See your results';
+
+  optionOrder = shuffledIndices(st.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(k => {
+    const b = document.createElement('button');
+    b.className = 'choice-btn';
+    b.textContent = st.options[k];
+    b.addEventListener('click', () => handleAnswer(st, k, b));
+    wrap.appendChild(b);
+  });
+}
+
+function handleAnswer(st, chosen, btnEl){
+  if(answered) return;
+  answered = true;
+  const p = currentProblem();
+  const right = chosen === st.correct;
+  score.total++;
+  if(right) score.correct++;
+  perProblem[p.id].total++;
+  if(right) perProblem[p.id].correct++;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === st.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const v = document.getElementById('feedbackVerdict');
+  v.textContent = right ? 'Correct.'
+    : `Not quite — the answer is “${st.options[st.correct]}.”`;
+  v.className = 'feedback-verdict ' + (right ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = st.explain;
+
+  /* the panel only moves once the answer is in, and it moves the same way
+     whether the answer was right or wrong */
+  drawTable(p, st.view || {});
+  drawPanel(p, st.view || {});
+  const note = document.getElementById('graphNote');
+  note.classList.remove('waiting');
+  note.textContent = st.note || st.prompt;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if(sIndex < currentSteps().length - 1){ sIndex++; loadStep(); }
+  else if(pIndex < order.length - 1){ pIndex++; loadProblem(); }
+  else showResults();
+});
+
+function showResults(){
+  document.getElementById('mainArea').style.display = 'none';
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(100 * score.correct / score.total);
+  const band = BANDS.find(b => pct >= b.min);
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  (${pct}%)`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  PROBLEMS.filter(p => perProblem[p.id].total > 0).forEach(p => {
+    const t = perProblem[p.id];
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${p.biz}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
