@@ -313,6 +313,16 @@ const PROBLEMS = [
    "flat": false,
    "plants": [
     {
+     "at": {
+      "200": "$6.00",
+      "400": "$10.00",
+      "600": "$17.00"
+     },
+     "atV": {
+      "200": 6.0,
+      "400": 10.0,
+      "600": 17.0
+     },
      "c": -4.375e-05,
      "d": 0.0675,
      "hi": 760.0,
@@ -327,6 +337,16 @@ const PROBLEMS = [
      "tanV": 6.0
     },
     {
+     "at": {
+      "200": "$9.00",
+      "400": "$5.00",
+      "600": "$8.00"
+     },
+     "atV": {
+      "200": 9.0,
+      "400": 5.0,
+      "600": 8.0
+     },
      "c": 3.75e-05,
      "d": 0.0075,
      "hi": 760.0,
@@ -341,6 +361,16 @@ const PROBLEMS = [
      "tanV": 5.0
     },
     {
+     "at": {
+      "200": "$14.00",
+      "400": "$8.00",
+      "600": "$6.00"
+     },
+     "atV": {
+      "200": 14.0,
+      "400": 8.0,
+      "600": 6.0
+     },
      "c": 0.0001,
      "d": -0.01,
      "hi": 760.0,
@@ -535,6 +565,16 @@ const PROBLEMS = [
    "flat": false,
    "plants": [
     {
+     "at": {
+      "300": "$4.50",
+      "600": "$4.50",
+      "900": "$10.50"
+     },
+     "atV": {
+      "300": 4.5,
+      "600": 4.5,
+      "900": 10.5
+     },
      "c": 1.6666666666666667e-05,
      "d": 0.0,
      "hi": 560.0,
@@ -549,6 +589,16 @@ const PROBLEMS = [
      "tanV": 4.5
     },
     {
+     "at": {
+      "300": "$6.00",
+      "600": "$3.00",
+      "900": "$6.00"
+     },
+     "atV": {
+      "300": 6.0,
+      "600": 3.0,
+      "900": 6.0
+     },
      "c": 1.6666666666666667e-05,
      "d": 0.0,
      "hi": 860.0,
@@ -563,6 +613,16 @@ const PROBLEMS = [
      "tanV": 3.0
     },
     {
+     "at": {
+      "300": "$10.50",
+      "600": "$4.50",
+      "900": "$4.50"
+     },
+     "atV": {
+      "300": 10.5,
+      "600": 4.5,
+      "900": 4.5
+     },
      "c": 1.6666666666666667e-05,
      "d": 0.0,
      "hi": 920.0,
@@ -600,13 +660,23 @@ const PROBLEMS = [
  },
  {
   "biz": "Northgate Dairy",
-  "blurb": "Two candidate long-run curves have been drawn through the same three tank sizes. Curve A touches each short-run curve once. Curve B runs through the lowest point of each one. Only one of them is the long-run average total cost curve.",
+  "blurb": "Northgate can install a small, a medium or a large pasteurizing tank, and the diagram shows what a case costs on each. Two candidate long-run curves have been drawn across the three of them: curve A touches each short-run curve once, and curve B runs through the lowest point of each one. Only one of the two is the long-run average total cost curve.",
   "env": {
    "A": 4.0,
    "B": 1e-05,
    "flat": false,
    "plants": [
     {
+     "at": {
+      "1000": "$5.80",
+      "1600": "$14.80",
+      "400": "$7.60"
+     },
+     "atV": {
+      "1000": 5.8,
+      "1600": 14.8,
+      "400": 7.6
+     },
      "c": 5e-06,
      "d": 0.0,
      "hi": 850.0,
@@ -621,6 +691,16 @@ const PROBLEMS = [
      "tanV": 7.6
     },
     {
+     "at": {
+      "1000": "$4.00",
+      "1600": "$9.40",
+      "400": "$9.40"
+     },
+     "atV": {
+      "1000": 4.0,
+      "1600": 9.4,
+      "400": 9.4
+     },
      "c": 5e-06,
      "d": 0.0,
      "hi": 1450.0,
@@ -635,6 +715,16 @@ const PROBLEMS = [
      "tanV": 4.0
     },
     {
+     "at": {
+      "1000": "$5.80",
+      "1600": "$7.60",
+      "400": "$14.80"
+     },
+     "atV": {
+      "1000": 5.8,
+      "1600": 7.6,
+      "400": 14.8
+     },
      "c": 5e-06,
      "d": 0.0,
      "hi": 1600.0,
@@ -687,6 +777,11 @@ const PROBLEMS = [
    "ymin": 3.712
   },
   "id": "L4",
+  "initial": {
+   "curves": "all",
+   "env": true,
+   "wrong": true
+  },
   "mes": {
    "plant": "medium tank",
    "q": 1000,
@@ -811,6 +906,7 @@ const PROBLEMS = [
    "ymax": 1958.0,
    "ymin": 0.0
   },
+  "freshPanel": true,
   "id": "L6",
   "mes": {
    "plant": "",
@@ -833,6 +929,18 @@ const PROBLEMS = [
    "flat": true,
    "plants": [
     {
+     "at": {
+      "25000": "$3.63",
+      "40000": "$7.00",
+      "55000": "$20.50",
+      "70000": "$43.00"
+     },
+     "atV": {
+      "25000": 3.625,
+      "40000": 7.0,
+      "55000": 20.5,
+      "70000": 43.0
+     },
      "c": 2e-08,
      "d": 0.0,
      "hi": 37000.0,
@@ -847,6 +955,18 @@ const PROBLEMS = [
      "tanV": 3.625
     },
     {
+     "at": {
+      "25000": "$8.13",
+      "40000": "$2.50",
+      "55000": "$7.00",
+      "70000": "$20.50"
+     },
+     "atV": {
+      "25000": 8.125,
+      "40000": 2.5,
+      "55000": 7.0,
+      "70000": 20.5
+     },
      "c": 2e-08,
      "d": 0.0,
      "hi": 52000.0,
@@ -861,6 +981,18 @@ const PROBLEMS = [
      "tanV": 2.5
     },
     {
+     "at": {
+      "25000": "$21.63",
+      "40000": "$7.00",
+      "55000": "$2.50",
+      "70000": "$7.00"
+     },
+     "atV": {
+      "25000": 21.625,
+      "40000": 7.0,
+      "55000": 2.5,
+      "70000": 7.0
+     },
      "c": 2e-08,
      "d": 0.0,
      "hi": 67000.0,
@@ -875,6 +1007,18 @@ const PROBLEMS = [
      "tanV": 2.5
     },
     {
+     "at": {
+      "25000": "$44.13",
+      "40000": "$20.50",
+      "55000": "$7.00",
+      "70000": "$2.50"
+     },
+     "atV": {
+      "25000": 44.125,
+      "40000": 20.5,
+      "55000": 7.0,
+      "70000": 2.5
+     },
      "c": 2e-08,
      "d": 0.0,
      "hi": 82000.0,
@@ -995,11 +1139,12 @@ const STEPS = {
   {
    "correct": 0,
    "explain": "Read across the 200-barrel row and take the smallest figure: $6 on one plot, against $9 on two and $14 on three. Two or three plots cost more per barrel at this output because they are more land, trellis and equipment than 200 barrels can keep busy, and all of it still has to be paid for out of those 200 barrels.",
+   "kind": "cheapest",
    "note": "Panel: the cheapest figure marked at 200, a tangency point marked at 200.",
    "options": [
-    "the 1-plot vineyard — $6 a barrel",
-    "the 2-plot vineyard — $9 a barrel",
-    "the 3-plot vineyard — $14 a barrel"
+    "the 1-plot vineyard",
+    "the 2-plot vineyard",
+    "the 3-plot vineyard"
    ],
    "prompt": "Stone Hollow wants 200 barrels a year. Which planting is cheapest for that output?",
    "view": {
@@ -1017,11 +1162,12 @@ const STEPS = {
   {
    "correct": 0,
    "explain": "Two plots, at $5. Notice what happened to the one-plot vineyard: it went from the cheapest option at 200 barrels to $10 at 400, because squeezing 400 barrels out of a single plot means working it far past the output it was sized for.",
+   "kind": "cheapest",
    "note": "Panel: the cheapest figure marked at 400, a tangency point marked at 400.",
    "options": [
-    "the 2-plot vineyard — $5 a barrel",
-    "the 1-plot vineyard — $10 a barrel",
-    "the 3-plot vineyard — $8 a barrel"
+    "the 2-plot vineyard",
+    "the 1-plot vineyard",
+    "the 3-plot vineyard"
    ],
    "prompt": "Now it wants 400 barrels. Which planting is cheapest for THAT output?",
    "view": {
@@ -1042,11 +1188,12 @@ const STEPS = {
   {
    "correct": 0,
    "explain": "Three plots, at $6. Each output has its own cheapest planting, and as the output rises the cheapest planting gets bigger: one plot at 200 barrels, two at 400, three at 600.",
+   "kind": "cheapest",
    "note": "Panel: the cheapest figure marked at 600, a tangency point marked at 600.",
    "options": [
-    "the 3-plot vineyard — $6 a barrel",
-    "the 2-plot vineyard — $8 a barrel",
-    "the 1-plot vineyard — $17 a barrel"
+    "the 3-plot vineyard",
+    "the 2-plot vineyard",
+    "the 1-plot vineyard"
    ],
    "prompt": "And at 600 barrels?",
    "view": {
@@ -1092,12 +1239,13 @@ const STEPS = {
   {
    "correct": 0,
    "explain": "The long-run curve runs $6, $5, $6, so it bottoms in the middle, at 400 barrels on two plots. That is not just the cheapest cell in its own row — it is the cheapest cell anywhere on the table.",
+   "kind": "cheapest",
    "note": "Panel: minimum efficient scale ringed.",
    "options": [
-    "400 barrels on 2 plots — $5 a barrel",
-    "200 barrels on 1 plot — $6 a barrel",
-    "600 barrels on 3 plots — $6 a barrel",
-    "600 barrels on 2 plots — $8 a barrel"
+    "400 barrels on 2 plots",
+    "200 barrels on 1 plot",
+    "600 barrels on 3 plots",
+    "600 barrels on 2 plots"
    ],
    "prompt": "Across the whole table, at which output and with how many plots is a barrel cheapest?",
    "view": {
@@ -1198,12 +1346,13 @@ const STEPS = {
   {
    "correct": 0,
    "explain": "The 2-line plant, at $12.00 a crate. Too few lines and each one is run past the output it was built for; too many and there is more line sitting there than 300 crates can keep busy. Either way the crates carry the cost.",
+   "kind": "cheapest",
    "note": "Panel: the cheapest figure marked at 300.",
    "options": [
-    "the 2-line plant — $12.00 a crate",
-    "the 3-line plant — $14.50 a crate",
-    "the 4-line plant — $19.00 a crate",
-    "the 5-line plant — $26.00 a crate"
+    "the 2-line plant",
+    "the 3-line plant",
+    "the 4-line plant",
+    "the 5-line plant"
    ],
    "prompt": "At 300 crates a day, which number of lines is cheapest?",
    "view": {
@@ -1215,12 +1364,13 @@ const STEPS = {
   {
    "correct": 0,
    "explain": "The 3-line plant, at $8.25 a crate. Too few lines and each one is run past the output it was built for; too many and there is more line sitting there than 600 crates can keep busy. Either way the crates carry the cost.",
+   "kind": "cheapest",
    "note": "Panel: the cheapest figure marked at 600.",
    "options": [
-    "the 3-line plant — $8.25 a crate",
-    "the 2-line plant — $15.00 a crate",
-    "the 4-line plant — $10.50 a crate",
-    "the 5-line plant — $14.00 a crate"
+    "the 3-line plant",
+    "the 2-line plant",
+    "the 4-line plant",
+    "the 5-line plant"
    ],
    "prompt": "At 600 crates a day, which number of lines is cheapest?",
    "view": {
@@ -1233,12 +1383,13 @@ const STEPS = {
   {
    "correct": 0,
    "explain": "The 4-line plant, at $7.00 a crate. Too few lines and each one is run past the output it was built for; too many and there is more line sitting there than 900 crates can keep busy. Either way the crates carry the cost.",
+   "kind": "cheapest",
    "note": "Panel: the cheapest figure marked at 900.",
    "options": [
-    "the 4-line plant — $7.00 a crate",
-    "the 2-line plant — $21.00 a crate",
-    "the 3-line plant — $11.00 a crate",
-    "the 5-line plant — $9.00 a crate"
+    "the 4-line plant",
+    "the 2-line plant",
+    "the 3-line plant",
+    "the 5-line plant"
    ],
    "prompt": "At 900 crates a day, which number of lines is cheapest?",
    "view": {
@@ -1252,12 +1403,13 @@ const STEPS = {
   {
    "correct": 0,
    "explain": "The 5-line plant, at $8.25 a crate. Too few lines and each one is run past the output it was built for; too many and there is more line sitting there than 1,200 crates can keep busy. Either way the crates carry the cost.",
+   "kind": "cheapest",
    "note": "Panel: the cheapest figure marked at 1,200.",
    "options": [
-    "the 5-line plant — $8.25 a crate",
-    "the 2-line plant — $29.00 a crate",
-    "the 3-line plant — $16.00 a crate",
-    "the 4-line plant — $9.50 a crate"
+    "the 5-line plant",
+    "the 2-line plant",
+    "the 3-line plant",
+    "the 4-line plant"
    ],
    "prompt": "At 1,200 crates a day, which number of lines is cheapest?",
    "view": {
@@ -1272,12 +1424,13 @@ const STEPS = {
   {
    "correct": 0,
    "explain": "Those four figures are the long-run average total cost curve, and they bottom at 900 crates a day at $7.00. That is the smallest output at which a crate costs as little as it ever will, which is what minimum efficient scale means. Below it Kingfisher still has economies of scale left to collect; above it, a crate starts costing more again.",
+   "kind": "cheapest",
    "note": "Panel: the cheapest figures joined up, minimum efficient scale ringed.",
    "options": [
-    "900 crates a day — $7.00 each",
-    "300 crates a day — $12.00 each",
-    "600 crates a day — $8.25 each",
-    "1,200 crates a day — $8.25 each"
+    "900 crates a day",
+    "300 crates a day",
+    "600 crates a day",
+    "1,200 crates a day"
    ],
    "prompt": "The cheapest figure in each row runs $12.00, $8.25, $7.00, $8.25. Which output is Kingfisher’s minimum efficient scale?",
    "view": {
@@ -1313,12 +1466,13 @@ const STEPS = {
  "L3": [
   {
    "correct": 0,
-   "explain": "The twelve-machine bank, at $4.50 a load. Its curve meets the long-run curve at exactly 300 loads and every other bank sits above the long-run curve there. A bank of twenty-four or thirty-six machines can wash 300 loads, but much of it stands idle and the loads still have to cover it.",
+   "explain": "The twelve-machine bank, at $4.50 a load against $6.00 on twenty-four machines and $10.50 on thirty-six. Its curve is the one that meets the long-run curve at exactly 300 loads; the other two sit above the long-run curve there. A larger bank can wash 300 loads perfectly well, but most of it stands idle at that output, and those 300 loads still have to cover the cost of operating and maintaining the excess capacity.",
+   "kind": "cheapest",
    "note": "Panel: the long-run curve drawn, a tangency point marked at 300.",
    "options": [
-    "the 12-machine bank — $4.50 a load",
-    "the 24-machine bank — $3.00 a load",
-    "the 36-machine bank — $4.50 a load"
+    "the 12-machine bank",
+    "the 24-machine bank",
+    "the 36-machine bank"
    ],
    "prompt": "At 300 loads a week, which bank of machines sits on the long-run curve — that is, which one washes 300 loads most cheaply?",
    "view": {
@@ -1368,12 +1522,13 @@ const STEPS = {
   {
    "correct": 0,
    "explain": "Minimum efficient scale is the smallest output at which the long-run curve reaches its lowest value: 600 loads a week, at $3.00. The twenty-four-machine bank is the one that gets there, and it is the single bank on this diagram whose own lowest point is also a point on the long-run curve.",
+   "kind": "cheapest",
    "note": "Panel: a tangency point marked at 600, minimum efficient scale ringed.",
    "options": [
-    "600 loads a week — $3.00 a load",
-    "300 loads a week — $4.50 a load",
-    "900 loads a week — $4.50 a load",
-    "480 loads a week — $3.24 a load"
+    "600 loads a week",
+    "300 loads a week",
+    "900 loads a week",
+    "480 loads a week"
    ],
    "prompt": "What is Larkspur’s minimum efficient scale?",
    "view": {
@@ -1432,8 +1587,8 @@ const STEPS = {
  "L4": [
   {
    "correct": 0,
-   "explain": "Curve B joins up the bottom of each tank’s own cost curve. That feels right and is wrong. The long-run curve answers \"what is the least a case can cost, if I may build any size of tank I like?\" — which means touching each short-run curve at the output for which that tank is the best size, not at the output that happens to be that tank’s own cheapest. Curve A does that.",
-   "note": "Panel: the long-run curve drawn, curve B added, through each short-run curve’s own lowest point.",
+   "explain": "Curve B joins up the bottom of each tank’s own cost curve — the three points now ringed. That feels right and is wrong. The long-run curve answers \"what is the least a case can cost, if I may build any size of tank I like?\", which means touching each short-run curve at the output for which that tank is the best size, not at the output that happens to be that tank’s own cheapest. Curve A does that; curve B does not.",
+   "note": "Panel: the long-run curve drawn, small tank and medium tank and large tank’s own lowest points circled, curve B added, through each short-run curve’s own lowest point.",
    "options": [
     "It runs through the lowest point of each short-run curve instead of touching each one where that tank is the cheapest way to produce",
     "It runs through the highest point of each short-run curve instead of the lowest point where that tank is the cheapest way to produce",
@@ -1444,13 +1599,18 @@ const STEPS = {
    "view": {
     "curves": "all",
     "env": true,
+    "own": [
+     "small tank",
+     "medium tank",
+     "large tank"
+    ],
     "wrong": true
    }
   },
   {
    "correct": 0,
-   "explain": "Curve A is at $4.40 there and curve B at $5.20, so curve B is $0.80 a case too high at that output. Every figure on curve B except one is too high in the same way.",
-   "note": "Panel: small tank’s own lowest point circled.",
+   "explain": "Curve A is at $4.40 there and curve B at $5.20, so curve B is $0.80 a case too high at that output. Curve B is too high at every output except one — by different amounts, shrinking to nothing as you approach the output where the two curves meet.",
+   "note": "Panel: nothing new to draw for this step.",
    "options": [
     "$4.40 a case",
     "$5.20 a case",
@@ -1469,18 +1629,21 @@ const STEPS = {
   },
   {
    "correct": 0,
-   "explain": "A long-run curve is supposed to be the floor — the least an output can cost when the plant size is still a choice. Curve B sits above that floor, so at almost every output it names a cost the dairy could undercut simply by building a tank of a different size. That is why the error matters: it is not a cosmetic slip, it misstates what is achievable.",
+   "explain": "Every point on curve B is a genuine figure — that is what makes the mistake so easy to make. But each one answers \"what is the least THIS tank can do?\", and stringing those answers together does not answer \"for THIS output, what is the least ANY tank can do?\" Take the small tank at 800 cases: $5.20 is the best that tank can manage, and it is a real number, but a differently sized tank makes 800 cases for $4.40. The two questions give the same answer at exactly one output — the one where the long-run curve bottoms — and nowhere else.",
    "note": "Panel: nothing new to draw for this step.",
    "options": [
-    "Costs that the dairy could actually beat, by building a different-sized tank",
-    "Costs that no dairy could ever reach, however it sized its tank",
-    "Costs for the short run rather than for the long run, at every output",
-    "Costs that are right at every output but plotted against the wrong quantities"
+    "The cheapest output for a given tank is not the cheapest tank for a given output",
+    "The cheapest output for a given tank is not the cheapest output for a larger tank",
+    "The cheapest tank for a given output is not the cheapest tank for a larger output",
+    "The cheapest output for a given tank is not the output the dairy actually wants"
    ],
-   "prompt": "So curve B sits above curve A nearly everywhere. What is curve B therefore claiming?",
+   "prompt": "Curve B is built entirely out of real figures: each point on it is a real tank at its own cheapest output. So what exactly has gone wrong?",
    "view": {
     "curves": "all",
     "env": true,
+    "own": [
+     "small tank"
+    ],
     "wrong": true
    }
   },
@@ -1555,7 +1718,7 @@ const STEPS = {
     "It stays at $20.00 a delivery",
     "It falls to $10.00 a delivery"
    ],
-   "prompt": "And what does that do to the cost per delivery?",
+   "prompt": "Still on that same doubling — 4 trucks to 8, 1,200 deliveries a month to 3,000 — what does it do to the cost per delivery?",
    "view": {
     "markCols": [
      2
@@ -1594,7 +1757,7 @@ const STEPS = {
     "It rises to $16.00 a delivery",
     "It falls to $8.00 a delivery"
    ],
-   "prompt": "And what does that do to the cost per delivery?",
+   "prompt": "Still on that same doubling — 8 trucks to 16, 3,000 deliveries a month to 6,000 — what does it do to the cost per delivery?",
    "view": {
     "markCols": [
      2
@@ -1633,7 +1796,7 @@ const STEPS = {
     "It stays at $16.00 a delivery",
     "It falls to $8.00 a delivery"
    ],
-   "prompt": "And what does that do to the cost per delivery?",
+   "prompt": "Still on that same doubling — 16 trucks to 32, 6,000 deliveries a month to 10,000 — what does it do to the cost per delivery?",
    "view": {
     "markCols": [
      2
@@ -1730,7 +1893,7 @@ const STEPS = {
   },
   {
    "correct": 0,
-   "explain": "Specialization is the oldest item on the list — Adam Smith’s pin factory. It only becomes possible at scale, because you need enough volume to keep a worker busy on one operation all day, and it lowers cost per garment at every output once it is available.",
+   "explain": "Specialization is the oldest item on the list — Adam Smith’s pin factory. Note what makes it an economy of SCALE rather than something else: it is the larger plant that makes it possible, because only at that volume is there enough of one operation to keep a worker at it all day. Reorganizing the work inside a plant that had NOT changed size would be a short-run story about one input, not a long-run story about scale, which is why the item says the plant grew.",
    "note": "Panel: nothing shaded — this one is not a stretch of the long-run curve at all.",
    "options": [
     "Economies of scale — the falling stretch of the long-run curve",
@@ -1738,7 +1901,7 @@ const STEPS = {
     "Constant returns to scale — the flat stretch of the long-run curve",
     "Diminishing marginal returns — a short-run idea, not a stretch of the long-run curve"
    ],
-   "prompt": "Instead of each worker sewing a whole garment, every worker now does one operation and does it all day.",
+   "prompt": "Windrow replaces its single workroom with a plant four times the size, and at that scale each worker can do one operation all day instead of sewing a whole garment.",
    "view": {
     "band": "eos"
    }
@@ -2002,7 +2165,9 @@ const BANDS = [
    The diagram
    ====================================================================== */
 const SVGNS = 'http://www.w3.org/2000/svg';
-const PAD = { l: 60, r: 72, t: 18, b: 48 };
+/* the right gutter has to hold the longest curve name in full -- at 72 the
+   last glyph of "36 machines" was cut off by the panel edge */
+const PAD = { l: 60, r: 88, t: 18, b: 48 };
 const VW = 580, VH = 420;
 const PW = VW - PAD.l - PAD.r;
 const PH = VH - PAD.t - PAD.b;
@@ -2137,8 +2302,8 @@ function drawCurves(svg, prob, view){
     svg.appendChild(el('polyline', { points: poly(s, fn, p.lo, p.hi), fill: 'none',
       stroke: C_SR, 'stroke-width': on ? 2.3 : 1.3, opacity: on ? 1 : .3,
       'data-curve': p.name, 'data-on': on ? '1' : '0' }));
-    if(on) labels.push({ y: s.y(fn(p.hi)), text: p.name, color: C_SR,
-                         role: 'plantLabel', size: 11.5, x: s.x(p.hi) + 4 });
+    labels.push({ y: s.y(fn(p.hi)), text: p.name, color: C_SR, role: 'plantLabel',
+                  size: 11.5, x: s.x(p.hi) + 4, op: on ? 1 : .55 });
   });
 
   /* the long-run curve */
@@ -2177,9 +2342,14 @@ function drawCurves(svg, prob, view){
       stroke: C_SR, 'stroke-width': 2.2, 'data-role': 'own', 'data-plant': name }));
     svg.appendChild(el('line', { x1: s.x(p.ownQ), y1: s.y(p.ownV), x2: s.x(p.ownQ),
       y2: PAD.t + PH, stroke: C_SR, 'stroke-width': 1, 'stroke-dasharray': '3 3', opacity: .6 }));
-    svg.appendChild(el('text', { x: s.x(p.ownQ), y: PAD.t + PH + 32, 'text-anchor': 'middle',
-      'font-size': 11.5, 'font-weight': 800, fill: C_SR, 'data-role': 'ownLabel' },
-      'own min'));
+    /* Above the circle, not under the axis: with three of them marked the
+       under-axis labels ran into the axis title. And where curve B is drawn
+       the rings are its own vertices, so labeling each of them repeats what
+       the curve already says and crowds its label. */
+    if(!view.wrong)
+      svg.appendChild(el('text', { x: s.x(p.ownQ), y: s.y(p.ownV) - 11, 'text-anchor': 'middle',
+        'font-size': 11.5, 'font-weight': 800, fill: C_SR, 'data-role': 'ownLabel' },
+        'own min'));
   });
 
   /* minimum efficient scale */
@@ -2197,7 +2367,7 @@ function drawCurves(svg, prob, view){
   spread(labels, 15).forEach(l => svg.appendChild(el('text', {
     x: l.x != null ? l.x : PAD.l + PW + 4, y: l.y + 4, 'font-size': l.size,
     'font-weight': l.role === 'lratcLabel' ? 800 : 700, fill: l.color,
-    'data-role': l.role }, l.text)));
+    opacity: l.op == null ? 1 : l.op, 'data-role': l.role }, l.text)));
 }
 
 function drawGrid(svg, prob, view){
@@ -2363,8 +2533,10 @@ function currentStep(){ return currentSteps()[sIndex]; }
 /* What the panel showed at the END of the previous step is what it shows
    while this one is being answered -- so a step never displays its own answer. */
 function priorView(){
-  const steps = currentSteps();
-  return sIndex > 0 ? (steps[sIndex - 1].view || {}) : {};
+  const p = currentProblem(), steps = currentSteps();
+  const start = p.initial || {};
+  if(sIndex === 0 || p.freshPanel) return start;
+  return steps[sIndex - 1].view || {};
 }
 
 function init(){
