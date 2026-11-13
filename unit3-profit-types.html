@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accounting Profit and Economic Profit &mdash; Explicit, Implicit and the Decision</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --teal: #2F6F62;
+    --orange: #C1542C;
+    --indigo: #4A5FB0;
+    --muted: #9C8E7A;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:1180px;margin:0 auto;}
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  .title-block h1{font-size:28px;font-weight:800;letter-spacing:-0.01em;margin:0 0 4px;}
+  .title-block p{margin:0;color:var(--ink-soft);font-size:14.5px;max-width:66ch;}
+
+  .identities{
+    background:var(--surface-alt);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:11px 14px;
+    margin-bottom:18px;
+    color:var(--ink-soft);
+    font-size:13.5px;
+    line-height:1.65;
+  }
+  .identities b{color:var(--ink);}
+  .identities .term{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:2px 9px;
+    margin:3px 7px 3px 0;
+    display:inline-block;
+    color:var(--ink);
+    font-weight:600;
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px 14px;
+    margin-bottom:14px;
+  }
+  .count-group{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+  .card-count{font-size:13px;font-weight:700;color:var(--ink-soft);}
+  .step-count{font-size:13px;font-weight:700;color:var(--teal);}
+  .score-badge{
+    font-size:13px;font-weight:700;color:var(--accent);
+    background:#FBF1DC;border:1px solid #EAD4A0;padding:4px 11px;border-radius:999px;
+  }
+
+  .main{display:grid;grid-template-columns:1fr 1.06fr;gap:22px;align-items:start;}
+  @media (max-width:900px){.main{grid-template-columns:1fr;}}
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px;
+  }
+
+  .biz-name{
+    font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:6px;
+  }
+  .blurb{
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:15px 17px;
+    font-size:15px;
+    line-height:1.5;
+    color:var(--ink);
+    margin-bottom:16px;
+  }
+  .prompt{font-size:17px;font-weight:700;line-height:1.4;margin-bottom:16px;}
+
+  .options{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+  .choice-btn{
+    text-align:left;padding:13px 16px;border-radius:10px;border:1.5px solid var(--border);
+    background:var(--surface);font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){border-color:var(--accent);background:#FFFBF2;}
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{background:var(--correct-soft);border-color:var(--correct);color:var(--correct);}
+  .choice-btn.incorrect{background:var(--incorrect-soft);border-color:var(--incorrect);color:var(--incorrect);}
+
+  .feedback{display:none;margin-bottom:16px;}
+  .feedback.show{display:block;}
+  .feedback-verdict{font-weight:800;font-size:15px;margin-bottom:6px;}
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;color:var(--ink-soft);background:var(--surface-alt);
+    border-left:3px solid var(--accent);padding:12px 14px;border-radius:0 8px 8px 0;
+  }
+
+  .controls{display:flex;justify-content:flex-end;}
+  .btn{padding:11px 20px;border-radius:10px;border:none;font-size:14.5px;font-weight:700;cursor:pointer;}
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover:not(:disabled){background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  /* ---- the panel ---- */
+  .table-wrap{overflow-x:auto;margin-bottom:16px;}
+  table.data-table{width:100%;border-collapse:collapse;font-size:14.5px;}
+  table.data-table th, table.data-table td{
+    border:1px solid var(--border);padding:9px 11px;text-align:center;white-space:nowrap;
+  }
+  table.data-table th{background:var(--surface-alt);font-weight:700;color:var(--ink-soft);font-size:12.5px;}
+  table.data-table th.corner{background:var(--surface-alt);text-align:left;}
+  table.data-table td.row-label{font-weight:700;text-align:left;color:var(--ink-soft);}
+  .panel-title{
+    font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:10px;
+  }
+  table.data-table td.line-label{
+    text-align:left;white-space:normal;color:var(--ink-soft);font-weight:500;padding-left:22px;
+  }
+  table.data-table tr.total td{border-top:2px solid var(--border);font-weight:800;}
+  table.data-table tr.headline td{background:var(--surface-alt);font-weight:800;}
+  table.data-table td.blank{color:var(--muted);font-weight:400;}
+  table.data-table td.pos{color:var(--correct);font-weight:800;}
+  table.data-table td.neg{color:var(--incorrect);font-weight:800;}
+  table.data-table td.zero{color:var(--accent);font-weight:800;}
+  table.data-table tr.note td{
+    background:var(--surface-alt);font-size:13px;font-style:italic;color:var(--ink-soft);
+    text-align:left;white-space:normal;font-weight:500;
+  }
+  table.data-table td.kind-e{color:var(--indigo);font-weight:800;}
+  table.data-table td.kind-i{color:var(--orange);font-weight:800;}
+  table.data-table td.best{
+    background:var(--correct-soft);color:var(--correct);font-weight:800;
+    box-shadow:inset 0 0 0 1px var(--correct);
+  }
+  table.data-table td.dim{color:var(--muted);}
+  table.data-table tr.marked td.row-label{color:var(--ink);}
+
+  .legend{
+    display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:10px;
+    font-size:12.5px;font-weight:700;color:var(--ink-soft);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:16px;height:3px;border-radius:2px;display:inline-block;}
+  .swatch.dash{background:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 7px);}
+  .graph-wrap svg{width:100%;height:auto;display:block;}
+  .graph-note{
+    margin-top:12px;font-size:13.5px;color:var(--ink-soft);background:var(--surface-alt);
+    border:1px solid var(--border);border-radius:10px;padding:11px 13px;min-height:56px;
+  }
+  .graph-note.waiting{font-style:italic;}
+
+  /* ---- results ---- */
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{font-size:34px;font-weight:800;letter-spacing:-0.02em;margin-bottom:10px;}
+  .results-note{font-size:15px;color:var(--ink-soft);margin-bottom:20px;}
+  table.data-table th.topic-head, table.data-table td.topic-cell{text-align:left;white-space:normal;}
+  table.data-table td.topic-cell{font-weight:600;color:var(--ink);}
+  table.data-table td.topic-score{font-weight:700;}
+  table.data-table td.topic-score.full{color:var(--correct);}
+  table.data-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px;color:var(--ink-soft);font-style:italic;line-height:1.5;
+    border-top:1px solid var(--border);padding-top:14px;margin:18px 0 20px;
+  }
+
+  footer.reset-row{margin-top:20px;display:flex;justify-content:flex-end;}
+  .link-btn{
+    background:none;border:none;color:var(--ink-soft);font-size:13px;
+    text-decoration:underline;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="title-block">
+      <h1>Accounting Profit and Economic Profit</h1>
+      <p>Two businesses can keep identical books and still face opposite correct decisions, because
+      what they each gave up to be in business differs. Accounting profit cannot see that.
+      Economic profit can &mdash; which is why the decision is made on economic profit.</p>
+    </div>
+  </header>
+
+  <div class="identities">
+    <b>The chain.</b>
+    <span class="term">Explicit costs: money paid out</span>
+    <span class="term">Implicit costs: uses given up</span>
+    <span class="term">Accounting profit = Revenue &minus; Explicit</span>
+    <span class="term">Economic profit = Accounting &minus; Implicit</span>
+    <br>An implicit cost is what a resource the owner already owns &mdash; their time, their land,
+    their money &mdash; could have been earning elsewhere. No money changes hands, and it is a real
+    cost all the same. Because implicit costs are never negative,
+    <b>economic profit is never above accounting profit</b>. Economic profit above zero says stay,
+    below zero says switch, and exactly zero is <b>normal profit</b>: the owner is earning precisely
+    what their resources would earn in their next-best use.
+  </div>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="card-count" id="problemCount">Problem 1 of 8</span>
+      <span class="step-count" id="stepCount">Step 1 of 8</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="main" id="mainArea">
+
+    <div class="panel" id="quizPanel">
+      <div class="biz-name" id="bizName"></div>
+      <div class="blurb" id="blurbText">Loading&hellip;</div>
+      <div class="prompt" id="promptText"></div>
+      <div class="options" id="optionsWrap"></div>
+
+      <div class="feedback" id="feedback">
+        <div class="feedback-verdict" id="feedbackVerdict"></div>
+        <div class="feedback-explain" id="feedbackExplain"></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-primary" id="nextBtn" disabled>Next step</button>
+      </div>
+    </div>
+
+    <div class="panel" id="graphPanel">
+      <div class="panel-title" id="panelTitle"></div>
+      <div class="table-wrap" id="tableWrap"></div>
+      <div class="graph-note waiting" id="graphNote"></div>
+    </div>
+
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">Problem</th><th>Score</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <p class="results-caveat">These bands say whether the two profit figures and the decision
+    between them are secure &mdash; they are not an AP score prediction. Treat a strong result here
+    as one idea nailed down, not as a grade.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Start again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Start over</button>
+  </footer>
+
+</div>
+<script>
+/* ---------------------------------------------------------------------------
+   Every number below was derived and asserted in verify_profit.py, and every
+   step was built and guarded in profit_steps.py, before either was written
+   here.
+
+   THE IDENTITIES, asserted on every scenario rather than only where a step
+   happens to ask about one:
+
+       accounting profit = revenue - explicit
+       economic profit   = accounting profit - implicit
+                         = revenue - explicit - implicit
+       implicit >= 0, so economic profit <= accounting profit, ALWAYS
+
+   Every break-even figure was solved and then substituted back: the solved
+   value has to give an economic profit of exactly zero. Every wrong answer on
+   a numeric step is a derivable slip -- adding instead of subtracting,
+   stopping at accounting profit, counting one of two implicit costs -- so
+   eliminating by arithmetic means doing the arithmetic the module is about.
+
+   The correct option is written FIRST in every step; the page shuffles them.
+--------------------------------------------------------------------------- */
+const PROBLEMS = [
+ {
+  "biz": "Stone Hollow Vineyard",
+  "blurb": "Two versions of the same vineyard, in two different years. The revenue is the same in both and so are the bills — what differs is what the land and the owners could be doing instead.",
+  "cases": [
+   {
+    "acc": 50000,
+    "accTxt": "$50,000",
+    "eco": 15000,
+    "ecoTxt": "$15,000",
+    "exp": 40000,
+    "expTxt": "$40,000",
+    "explicit": [
+     {
+      "name": "Hired labor, sprays, fuel and repairs",
+      "txt": "$40,000",
+      "v": 40000
+     }
+    ],
+    "imp": 35000,
+    "impTxt": "$35,000",
+    "implicit": [
+     {
+      "name": "The farmhouse run as a bed-and-breakfast",
+      "txt": "$20,000",
+      "v": 20000
+     },
+     {
+      "name": "The salary the owners could earn elsewhere",
+      "txt": "$15,000",
+      "v": 15000
+     }
+    ],
+    "label": "Case A",
+    "revenue": 90000,
+    "revenueTxt": "$90,000",
+    "verdict": "stay"
+   },
+   {
+    "acc": 50000,
+    "accTxt": "$50,000",
+    "eco": -15000,
+    "ecoTxt": "−$15,000",
+    "exp": 40000,
+    "expTxt": "$40,000",
+    "explicit": [
+     {
+      "name": "Hired labor, sprays, fuel and repairs",
+      "txt": "$40,000",
+      "v": 40000
+     }
+    ],
+    "imp": 65000,
+    "impTxt": "$65,000",
+    "implicit": [
+     {
+      "name": "The farmhouse run as a bed-and-breakfast",
+      "txt": "$50,000",
+      "v": 50000
+     },
+     {
+      "name": "The salary the owners could earn elsewhere",
+      "txt": "$15,000",
+      "v": 15000
+     }
+    ],
+    "label": "Case B",
+    "revenue": 90000,
+    "revenueTxt": "$90,000",
+    "verdict": "switch"
+   }
+  ],
+  "id": "E1",
+  "panel": "statement",
+  "title": "Stone Hollow Vineyard"
+ },
+ {
+  "biz": "Stone Hollow Vineyard",
+  "blurb": "The same vineyard again, with two alternatives on the table at once: a company wants to put a data center on the land, and a school has offered the owner a teaching post. The land and the owner’s time are two different resources, and the vineyard is using both.",
+  "cases": [
+   {
+    "acc": 50000,
+    "accTxt": "$50,000",
+    "eco": -10000,
+    "ecoTxt": "−$10,000",
+    "exp": 40000,
+    "expTxt": "$40,000",
+    "explicit": [
+     {
+      "name": "Hired labor, sprays, fuel and repairs",
+      "txt": "$40,000",
+      "v": 40000
+     }
+    ],
+    "imp": 60000,
+    "impTxt": "$60,000",
+    "implicit": [
+     {
+      "name": "The data center the land could host",
+      "txt": "$40,000",
+      "v": 40000
+     },
+     {
+      "name": "The teaching post the owner could take",
+      "txt": "$20,000",
+      "v": 20000
+     }
+    ],
+    "label": "Stone Hollow",
+    "revenue": 90000,
+    "revenueTxt": "$90,000",
+    "verdict": "switch"
+   }
+  ],
+  "id": "E2",
+  "panel": "statement",
+  "reverse": {
+   "fixed": 20000,
+   "fixedTxt": "$20,000",
+   "need": 50000,
+   "needTxt": "$50,000",
+   "solved": 30000,
+   "solvedTxt": "$30,000"
+  },
+  "title": "Stone Hollow Vineyard — the second offer"
+ },
+ {
+  "biz": "Gable Street Food Truck",
+  "blurb": "Priya left a salaried job to run a food truck, and put $60,000 of her own savings into the truck and the fit-out. Her first full year is on the books.",
+  "cases": [
+   {
+    "acc": 52000,
+    "accTxt": "$52,000",
+    "eco": 11000,
+    "ecoTxt": "$11,000",
+    "exp": 96000,
+    "expTxt": "$96,000",
+    "explicit": [
+     {
+      "name": "Truck lease, fuel and permits",
+      "txt": "$34,000",
+      "v": 34000
+     },
+     {
+      "name": "Ingredients and packaging",
+      "txt": "$46,000",
+      "v": 46000
+     },
+     {
+      "name": "Wages for the two staff",
+      "txt": "$16,000",
+      "v": 16000
+     }
+    ],
+    "imp": 41000,
+    "impTxt": "$41,000",
+    "implicit": [
+     {
+      "name": "The salary the owner left behind",
+      "txt": "$38,000",
+      "v": 38000
+     },
+     {
+      "name": "Interest the owner’s $60,000 of savings would earn at 5%",
+      "txt": "$3,000",
+      "v": 3000
+     }
+    ],
+    "label": "Gable Street",
+    "revenue": 148000,
+    "revenueTxt": "$148,000",
+    "verdict": "stay"
+   }
+  ],
+  "id": "E3",
+  "panel": "statement",
+  "title": "Gable Street Food Truck"
+ },
+ {
+  "biz": "Tessellate Tutoring",
+  "blurb": "Dani tutors from a spare room at home rather than taking a post at a school. The spare room could be let out, and the school keeps asking. The first column is the salary at which Dani would be exactly indifferent; the second is what the school has actually offered.",
+  "cases": [
+   {
+    "acc": 63000,
+    "accTxt": "$63,000",
+    "eco": 0,
+    "ecoTxt": "$0",
+    "exp": 21000,
+    "expTxt": "$21,000",
+    "explicit": [
+     {
+      "name": "Room hire, materials and advertising",
+      "txt": "$21,000",
+      "v": 21000
+     }
+    ],
+    "imp": 63000,
+    "impTxt": "$63,000",
+    "implicit": [
+     {
+      "name": "Rent the spare room could fetch",
+      "txt": "$6,000",
+      "v": 6000
+     },
+     {
+      "name": "The school salary the owner turned down",
+      "txt": "$57,000",
+      "v": 57000
+     }
+    ],
+    "label": "The break-even salary",
+    "revenue": 84000,
+    "revenueTxt": "$84,000",
+    "verdict": "tie"
+   },
+   {
+    "acc": 63000,
+    "accTxt": "$63,000",
+    "eco": -5000,
+    "ecoTxt": "−$5,000",
+    "exp": 21000,
+    "expTxt": "$21,000",
+    "explicit": [
+     {
+      "name": "Room hire, materials and advertising",
+      "txt": "$21,000",
+      "v": 21000
+     }
+    ],
+    "imp": 68000,
+    "impTxt": "$68,000",
+    "implicit": [
+     {
+      "name": "Rent the spare room could fetch",
+      "txt": "$6,000",
+      "v": 6000
+     },
+     {
+      "name": "The school salary the owner turned down",
+      "txt": "$62,000",
+      "v": 62000
+     }
+    ],
+    "label": "The school’s actual offer",
+    "revenue": 84000,
+    "revenueTxt": "$84,000",
+    "verdict": "switch"
+   }
+  ],
+  "id": "E4",
+  "panel": "statement",
+  "reverse": {
+   "fixed": 6000,
+   "fixedTxt": "$6,000",
+   "need": 63000,
+   "needTxt": "$63,000",
+   "solved": 57000,
+   "solvedTxt": "$57,000"
+  },
+  "title": "Tessellate Tutoring"
+ },
+ {
+  "biz": "Hammerhead Joinery",
+  "blurb": "No arithmetic in this one. Hammerhead faces the costs below; the only question is which kind each one is. Getting this wrong is the usual reason an economic profit comes out wrong, because a cost put in the wrong column is either counted twice or not at all.",
+  "id": "E5",
+  "items": [
+   {
+    "kind": "explicit",
+    "name": "The rent Hammerhead pays on the workshop"
+   },
+   {
+    "kind": "implicit",
+    "name": "The salary the owner gave up as a site foreman"
+   },
+   {
+    "kind": "explicit",
+    "name": "The wages paid to the apprentice"
+   },
+   {
+    "kind": "implicit",
+    "name": "The interest the owner’s $50,000 of tools money would have earned in the bank"
+   },
+   {
+    "kind": "explicit",
+    "name": "The electricity bill for the saws and the heating"
+   }
+  ],
+  "panel": "classify",
+  "title": "Hammerhead Joinery"
+ },
+ {
+  "biz": "Bellweather Bookbinding",
+  "blurb": "Bellweather’s accountant reports an accounting profit of $44,000 for the year and an economic profit of $51,000. No scenario is needed to see that something is wrong with that pair of figures.",
+  "claim": {
+   "acc": 44000,
+   "accTxt": "$44,000",
+   "eco": 51000,
+   "ecoTxt": "$51,000"
+  },
+  "id": "E6",
+  "panel": "rule",
+  "rule": [
+   "Accounting profit = Revenue − Explicit costs",
+   "Economic profit = Revenue − Explicit costs − Implicit costs",
+   "Implicit costs ≥ 0, always",
+   "So Economic profit ≤ Accounting profit, always"
+  ],
+  "title": "Bellweather Bookbinding"
+ },
+ {
+  "biz": "Mossback Orchard",
+  "blurb": "Mossback’s owner could lease the land to the grower next door, or take a salaried job managing someone else’s orchard. The owner does neither, and works the land.",
+  "cases": [
+   {
+    "acc": 48000,
+    "accTxt": "$48,000",
+    "eco": 0,
+    "ecoTxt": "$0",
+    "exp": 112000,
+    "expTxt": "$112,000",
+    "explicit": [
+     {
+      "name": "Pickers, sprays, fuel and packing",
+      "txt": "$112,000",
+      "v": 112000
+     }
+    ],
+    "imp": 48000,
+    "impTxt": "$48,000",
+    "implicit": [
+     {
+      "name": "The lease a neighboring grower would pay for the land",
+      "txt": "$30,000",
+      "v": 30000
+     },
+     {
+      "name": "The salary the owner could earn managing another orchard",
+      "txt": "$18,000",
+      "v": 18000
+     }
+    ],
+    "label": "Mossback",
+    "revenue": 160000,
+    "revenueTxt": "$160,000",
+    "verdict": "tie"
+   }
+  ],
+  "id": "E7",
+  "panel": "statement",
+  "title": "Mossback Orchard"
+ },
+ {
+  "biz": "Quill & Ledger Bookkeeping",
+  "blurb": "An edge case, set up to isolate one point. Suppose the owner has no other offer of work, no money of their own in the business, and rents the office rather than owning it — so there is no resource of theirs tied up in it with a forgone use.",
+  "cases": [
+   {
+    "acc": 25000,
+    "accTxt": "$25,000",
+    "eco": 25000,
+    "ecoTxt": "$25,000",
+    "exp": 47000,
+    "expTxt": "$47,000",
+    "explicit": [
+     {
+      "name": "Office rent, software and insurance",
+      "txt": "$47,000",
+      "v": 47000
+     }
+    ],
+    "imp": 0,
+    "impTxt": "$0",
+    "implicit": [],
+    "label": "Quill & Ledger",
+    "revenue": 72000,
+    "revenueTxt": "$72,000",
+    "verdict": "stay"
+   }
+  ],
+  "id": "E8",
+  "panel": "statement",
+  "title": "Quill & Ledger Bookkeeping"
+ }
+];
+const STEPS = {
+ "E1": [
+  {
+   "correct": 0,
+   "explain": "Accounting profit is revenue minus the costs actually paid out: $90,000 − $40,000 = $50,000. That is the figure the books show and the figure the tax return is built on. It has not yet taken any account of what the owners gave up to be here.",
+   "note": "Panel: accounting profit filled in, Case A.",
+   "options": [
+    "$50,000",
+    "$130,000",
+    "$15,000",
+    "$55,000"
+   ],
+   "prompt": "Case A takes $90,000 in revenue and pays out $40,000 in bills. What is its accounting profit?",
+   "view": {
+    "fill": [
+     "acc0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Both of them count, and they add: $20,000 + $15,000 = $35,000. An implicit cost is the value of the best thing a resource you already own could be doing instead. No money changes hands, which is exactly why they are easy to leave out — and leaving them out is the mistake the whole topic exists to prevent.",
+   "note": "Panel: implicit costs totaled, Case A.",
+   "options": [
+    "$35,000",
+    "$20,000",
+    "$15,000",
+    "$0"
+   ],
+   "prompt": "Nothing has been paid out for either of these, but the farmhouse could be run as a bed-and-breakfast worth $20,000 a year, and the owners could earn $15,000 working elsewhere. What do Case A’s implicit costs come to?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Economic profit takes implicit costs off as well: $50,000 − $35,000 = $15,000. Another way to the same place is revenue minus everything, paid or forgone: $90,000 − $40,000 − $35,000 = $15,000.",
+   "note": "Panel: economic profit filled in, Case A.",
+   "options": [
+    "$15,000",
+    "$50,000",
+    "$55,000",
+    "$85,000"
+   ],
+   "prompt": "So what is Case A’s economic profit?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "A positive economic profit means the vineyard is worth more to them than the best alternative they gave up for it — $15,000 a year more, after charging themselves for the farmhouse and for their own time. Stay.",
+   "note": "Panel: the decision shown, Case A.",
+   "options": [
+    "Stay with the business — it beats the best alternative",
+    "Switch to the alternative — it is worth more",
+    "Neither is better — the two are worth exactly the same"
+   ],
+   "prompt": "Economic profit in Case A is $15,000. What should the owners do?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0",
+     "ver0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "The same $50,000, because nothing in the books has changed. Hold on to that: the two cases have identical revenue, identical bills and identical accounting profit.",
+   "note": "Panel: accounting profit filled in, Case B.",
+   "options": [
+    "$50,000",
+    "−$15,000",
+    "$25,000",
+    "$130,000"
+   ],
+   "prompt": "Case B is the same vineyard in a different year. Revenue is still $90,000 and the bills are still $40,000. What is Case B’s accounting profit?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0",
+     "ver0",
+     "acc1"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Implicit costs are now $50,000 + $15,000 = $65,000, so economic profit is $50,000 − $65,000 = −$15,000. The vineyard is earning $15,000 less than the land and the owners’ time could earn elsewhere.",
+   "note": "Panel: implicit costs totaled, Case B, economic profit filled in, Case B.",
+   "options": [
+    "−$15,000",
+    "$50,000",
+    "$15,000",
+    "$0"
+   ],
+   "prompt": "What has changed is outside the business: a tourism boom means the farmhouse would now make $50,000 as a bed-and-breakfast, with the same $15,000 salary forgone as before. What is Case B’s economic profit?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0",
+     "ver0",
+     "acc1",
+     "imp1",
+     "eco1"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "A negative economic profit means the alternative is worth more than what they are doing — by $15,000 a year here. Switch: close the vineyard and run the bed-and-breakfast. And notice what they would be walking away from: a business still making $50,000 on the books. A perfectly profitable business they should nonetheless get out of is a sentence that only makes sense once you have economic profit.",
+   "note": "Panel: the decision shown, Case B.",
+   "options": [
+    "Switch to the alternative — it is worth more",
+    "Stay with the business — it beats the best alternative",
+    "Neither is better — the two are worth exactly the same"
+   ],
+   "prompt": "And in Case B, what should the owners do?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0",
+     "ver0",
+     "acc1",
+     "imp1",
+     "eco1",
+     "ver1"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "This is the whole module in one table. Revenue $90,000, bills $40,000, accounting profit $50,000 — identical in both columns. An accountant comparing the two years would see no difference at all. Yet the right decision flips from stay to switch, because the opportunity cost of the land changed: the same farmhouse that was worth $20,000 as a bed-and-breakfast is now worth $50,000. Nothing about growing grapes changed. Accounting profit cannot see that, and economic profit can — which is why the decision is made on economic profit and never on the books alone.",
+   "note": "Panel: both columns complete, side by side.",
+   "options": [
+    "The books are identical and the right decision is opposite",
+    "The books are different and the right decision is opposite",
+    "The books are identical and the right decision is the same",
+    "The books are different and the right decision is the same"
+   ],
+   "prompt": "Look at the two columns side by side. What is the difference between them?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0",
+     "ver0",
+     "acc1",
+     "imp1",
+     "eco1",
+     "ver1"
+    ],
+    "punch": true
+   }
+  }
+ ],
+ "E2": [
+  {
+   "correct": 0,
+   "explain": "$90,000 − $40,000 = $50,000. Exactly as before: the books only know about money that moved, and neither the data center nor the teaching post has moved any. Both offers are invisible to this figure, which is the whole reason it is the wrong figure to decide on.",
+   "note": "Panel: accounting profit filled in.",
+   "options": [
+    "$50,000",
+    "$130,000",
+    "−$10,000",
+    "$30,000"
+   ],
+   "prompt": "Stone Hollow takes $90,000 and pays $40,000 in bills. What is the accounting profit?",
+   "view": {
+    "fill": [
+     "acc0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Both, added: $40,000 + $20,000 = $60,000. It is tempting to pick whichever alternative is bigger, as though the owner had to choose between them. They are not alternatives to each other — they are forgone uses of two DIFFERENT resources the vineyard is using at the same time: the land, and the owner’s hours. Running the vineyard costs both.",
+   "note": "Panel: implicit costs totaled.",
+   "options": [
+    "$60,000",
+    "$40,000",
+    "$20,000",
+    "$50,000"
+   ],
+   "prompt": "The land could host a data center earning $40,000, and the owner could take a teaching post paying $20,000. What do the implicit costs come to?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "$50,000 − $60,000 = −$10,000. Note how much the two near misses matter: counting only the data center leaves $10,000 and counting only the teaching post leaves $30,000, and both of those are positive. Drop either implicit cost and the decision comes out backwards.",
+   "note": "Panel: economic profit filled in.",
+   "options": [
+    "−$10,000",
+    "$50,000",
+    "$10,000",
+    "$30,000"
+   ],
+   "prompt": "So what is the economic profit?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Economic profit is −$10,000, so the resources are worth more elsewhere: let the data center have the land. The teaching post is a separate decision about the owner’s own hours, and worth weighing on its own terms once the land is no longer tying them to the vineyard.",
+   "note": "Panel: the decision shown.",
+   "options": [
+    "Switch to the alternative — it is worth more",
+    "Stay with the business — it beats the best alternative",
+    "Neither is better — the two are worth exactly the same"
+   ],
+   "prompt": "What should the owner do?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0",
+     "ver0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Being on the fence means economic profit of exactly zero, which means implicit costs exactly equal to accounting profit: $50,000. The teaching post supplies $20,000 of that, so the data center would have to supply $50,000 − $20,000 = $30,000. Check it: $90,000 − $40,000 − $50,000 = $0.",
+   "note": "Panel: the break-even note added.",
+   "options": [
+    "$30,000",
+    "$50,000",
+    "$40,000",
+    "$70,000"
+   ],
+   "prompt": "Now run it backwards. Keep the teaching post at $20,000. At what data-center profit would Stone Hollow be exactly on the fence?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0",
+     "ver0",
+     "be"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Below $30,000 the implicit costs come to less than the $50,000 of accounting profit, so economic profit is positive and the vineyard is the better use. Above $30,000 it is the other way round. The break-even figure is the hinge the decision turns on, which is why it is worth being able to solve for it rather than only testing one offer at a time.",
+   "note": "Panel: the completed statement stays on screen.",
+   "options": [
+    "Keep the vineyard — economic profit would be positive",
+    "Take the offer — economic profit would be positive",
+    "Keep the vineyard — economic profit would be negative",
+    "Take the offer — economic profit would be negative"
+   ],
+   "prompt": "A different company offers to pay for the land for a data center earning less than $30,000. What follows?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0",
+     "ver0",
+     "be"
+    ]
+   }
+  }
+ ],
+ "E3": [
+  {
+   "correct": 0,
+   "explain": "The truck lease, the ingredients and the wages: $34,000 + $46,000 + $16,000 = $96,000. All three are money that left the business and can be pointed at on a bank statement. The salary Priya gave up and the interest her savings are not earning are costs too, but they are not these costs, and they do not belong on this line.",
+   "note": "Panel: explicit costs totaled.",
+   "options": [
+    "$96,000",
+    "$137,000",
+    "$80,000",
+    "$134,000"
+   ],
+   "prompt": "Add up what Gable Street actually paid out over the year. What are its explicit costs?",
+   "view": {
+    "fill": [
+     "exp0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "$148,000 − $96,000 = $52,000. This is the figure Priya would quote if someone asked how the first year went, and the figure her tax return is built on. It is a real and useful number — it just is not the one that answers whether she was right to leave her job.",
+   "note": "Panel: accounting profit filled in.",
+   "options": [
+    "$52,000",
+    "$11,000",
+    "$107,000",
+    "$244,000"
+   ],
+   "prompt": "So what is the accounting profit?",
+   "view": {
+    "fill": [
+     "exp0",
+     "acc0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "$38,000 of forgone salary and $60,000 × 5% = $3,000 of forgone interest, so $41,000 in all. The savings are the part people forget: money sunk into a truck is money not earning anything anywhere else, and that is a real cost of running the truck even though no one ever writes a check for it.",
+   "note": "Panel: implicit costs totaled.",
+   "options": [
+    "$41,000",
+    "$38,000",
+    "$3,000",
+    "$137,000"
+   ],
+   "prompt": "Two things Priya gave up are not in those bills: the salary she left, $38,000, and the interest her $60,000 of savings would have earned at 5% in the bank. What do the implicit costs come to?",
+   "view": {
+    "fill": [
+     "exp0",
+     "acc0",
+     "imp0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "$52,000 − $41,000 = $11,000. The accounting profit was $52,000 and the economic profit is $11,000: the gap between them is precisely the $41,000 of salary and interest Priya is giving up to be here, which the books never mention.",
+   "note": "Panel: economic profit filled in.",
+   "options": [
+    "$11,000",
+    "$52,000",
+    "$14,000",
+    "$93,000"
+   ],
+   "prompt": "What is the economic profit?",
+   "view": {
+    "fill": [
+     "exp0",
+     "acc0",
+     "imp0",
+     "eco0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Economic profit is $11,000, so the truck is beating the salaried job AND the bank by $11,000 a year. Note what that figure already includes: she has charged herself for the salary she gave up and for the interest she is not earning. Stay.",
+   "note": "Panel: the decision shown.",
+   "options": [
+    "Stay with the business — it beats the best alternative",
+    "Switch to the alternative — it is worth more",
+    "Neither is better — the two are worth exactly the same"
+   ],
+   "prompt": "What should Priya do?",
+   "view": {
+    "fill": [
+     "exp0",
+     "acc0",
+     "imp0",
+     "eco0",
+     "ver0"
+    ]
+   }
+  }
+ ],
+ "E4": [
+  {
+   "correct": 0,
+   "explain": "$84,000 − $21,000 = $63,000, and that figure does not depend on what the school is offering — it is the same whatever Dani turned down. That is worth noticing before the next step: the accounting profit is fixed here, so everything that follows turns on the implicit side alone.",
+   "note": "Panel: accounting profit filled in, The break-even salary, accounting profit filled in, The school’s actual offer.",
+   "options": [
+    "$63,000",
+    "$105,000",
+    "−$5,000",
+    "$78,000"
+   ],
+   "prompt": "Dani takes $84,000 in fees and pays $21,000 for room hire, materials and advertising. What is the accounting profit?",
+   "view": {
+    "fill": [
+     "acc0",
+     "acc1"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Indifferent means economic profit of exactly zero, and economic profit is accounting profit minus implicit costs. Zero means the implicit costs have eaten the accounting profit exactly: $63,000. Not zero implicit costs — that would leave the whole $63,000 on the table.",
+   "note": "Panel: implicit costs totaled, The break-even salary.",
+   "options": [
+    "$63,000",
+    "$0",
+    "$84,000",
+    "$57,000"
+   ],
+   "prompt": "For Dani to be exactly indifferent between tutoring and the school post, what would the implicit costs have to total?",
+   "view": {
+    "fill": [
+     "acc0",
+     "acc1",
+     "imp0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "The room supplies $6,000 of the $63,000 needed, so the salary supplies the rest: $63,000 − $6,000 = $57,000. Check it against the first column: $84,000 − $21,000 − ($6,000 + $57,000) = $0.",
+   "note": "Panel: economic profit filled in, The break-even salary, the decision shown, The break-even salary, the break-even note added.",
+   "options": [
+    "$57,000",
+    "$63,000",
+    "$69,000",
+    "$62,000"
+   ],
+   "prompt": "The spare room would let for $6,000. So what school salary would leave Dani exactly indifferent?",
+   "view": {
+    "fill": [
+     "acc0",
+     "acc1",
+     "imp0",
+     "eco0",
+     "ver0",
+     "be"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Implicit costs become $6,000 + $62,000 = $68,000, so economic profit is $63,000 − $68,000 = −$5,000. The offer is $5,000 above the break-even salary, and the economic loss is exactly that $5,000.",
+   "note": "Panel: implicit costs totaled, The school’s actual offer, economic profit filled in, The school’s actual offer.",
+   "options": [
+    "−$5,000",
+    "$0",
+    "$63,000",
+    "$1,000"
+   ],
+   "prompt": "The school actually offers $62,000. What is Dani’s economic profit then?",
+   "view": {
+    "fill": [
+     "acc0",
+     "acc1",
+     "imp0",
+     "eco0",
+     "ver0",
+     "be",
+     "imp1",
+     "eco1"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Take the post. The tutoring business is still showing an accounting profit of $63,000 — it is not failing in any ordinary sense — but it is $5,000 a year short of what the same room and the same hours would earn the other way.",
+   "note": "Panel: the decision shown, The school’s actual offer.",
+   "options": [
+    "Switch to the alternative — it is worth more",
+    "Stay with the business — it beats the best alternative",
+    "Neither is better — the two are worth exactly the same"
+   ],
+   "prompt": "So what should Dani do about the school’s actual offer?",
+   "view": {
+    "fill": [
+     "acc0",
+     "acc1",
+     "imp0",
+     "eco0",
+     "ver0",
+     "be",
+     "imp1",
+     "eco1",
+     "ver1"
+    ]
+   }
+  }
+ ],
+ "E5": [
+  {
+   "correct": 0,
+   "explain": "Rent is written in a check every month, so it is money out of the business: explicit. The test to apply to every item on this list is the same one — did somebody outside the business receive a payment? Here they did. Explicit costs are subtracted in BOTH profit figures.",
+   "note": "Panel: “The rent Hammerhead pays on the workshop” classified.",
+   "options": [
+    "An explicit cost — money the business actually pays out",
+    "An implicit cost — the value of a use the owner gave up"
+   ],
+   "prompt": "The rent Hammerhead pays on the workshop. Explicit or implicit?",
+   "view": {
+    "fill": [
+     "c0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "No one pays the owner this and no one invoices for it, but the hours spent in the workshop are hours not spent earning a foreman’s salary. The forgone salary is a real cost of running the joinery: implicit.",
+   "note": "Panel: “The salary the owner gave up as a site foreman” classified.",
+   "options": [
+    "An implicit cost — the value of a use the owner gave up",
+    "An explicit cost — money the business actually pays out"
+   ],
+   "prompt": "The salary the owner gave up as a site foreman. Explicit or implicit?",
+   "view": {
+    "fill": [
+     "c0",
+     "c1"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Wages leave the business the same way rent does: somebody outside it was paid, so it is explicit, and it is subtracted in both profit figures. The owner’s own forgone salary in the previous item looked similar and was not, because nobody paid it to anybody.",
+   "note": "Panel: “The wages paid to the apprentice” classified.",
+   "options": [
+    "An explicit cost — money the business actually pays out",
+    "An implicit cost — the value of a use the owner gave up"
+   ],
+   "prompt": "The wages paid to the apprentice. Explicit or implicit?",
+   "view": {
+    "fill": [
+     "c0",
+     "c1",
+     "c2"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "The money is the owner’s own, so nothing is paid to anyone — but money sitting in tools is money not sitting in a bank earning interest. That forgone interest is implicit. Note that the tools themselves were an explicit cost when they were bought; what is implicit is the return the money would otherwise have made.",
+   "note": "Panel: “The interest the owner’s $50,000 of tools money would have earned in the bank” classified.",
+   "options": [
+    "An implicit cost — the value of a use the owner gave up",
+    "An explicit cost — money the business actually pays out"
+   ],
+   "prompt": "The interest the owner’s $50,000 of tools money would have earned in the bank. Explicit or implicit?",
+   "view": {
+    "fill": [
+     "c0",
+     "c1",
+     "c2",
+     "c3"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "A utility bill is as explicit as a cost gets: a meter, an invoice, a payment to the utility. Three of the five items here are explicit and two are implicit, and the split has nothing to do with how large they are or how obviously they feel like costs — only with whether money left the business.",
+   "note": "Panel: “The electricity bill for the saws and the heating” classified.",
+   "options": [
+    "An explicit cost — money the business actually pays out",
+    "An implicit cost — the value of a use the owner gave up"
+   ],
+   "prompt": "The electricity bill for the saws and the heating. Explicit or implicit?",
+   "view": {
+    "fill": [
+     "c0",
+     "c1",
+     "c2",
+     "c3",
+     "c4"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Accounting profit subtracts the explicit costs only, so the rent, the wages and the electricity. Economic profit subtracts those three AND the two forgone uses. That is the entire difference between the two figures, and it is why a cost filed in the wrong column puts the economic profit out by that amount in one direction or the other.",
+   "note": "Panel: the summary line added.",
+   "options": [
+    "Only the three that are paid out — rent, wages and electricity",
+    "Only the two that are not paid out — the salary and the interest",
+    "All five, which is what makes it the complete figure",
+    "None of them — accounting profit is revenue before any costs"
+   ],
+   "prompt": "Which of the five does Hammerhead’s ACCOUNTING profit subtract?",
+   "view": {
+    "fill": [
+     "c0",
+     "c1",
+     "c2",
+     "c3",
+     "c4",
+     "sum"
+    ]
+   }
+  }
+ ],
+ "E6": [
+  {
+   "correct": 0,
+   "explain": "Economic profit starts from accounting profit and takes MORE away. There is no arrangement of a business in which taking more away leaves you with more, so a reported economic profit above the accounting profit is an arithmetic error somewhere, not an unusual business.",
+   "note": "Panel: lines 1 and 2 of the rule added.",
+   "options": [
+    "Something is wrong: economic profit can never be above accounting profit",
+    "Nothing is wrong: this happens when implicit costs are unusually low",
+    "Nothing is wrong: this happens when the business owns most of its resources",
+    "Something is wrong: accounting profit can never be above economic profit"
+   ],
+   "prompt": "The report puts accounting profit at $44,000 and economic profit at $51,000. What should you conclude?",
+   "view": {
+    "fill": [
+     "r0",
+     "r1"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "An implicit cost is the value of a forgone alternative, and an alternative cannot be worth less than nothing — at worst it is worth nothing and you give up nothing by passing it up. So implicit costs are zero or more, and economic profit is accounting profit minus something that is zero or more.",
+   "note": "Panel: lines 3 and 4 of the rule added.",
+   "options": [
+    "Implicit costs are never negative, so subtracting them cannot raise the figure",
+    "Implicit costs are never positive, so subtracting them cannot raise the figure",
+    "Explicit costs are never negative, so subtracting them cannot raise the figure",
+    "Revenue is never negative, so subtracting costs cannot raise the figure"
+   ],
+   "prompt": "Why can it never go the other way?",
+   "view": {
+    "fill": [
+     "r0",
+     "r1",
+     "r2",
+     "r3"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Equality is the one case the inequality allows: subtract nothing and the figure does not move. That happens when the owner has tied up nothing of their own with a forgone use. It is rare in practice — almost every owner is at least giving up their own time — but it is the limiting case, and it is what makes the rule an inequality rather than a strict one.",
+   "note": "Panel: the whole rule stays on screen, beside the two reported figures.",
+   "options": [
+    "When implicit costs are exactly zero",
+    "When explicit costs are exactly zero",
+    "When economic profit is exactly zero",
+    "When accounting profit is exactly zero"
+   ],
+   "prompt": "When are the two figures equal?",
+   "view": {
+    "fill": [
+     "r0",
+     "r1",
+     "r2",
+     "r3"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Nothing caps implicit costs below accounting profit. A business making $44,000 on the books whose owner turned down $54,000 elsewhere has a negative economic profit, and that is not a strange case — it is the whole of Case B in the vineyard problem. Size of the accounting profit tells you nothing on its own; what matters is how it compares with what the same resources could earn elsewhere.",
+   "note": "Panel: the whole rule stays on screen, beside the two reported figures.",
+   "options": [
+    "False — implicit costs can exceed any accounting profit, however large",
+    "True — a large accounting profit leaves room for any implicit costs",
+    "False — accounting profit does not subtract explicit costs",
+    "True — implicit costs are small compared with explicit ones"
+   ],
+   "prompt": "True or false: a business with a large accounting profit must have a positive economic profit.",
+   "view": {
+    "fill": [
+     "r0",
+     "r1",
+     "r2",
+     "r3"
+    ]
+   }
+  }
+ ],
+ "E7": [
+  {
+   "correct": 0,
+   "explain": "$160,000 − $112,000 = $48,000. On the books that is a good year, and an accountant looking only at this line would tell the owner to carry on. Hold the figure in mind while you work out what the owner is giving up for it.",
+   "note": "Panel: accounting profit filled in.",
+   "options": [
+    "$48,000",
+    "$272,000",
+    "$112,000",
+    "$64,000"
+   ],
+   "prompt": "Mossback takes $160,000 and pays $112,000 to run the orchard. What is the accounting profit?",
+   "view": {
+    "fill": [
+     "acc0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "$30,000 + $18,000 = $48,000. Now look at that total against the accounting profit you just worked out: the two are the same figure. That is not a coincidence in this problem — it is what the problem was built to show, and the next step names it.",
+   "note": "Panel: implicit costs totaled.",
+   "options": [
+    "$48,000",
+    "$30,000",
+    "$18,000",
+    "$160,000"
+   ],
+   "prompt": "The land would lease for $30,000 and the owner could earn $18,000 managing elsewhere. What do the implicit costs come to?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "$48,000 − $48,000 = $0, exactly. The implicit costs have eaten the accounting profit to the dollar, so the orchard is earning its owner precisely what the land and the owner’s hours would earn in their next-best use — no more and no less.",
+   "note": "Panel: economic profit filled in.",
+   "options": [
+    "$0",
+    "$48,000",
+    "−$48,000",
+    "$96,000"
+   ],
+   "prompt": "So what is the economic profit?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Normal profit is the accounting profit that exactly covers the implicit costs — here $48,000 of accounting profit against $48,000 of forgone alternatives. It is not a loss and it is not nothing: the owner is earning precisely what the land and the owner’s time would earn in their next-best use. Zero economic profit sounds alarming and is not.",
+   "note": "Panel: the normal-profit note added.",
+   "options": [
+    "Normal profit",
+    "Zero accounting profit",
+    "The break-even quantity",
+    "Negative economic profit"
+   ],
+   "prompt": "An economic profit of exactly zero has a name. What is it?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0",
+     "normal"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Nothing in the figures favors either course: the orchard and the alternatives are worth exactly the same. In a competitive industry this is where entry and exit push everyone in the long run, which is why zero economic profit is the resting point of the long-run model rather than a sign of trouble.",
+   "note": "Panel: the decision shown.",
+   "options": [
+    "Neither is better — the two are worth exactly the same",
+    "Stay with the business — it beats the best alternative",
+    "Switch to the alternative — it is worth more"
+   ],
+   "prompt": "So what should Mossback’s owner do?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0",
+     "normal",
+     "ver0"
+    ]
+   }
+  }
+ ],
+ "E8": [
+  {
+   "correct": 0,
+   "explain": "$72,000 − $47,000 = $25,000. Nothing unusual so far — the accounting profit is worked out the same way whatever the implicit costs turn out to be, because it does not look at them.",
+   "note": "Panel: accounting profit filled in.",
+   "options": [
+    "$25,000",
+    "$119,000",
+    "$72,000",
+    "$47,000"
+   ],
+   "prompt": "Quill & Ledger bills $72,000 and pays $47,000 in rent, software and insurance. What is the accounting profit?",
+   "view": {
+    "fill": [
+     "acc0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Nothing. The office is rented rather than owned, no money of the owner’s is tied up in the business, and there is no other offer of work on the table. With no resource of their own committed to it, there is no forgone use to charge for. This is a deliberately artificial case — almost every real owner is at least giving up their own time somewhere else.",
+   "note": "Panel: implicit costs totaled.",
+   "options": [
+    "$0",
+    "$25,000",
+    "$47,000",
+    "$72,000"
+   ],
+   "prompt": "By the terms of this one, what do the implicit costs come to?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "$25,000 − $0 = $25,000. Subtract nothing and the figure does not move, so economic profit and accounting profit are the same $25,000. In every other problem in this set the two figures differ, and they differ by exactly the implicit costs; here there are none, so they coincide.",
+   "note": "Panel: economic profit filled in.",
+   "options": [
+    "$25,000",
+    "$0",
+    "$72,000",
+    "−$25,000"
+   ],
+   "prompt": "So what is the economic profit?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "Carry on. With no forgone use to charge for, the $25,000 on the books really is $25,000 better than the next-best thing the owner could do with what they are putting in — because the next-best thing is worth nothing to them. That is what makes this case artificial, and also what makes it a clean test of the arithmetic.",
+   "note": "Panel: the decision shown.",
+   "options": [
+    "Stay with the business — it beats the best alternative",
+    "Switch to the alternative — it is worth more",
+    "Neither is better — the two are worth exactly the same"
+   ],
+   "prompt": "And what should the owner do?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0",
+     "ver0"
+    ]
+   }
+  },
+  {
+   "correct": 0,
+   "explain": "It is not a counter-example; it is the boundary. The rule says economic profit is less than OR EQUAL TO accounting profit, and this is the case the \"or equal to\" is there for. Every other case has something forgone, and every one of those sits strictly below.",
+   "note": "Panel: the note on the equal case added.",
+   "options": [
+    "It is the one case where they are equal, which is why the rule allows equality",
+    "It is a counter-example, which is why the rule holds only most of the time",
+    "It is the one case where they are equal, which is why the rule rules equality out",
+    "It is a counter-example, which is why the rule is about explicit costs instead"
+   ],
+   "prompt": "What does this case show about the rule that economic profit is never above accounting profit?",
+   "view": {
+    "fill": [
+     "acc0",
+     "imp0",
+     "eco0",
+     "ver0",
+     "edge"
+    ]
+   }
+  }
+ ]
+};
+
+const BANDS = [
+  { min: 90, label: 'Mastered', tone: 'good',
+    note: 'Secure. You can sort explicit costs from implicit ones, get both profit figures out of a set of books, solve one backwards for a break-even, and say which figure the decision turns on.' },
+  { min: 80, label: 'Strong', tone: 'good',
+    note: 'Good command of the chain. Look at the problems below where you dropped marks, then run it again.' },
+  { min: 70, label: 'Developing', tone: 'mid',
+    note: 'The arithmetic is mostly there, but something in the classification or the decision rule is not following from it yet. The breakdown below shows which.' },
+  { min: 55, label: 'Shaky', tone: 'poor',
+    note: 'Enough of this is unsettled to cost you marks. Go back to what an implicit cost IS — the value of a use the owner gave up — before drilling again.' },
+  { min: 0, label: 'Needs Review', tone: 'poor',
+    note: 'Start with the vineyard problem, where the same books lead to opposite decisions. More practice without review will not close a gap this size.' },
+];
+
+/* ======================================================================
+   The panel: a small financial statement that fills in as the work is done
+   ====================================================================== */
+function money(v){
+  const s = String(Math.abs(Math.round(v))).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return (v < 0 ? '\u2212$' : '$') + s;
+}
+function cls(v){ return v > 0 ? 'pos' : v < 0 ? 'neg' : 'zero'; }
+
+function cell(shown, text, extra){
+  return shown ? `<td class="${extra || ''}">${text}</td>`
+               : `<td class="blank">\u2014</td>`;
+}
+
+const DECISION = { stay: 'Stay', switch: 'Switch', tie: 'Indifferent' };
+
+function drawStatement(prob, fill){
+  const cs = prob.cases, two = cs.length > 1;
+  const has = k => fill.indexOf(k) >= 0;
+  const head = `<tr><th class="corner">${prob.unitLabel || 'For the year'}</th>`
+    + cs.map(c => `<th>${two ? c.label : 'Amount'}</th>`).join('') + '</tr>';
+  const rows = [];
+  const row = (label, cells, klass) =>
+    rows.push(`<tr class="${klass || ''}"><td class="${klass === 'headline' || klass === 'total'
+      ? 'row-label' : 'line-label'}">${label}</td>${cells.join('')}</tr>`);
+
+  row('Revenue', cs.map(c => `<td>${c.revenueTxt}</td>`), 'total');
+  cs[0].explicit.forEach((ln, i) =>
+    row(ln.name, cs.map(c => `<td>${c.explicit[i].txt}</td>`)));
+  if(cs[0].explicit.length > 1)
+    row('Explicit costs', cs.map((c, i) => cell(has('exp' + i), c.expTxt)), 'total');
+  row('Accounting profit', cs.map((c, i) => cell(has('acc' + i), c.accTxt, cls(c.acc))), 'headline');
+
+  if(cs[0].implicit.length){
+    cs[0].implicit.forEach((ln, i) =>
+      row(ln.name, cs.map(c => `<td>${c.implicit[i].txt}</td>`)));
+    row('Implicit costs', cs.map((c, i) => cell(has('imp' + i), c.impTxt)), 'total');
+  } else {
+    row('Implicit costs', cs.map((c, i) => cell(has('imp' + i), c.impTxt)), 'total');
+  }
+  row('Economic profit', cs.map((c, i) => cell(has('eco' + i), c.ecoTxt, cls(c.eco))), 'headline');
+  row('Decision', cs.map((c, i) => cell(has('ver' + i), DECISION[c.verdict])), 'headline');
+
+  if(has('be') && prob.reverse)
+    rows.push(`<tr class="note"><td colspan="${cs.length + 1}">Break-even: implicit costs would `
+      + `have to total ${prob.reverse.needTxt}. With ${prob.reverse.fixedTxt} already accounted `
+      + `for, the other alternative would have to be worth ${prob.reverse.solvedTxt}.</td></tr>`);
+  if(has('normal'))
+    rows.push(`<tr class="note"><td colspan="${cs.length + 1}">Economic profit of exactly zero is `
+      + `<b>normal profit</b>: the accounting profit exactly covers the implicit costs.</td></tr>`);
+  if(has('edge'))
+    rows.push(`<tr class="note"><td colspan="${cs.length + 1}">With no implicit costs, the two `
+      + `profit figures coincide \u2014 the one case the "less than or equal to" allows.</td></tr>`);
+
+  return `<table class="data-table"><thead>${head}</thead><tbody>${rows.join('')}</tbody></table>`;
+}
+
+function drawClassify(prob, fill){
+  const has = k => fill.indexOf(k) >= 0;
+  const rows = prob.items.map((it, i) => {
+    const shown = has('c' + i);
+    const k = it.kind === 'explicit' ? 'Explicit' : 'Implicit';
+    return `<tr><td class="line-label">${it.name}</td>`
+      + (shown ? `<td class="kind-${it.kind[0]}">${k}</td>` : '<td class="blank">\u2014</td>')
+      + '</tr>';
+  });
+  if(has('sum')){
+    const e = prob.items.filter(x => x.kind === 'explicit').length;
+    rows.push(`<tr class="note"><td colspan="2">Accounting profit subtracts the ${e} explicit `
+      + `costs. Economic profit subtracts those ${e} <b>and</b> the `
+      + `${prob.items.length - e} implicit ones.</td></tr>`);
+  }
+  return '<table class="data-table"><thead><tr><th class="corner">Cost</th><th>Which kind?</th>'
+    + `</tr></thead><tbody>${rows.join('')}</tbody></table>`;
+}
+
+function drawRule(prob, fill){
+  const has = k => fill.indexOf(k) >= 0;
+  const rows = [
+    `<tr class="headline"><td class="row-label">Accounting profit, as reported</td>`
+      + `<td>${prob.claim.accTxt}</td></tr>`,
+    `<tr class="headline"><td class="row-label">Economic profit, as reported</td>`
+      + `<td class="neg">${prob.claim.ecoTxt}</td></tr>`,
+  ];
+  prob.rule.forEach((line, i) => {
+    rows.push(`<tr><td class="line-label${has('r' + i) ? '' : ' blank'}" colspan="2">`
+      + (has('r' + i) ? line : '\u2014') + '</td></tr>');
+  });
+  return '<table class="data-table"><thead><tr><th class="corner">' + prob.biz
+    + '\u2019s figures</th><th>Amount</th></tr></thead><tbody>'
+    + rows.join('') + '</tbody></table>';
+}
+
+function drawPanel(prob, view){
+  const fill = (view && view.fill) || [];
+  const wrap = document.getElementById('tableWrap');
+  const title = document.getElementById('panelTitle');
+  if(prob.panel === 'classify'){
+    title.textContent = 'Which kind of cost?';
+    wrap.innerHTML = drawClassify(prob, fill);
+  } else if(prob.panel === 'rule'){
+    title.textContent = 'The reported figures, and the rule';
+    wrap.innerHTML = drawRule(prob, fill);
+  } else {
+    title.textContent = prob.cases.length > 1 ? 'The two sets of books' : 'The books';
+    wrap.innerHTML = drawStatement(prob, fill);
+  }
+}
+
+/* ======================================================================
+   The step-through
+   ====================================================================== */
+let order = [], pIndex = 0, sIndex = 0, answered = false, optionOrder = [];
+let score = { correct: 0, total: 0 }, perProblem = {};
+
+function shuffledIndices(n){
+  const a = [...Array(n).keys()];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function currentProblem(){ return PROBLEMS[order[pIndex]]; }
+function currentSteps(){ return STEPS[currentProblem().id]; }
+function currentStep(){ return currentSteps()[sIndex]; }
+
+/* What the panel showed at the END of the previous step is what it shows
+   while this one is being answered -- so a step never displays its own answer. */
+function priorView(){
+  const p = currentProblem(), steps = currentSteps();
+  const start = p.initial || {};
+  if(sIndex === 0 || p.freshPanel) return start;
+  return steps[sIndex - 1].view || {};
+}
+
+function init(){
+  order = shuffledIndices(PROBLEMS.length);
+  pIndex = 0; sIndex = 0;
+  score = { correct: 0, total: 0 };
+  perProblem = {};
+  PROBLEMS.forEach(p => perProblem[p.id] = { correct: 0, total: 0 });
+  document.getElementById('mainArea').style.display = '';
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+  loadProblem();
+}
+
+function loadProblem(){
+  const p = currentProblem();
+  document.getElementById('bizName').textContent = p.biz;
+  document.getElementById('blurbText').textContent = p.blurb;
+  sIndex = 0;
+  loadStep();
+}
+
+function loadStep(){
+  answered = false;
+  const p = currentProblem(), st = currentStep();
+  document.getElementById('problemCount').textContent =
+    `Problem ${pIndex + 1} of ${order.length}`;
+  document.getElementById('stepCount').textContent =
+    `Step ${sIndex + 1} of ${currentSteps().length}`;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('promptText').textContent = st.prompt;
+  document.getElementById('feedback').classList.remove('show');
+
+  const prior = priorView();
+  drawPanel(p, prior);
+  const note = document.getElementById('graphNote');
+  note.classList.add('waiting');
+  note.textContent = 'Answer, and the panel updates to show what the answer means.';
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  const lastStep = sIndex === currentSteps().length - 1;
+  const lastProblem = pIndex === order.length - 1;
+  nextBtn.textContent = !lastStep ? 'Next step'
+                      : !lastProblem ? 'Next problem' : 'See your results';
+
+  optionOrder = shuffledIndices(st.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(k => {
+    const b = document.createElement('button');
+    b.className = 'choice-btn';
+    b.textContent = st.options[k];
+    b.addEventListener('click', () => handleAnswer(st, k, b));
+    wrap.appendChild(b);
+  });
+}
+
+function handleAnswer(st, chosen, btnEl){
+  if(answered) return;
+  answered = true;
+  const p = currentProblem();
+  const right = chosen === st.correct;
+  score.total++;
+  if(right) score.correct++;
+  perProblem[p.id].total++;
+  if(right) perProblem[p.id].correct++;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === st.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const v = document.getElementById('feedbackVerdict');
+  v.textContent = right ? 'Correct.'
+    : `Not quite — the answer is “${st.options[st.correct]}.”`;
+  v.className = 'feedback-verdict ' + (right ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = st.explain;
+
+  /* the panel only moves once the answer is in, and it moves the same way
+     whether the answer was right or wrong */
+  drawPanel(p, st.view || {});
+  const note = document.getElementById('graphNote');
+  note.classList.remove('waiting');
+  note.textContent = st.note || st.prompt;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if(sIndex < currentSteps().length - 1){ sIndex++; loadStep(); }
+  else if(pIndex < order.length - 1){ pIndex++; loadProblem(); }
+  else showResults();
+});
+
+function showResults(){
+  document.getElementById('mainArea').style.display = 'none';
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(100 * score.correct / score.total);
+  const band = BANDS.find(b => pct >= b.min);
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  (${pct}%)`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  PROBLEMS.filter(p => perProblem[p.id].total > 0).forEach(p => {
+    const t = perProblem[p.id];
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${p.title}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
