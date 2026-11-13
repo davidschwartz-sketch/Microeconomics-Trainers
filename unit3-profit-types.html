@@ -449,7 +449,7 @@ const PROBLEMS = [
  },
  {
   "biz": "Gable Street Food Truck",
-  "blurb": "Priya left a salaried job to run a food truck, and put $60,000 of her own savings into the truck and the fit-out. Her first full year is on the books.",
+  "blurb": "Priya left a salaried job to run a food truck. She bought the truck outright and fitted it out before opening, with $60,000 of her own savings — that purchase came before the year began, so it is not one of the bills below. What is below is the first full year of trading.",
   "cases": [
    {
     "acc": 52000,
@@ -460,7 +460,7 @@ const PROBLEMS = [
     "expTxt": "$96,000",
     "explicit": [
      {
-      "name": "Truck lease, fuel and permits",
+      "name": "Fuel, permits and truck upkeep",
       "txt": "$34,000",
       "v": 34000
      },
@@ -851,12 +851,12 @@ const STEPS = {
    "explain": "This is the whole module in one table. Revenue $90,000, bills $40,000, accounting profit $50,000 — identical in both columns. An accountant comparing the two years would see no difference at all. Yet the right decision flips from stay to switch, because the opportunity cost of the land changed: the same farmhouse that was worth $20,000 as a bed-and-breakfast is now worth $50,000. Nothing about growing grapes changed. Accounting profit cannot see that, and economic profit can — which is why the decision is made on economic profit and never on the books alone.",
    "note": "Panel: both columns complete, side by side.",
    "options": [
-    "The books are identical and the right decision is opposite",
-    "The books are different and the right decision is opposite",
-    "The books are identical and the right decision is the same",
-    "The books are different and the right decision is the same"
+    "The accounting books are identical and the right decision is opposite",
+    "The accounting books are different and the right decision is opposite",
+    "The accounting books are identical and the right decision is the same",
+    "The accounting books are different and the right decision is the same"
    ],
-   "prompt": "Look at the two columns side by side. What is the difference between them?",
+   "prompt": "How would you describe the accounting books and decisions reflected in the two columns?",
    "view": {
     "fill": [
      "acc0",
@@ -972,10 +972,10 @@ const STEPS = {
    "explain": "Below $30,000 the implicit costs come to less than the $50,000 of accounting profit, so economic profit is positive and the vineyard is the better use. Above $30,000 it is the other way round. The break-even figure is the hinge the decision turns on, which is why it is worth being able to solve for it rather than only testing one offer at a time.",
    "note": "Panel: the completed statement stays on screen.",
    "options": [
-    "Keep the vineyard — economic profit would be positive",
-    "Take the offer — economic profit would be positive",
-    "Keep the vineyard — economic profit would be negative",
-    "Take the offer — economic profit would be negative"
+    "Keep the vineyard, because the vineyard’s economic profit would be positive",
+    "Take the offer, because the vineyard’s economic profit would be positive",
+    "Keep the vineyard, because the vineyard’s economic profit would be negative",
+    "Take the offer, because the vineyard’s economic profit would be negative"
    ],
    "prompt": "A different company offers to pay for the land for a data center earning less than $30,000. What follows?",
    "view": {
@@ -992,7 +992,7 @@ const STEPS = {
  "E3": [
   {
    "correct": 0,
-   "explain": "The truck lease, the ingredients and the wages: $34,000 + $46,000 + $16,000 = $96,000. All three are money that left the business and can be pointed at on a bank statement. The salary Priya gave up and the interest her savings are not earning are costs too, but they are not these costs, and they do not belong on this line.",
+   "explain": "Running the truck, the ingredients and the wages: $34,000 + $46,000 + $16,000 = $96,000. All three are money that left the business and can be pointed at on a bank statement. The salary Priya gave up and the interest her savings are not earning are costs too, but they are not these costs, and they do not belong on this line.",
    "note": "Panel: explicit costs totaled.",
    "options": [
     "$96,000",
@@ -1200,10 +1200,10 @@ const STEPS = {
    "explain": "Rent is written in a check every month, so it is money out of the business: explicit. The test to apply to every item on this list is the same one — did somebody outside the business receive a payment? Here they did. Explicit costs are subtracted in BOTH profit figures.",
    "note": "Panel: “The rent Hammerhead pays on the workshop” classified.",
    "options": [
-    "An explicit cost — money the business actually pays out",
-    "An implicit cost — the value of a use the owner gave up"
+    "Explicit",
+    "Implicit"
    ],
-   "prompt": "The rent Hammerhead pays on the workshop. Explicit or implicit?",
+   "prompt": "The rent Hammerhead pays on the workshop. Which kind of cost is it?",
    "view": {
     "fill": [
      "c0"
@@ -1215,10 +1215,10 @@ const STEPS = {
    "explain": "No one pays the owner this and no one invoices for it, but the hours spent in the workshop are hours not spent earning a foreman’s salary. The forgone salary is a real cost of running the joinery: implicit.",
    "note": "Panel: “The salary the owner gave up as a site foreman” classified.",
    "options": [
-    "An implicit cost — the value of a use the owner gave up",
-    "An explicit cost — money the business actually pays out"
+    "Implicit",
+    "Explicit"
    ],
-   "prompt": "The salary the owner gave up as a site foreman. Explicit or implicit?",
+   "prompt": "The salary the owner gave up as a site foreman. Which kind of cost is it?",
    "view": {
     "fill": [
      "c0",
@@ -1231,10 +1231,10 @@ const STEPS = {
    "explain": "Wages leave the business the same way rent does: somebody outside it was paid, so it is explicit, and it is subtracted in both profit figures. The owner’s own forgone salary in the previous item looked similar and was not, because nobody paid it to anybody.",
    "note": "Panel: “The wages paid to the apprentice” classified.",
    "options": [
-    "An explicit cost — money the business actually pays out",
-    "An implicit cost — the value of a use the owner gave up"
+    "Explicit",
+    "Implicit"
    ],
-   "prompt": "The wages paid to the apprentice. Explicit or implicit?",
+   "prompt": "The wages paid to the apprentice. Which kind of cost is it?",
    "view": {
     "fill": [
      "c0",
@@ -1248,10 +1248,10 @@ const STEPS = {
    "explain": "The money is the owner’s own, so nothing is paid to anyone — but money sitting in tools is money not sitting in a bank earning interest. That forgone interest is implicit. Note that the tools themselves were an explicit cost when they were bought; what is implicit is the return the money would otherwise have made.",
    "note": "Panel: “The interest the owner’s $50,000 of tools money would have earned in the bank” classified.",
    "options": [
-    "An implicit cost — the value of a use the owner gave up",
-    "An explicit cost — money the business actually pays out"
+    "Implicit",
+    "Explicit"
    ],
-   "prompt": "The interest the owner’s $50,000 of tools money would have earned in the bank. Explicit or implicit?",
+   "prompt": "The interest the owner’s $50,000 of tools money would have earned in the bank. Which kind of cost is it?",
    "view": {
     "fill": [
      "c0",
@@ -1266,10 +1266,10 @@ const STEPS = {
    "explain": "A utility bill is as explicit as a cost gets: a meter, an invoice, a payment to the utility. Three of the five items here are explicit and two are implicit, and the split has nothing to do with how large they are or how obviously they feel like costs — only with whether money left the business.",
    "note": "Panel: “The electricity bill for the saws and the heating” classified.",
    "options": [
-    "An explicit cost — money the business actually pays out",
-    "An implicit cost — the value of a use the owner gave up"
+    "Explicit",
+    "Implicit"
    ],
-   "prompt": "The electricity bill for the saws and the heating. Explicit or implicit?",
+   "prompt": "The electricity bill for the saws and the heating. Which kind of cost is it?",
    "view": {
     "fill": [
      "c0",
