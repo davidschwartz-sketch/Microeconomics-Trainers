@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finding the Profit-Maximizing Quantity &mdash; MR, MC and the Three Traps</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --teal: #2F6F62;
+    --orange: #C1542C;
+    --indigo: #4A5FB0;
+    --muted: #9C8E7A;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:1180px;margin:0 auto;}
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  .title-block h1{font-size:28px;font-weight:800;letter-spacing:-0.01em;margin:0 0 4px;}
+  .title-block p{margin:0;color:var(--ink-soft);font-size:14.5px;max-width:66ch;}
+
+  .identities{
+    background:var(--surface-alt);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:11px 14px;
+    margin-bottom:18px;
+    color:var(--ink-soft);
+    font-size:13.5px;
+    line-height:1.65;
+  }
+  .identities b{color:var(--ink);}
+  .identities .term{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:2px 9px;
+    margin:3px 7px 3px 0;
+    display:inline-block;
+    color:var(--ink);
+    font-weight:600;
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px 14px;
+    margin-bottom:14px;
+  }
+  .count-group{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+  .card-count{font-size:13px;font-weight:700;color:var(--ink-soft);}
+  .step-count{font-size:13px;font-weight:700;color:var(--teal);}
+  .score-badge{
+    font-size:13px;font-weight:700;color:var(--accent);
+    background:#FBF1DC;border:1px solid #EAD4A0;padding:4px 11px;border-radius:999px;
+  }
+
+  .main{display:grid;grid-template-columns:1fr 1.06fr;gap:22px;align-items:start;}
+  @media (max-width:900px){.main{grid-template-columns:1fr;}}
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px;
+  }
+
+  .biz-name{
+    font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:6px;
+  }
+  .blurb{
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:15px 17px;
+    font-size:15px;
+    line-height:1.5;
+    color:var(--ink);
+    margin-bottom:16px;
+  }
+  .prompt{font-size:17px;font-weight:700;line-height:1.4;margin-bottom:16px;}
+
+  .options{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+  .choice-btn{
+    text-align:left;padding:13px 16px;border-radius:10px;border:1.5px solid var(--border);
+    background:var(--surface);font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){border-color:var(--accent);background:#FFFBF2;}
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{background:var(--correct-soft);border-color:var(--correct);color:var(--correct);}
+  .choice-btn.incorrect{background:var(--incorrect-soft);border-color:var(--incorrect);color:var(--incorrect);}
+
+  .feedback{display:none;margin-bottom:16px;}
+  .feedback.show{display:block;}
+  .feedback-verdict{font-weight:800;font-size:15px;margin-bottom:6px;}
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;color:var(--ink-soft);background:var(--surface-alt);
+    border-left:3px solid var(--accent);padding:12px 14px;border-radius:0 8px 8px 0;
+  }
+
+  .controls{display:flex;justify-content:flex-end;}
+  .btn{padding:11px 20px;border-radius:10px;border:none;font-size:14.5px;font-weight:700;cursor:pointer;}
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover:not(:disabled){background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  /* ---- the panel ---- */
+  .table-wrap{overflow-x:auto;margin-bottom:16px;}
+  table.data-table{width:100%;border-collapse:collapse;font-size:14.5px;}
+  table.data-table th, table.data-table td{
+    border:1px solid var(--border);padding:9px 11px;text-align:center;white-space:nowrap;
+  }
+  table.data-table th{background:var(--surface-alt);font-weight:700;color:var(--ink-soft);font-size:12.5px;}
+  table.data-table th.corner{background:var(--surface-alt);text-align:left;}
+  table.data-table td.row-label{font-weight:700;text-align:left;color:var(--ink-soft);}
+  .panel-title{
+    font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:10px;
+  }
+  table.data-table td.line-label{
+    text-align:left;white-space:normal;color:var(--ink-soft);font-weight:500;padding-left:22px;
+  }
+  table.data-table tr.total td{border-top:2px solid var(--border);font-weight:800;}
+  table.data-table tr.headline td{background:var(--surface-alt);font-weight:800;}
+  table.data-table td.blank{color:var(--muted);font-weight:400;}
+  table.data-table td.pos{color:var(--correct);font-weight:800;}
+  table.data-table td.neg{color:var(--incorrect);font-weight:800;}
+  table.data-table td.zero{color:var(--accent);font-weight:800;}
+  table.data-table tr.note td{
+    background:var(--surface-alt);font-size:13px;font-style:italic;color:var(--ink-soft);
+    text-align:left;white-space:normal;font-weight:500;
+  }
+  table.data-table td.kind-e{color:var(--indigo);font-weight:800;}
+  table.data-table td.kind-i{color:var(--orange);font-weight:800;}
+  table.data-table td.best{
+    background:var(--correct-soft);color:var(--correct);font-weight:800;
+    box-shadow:inset 0 0 0 1px var(--correct);
+  }
+  table.data-table td.dim{color:var(--muted);}
+  table.data-table tr.marked td.row-label{color:var(--ink);}
+
+  .legend{
+    display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:10px;
+    font-size:12.5px;font-weight:700;color:var(--ink-soft);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:16px;height:3px;border-radius:2px;display:inline-block;}
+  .swatch.dash{background:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 7px);}
+  .graph-wrap svg{width:100%;height:auto;display:block;}
+  .graph-note{
+    margin-top:12px;font-size:13.5px;color:var(--ink-soft);background:var(--surface-alt);
+    border:1px solid var(--border);border-radius:10px;padding:11px 13px;min-height:56px;
+  }
+  .graph-note.waiting{font-style:italic;}
+
+  /* ---- results ---- */
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{font-size:34px;font-weight:800;letter-spacing:-0.02em;margin-bottom:10px;}
+  .results-note{font-size:15px;color:var(--ink-soft);margin-bottom:20px;}
+  table.data-table th.topic-head, table.data-table td.topic-cell{text-align:left;white-space:normal;}
+  table.data-table td.topic-cell{font-weight:600;color:var(--ink);}
+  table.data-table td.topic-score{font-weight:700;}
+  table.data-table td.topic-score.full{color:var(--correct);}
+  table.data-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px;color:var(--ink-soft);font-style:italic;line-height:1.5;
+    border-top:1px solid var(--border);padding-top:14px;margin:18px 0 20px;
+  }
+
+  footer.reset-row{margin-top:20px;display:flex;justify-content:flex-end;}
+  .link-btn{
+    background:none;border:none;color:var(--ink-soft);font-size:13px;
+    text-decoration:underline;cursor:pointer;
+  }
+
+  /* ---- the row the student picked, and the row that was right ---- */
+  table.data-table tr.q-row td{cursor:default;}
+  table.data-table tr.q-star td{background:var(--correct-soft);font-weight:800;color:var(--correct);}
+  table.data-table tr.q-star td.q-cell{box-shadow:inset 2px 0 0 var(--correct);}
+  table.data-table tr.q-chosen td{background:var(--incorrect-soft);color:var(--incorrect);font-weight:800;}
+  table.data-table tr.q-chosen td.q-cell{box-shadow:inset 2px 0 0 var(--incorrect);}
+  table.data-table td.mc-over{color:var(--incorrect);}
+  table.data-table td.mc-under{color:var(--teal);}
+  table.data-table tr.dim-row td{color:var(--muted);}
+
+  /* ---- the trap tally ---- */
+  .tally{border-top:1px solid var(--border);margin-top:16px;padding-top:14px;}
+  .tally-head{
+    font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:10px;
+  }
+  .tally-row{
+    display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+    padding:7px 0;border-bottom:1px dotted var(--border);font-size:14px;
+  }
+  .tally-row:last-child{border-bottom:none;}
+  .tally-name{font-weight:700;}
+  .tally-name.highest{color:var(--orange);}
+  .tally-name.fattest{color:var(--indigo);}
+  .tally-name.forced{color:var(--teal);}
+  .tally-name.right{color:var(--correct);}
+  .tally-what{color:var(--ink-soft);font-size:13px;font-weight:500;display:block;}
+  .tally-count{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .tally-count.none{color:var(--muted);font-weight:600;}
+  .tally-count.hit{color:var(--incorrect);}
+  .tally-count.right{color:var(--correct);}
+  .tally-foot{font-size:12.5px;color:var(--ink-soft);font-style:italic;margin-top:12px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="title-block">
+      <h1>Finding the Profit-Maximizing Quantity</h1>
+      <p>Eight price-taking firms, eight complete tables, one question each. The arithmetic is
+      already done for you &mdash; the whole difficulty is knowing which row to stop at, and
+      there are three well-worn ways to stop at the wrong one.</p>
+    </div>
+  </header>
+
+  <div class="identities">
+    <b>The rule.</b>
+    <span class="term">MR = P for a price-taker</span>
+    <span class="term">Make the unit if MC &le; MR</span>
+    <span class="term">Stop at the LAST such unit</span>
+    <br>A small firm in a competitive market sells all it wants at the going price without moving
+    it, so every extra unit adds exactly that price to revenue: <b>MR = P</b>. Make a unit whenever
+    it brings in at least what it costs, and keep going while that is still true. The three ways
+    to get this wrong are <b>chasing revenue</b> to the bottom of the table, <b>stopping at the
+    fattest margin</b> instead of the last positive one, and <b>hunting for a row where MC exactly
+    equals MR</b> &mdash; which, with whole units, usually does not exist.
+  </div>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="card-count" id="problemCount">Problem 1 of 8</span>
+      <span class="step-count" id="priceNote"></span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="main" id="mainArea">
+
+    <div class="panel" id="quizPanel">
+      <div class="biz-name" id="bizName"></div>
+      <div class="blurb" id="blurbText">Loading&hellip;</div>
+      <div class="prompt" id="promptText"></div>
+      <div class="options" id="optionsWrap"></div>
+
+      <div class="feedback" id="feedback">
+        <div class="feedback-verdict" id="feedbackVerdict"></div>
+        <div class="feedback-explain" id="feedbackExplain"></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-primary" id="nextBtn" disabled>Next problem</button>
+      </div>
+    </div>
+
+    <div class="panel" id="graphPanel">
+      <div class="panel-title" id="panelTitle">The table, in full</div>
+      <div class="table-wrap" id="tableWrap"></div>
+      <div class="graph-note waiting" id="graphNote"></div>
+
+      <div class="tally" id="tallyWrap">
+        <div class="tally-head">Trap tally</div>
+        <div id="tallyBody"></div>
+        <div class="tally-foot" id="tallyFoot"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">How it went</th><th>Count</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">Problem</th><th>Your answer</th></tr></thead>
+        <tbody id="perProblemBody"></tbody>
+      </table>
+    </div>
+
+    <p class="results-caveat">The tally says which mistake to work on, not how you would score on
+    an exam. One slip of a kind is a slip; the same trap twice is a habit worth breaking.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Start again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Start over</button>
+  </footer>
+
+</div>
+<script>
+/* ---------------------------------------------------------------------------
+   Every figure below was derived and asserted in verify_traps.py, and checked a
+   second time in expected_traps.py by typing the total-cost column instead of
+   the marginal costs and working back the other way. Nothing here is typed by
+   hand.
+
+   WHAT EACH TABLE HAS TO SATISFY, asserted before it could be written here:
+
+       TR = P x Q          MC = change in TC          profit = TR - TC
+       MR = P              (a price-taker's every unit sells at the going price)
+
+       the profit peak is unique, and it is the LAST unit whose MC is within P
+       no row has MC exactly equal to P  (which is what the third trap is about)
+
+   and the four answers offered are four DIFFERENT quantities:
+
+       correct           the profit peak
+       highest-quantity  the last row of the table
+       fattest-margin    the single unit with the biggest MR - MC of its own,
+                         which always sits EARLIER than the peak
+       forced-equality   either "no such quantity", or the first row where MC
+                         has already passed P -- never a row where they are equal,
+                         because no table here has one
+
+   Each wrong option carries the tag of the trap it represents. That tag, not the
+   option's position or text, is what the tally counts.
+   --------------------------------------------------------------------------- */
+
+const PROBLEMS = [
+ {
+  "bestTxt": "$10",
+  "biz": "Stone Hollow Vineyard",
+  "blurb": "The vineyard sells into a market far too large for it to move: every bottle goes at the going price of $10, however many it brings. The whole table is already filled in. The only question is where to stop.",
+  "fixed": 6,
+  "fixedTxt": "$6",
+  "good": "bottles",
+  "id": "T1",
+  "lost": {
+   "fattest-margin": "$6",
+   "highest-quantity": "$6"
+  },
+  "lostRaw": {
+   "fattest-margin": 6,
+   "highest-quantity": 6
+  },
+  "margin": 6,
+  "marginTxt": "$6",
+  "price": 10,
+  "priceTxt": "$10",
+  "qcross": 5,
+  "qhigh": 6,
+  "qmargin": 2,
+  "qstar": 4,
+  "rows": [
+   {
+    "mc": null,
+    "mcTxt": "—",
+    "mr": null,
+    "mrTxt": "—",
+    "profit": -6,
+    "profitTxt": "−$6",
+    "q": 0,
+    "tc": 6,
+    "tcTxt": "$6",
+    "tr": 0,
+    "trTxt": "$0"
+   },
+   {
+    "mc": 6,
+    "mcTxt": "$6",
+    "mr": 10,
+    "mrTxt": "$10",
+    "profit": -2,
+    "profitTxt": "−$2",
+    "q": 1,
+    "tc": 12,
+    "tcTxt": "$12",
+    "tr": 10,
+    "trTxt": "$10"
+   },
+   {
+    "mc": 4,
+    "mcTxt": "$4",
+    "mr": 10,
+    "mrTxt": "$10",
+    "profit": 4,
+    "profitTxt": "$4",
+    "q": 2,
+    "tc": 16,
+    "tcTxt": "$16",
+    "tr": 20,
+    "trTxt": "$20"
+   },
+   {
+    "mc": 6,
+    "mcTxt": "$6",
+    "mr": 10,
+    "mrTxt": "$10",
+    "profit": 8,
+    "profitTxt": "$8",
+    "q": 3,
+    "tc": 22,
+    "tcTxt": "$22",
+    "tr": 30,
+    "trTxt": "$30"
+   },
+   {
+    "mc": 8,
+    "mcTxt": "$8",
+    "mr": 10,
+    "mrTxt": "$10",
+    "profit": 10,
+    "profitTxt": "$10",
+    "q": 4,
+    "tc": 30,
+    "tcTxt": "$30",
+    "tr": 40,
+    "trTxt": "$40"
+   },
+   {
+    "mc": 12,
+    "mcTxt": "$12",
+    "mr": 10,
+    "mrTxt": "$10",
+    "profit": 8,
+    "profitTxt": "$8",
+    "q": 5,
+    "tc": 42,
+    "tcTxt": "$42",
+    "tr": 50,
+    "trTxt": "$50"
+   },
+   {
+    "mc": 14,
+    "mcTxt": "$14",
+    "mr": 10,
+    "mrTxt": "$10",
+    "profit": 4,
+    "profitTxt": "$4",
+    "q": 6,
+    "tc": 56,
+    "tcTxt": "$56",
+    "tr": 60,
+    "trTxt": "$60"
+   }
+  ],
+  "title": "Stone Hollow Vineyard — the class table",
+  "trap3": "none"
+ },
+ {
+  "bestTxt": "$8",
+  "biz": "Stone Hollow Vineyard",
+  "blurb": "A different season at the same vineyard: the going price is $12 now, and the costs have moved too. Note that marginal cost falls before it rises — the second bottle costs less to make than the first.",
+  "fixed": 8,
+  "fixedTxt": "$8",
+  "good": "bottles",
+  "id": "T2",
+  "lost": {
+   "fattest-margin": "$6",
+   "forced-equality": "$2",
+   "highest-quantity": "$6"
+  },
+  "lostRaw": {
+   "fattest-margin": 6,
+   "forced-equality": 2,
+   "highest-quantity": 6
+  },
+  "margin": 6,
+  "marginTxt": "$6",
+  "price": 12,
+  "priceTxt": "$12",
+  "qcross": 5,
+  "qhigh": 6,
+  "qmargin": 2,
+  "qstar": 4,
+  "rows": [
+   {
+    "mc": null,
+    "mcTxt": "—",
+    "mr": null,
+    "mrTxt": "—",
+    "profit": -8,
+    "profitTxt": "−$8",
+    "q": 0,
+    "tc": 8,
+    "tcTxt": "$8",
+    "tr": 0,
+    "trTxt": "$0"
+   },
+   {
+    "mc": 8,
+    "mcTxt": "$8",
+    "mr": 12,
+    "mrTxt": "$12",
+    "profit": -4,
+    "profitTxt": "−$4",
+    "q": 1,
+    "tc": 16,
+    "tcTxt": "$16",
+    "tr": 12,
+    "trTxt": "$12"
+   },
+   {
+    "mc": 6,
+    "mcTxt": "$6",
+    "mr": 12,
+    "mrTxt": "$12",
+    "profit": 2,
+    "profitTxt": "$2",
+    "q": 2,
+    "tc": 22,
+    "tcTxt": "$22",
+    "tr": 24,
+    "trTxt": "$24"
+   },
+   {
+    "mc": 8,
+    "mcTxt": "$8",
+    "mr": 12,
+    "mrTxt": "$12",
+    "profit": 6,
+    "profitTxt": "$6",
+    "q": 3,
+    "tc": 30,
+    "tcTxt": "$30",
+    "tr": 36,
+    "trTxt": "$36"
+   },
+   {
+    "mc": 10,
+    "mcTxt": "$10",
+    "mr": 12,
+    "mrTxt": "$12",
+    "profit": 8,
+    "profitTxt": "$8",
+    "q": 4,
+    "tc": 40,
+    "tcTxt": "$40",
+    "tr": 48,
+    "trTxt": "$48"
+   },
+   {
+    "mc": 14,
+    "mcTxt": "$14",
+    "mr": 12,
+    "mrTxt": "$12",
+    "profit": 6,
+    "profitTxt": "$6",
+    "q": 5,
+    "tc": 54,
+    "tcTxt": "$54",
+    "tr": 60,
+    "trTxt": "$60"
+   },
+   {
+    "mc": 16,
+    "mcTxt": "$16",
+    "mr": 12,
+    "mrTxt": "$12",
+    "profit": 2,
+    "profitTxt": "$2",
+    "q": 6,
+    "tc": 70,
+    "tcTxt": "$70",
+    "tr": 72,
+    "trTxt": "$72"
+   }
+  ],
+  "title": "Stone Hollow Vineyard — the review problem",
+  "trap3": "cross"
+ },
+ {
+  "bestTxt": "$14",
+  "biz": "Gable Street Food Truck",
+  "blurb": "Tacos go for $7 at every truck on the street, so Gable Street takes $7 for each one it sells and could not charge more if it tried. The kitchen can manage eight.",
+  "fixed": 5,
+  "fixedTxt": "$5",
+  "good": "tacos",
+  "id": "T3",
+  "lost": {
+   "fattest-margin": "$10",
+   "forced-equality": "$2",
+   "highest-quantity": "$6"
+  },
+  "lostRaw": {
+   "fattest-margin": 10,
+   "forced-equality": 2,
+   "highest-quantity": 6
+  },
+  "margin": 5,
+  "marginTxt": "$5",
+  "price": 7,
+  "priceTxt": "$7",
+  "qcross": 7,
+  "qhigh": 8,
+  "qmargin": 2,
+  "qstar": 6,
+  "rows": [
+   {
+    "mc": null,
+    "mcTxt": "—",
+    "mr": null,
+    "mrTxt": "—",
+    "profit": -5,
+    "profitTxt": "−$5",
+    "q": 0,
+    "tc": 5,
+    "tcTxt": "$5",
+    "tr": 0,
+    "trTxt": "$0"
+   },
+   {
+    "mc": 3,
+    "mcTxt": "$3",
+    "mr": 7,
+    "mrTxt": "$7",
+    "profit": -1,
+    "profitTxt": "−$1",
+    "q": 1,
+    "tc": 8,
+    "tcTxt": "$8",
+    "tr": 7,
+    "trTxt": "$7"
+   },
+   {
+    "mc": 2,
+    "mcTxt": "$2",
+    "mr": 7,
+    "mrTxt": "$7",
+    "profit": 4,
+    "profitTxt": "$4",
+    "q": 2,
+    "tc": 10,
+    "tcTxt": "$10",
+    "tr": 14,
+    "trTxt": "$14"
+   },
+   {
+    "mc": 3,
+    "mcTxt": "$3",
+    "mr": 7,
+    "mrTxt": "$7",
+    "profit": 8,
+    "profitTxt": "$8",
+    "q": 3,
+    "tc": 13,
+    "tcTxt": "$13",
+    "tr": 21,
+    "trTxt": "$21"
+   },
+   {
+    "mc": 4,
+    "mcTxt": "$4",
+    "mr": 7,
+    "mrTxt": "$7",
+    "profit": 11,
+    "profitTxt": "$11",
+    "q": 4,
+    "tc": 17,
+    "tcTxt": "$17",
+    "tr": 28,
+    "trTxt": "$28"
+   },
+   {
+    "mc": 5,
+    "mcTxt": "$5",
+    "mr": 7,
+    "mrTxt": "$7",
+    "profit": 13,
+    "profitTxt": "$13",
+    "q": 5,
+    "tc": 22,
+    "tcTxt": "$22",
+    "tr": 35,
+    "trTxt": "$35"
+   },
+   {
+    "mc": 6,
+    "mcTxt": "$6",
+    "mr": 7,
+    "mrTxt": "$7",
+    "profit": 14,
+    "profitTxt": "$14",
+    "q": 6,
+    "tc": 28,
+    "tcTxt": "$28",
+    "tr": 42,
+    "trTxt": "$42"
+   },
+   {
+    "mc": 9,
+    "mcTxt": "$9",
+    "mr": 7,
+    "mrTxt": "$7",
+    "profit": 12,
+    "profitTxt": "$12",
+    "q": 7,
+    "tc": 37,
+    "tcTxt": "$37",
+    "tr": 49,
+    "trTxt": "$49"
+   },
+   {
+    "mc": 11,
+    "mcTxt": "$11",
+    "mr": 7,
+    "mrTxt": "$7",
+    "profit": 8,
+    "profitTxt": "$8",
+    "q": 8,
+    "tc": 48,
+    "tcTxt": "$48",
+    "tr": 56,
+    "trTxt": "$56"
+   }
+  ],
+  "title": "Gable Street Food Truck",
+  "trap3": "cross"
+ },
+ {
+  "bestTxt": "$5",
+  "biz": "Ridgeline Print Shop",
+  "blurb": "Posters go for $9 apiece at every shop in the district, and Ridgeline is in no position to ask more. The press runs faster for a while as the run gets longer, then slower as the ink and the attention run short. Margins here are thin, which is exactly when the stopping rule matters most.",
+  "fixed": 10,
+  "fixedTxt": "$10",
+  "good": "posters",
+  "id": "T4",
+  "lost": {
+   "fattest-margin": "$1",
+   "highest-quantity": "$10"
+  },
+  "lostRaw": {
+   "fattest-margin": 1,
+   "highest-quantity": 10
+  },
+  "margin": 5,
+  "marginTxt": "$5",
+  "price": 9,
+  "priceTxt": "$9",
+  "qcross": 6,
+  "qhigh": 8,
+  "qmargin": 4,
+  "qstar": 5,
+  "rows": [
+   {
+    "mc": null,
+    "mcTxt": "—",
+    "mr": null,
+    "mrTxt": "—",
+    "profit": -10,
+    "profitTxt": "−$10",
+    "q": 0,
+    "tc": 10,
+    "tcTxt": "$10",
+    "tr": 0,
+    "trTxt": "$0"
+   },
+   {
+    "mc": 7,
+    "mcTxt": "$7",
+    "mr": 9,
+    "mrTxt": "$9",
+    "profit": -8,
+    "profitTxt": "−$8",
+    "q": 1,
+    "tc": 17,
+    "tcTxt": "$17",
+    "tr": 9,
+    "trTxt": "$9"
+   },
+   {
+    "mc": 6,
+    "mcTxt": "$6",
+    "mr": 9,
+    "mrTxt": "$9",
+    "profit": -5,
+    "profitTxt": "−$5",
+    "q": 2,
+    "tc": 23,
+    "tcTxt": "$23",
+    "tr": 18,
+    "trTxt": "$18"
+   },
+   {
+    "mc": 5,
+    "mcTxt": "$5",
+    "mr": 9,
+    "mrTxt": "$9",
+    "profit": -1,
+    "profitTxt": "−$1",
+    "q": 3,
+    "tc": 28,
+    "tcTxt": "$28",
+    "tr": 27,
+    "trTxt": "$27"
+   },
+   {
+    "mc": 4,
+    "mcTxt": "$4",
+    "mr": 9,
+    "mrTxt": "$9",
+    "profit": 4,
+    "profitTxt": "$4",
+    "q": 4,
+    "tc": 32,
+    "tcTxt": "$32",
+    "tr": 36,
+    "trTxt": "$36"
+   },
+   {
+    "mc": 8,
+    "mcTxt": "$8",
+    "mr": 9,
+    "mrTxt": "$9",
+    "profit": 5,
+    "profitTxt": "$5",
+    "q": 5,
+    "tc": 40,
+    "tcTxt": "$40",
+    "tr": 45,
+    "trTxt": "$45"
+   },
+   {
+    "mc": 10,
+    "mcTxt": "$10",
+    "mr": 9,
+    "mrTxt": "$9",
+    "profit": 4,
+    "profitTxt": "$4",
+    "q": 6,
+    "tc": 50,
+    "tcTxt": "$50",
+    "tr": 54,
+    "trTxt": "$54"
+   },
+   {
+    "mc": 12,
+    "mcTxt": "$12",
+    "mr": 9,
+    "mrTxt": "$9",
+    "profit": 1,
+    "profitTxt": "$1",
+    "q": 7,
+    "tc": 62,
+    "tcTxt": "$62",
+    "tr": 63,
+    "trTxt": "$63"
+   },
+   {
+    "mc": 15,
+    "mcTxt": "$15",
+    "mr": 9,
+    "mrTxt": "$9",
+    "profit": -5,
+    "profitTxt": "−$5",
+    "q": 8,
+    "tc": 77,
+    "tcTxt": "$77",
+    "tr": 72,
+    "trTxt": "$72"
+   }
+  ],
+  "title": "Ridgeline Print Shop",
+  "trap3": "none"
+ },
+ {
+  "bestTxt": "$5",
+  "biz": "Birchwood Candle Works",
+  "blurb": "Candles sell at $11 each at the market, the same as every other stall charges. Costs climb quickly at this workshop — the first candle of the day is much the cheapest one.",
+  "fixed": 8,
+  "fixedTxt": "$8",
+  "good": "candles",
+  "id": "T5",
+  "lost": {
+   "fattest-margin": "$6",
+   "forced-equality": "$2",
+   "highest-quantity": "$15"
+  },
+  "lostRaw": {
+   "fattest-margin": 6,
+   "forced-equality": 2,
+   "highest-quantity": 15
+  },
+  "margin": 7,
+  "marginTxt": "$7",
+  "price": 11,
+  "priceTxt": "$11",
+  "qcross": 4,
+  "qhigh": 6,
+  "qmargin": 1,
+  "qstar": 3,
+  "rows": [
+   {
+    "mc": null,
+    "mcTxt": "—",
+    "mr": null,
+    "mrTxt": "—",
+    "profit": -8,
+    "profitTxt": "−$8",
+    "q": 0,
+    "tc": 8,
+    "tcTxt": "$8",
+    "tr": 0,
+    "trTxt": "$0"
+   },
+   {
+    "mc": 4,
+    "mcTxt": "$4",
+    "mr": 11,
+    "mrTxt": "$11",
+    "profit": -1,
+    "profitTxt": "−$1",
+    "q": 1,
+    "tc": 12,
+    "tcTxt": "$12",
+    "tr": 11,
+    "trTxt": "$11"
+   },
+   {
+    "mc": 7,
+    "mcTxt": "$7",
+    "mr": 11,
+    "mrTxt": "$11",
+    "profit": 3,
+    "profitTxt": "$3",
+    "q": 2,
+    "tc": 19,
+    "tcTxt": "$19",
+    "tr": 22,
+    "trTxt": "$22"
+   },
+   {
+    "mc": 9,
+    "mcTxt": "$9",
+    "mr": 11,
+    "mrTxt": "$11",
+    "profit": 5,
+    "profitTxt": "$5",
+    "q": 3,
+    "tc": 28,
+    "tcTxt": "$28",
+    "tr": 33,
+    "trTxt": "$33"
+   },
+   {
+    "mc": 13,
+    "mcTxt": "$13",
+    "mr": 11,
+    "mrTxt": "$11",
+    "profit": 3,
+    "profitTxt": "$3",
+    "q": 4,
+    "tc": 41,
+    "tcTxt": "$41",
+    "tr": 44,
+    "trTxt": "$44"
+   },
+   {
+    "mc": 16,
+    "mcTxt": "$16",
+    "mr": 11,
+    "mrTxt": "$11",
+    "profit": -2,
+    "profitTxt": "−$2",
+    "q": 5,
+    "tc": 57,
+    "tcTxt": "$57",
+    "tr": 55,
+    "trTxt": "$55"
+   },
+   {
+    "mc": 19,
+    "mcTxt": "$19",
+    "mr": 11,
+    "mrTxt": "$11",
+    "profit": -10,
+    "profitTxt": "−$10",
+    "q": 6,
+    "tc": 76,
+    "tcTxt": "$76",
+    "tr": 66,
+    "trTxt": "$66"
+   }
+  ],
+  "title": "Birchwood Candle Works",
+  "trap3": "cross"
+ },
+ {
+  "bestTxt": "$4",
+  "biz": "Clearwater Car Wash",
+  "blurb": "A wash goes for $6, the going rate at every bay in town. The crew gets into a rhythm for the first few cars and then tires, so marginal cost falls a long way before it turns around.",
+  "fixed": 12,
+  "fixedTxt": "$12",
+  "good": "washes",
+  "id": "F6",
+  "lost": {
+   "fattest-margin": "$6",
+   "highest-quantity": "$4"
+  },
+  "lostRaw": {
+   "fattest-margin": 6,
+   "highest-quantity": 4
+  },
+  "margin": 4,
+  "marginTxt": "$4",
+  "price": 6,
+  "priceTxt": "$6",
+  "qcross": 8,
+  "qhigh": 9,
+  "qmargin": 4,
+  "qstar": 7,
+  "rows": [
+   {
+    "mc": null,
+    "mcTxt": "—",
+    "mr": null,
+    "mrTxt": "—",
+    "profit": -12,
+    "profitTxt": "−$12",
+    "q": 0,
+    "tc": 12,
+    "tcTxt": "$12",
+    "tr": 0,
+    "trTxt": "$0"
+   },
+   {
+    "mc": 5,
+    "mcTxt": "$5",
+    "mr": 6,
+    "mrTxt": "$6",
+    "profit": -11,
+    "profitTxt": "−$11",
+    "q": 1,
+    "tc": 17,
+    "tcTxt": "$17",
+    "tr": 6,
+    "trTxt": "$6"
+   },
+   {
+    "mc": 4,
+    "mcTxt": "$4",
+    "mr": 6,
+    "mrTxt": "$6",
+    "profit": -9,
+    "profitTxt": "−$9",
+    "q": 2,
+    "tc": 21,
+    "tcTxt": "$21",
+    "tr": 12,
+    "trTxt": "$12"
+   },
+   {
+    "mc": 3,
+    "mcTxt": "$3",
+    "mr": 6,
+    "mrTxt": "$6",
+    "profit": -6,
+    "profitTxt": "−$6",
+    "q": 3,
+    "tc": 24,
+    "tcTxt": "$24",
+    "tr": 18,
+    "trTxt": "$18"
+   },
+   {
+    "mc": 2,
+    "mcTxt": "$2",
+    "mr": 6,
+    "mrTxt": "$6",
+    "profit": -2,
+    "profitTxt": "−$2",
+    "q": 4,
+    "tc": 26,
+    "tcTxt": "$26",
+    "tr": 24,
+    "trTxt": "$24"
+   },
+   {
+    "mc": 3,
+    "mcTxt": "$3",
+    "mr": 6,
+    "mrTxt": "$6",
+    "profit": 1,
+    "profitTxt": "$1",
+    "q": 5,
+    "tc": 29,
+    "tcTxt": "$29",
+    "tr": 30,
+    "trTxt": "$30"
+   },
+   {
+    "mc": 4,
+    "mcTxt": "$4",
+    "mr": 6,
+    "mrTxt": "$6",
+    "profit": 3,
+    "profitTxt": "$3",
+    "q": 6,
+    "tc": 33,
+    "tcTxt": "$33",
+    "tr": 36,
+    "trTxt": "$36"
+   },
+   {
+    "mc": 5,
+    "mcTxt": "$5",
+    "mr": 6,
+    "mrTxt": "$6",
+    "profit": 4,
+    "profitTxt": "$4",
+    "q": 7,
+    "tc": 38,
+    "tcTxt": "$38",
+    "tr": 42,
+    "trTxt": "$42"
+   },
+   {
+    "mc": 7,
+    "mcTxt": "$7",
+    "mr": 6,
+    "mrTxt": "$6",
+    "profit": 3,
+    "profitTxt": "$3",
+    "q": 8,
+    "tc": 45,
+    "tcTxt": "$45",
+    "tr": 48,
+    "trTxt": "$48"
+   },
+   {
+    "mc": 9,
+    "mcTxt": "$9",
+    "mr": 6,
+    "mrTxt": "$6",
+    "profit": 0,
+    "profitTxt": "$0",
+    "q": 9,
+    "tc": 54,
+    "tcTxt": "$54",
+    "tr": 54,
+    "trTxt": "$54"
+   }
+  ],
+  "title": "Clearwater Car Wash",
+  "trap3": "none"
+ },
+ {
+  "bestTxt": "$3",
+  "biz": "Marigold Bakery",
+  "blurb": "Loaves go at $5 at every bakery in town. The oven holds six, and the last one is awkward to fit.",
+  "fixed": 6,
+  "fixedTxt": "$6",
+  "good": "loaves",
+  "id": "G7",
+  "lost": {
+   "fattest-margin": "$1",
+   "highest-quantity": "$2"
+  },
+  "lostRaw": {
+   "fattest-margin": 1,
+   "highest-quantity": 2
+  },
+  "margin": 3,
+  "marginTxt": "$3",
+  "price": 5,
+  "priceTxt": "$5",
+  "qcross": 6,
+  "qhigh": 6,
+  "qmargin": 4,
+  "qstar": 5,
+  "rows": [
+   {
+    "mc": null,
+    "mcTxt": "—",
+    "mr": null,
+    "mrTxt": "—",
+    "profit": -6,
+    "profitTxt": "−$6",
+    "q": 0,
+    "tc": 6,
+    "tcTxt": "$6",
+    "tr": 0,
+    "trTxt": "$0"
+   },
+   {
+    "mc": 4,
+    "mcTxt": "$4",
+    "mr": 5,
+    "mrTxt": "$5",
+    "profit": -5,
+    "profitTxt": "−$5",
+    "q": 1,
+    "tc": 10,
+    "tcTxt": "$10",
+    "tr": 5,
+    "trTxt": "$5"
+   },
+   {
+    "mc": 3,
+    "mcTxt": "$3",
+    "mr": 5,
+    "mrTxt": "$5",
+    "profit": -3,
+    "profitTxt": "−$3",
+    "q": 2,
+    "tc": 13,
+    "tcTxt": "$13",
+    "tr": 10,
+    "trTxt": "$10"
+   },
+   {
+    "mc": 3,
+    "mcTxt": "$3",
+    "mr": 5,
+    "mrTxt": "$5",
+    "profit": -1,
+    "profitTxt": "−$1",
+    "q": 3,
+    "tc": 16,
+    "tcTxt": "$16",
+    "tr": 15,
+    "trTxt": "$15"
+   },
+   {
+    "mc": 2,
+    "mcTxt": "$2",
+    "mr": 5,
+    "mrTxt": "$5",
+    "profit": 2,
+    "profitTxt": "$2",
+    "q": 4,
+    "tc": 18,
+    "tcTxt": "$18",
+    "tr": 20,
+    "trTxt": "$20"
+   },
+   {
+    "mc": 4,
+    "mcTxt": "$4",
+    "mr": 5,
+    "mrTxt": "$5",
+    "profit": 3,
+    "profitTxt": "$3",
+    "q": 5,
+    "tc": 22,
+    "tcTxt": "$22",
+    "tr": 25,
+    "trTxt": "$25"
+   },
+   {
+    "mc": 7,
+    "mcTxt": "$7",
+    "mr": 5,
+    "mrTxt": "$5",
+    "profit": 1,
+    "profitTxt": "$1",
+    "q": 6,
+    "tc": 29,
+    "tcTxt": "$29",
+    "tr": 30,
+    "trTxt": "$30"
+   }
+  ],
+  "title": "Marigold Bakery",
+  "trap3": "none"
+ },
+ {
+  "bestTxt": "$8",
+  "biz": "Lumen Phone-Case Shop",
+  "blurb": "Cases sell at $8 online, where a thousand other shops sell the same case. Lumen can assemble nine in a day.",
+  "fixed": 9,
+  "fixedTxt": "$9",
+  "good": "cases",
+  "id": "H8",
+  "lost": {
+   "fattest-margin": "$7",
+   "forced-equality": "$2",
+   "highest-quantity": "$12"
+  },
+  "lostRaw": {
+   "fattest-margin": 7,
+   "forced-equality": 2,
+   "highest-quantity": 12
+  },
+  "margin": 5,
+  "marginTxt": "$5",
+  "price": 8,
+  "priceTxt": "$8",
+  "qcross": 7,
+  "qhigh": 9,
+  "qmargin": 3,
+  "qstar": 6,
+  "rows": [
+   {
+    "mc": null,
+    "mcTxt": "—",
+    "mr": null,
+    "mrTxt": "—",
+    "profit": -9,
+    "profitTxt": "−$9",
+    "q": 0,
+    "tc": 9,
+    "tcTxt": "$9",
+    "tr": 0,
+    "trTxt": "$0"
+   },
+   {
+    "mc": 6,
+    "mcTxt": "$6",
+    "mr": 8,
+    "mrTxt": "$8",
+    "profit": -7,
+    "profitTxt": "−$7",
+    "q": 1,
+    "tc": 15,
+    "tcTxt": "$15",
+    "tr": 8,
+    "trTxt": "$8"
+   },
+   {
+    "mc": 5,
+    "mcTxt": "$5",
+    "mr": 8,
+    "mrTxt": "$8",
+    "profit": -4,
+    "profitTxt": "−$4",
+    "q": 2,
+    "tc": 20,
+    "tcTxt": "$20",
+    "tr": 16,
+    "trTxt": "$16"
+   },
+   {
+    "mc": 3,
+    "mcTxt": "$3",
+    "mr": 8,
+    "mrTxt": "$8",
+    "profit": 1,
+    "profitTxt": "$1",
+    "q": 3,
+    "tc": 23,
+    "tcTxt": "$23",
+    "tr": 24,
+    "trTxt": "$24"
+   },
+   {
+    "mc": 4,
+    "mcTxt": "$4",
+    "mr": 8,
+    "mrTxt": "$8",
+    "profit": 5,
+    "profitTxt": "$5",
+    "q": 4,
+    "tc": 27,
+    "tcTxt": "$27",
+    "tr": 32,
+    "trTxt": "$32"
+   },
+   {
+    "mc": 6,
+    "mcTxt": "$6",
+    "mr": 8,
+    "mrTxt": "$8",
+    "profit": 7,
+    "profitTxt": "$7",
+    "q": 5,
+    "tc": 33,
+    "tcTxt": "$33",
+    "tr": 40,
+    "trTxt": "$40"
+   },
+   {
+    "mc": 7,
+    "mcTxt": "$7",
+    "mr": 8,
+    "mrTxt": "$8",
+    "profit": 8,
+    "profitTxt": "$8",
+    "q": 6,
+    "tc": 40,
+    "tcTxt": "$40",
+    "tr": 48,
+    "trTxt": "$48"
+   },
+   {
+    "mc": 10,
+    "mcTxt": "$10",
+    "mr": 8,
+    "mrTxt": "$8",
+    "profit": 6,
+    "profitTxt": "$6",
+    "q": 7,
+    "tc": 50,
+    "tcTxt": "$50",
+    "tr": 56,
+    "trTxt": "$56"
+   },
+   {
+    "mc": 12,
+    "mcTxt": "$12",
+    "mr": 8,
+    "mrTxt": "$8",
+    "profit": 2,
+    "profitTxt": "$2",
+    "q": 8,
+    "tc": 62,
+    "tcTxt": "$62",
+    "tr": 64,
+    "trTxt": "$64"
+   },
+   {
+    "mc": 14,
+    "mcTxt": "$14",
+    "mr": 8,
+    "mrTxt": "$8",
+    "profit": -4,
+    "profitTxt": "−$4",
+    "q": 9,
+    "tc": 76,
+    "tcTxt": "$76",
+    "tr": 72,
+    "trTxt": "$72"
+   }
+  ],
+  "title": "Lumen Phone-Case Shop",
+  "trap3": "cross"
+ }
+];
+const CARDS = [
+ {
+  "correct": 0,
+  "id": "T1",
+  "options": [
+   {
+    "q": 4,
+    "text": "4 bottles",
+    "trap": null,
+    "why": "Profit peaks at $10, at 4 bottles. Unit 4 costs $8 to make and brings in $10, so it adds to profit — make it. Unit 5 costs $12 and still brings in only $10, so it would take $2 back off — skip it. That is the rule in a table of whole units: produce the last unit whose marginal cost is still within the price."
+   },
+   {
+    "q": 6,
+    "text": "6 bottles",
+    "trap": "highest-quantity",
+    "why": "6 bottles is the last row of the table, not the best row in it. Every unit after the 4th costs more to make than the $10 it brings in, so carrying on to 6 turns $10 of profit into $4 — $6 handed back. Revenue really does keep rising the whole way; profit stops rising first, and profit is what the firm keeps."
+   },
+   {
+    "q": 2,
+    "text": "2 bottles",
+    "trap": "fattest-margin",
+    "why": "Unit 2 has the biggest margin of any single unit in the table: $10 − $4 = $6. But that is the best unit, not the best stopping point. Units 3 through 4 each still add something, even if less, and adding something is still adding. Profit at 2 bottles is $4 against $10 at 4 bottles — $6 left on the table. Keep going while any margin remains."
+   },
+   {
+    "q": null,
+    "text": "No quantity — marginal cost never equals $10 in this table",
+    "trap": "forced-equality",
+    "why": "There is no row where marginal cost equals $10: it goes straight from $8 at unit 4 to $12 at unit 5, stepping over the price without landing on it. That is the usual case with whole units, and it is not a reason to answer that no quantity works. “Set MR = MC” is shorthand for a smooth curve; in a table you take the last unit whose marginal cost is still within the price, which is 4 bottles."
+   }
+  ],
+  "prompt": "What is the profit-maximizing quantity?"
+ },
+ {
+  "correct": 0,
+  "id": "T2",
+  "options": [
+   {
+    "q": 4,
+    "text": "4 bottles",
+    "trap": null,
+    "why": "Profit peaks at $8, at 4 bottles. Unit 4 costs $10 to make and brings in $12, so it adds to profit — make it. Unit 5 costs $14 and still brings in only $12, so it would take $2 back off — skip it. That is the rule in a table of whole units: produce the last unit whose marginal cost is still within the price."
+   },
+   {
+    "q": 6,
+    "text": "6 bottles",
+    "trap": "highest-quantity",
+    "why": "6 bottles is the last row of the table, not the best row in it. Every unit after the 4th costs more to make than the $12 it brings in, so carrying on to 6 turns $8 of profit into $2 — $6 handed back. Revenue really does keep rising the whole way; profit stops rising first, and profit is what the firm keeps."
+   },
+   {
+    "q": 2,
+    "text": "2 bottles",
+    "trap": "fattest-margin",
+    "why": "Unit 2 has the biggest margin of any single unit in the table: $12 − $6 = $6. But that is the best unit, not the best stopping point. Units 3 through 4 each still add something, even if less, and adding something is still adding. Profit at 2 bottles is $2 against $8 at 4 bottles — $6 left on the table. Keep going while any margin remains."
+   },
+   {
+    "q": 5,
+    "text": "5 bottles",
+    "trap": "forced-equality",
+    "why": "Unit 5 is where marginal cost first passes the price, not where it equals it: $14 against $12. No row equals $12, and hunting for one is what pushes students into making the 5th unit anyway. It loses $2, so profit falls from $8 to $6. Stop at the last unit whose marginal cost is still within the price, which is 4 bottles."
+   }
+  ],
+  "prompt": "What is the profit-maximizing quantity?"
+ },
+ {
+  "correct": 0,
+  "id": "T3",
+  "options": [
+   {
+    "q": 6,
+    "text": "6 tacos",
+    "trap": null,
+    "why": "Profit peaks at $14, at 6 tacos. Unit 6 costs $6 to make and brings in $7, so it adds to profit — make it. Unit 7 costs $9 and still brings in only $7, so it would take $2 back off — skip it. That is the rule in a table of whole units: produce the last unit whose marginal cost is still within the price."
+   },
+   {
+    "q": 8,
+    "text": "8 tacos",
+    "trap": "highest-quantity",
+    "why": "8 tacos is the last row of the table, not the best row in it. Every unit after the 6th costs more to make than the $7 it brings in, so carrying on to 8 turns $14 of profit into $8 — $6 handed back. Revenue really does keep rising the whole way; profit stops rising first, and profit is what the firm keeps."
+   },
+   {
+    "q": 2,
+    "text": "2 tacos",
+    "trap": "fattest-margin",
+    "why": "Unit 2 has the biggest margin of any single unit in the table: $7 − $2 = $5. But that is the best unit, not the best stopping point. Units 3 through 6 each still add something, even if less, and adding something is still adding. Profit at 2 tacos is $4 against $14 at 6 tacos — $10 left on the table. Keep going while any margin remains."
+   },
+   {
+    "q": 7,
+    "text": "7 tacos",
+    "trap": "forced-equality",
+    "why": "Unit 7 is where marginal cost first passes the price, not where it equals it: $9 against $7. No row equals $7, and hunting for one is what pushes students into making the 7th unit anyway. It loses $2, so profit falls from $14 to $12. Stop at the last unit whose marginal cost is still within the price, which is 6 tacos."
+   }
+  ],
+  "prompt": "What is the profit-maximizing quantity?"
+ },
+ {
+  "correct": 0,
+  "id": "T4",
+  "options": [
+   {
+    "q": 5,
+    "text": "5 posters",
+    "trap": null,
+    "why": "Profit peaks at $5, at 5 posters. Unit 5 costs $8 to make and brings in $9, so it adds to profit — make it. Unit 6 costs $10 and still brings in only $9, so it would take $1 back off — skip it. That is the rule in a table of whole units: produce the last unit whose marginal cost is still within the price."
+   },
+   {
+    "q": 8,
+    "text": "8 posters",
+    "trap": "highest-quantity",
+    "why": "8 posters is the last row of the table, not the best row in it. Every unit after the 5th costs more to make than the $9 it brings in, so carrying on to 8 turns $5 of profit into −$5 — $10 handed back. Revenue really does keep rising the whole way; profit stops rising first, and profit is what the firm keeps."
+   },
+   {
+    "q": 4,
+    "text": "4 posters",
+    "trap": "fattest-margin",
+    "why": "Unit 4 has the biggest margin of any single unit in the table: $9 − $4 = $5. But that is the best unit, not the best stopping point. Unit 5 still adds something, even if less, and adding something is still adding. Profit at 4 posters is $4 against $5 at 5 posters — $1 left on the table. Keep going while any margin remains."
+   },
+   {
+    "q": null,
+    "text": "No quantity — marginal cost never equals $9 in this table",
+    "trap": "forced-equality",
+    "why": "There is no row where marginal cost equals $9: it goes straight from $8 at unit 5 to $10 at unit 6, stepping over the price without landing on it. That is the usual case with whole units, and it is not a reason to answer that no quantity works. “Set MR = MC” is shorthand for a smooth curve; in a table you take the last unit whose marginal cost is still within the price, which is 5 posters."
+   }
+  ],
+  "prompt": "What is the profit-maximizing quantity?"
+ },
+ {
+  "correct": 0,
+  "id": "T5",
+  "options": [
+   {
+    "q": 3,
+    "text": "3 candles",
+    "trap": null,
+    "why": "Profit peaks at $5, at 3 candles. Unit 3 costs $9 to make and brings in $11, so it adds to profit — make it. Unit 4 costs $13 and still brings in only $11, so it would take $2 back off — skip it. That is the rule in a table of whole units: produce the last unit whose marginal cost is still within the price."
+   },
+   {
+    "q": 6,
+    "text": "6 candles",
+    "trap": "highest-quantity",
+    "why": "6 candles is the last row of the table, not the best row in it. Every unit after the 3th costs more to make than the $11 it brings in, so carrying on to 6 turns $5 of profit into −$10 — $15 handed back. Revenue really does keep rising the whole way; profit stops rising first, and profit is what the firm keeps."
+   },
+   {
+    "q": 1,
+    "text": "1 candle",
+    "trap": "fattest-margin",
+    "why": "Unit 1 has the biggest margin of any single unit in the table: $11 − $4 = $7. But that is the best unit, not the best stopping point. Units 2 through 3 each still add something, even if less, and adding something is still adding. Profit at 1 candle is −$1 against $5 at 3 candles — $6 left on the table. Keep going while any margin remains."
+   },
+   {
+    "q": 4,
+    "text": "4 candles",
+    "trap": "forced-equality",
+    "why": "Unit 4 is where marginal cost first passes the price, not where it equals it: $13 against $11. No row equals $11, and hunting for one is what pushes students into making the 4th unit anyway. It loses $2, so profit falls from $5 to $3. Stop at the last unit whose marginal cost is still within the price, which is 3 candles."
+   }
+  ],
+  "prompt": "What is the profit-maximizing quantity?"
+ },
+ {
+  "correct": 0,
+  "id": "F6",
+  "options": [
+   {
+    "q": 7,
+    "text": "7 washes",
+    "trap": null,
+    "why": "Profit peaks at $4, at 7 washes. Unit 7 costs $5 to make and brings in $6, so it adds to profit — make it. Unit 8 costs $7 and still brings in only $6, so it would take $1 back off — skip it. That is the rule in a table of whole units: produce the last unit whose marginal cost is still within the price."
+   },
+   {
+    "q": 9,
+    "text": "9 washes",
+    "trap": "highest-quantity",
+    "why": "9 washes is the last row of the table, not the best row in it. Every unit after the 7th costs more to make than the $6 it brings in, so carrying on to 9 turns $4 of profit into $0 — $4 handed back. Revenue really does keep rising the whole way; profit stops rising first, and profit is what the firm keeps."
+   },
+   {
+    "q": 4,
+    "text": "4 washes",
+    "trap": "fattest-margin",
+    "why": "Unit 4 has the biggest margin of any single unit in the table: $6 − $2 = $4. But that is the best unit, not the best stopping point. Units 5 through 7 each still add something, even if less, and adding something is still adding. Profit at 4 washes is −$2 against $4 at 7 washes — $6 left on the table. Keep going while any margin remains."
+   },
+   {
+    "q": null,
+    "text": "No quantity — marginal cost never equals $6 in this table",
+    "trap": "forced-equality",
+    "why": "There is no row where marginal cost equals $6: it goes straight from $5 at unit 7 to $7 at unit 8, stepping over the price without landing on it. That is the usual case with whole units, and it is not a reason to answer that no quantity works. “Set MR = MC” is shorthand for a smooth curve; in a table you take the last unit whose marginal cost is still within the price, which is 7 washes."
+   }
+  ],
+  "prompt": "What is the profit-maximizing quantity?"
+ },
+ {
+  "correct": 0,
+  "id": "G7",
+  "options": [
+   {
+    "q": 5,
+    "text": "5 loaves",
+    "trap": null,
+    "why": "Profit peaks at $3, at 5 loaves. Unit 5 costs $4 to make and brings in $5, so it adds to profit — make it. Unit 6 costs $7 and still brings in only $5, so it would take $2 back off — skip it. That is the rule in a table of whole units: produce the last unit whose marginal cost is still within the price."
+   },
+   {
+    "q": 6,
+    "text": "6 loaves",
+    "trap": "highest-quantity",
+    "why": "6 loaves is the last row of the table, not the best row in it. Every unit after the 5th costs more to make than the $5 it brings in, so carrying on to 6 turns $3 of profit into $1 — $2 handed back. Revenue really does keep rising the whole way; profit stops rising first, and profit is what the firm keeps."
+   },
+   {
+    "q": 4,
+    "text": "4 loaves",
+    "trap": "fattest-margin",
+    "why": "Unit 4 has the biggest margin of any single unit in the table: $5 − $2 = $3. But that is the best unit, not the best stopping point. Unit 5 still adds something, even if less, and adding something is still adding. Profit at 4 loaves is $2 against $3 at 5 loaves — $1 left on the table. Keep going while any margin remains."
+   },
+   {
+    "q": null,
+    "text": "No quantity — marginal cost never equals $5 in this table",
+    "trap": "forced-equality",
+    "why": "There is no row where marginal cost equals $5: it goes straight from $4 at unit 5 to $7 at unit 6, stepping over the price without landing on it. That is the usual case with whole units, and it is not a reason to answer that no quantity works. “Set MR = MC” is shorthand for a smooth curve; in a table you take the last unit whose marginal cost is still within the price, which is 5 loaves."
+   }
+  ],
+  "prompt": "What is the profit-maximizing quantity?"
+ },
+ {
+  "correct": 0,
+  "id": "H8",
+  "options": [
+   {
+    "q": 6,
+    "text": "6 cases",
+    "trap": null,
+    "why": "Profit peaks at $8, at 6 cases. Unit 6 costs $7 to make and brings in $8, so it adds to profit — make it. Unit 7 costs $10 and still brings in only $8, so it would take $2 back off — skip it. That is the rule in a table of whole units: produce the last unit whose marginal cost is still within the price."
+   },
+   {
+    "q": 9,
+    "text": "9 cases",
+    "trap": "highest-quantity",
+    "why": "9 cases is the last row of the table, not the best row in it. Every unit after the 6th costs more to make than the $8 it brings in, so carrying on to 9 turns $8 of profit into −$4 — $12 handed back. Revenue really does keep rising the whole way; profit stops rising first, and profit is what the firm keeps."
+   },
+   {
+    "q": 3,
+    "text": "3 cases",
+    "trap": "fattest-margin",
+    "why": "Unit 3 has the biggest margin of any single unit in the table: $8 − $3 = $5. But that is the best unit, not the best stopping point. Units 4 through 6 each still add something, even if less, and adding something is still adding. Profit at 3 cases is $1 against $8 at 6 cases — $7 left on the table. Keep going while any margin remains."
+   },
+   {
+    "q": 7,
+    "text": "7 cases",
+    "trap": "forced-equality",
+    "why": "Unit 7 is where marginal cost first passes the price, not where it equals it: $10 against $8. No row equals $8, and hunting for one is what pushes students into making the 7th unit anyway. It loses $2, so profit falls from $8 to $6. Stop at the last unit whose marginal cost is still within the price, which is 6 cases."
+   }
+  ],
+  "prompt": "What is the profit-maximizing quantity?"
+ }
+];
+const BANDS = [
+  { min: 88, label: 'Trap-proof',   tone: 'good',
+    note: 'You stopped at the last unit worth making, table after table. That is the rule doing the work, not luck.' },
+  { min: 75, label: 'Solid',        tone: 'good',
+    note: 'The rule is there. Read the tally below for the one kind of row that is still catching you.' },
+  { min: 50, label: 'Getting there', tone: 'mid',
+    note: 'Half of these came out right. The tally says which mistake to go after first.' },
+  { min: 25, label: 'Needs review',  tone: 'poor',
+    note: 'Go back to the rule: make every unit whose MC is within the price, and stop at the last one.' },
+  { min: 0,  label: 'Start again',   tone: 'poor',
+    note: 'Work one table slowly with a finger on the MC column: make the unit while MC is at or below the price, stop when it is above.' },
+];
+
+const TRAPS = [
+  { key: 'highest-quantity', cls: 'highest', name: 'Highest quantity', inline: 'highest-quantity',
+    what: 'chasing revenue to the bottom of the table' },
+  { key: 'fattest-margin',   cls: 'fattest', name: 'Fattest margin', inline: 'fattest-margin',
+    what: 'stopping at the best single unit instead of the last good one' },
+  { key: 'forced-equality',  cls: 'forced',  name: 'Forced equality', inline: 'forced-equality',
+    what: 'hunting for a row where MC exactly equals MR' },
+];
+
+/* ======================================================================
+   The table
+   ====================================================================== */
+function drawTable(prob, picked, reveal){
+  const rows = prob.rows.map(r => {
+    const cls = [];
+    if(reveal && r.q === prob.qstar) cls.push('q-star');
+    if(reveal && picked !== null && r.q === picked && r.q !== prob.qstar) cls.push('q-chosen');
+    /* only once the answer is in: before that, a colored MC column would mark the
+       last within-price row, which is precisely what the question asks for */
+    const mcCls = (!reveal || r.mc === null) ? ''
+                : (r.mc <= prob.price ? 'mc-under' : 'mc-over');
+    return `<tr class="q-row ${cls.join(' ')}">`
+      + `<td class="q-cell">${r.q}</td>`
+      + `<td>${r.trTxt}</td><td>${r.tcTxt}</td>`
+      + `<td>${r.mrTxt}</td><td class="${mcCls}">${r.mcTxt}</td>`
+      + `<td>${r.profitTxt}</td></tr>`;
+  });
+  return '<table class="data-table"><thead><tr>'
+    + `<th class="corner">Q</th><th>TR</th><th>TC</th><th>MR</th><th>MC</th><th>Profit</th>`
+    + `</tr></thead><tbody>${rows.join('')}</tbody></table>`;
+}
+
+/* ======================================================================
+   The tally -- the point of the module, so it is on screen the whole time
+   ====================================================================== */
+let tally = {}, firstTry = 0, answers = [];
+
+function blankTally(){
+  tally = {};
+  TRAPS.forEach(t => tally[t.key] = 0);
+  firstTry = 0;
+  answers = [];
+}
+
+function timesTxt(n){ return n === 0 ? 'never' : (n === 1 ? 'once' : n + ' times'); }
+
+function drawTally(){
+  const body = document.getElementById('tallyBody');
+  body.innerHTML = TRAPS.map(t => {
+    const n = tally[t.key];
+    return `<div class="tally-row"><span><span class="tally-name ${t.cls}">${t.name}</span>`
+      + `<span class="tally-what">${t.what}</span></span>`
+      + `<span class="tally-count ${n ? 'hit' : 'none'}">${timesTxt(n)}</span></div>`;
+  }).join('')
+    + `<div class="tally-row"><span><span class="tally-name right">Right first time</span>`
+    + `<span class="tally-what">stopped at the last unit worth making</span></span>`
+    + `<span class="tally-count right">${firstTry} of ${answers.length}</span></div>`;
+  const worst = TRAPS.filter(t => tally[t.key] > 0)
+                     .sort((a, b) => tally[b.key] - tally[a.key])[0];
+  document.getElementById('tallyFoot').textContent = answers.length === 0
+    ? 'Answer a problem and this fills in.'
+    : (worst ? `Most often: the ${worst.inline} trap — ${worst.what}.`
+             : 'No trap has caught you yet.');
+}
+
+/* ======================================================================
+   The quiz
+   ====================================================================== */
+let order = [], pIndex = 0, answered = false, optionOrder = [];
+let score = { correct: 0, total: 0 };
+
+function shuffledIndices(n){
+  const a = [...Array(n).keys()];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function currentProblem(){ return PROBLEMS[order[pIndex]]; }
+function currentCard(){ return CARDS.find(c => c.id === currentProblem().id); }
+
+function init(){
+  order = shuffledIndices(PROBLEMS.length);
+  pIndex = 0;
+  score = { correct: 0, total: 0 };
+  blankTally();
+  document.getElementById('mainArea').style.display = '';
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+  drawTally();
+  loadProblem();
+}
+
+function loadProblem(){
+  answered = false;
+  const p = currentProblem(), card = currentCard();
+  document.getElementById('bizName').textContent = p.biz;
+  document.getElementById('blurbText').textContent = p.blurb;
+  document.getElementById('promptText').textContent = card.prompt;
+  document.getElementById('problemCount').textContent =
+    `Problem ${pIndex + 1} of ${order.length}`;
+  document.getElementById('priceNote').textContent =
+    `Price: ${p.priceTxt} per unit, so MR = ${p.priceTxt}`;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('feedback').classList.remove('show');
+  document.getElementById('tableWrap').innerHTML = drawTable(p, null, false);
+
+  const note = document.getElementById('graphNote');
+  note.classList.add('waiting');
+  note.textContent = 'Answer, and the table marks the quantity you picked against the one that '
+                   + 'maximizes profit.';
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  nextBtn.textContent = pIndex === order.length - 1 ? 'See your results' : 'Next problem';
+
+  optionOrder = shuffledIndices(card.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(k => {
+    const b = document.createElement('button');
+    b.className = 'choice-btn';
+    b.textContent = card.options[k].text;
+    b.addEventListener('click', () => handleAnswer(card, k, b));
+    wrap.appendChild(b);
+  });
+}
+
+function handleAnswer(card, chosen, btnEl){
+  if(answered) return;
+  answered = true;
+  const p = currentProblem(), opt = card.options[chosen];
+  const right = chosen === card.correct;
+  score.total++;
+  if(right){ score.correct++; firstTry++; }
+  else tally[opt.trap]++;
+  answers.push({ id: p.id, title: p.title, right: right,
+                 trap: right ? null : opt.trap, text: opt.text });
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === card.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const trap = TRAPS.find(t => t.key === opt.trap);
+  const v = document.getElementById('feedbackVerdict');
+  v.textContent = right ? 'Correct.' : `Not quite — that is the ${trap.inline} trap.`;
+  v.className = 'feedback-verdict ' + (right ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = opt.why;
+  document.getElementById('feedback').classList.add('show');
+
+  /* the table marks the same two rows whether the answer was right or wrong */
+  document.getElementById('tableWrap').innerHTML = drawTable(p, opt.q, true);
+  const note = document.getElementById('graphNote');
+  note.classList.remove('waiting');
+  note.textContent = right
+    ? `Marked: ${p.qstar} — the profit peak, and the last unit whose MC is within ${p.priceTxt}.`
+    : (opt.q === null
+        ? `Marked: ${p.qstar} — the profit peak. No row has MC equal to ${p.priceTxt}, and none has to.`
+        : `Marked: your ${opt.q} against the profit peak at ${p.qstar}.`);
+
+  drawTally();
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if(pIndex < order.length - 1){ pIndex++; loadProblem(); }
+  else showResults();
+});
+
+function showResults(){
+  document.getElementById('mainArea').style.display = 'none';
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(100 * score.correct / score.total);
+  const band = BANDS.find(b => pct >= b.min);
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  (${pct}%)`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  const line = (label, count, cls) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${label}</td>`
+                 + `<td class="topic-score ${cls}">${count}</td>`;
+    body.appendChild(tr);
+  };
+  line('Right first time', `${firstTry} of ${answers.length}`, firstTry === answers.length ? 'full' : '');
+  TRAPS.forEach(t => line(`Fell for the ${t.inline} trap`,
+                          timesTxt(tally[t.key]), tally[t.key] ? 'low' : ''));
+
+  const per = document.getElementById('perProblemBody');
+  per.innerHTML = '';
+  answers.forEach(a => {
+    const tr = document.createElement('tr');
+    const trap = TRAPS.find(t => t.key === a.trap);
+    tr.innerHTML = `<td class="topic-cell">${a.title}</td>`
+      + `<td class="topic-score ${a.right ? 'full' : 'low'}">`
+      + `${a.right ? 'Right' : trap.inline[0].toUpperCase() + trap.inline.slice(1) + ' trap'}</td>`;
+    per.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
