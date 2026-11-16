@@ -1,0 +1,3206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operate, Shut Down or Exit &mdash; Reading the Profit Rectangle</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --teal: #2F6F62;
+    --orange: #C1542C;
+    --indigo: #4A5FB0;
+    --muted: #9C8E7A;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:1180px;margin:0 auto;}
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  .title-block h1{font-size:28px;font-weight:800;letter-spacing:-0.01em;margin:0 0 4px;}
+  .title-block p{margin:0;color:var(--ink-soft);font-size:14.5px;max-width:66ch;}
+
+  .identities{
+    background:var(--surface-alt);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:11px 14px;
+    margin-bottom:18px;
+    color:var(--ink-soft);
+    font-size:13.5px;
+    line-height:1.65;
+  }
+  .identities b{color:var(--ink);}
+  .identities .term{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:2px 9px;
+    margin:3px 7px 3px 0;
+    display:inline-block;
+    color:var(--ink);
+    font-weight:600;
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px 14px;
+    margin-bottom:14px;
+  }
+  .count-group{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+  .card-count{font-size:13px;font-weight:700;color:var(--ink-soft);}
+  .step-count{font-size:13px;font-weight:700;color:var(--teal);}
+  .score-badge{
+    font-size:13px;font-weight:700;color:var(--accent);
+    background:#FBF1DC;border:1px solid #EAD4A0;padding:4px 11px;border-radius:999px;
+  }
+
+  .main{display:grid;grid-template-columns:1fr 1.06fr;gap:22px;align-items:start;}
+  @media (max-width:900px){.main{grid-template-columns:1fr;}}
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px;
+  }
+
+  .biz-name{
+    font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:6px;
+  }
+  .blurb{
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:15px 17px;
+    font-size:15px;
+    line-height:1.5;
+    color:var(--ink);
+    margin-bottom:16px;
+  }
+  .prompt{font-size:17px;font-weight:700;line-height:1.4;margin-bottom:16px;}
+
+  .options{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+  .choice-btn{
+    text-align:left;padding:13px 16px;border-radius:10px;border:1.5px solid var(--border);
+    background:var(--surface);font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){border-color:var(--accent);background:#FFFBF2;}
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{background:var(--correct-soft);border-color:var(--correct);color:var(--correct);}
+  .choice-btn.incorrect{background:var(--incorrect-soft);border-color:var(--incorrect);color:var(--incorrect);}
+
+  .feedback{display:none;margin-bottom:16px;}
+  .feedback.show{display:block;}
+  .feedback-verdict{font-weight:800;font-size:15px;margin-bottom:6px;}
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;color:var(--ink-soft);background:var(--surface-alt);
+    border-left:3px solid var(--accent);padding:12px 14px;border-radius:0 8px 8px 0;
+  }
+
+  .controls{display:flex;justify-content:flex-end;}
+  .btn{padding:11px 20px;border-radius:10px;border:none;font-size:14.5px;font-weight:700;cursor:pointer;}
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover:not(:disabled){background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  /* ---- the panel ---- */
+  .table-wrap{overflow-x:auto;margin-bottom:16px;}
+  table.data-table{width:100%;border-collapse:collapse;font-size:14.5px;}
+  table.data-table th, table.data-table td{
+    border:1px solid var(--border);padding:9px 11px;text-align:center;white-space:nowrap;
+  }
+  table.data-table th{background:var(--surface-alt);font-weight:700;color:var(--ink-soft);font-size:12.5px;}
+  table.data-table th.corner{background:var(--surface-alt);text-align:left;}
+  table.data-table td.row-label{font-weight:700;text-align:left;color:var(--ink-soft);}
+  .panel-title{
+    font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:10px;
+  }
+  table.data-table td.line-label{
+    text-align:left;white-space:normal;color:var(--ink-soft);font-weight:500;padding-left:22px;
+  }
+  table.data-table tr.total td{border-top:2px solid var(--border);font-weight:800;}
+  table.data-table tr.headline td{background:var(--surface-alt);font-weight:800;}
+  table.data-table td.blank{color:var(--muted);font-weight:400;}
+  table.data-table td.pos{color:var(--correct);font-weight:800;}
+  table.data-table td.neg{color:var(--incorrect);font-weight:800;}
+  table.data-table td.zero{color:var(--accent);font-weight:800;}
+  table.data-table tr.note td{
+    background:var(--surface-alt);font-size:13px;font-style:italic;color:var(--ink-soft);
+    text-align:left;white-space:normal;font-weight:500;
+  }
+  table.data-table td.kind-e{color:var(--indigo);font-weight:800;}
+  table.data-table td.kind-i{color:var(--orange);font-weight:800;}
+  table.data-table td.best{
+    background:var(--correct-soft);color:var(--correct);font-weight:800;
+    box-shadow:inset 0 0 0 1px var(--correct);
+  }
+  table.data-table td.dim{color:var(--muted);}
+  table.data-table tr.marked td.row-label{color:var(--ink);}
+
+  .legend{
+    display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:10px;
+    font-size:12.5px;font-weight:700;color:var(--ink-soft);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:16px;height:3px;border-radius:2px;display:inline-block;}
+  .swatch.dash{background:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 7px);}
+  .graph-wrap svg{width:100%;height:auto;display:block;}
+  .graph-note{
+    margin-top:12px;font-size:13.5px;color:var(--ink-soft);background:var(--surface-alt);
+    border:1px solid var(--border);border-radius:10px;padding:11px 13px;min-height:56px;
+  }
+  .graph-note.waiting{font-style:italic;}
+
+  /* ---- results ---- */
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{font-size:34px;font-weight:800;letter-spacing:-0.02em;margin-bottom:10px;}
+  .results-note{font-size:15px;color:var(--ink-soft);margin-bottom:20px;}
+  table.data-table th.topic-head, table.data-table td.topic-cell{text-align:left;white-space:normal;}
+  table.data-table td.topic-cell{font-weight:600;color:var(--ink);}
+  table.data-table td.topic-score{font-weight:700;}
+  table.data-table td.topic-score.full{color:var(--correct);}
+  table.data-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px;color:var(--ink-soft);font-style:italic;line-height:1.5;
+    border-top:1px solid var(--border);padding-top:14px;margin:18px 0 20px;
+  }
+
+  footer.reset-row{margin-top:20px;display:flex;justify-content:flex-end;}
+  .link-btn{
+    background:none;border:none;color:var(--ink-soft);font-size:13px;
+    text-decoration:underline;cursor:pointer;
+  }
+
+  /* ---- the diagram ---- */
+  .graph-wrap{margin-bottom:14px;}
+  .graph-wrap svg{width:100%;height:auto;display:block;overflow:visible;}
+  .axis{stroke:var(--ink-soft);stroke-width:1.2;}
+  .gridline{stroke:var(--border);stroke-width:1;}
+  .curve{fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .curve.mc{stroke:var(--orange);}
+  .curve.atc{stroke:var(--indigo);}
+  .curve.avc{stroke:var(--teal);}
+  .curve.supply{stroke:var(--orange);stroke-width:10;opacity:.28;stroke-linecap:round;}
+  .priceline{stroke:var(--ink);stroke-width:2;}
+  .qline{stroke:var(--ink-soft);stroke-width:1.4;stroke-dasharray:5 4;}
+  .rect-profit{fill:var(--correct);fill-opacity:.22;stroke:var(--correct);stroke-width:1.6;}
+  .rect-loss{fill:var(--incorrect);fill-opacity:.2;stroke:var(--incorrect);stroke-width:1.6;}
+  .gapline{stroke:var(--accent);stroke-width:2.4;}
+  .marker{fill:var(--ink);}
+  .marker.atc{fill:var(--indigo);}
+  .marker.avc{fill:var(--teal);}
+  text.lab{font-size:12.5px;font-weight:700;fill:var(--ink-soft);}
+  text.lab.mc{fill:var(--orange);}
+  text.lab.atc{fill:var(--indigo);}
+  text.lab.avc{fill:var(--teal);}
+  text.tick{font-size:11.5px;fill:var(--muted);}
+  text.flag{font-size:12px;font-weight:700;fill:var(--ink);}
+  text.flag.profit{fill:var(--correct);}
+  text.flag.loss{fill:var(--incorrect);}
+  text.flag.gold{fill:#9A7520;}
+
+  /* ---- the numbers under it ---- */
+  table.data-table td.q-head{text-align:left;font-weight:700;color:var(--ink-soft);white-space:normal;}
+  table.data-table tr.given td{background:#FCF8F0;}
+  table.data-table td.fig{font-weight:800;}
+  table.data-table td.fig.pos{color:var(--correct);}
+  table.data-table td.fig.neg{color:var(--incorrect);}
+  table.data-table td.fig.gold{color:#9A7520;}
+  table.data-table td.band-sr{color:var(--teal);font-weight:800;}
+  table.data-table td.band-lr{color:var(--indigo);font-weight:800;}
+  .chart-cap{font-size:12.5px;color:var(--ink-soft);font-style:italic;margin:10px 0 0;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="title-block">
+      <h1>Operate, Shut Down or Exit</h1>
+      <p>The quantity is already settled &mdash; marginal cost meets the price and that fixes it.
+      What is left is reading the rectangle it leaves behind, and deciding whether a firm losing
+      money should keep going anyway. In the short run, surprisingly often, it should.</p>
+    </div>
+  </header>
+
+  <div class="identities">
+    <b>The chain.</b>
+    <span class="term">Profit = (P &minus; ATC) &times; Q</span>
+    <span class="term">Short run: produce if P &ge; AVC</span>
+    <span class="term">Long run: stay if P &ge; ATC</span>
+    <span class="term">TFC = (ATC &minus; AVC) &times; Q</span>
+    <br>Fixed costs are <b>sunk</b> in the short run: owed whether the firm produces or not, so
+    they cannot tell it what to do next. The question is not &ldquo;am I losing money?&rdquo; but
+    &ldquo;does producing lose less than closing?&rdquo; &mdash; and it does, as long as the price
+    covers average variable cost, because everything above AVC is a contribution toward the fixed
+    cost the firm owes anyway. In the long run nothing is sunk, so the bar rises from the bottom
+    of AVC to the bottom of ATC.
+  </div>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="card-count" id="problemCount">Problem 1 of 10</span>
+      <span class="step-count" id="stepCount">Step 1 of 6</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="main" id="mainArea">
+
+    <div class="panel" id="quizPanel">
+      <div class="biz-name" id="bizName"></div>
+      <div class="blurb" id="blurbText">Loading&hellip;</div>
+      <div class="prompt" id="promptText"></div>
+      <div class="options" id="optionsWrap"></div>
+
+      <div class="feedback" id="feedback">
+        <div class="feedback-verdict" id="feedbackVerdict"></div>
+        <div class="feedback-explain" id="feedbackExplain"></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-primary" id="nextBtn" disabled>Next step</button>
+      </div>
+    </div>
+
+    <div class="panel" id="graphPanel">
+      <div class="panel-title" id="panelTitle">The firm</div>
+      <div class="legend" id="legendWrap"></div>
+      <div class="graph-wrap" id="graphWrap"></div>
+      <div class="table-wrap" id="tableWrap"></div>
+      <div class="graph-note waiting" id="graphNote"></div>
+    </div>
+
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">Problem</th><th>Score</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <p class="results-caveat">These bands say whether the rectangle and the two decision rules
+    are secure &mdash; they are not an AP score prediction. Treat a strong result here as one
+    chain nailed down, not as a grade.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Start again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Start over</button>
+  </footer>
+
+</div>
+<script>
+/* ---------------------------------------------------------------------------
+   Every figure below was derived in verify_shutdown.py and checked a second
+   time in expected_shutdown.py, which retypes the primitives and works in
+   TOTALS instead of per-unit terms. Nothing here is typed by hand.
+
+   Each firm is a cost FUNCTION, fitted to the values its problem quotes, so
+   the drawn price line meets MC at the quantity the problem names and the
+   rectangle is the arithmetic rather than an illustration of it:
+
+       profit = (P - ATC) x Q = TR - TC
+       TFC    = (ATC - AVC) x Q = AFC x Q
+       short run:  produce while P >= AVC, which is the same test as
+                   P >= minimum AVC once Q is read off MC
+       long run:   stay while P >= minimum ATC
+
+   and the comparison the module exists to make: a firm producing at a loss
+   with P >= AVC loses LESS than the fixed cost it would still owe if it shut
+   down, by exactly the contribution (P - AVC) x Q.
+   --------------------------------------------------------------------------- */
+
+const PROBLEMS = [
+ {
+  "biz": "Thornbury Cidery",
+  "blurb": "Thornbury sells cider at the going price of $9 a case and has already found its profit-maximizing output, 40 cases, where MC meets the price. At 40 cases its average total cost is $7. Before reading any profit off the picture, build the formula that the picture draws.",
+  "case": {
+   "afc": 1.5,
+   "afcTxt": "$1.50",
+   "atc": 7.0,
+   "atcTxt": "$7",
+   "avc": 5.5,
+   "avcTxt": "$5.50",
+   "contribution": 140.0,
+   "contributionTxt": "$140",
+   "gap": 2.0,
+   "gapTxt": "$2",
+   "label": "Thornbury Cidery",
+   "lr": "stay",
+   "minAtc": 6.8,
+   "minAvc": 4.5,
+   "operate": -80.0,
+   "operateTxt": "$80",
+   "outcome": "profit",
+   "price": 9.0,
+   "priceTxt": "$9",
+   "profit": 80.0,
+   "profitTxt": "$80",
+   "q": 40.0,
+   "qTxt": "40",
+   "shutdown": 60.0,
+   "shutdownTxt": "$60",
+   "sr": "produce",
+   "tc": 280.0,
+   "tcTxt": "$280",
+   "tfc": 60.0,
+   "tfcTxt": "$60",
+   "tr": 360.0,
+   "trTxt": "$360"
+  },
+  "geom": {
+   "atc": "M133.0 68.3 L137.2 78.6 L141.3 87.9 L145.5 96.3 L149.7 104.0 L153.8 111.0 L158.0 117.4 L162.2 123.3 L166.3 128.8 L170.5 133.9 L174.7 138.6 L178.8 142.9 L183.0 147.0 L187.2 150.8 L191.3 154.4 L195.5 157.7 L199.7 160.8 L203.8 163.8 L208.0 166.5 L212.2 169.1 L216.3 171.5 L220.5 173.8 L224.7 176.0 L228.8 178.0 L233.0 179.9 L237.2 181.7 L241.3 183.4 L245.5 185.0 L249.7 186.5 L253.8 188.0 L258.0 189.3 L262.2 190.6 L266.3 191.7 L270.5 192.8 L274.7 193.9 L278.8 194.8 L283.0 195.7 L287.2 196.6 L291.3 197.4 L295.5 198.1 L299.7 198.7 L303.8 199.4 L308.0 199.9 L312.2 200.4 L316.3 200.9 L320.5 201.3 L324.7 201.7 L328.8 202.0 L333.0 202.3 L337.2 202.5 L341.3 202.7 L345.5 202.9 L349.7 203.0 L353.8 203.1 L358.0 203.1 L362.2 203.1 L366.3 203.1 L370.5 203.0 L374.7 202.9 L378.8 202.7 L383.0 202.6 L387.2 202.4 L391.3 202.1 L395.5 201.8 L399.7 201.5 L403.8 201.2 L408.0 200.8 L412.2 200.4 L416.3 200.0 L420.5 199.5 L424.7 199.1 L428.8 198.5 L433.0 198.0 L437.2 197.4 L441.3 196.8 L445.5 196.2 L449.7 195.5 L453.8 194.9 L458.0 194.1 L462.2 193.4 L466.3 192.6 L470.5 191.9 L474.7 191.0 L478.8 190.2 L483.0 189.3 L487.2 188.4 L491.3 187.5 L495.5 186.6 L499.7 185.6 L503.8 184.6 L508.0 183.6",
+   "atcAt": {
+    "v": 7.0,
+    "y": 198.0
+   },
+   "avc": "M133.0 256.8 L137.2 257.2 L141.3 257.6 L145.5 257.9 L149.7 258.2 L153.8 258.6 L158.0 258.8 L162.2 259.1 L166.3 259.4 L170.5 259.6 L174.7 259.8 L178.8 260.0 L183.0 260.2 L187.2 260.3 L191.3 260.4 L195.5 260.6 L199.7 260.7 L203.8 260.7 L208.0 260.8 L212.2 260.8 L216.3 260.9 L220.5 260.9 L224.7 260.8 L228.8 260.8 L233.0 260.7 L237.2 260.7 L241.3 260.6 L245.5 260.5 L249.7 260.3 L253.8 260.2 L258.0 260.0 L262.2 259.8 L266.3 259.6 L270.5 259.4 L274.7 259.1 L278.8 258.9 L283.0 258.6 L287.2 258.3 L291.3 258.0 L295.5 257.6 L299.7 257.3 L303.8 256.9 L308.0 256.5 L312.2 256.1 L316.3 255.6 L320.5 255.2 L324.7 254.7 L328.8 254.2 L333.0 253.7 L337.2 253.2 L341.3 252.6 L345.5 252.1 L349.7 251.5 L353.8 250.9 L358.0 250.2 L362.2 249.6 L366.3 248.9 L370.5 248.2 L374.7 247.5 L378.8 246.8 L383.0 246.1 L387.2 245.3 L391.3 244.5 L395.5 243.7 L399.7 242.9 L403.8 242.1 L408.0 241.2 L412.2 240.4 L416.3 239.5 L420.5 238.6 L424.7 237.6 L428.8 236.7 L433.0 235.7 L437.2 234.7 L441.3 233.7 L445.5 232.7 L449.7 231.7 L453.8 230.6 L458.0 229.5 L462.2 228.4 L466.3 227.3 L470.5 226.1 L474.7 225.0 L478.8 223.8 L483.0 222.6 L487.2 221.4 L491.3 220.2 L495.5 218.9 L499.7 217.6 L503.8 216.3 L508.0 215.0",
+   "avcAt": {
+    "v": 5.5,
+    "y": 235.71428571428572
+   },
+   "h": 420,
+   "labels": [
+    {
+     "cls": "mc",
+     "t": "MC",
+     "x": 515.0,
+     "y": 76.47428571428571
+    },
+    {
+     "cls": "atc",
+     "t": "ATC",
+     "x": 515.0,
+     "y": 187.6057142857143
+    },
+    {
+     "cls": "avc",
+     "t": "AVC",
+     "x": 515.0,
+     "y": 219.03428571428572
+    }
+   ],
+   "marks": [],
+   "mc": "M133.0 263.9 L137.2 264.3 L141.3 264.6 L145.5 264.9 L149.7 265.2 L153.8 265.4 L158.0 265.5 L162.2 265.6 L166.3 265.6 L170.5 265.5 L174.7 265.4 L178.8 265.3 L183.0 265.0 L187.2 264.8 L191.3 264.4 L195.5 264.1 L199.7 263.6 L203.8 263.1 L208.0 262.6 L212.2 261.9 L216.3 261.3 L220.5 260.5 L224.7 259.8 L228.8 258.9 L233.0 258.0 L237.2 257.1 L241.3 256.0 L245.5 255.0 L249.7 253.8 L253.8 252.7 L258.0 251.4 L262.2 250.1 L266.3 248.8 L270.5 247.3 L274.7 245.9 L278.8 244.3 L283.0 242.8 L287.2 241.1 L291.3 239.4 L295.5 237.7 L299.7 235.8 L303.8 234.0 L308.0 232.0 L312.2 230.1 L316.3 228.0 L320.5 225.9 L324.7 223.8 L328.8 221.6 L333.0 219.3 L337.2 217.0 L341.3 214.6 L345.5 212.1 L349.7 209.6 L353.8 207.1 L358.0 204.5 L362.2 201.8 L366.3 199.1 L370.5 196.3 L374.7 193.5 L378.8 190.6 L383.0 187.6 L387.2 184.6 L391.3 181.5 L395.5 178.4 L399.7 175.2 L403.8 172.0 L408.0 168.7 L412.2 165.3 L416.3 161.9 L420.5 158.5 L424.7 154.9 L428.8 151.4 L433.0 147.7 L437.2 144.0 L441.3 140.3 L445.5 136.5 L449.7 132.6 L453.8 128.7 L458.0 124.7 L462.2 120.7 L466.3 116.6 L470.5 112.4 L474.7 108.2 L478.8 103.9 L483.0 99.6 L487.2 95.2 L491.3 90.8 L495.5 86.3 L499.7 81.7 L503.8 77.1 L508.0 72.5",
+   "price": {
+    "t": "P = MR = D",
+    "y": 147.71428571428572
+   },
+   "qstar": {
+    "q": 40.0,
+    "t": "Q* = 40",
+    "x": 433.0
+   },
+   "rect": {
+    "h": 50.28571428571428,
+    "sign": "profit",
+    "w": 375.0,
+    "x": 58.0,
+    "y": 147.71428571428572
+   },
+   "ticks": [
+    {
+     "t": "$2",
+     "y": 311.14285714285717
+    },
+    {
+     "t": "$5",
+     "y": 248.28571428571428
+    },
+    {
+     "t": "$7",
+     "y": 185.42857142857142
+    },
+    {
+     "t": "$10",
+     "y": 122.57142857142858
+    },
+    {
+     "t": "$12",
+     "y": 59.71428571428572
+    },
+    {
+     "t": "10",
+     "x": 151.75
+    },
+    {
+     "t": "20",
+     "x": 245.5
+    },
+    {
+     "t": "30",
+     "x": 339.25
+    },
+    {
+     "t": "40",
+     "x": 433.0
+    }
+   ],
+   "w": 600,
+   "x0": 58,
+   "x1": 508,
+   "y0": 22,
+   "y1": 374
+  },
+  "good": "cases",
+  "id": "R1",
+  "title": "Thornbury Cidery — where the rectangle comes from"
+ },
+ {
+  "biz": "Stone Hollow Vineyard",
+  "blurb": "The vineyard sells at the market price of $8 a bottle. Marginal cost meets that price at 10 bottles, and average total cost there is $6. The whole of the rest of the curve matters not at all: what the firm earns is decided at that one quantity.",
+  "case": {
+   "afc": 1.8,
+   "afcTxt": "$1.80",
+   "atc": 6.0,
+   "atcTxt": "$6",
+   "avc": 4.2,
+   "avcTxt": "$4.20",
+   "contribution": 38.0,
+   "contributionTxt": "$38",
+   "gap": 2.0,
+   "gapTxt": "$2",
+   "label": "Stone Hollow Vineyard at $8",
+   "lr": "stay",
+   "minAtc": 5.69,
+   "minAvc": 2.98,
+   "operate": -20.0,
+   "operateTxt": "$20",
+   "outcome": "profit",
+   "price": 8.0,
+   "priceTxt": "$8",
+   "profit": 20.0,
+   "profitTxt": "$20",
+   "q": 10.0,
+   "qTxt": "10",
+   "shutdown": 18.0,
+   "shutdownTxt": "$18",
+   "sr": "produce",
+   "tc": 60.0,
+   "tcTxt": "$60",
+   "tfc": 18.0,
+   "tfcTxt": "$18",
+   "tr": 80.0,
+   "trTxt": "$80"
+  },
+  "geom": {
+   "atc": "M184.2 24.6 L188.2 33.5 L192.3 42.0 L196.3 49.9 L200.4 57.5 L204.4 64.6 L208.5 71.3 L212.5 77.7 L216.6 83.8 L220.6 89.5 L224.7 95.0 L228.7 100.1 L232.8 105.0 L236.8 109.7 L240.9 114.1 L244.9 118.2 L249.0 122.2 L253.0 125.9 L257.0 129.5 L261.1 132.8 L265.1 136.0 L269.2 139.0 L273.2 141.9 L277.3 144.5 L281.3 147.0 L285.4 149.4 L289.4 151.6 L293.5 153.7 L297.5 155.7 L301.6 157.5 L305.6 159.2 L309.7 160.8 L313.7 162.3 L317.8 163.7 L321.8 164.9 L325.9 166.1 L329.9 167.2 L334.0 168.1 L338.0 169.0 L342.0 169.8 L346.1 170.5 L350.1 171.1 L354.2 171.7 L358.2 172.2 L362.3 172.6 L366.3 172.9 L370.4 173.2 L374.4 173.4 L378.5 173.5 L382.5 173.6 L386.6 173.6 L390.6 173.6 L394.7 173.5 L398.7 173.4 L402.8 173.2 L406.8 173.0 L410.9 172.7 L414.9 172.4 L419.0 172.1 L423.0 171.7 L427.0 171.3 L431.1 170.9 L435.1 170.4 L439.2 169.9 L443.2 169.4 L447.3 168.9 L451.3 168.3 L455.4 167.7 L459.4 167.1 L463.5 166.5 L467.5 165.9 L471.6 165.2 L475.6 164.6 L479.7 163.9 L483.7 163.3 L487.8 162.6 L491.8 161.9 L495.9 161.3 L499.9 160.6 L504.0 159.9 L508.0 159.3",
+   "atcAt": {
+    "v": 6.0,
+    "y": 162.8
+   },
+   "avc": "M143.7 211.1 L147.8 214.5 L151.8 217.8 L155.9 220.9 L159.9 223.9 L164.0 226.9 L168.0 229.7 L172.0 232.3 L176.1 234.9 L180.1 237.4 L184.2 239.8 L188.2 242.0 L192.3 244.2 L196.3 246.2 L200.4 248.2 L204.4 250.0 L208.5 251.8 L212.5 253.5 L216.6 255.0 L220.6 256.5 L224.7 257.9 L228.7 259.2 L232.8 260.4 L236.8 261.5 L240.9 262.6 L244.9 263.5 L249.0 264.4 L253.0 265.2 L257.0 265.9 L261.1 266.6 L265.1 267.1 L269.2 267.6 L273.2 268.0 L277.3 268.4 L281.3 268.6 L285.4 268.8 L289.4 269.0 L293.5 269.0 L297.5 269.1 L301.6 269.0 L305.6 268.9 L309.7 268.7 L313.7 268.5 L317.8 268.2 L321.8 267.9 L325.9 267.5 L329.9 267.0 L334.0 266.5 L338.0 266.0 L342.0 265.4 L346.1 264.8 L350.1 264.1 L354.2 263.4 L358.2 262.6 L362.3 261.8 L366.3 261.0 L370.4 260.1 L374.4 259.2 L378.5 258.2 L382.5 257.3 L386.6 256.3 L390.6 255.2 L394.7 254.2 L398.7 253.1 L402.8 252.0 L406.8 250.8 L410.9 249.7 L414.9 248.5 L419.0 247.3 L423.0 246.1 L427.0 244.9 L431.1 243.7 L435.1 242.4 L439.2 241.2 L443.2 239.9 L447.3 238.6 L451.3 237.3 L455.4 236.0 L459.4 234.8 L463.5 233.5 L467.5 232.2 L471.6 230.9 L475.6 229.6 L479.7 228.3 L483.7 227.1 L487.8 225.8 L491.8 224.5 L495.9 223.3 L499.9 222.1 L504.0 220.8 L508.0 219.6",
+   "avcAt": {
+    "v": 4.2,
+    "y": 226.16
+   },
+   "h": 420,
+   "labels": [
+    {
+     "cls": "mc",
+     "t": "MC",
+     "x": 515.0,
+     "y": 90.78999999999996
+    },
+    {
+     "cls": "atc",
+     "t": "ATC",
+     "x": 515.0,
+     "y": 163.29139285714285
+    },
+    {
+     "cls": "avc",
+     "t": "AVC",
+     "x": 515.0,
+     "y": 223.63425
+    }
+   ],
+   "marks": [],
+   "mc": "M143.7 283.9 L147.8 288.1 L151.8 291.9 L155.9 295.4 L159.9 298.7 L164.0 301.6 L168.0 304.2 L172.0 306.5 L176.1 308.6 L180.1 310.4 L184.2 311.9 L188.2 313.1 L192.3 314.1 L196.3 314.8 L200.4 315.3 L204.4 315.5 L208.5 315.5 L212.5 315.2 L216.6 314.8 L220.6 314.1 L224.7 313.2 L228.7 312.1 L232.8 310.8 L236.8 309.3 L240.9 307.6 L244.9 305.8 L249.0 303.7 L253.0 301.5 L257.0 299.1 L261.1 296.6 L265.1 293.9 L269.2 291.1 L273.2 288.2 L277.3 285.1 L281.3 281.8 L285.4 278.5 L289.4 275.0 L293.5 271.5 L297.5 267.8 L301.6 264.0 L305.6 260.2 L309.7 256.3 L313.7 252.2 L317.8 248.1 L321.8 244.0 L325.9 239.8 L329.9 235.5 L334.0 231.2 L338.0 226.8 L342.0 222.4 L346.1 218.0 L350.1 213.6 L354.2 209.1 L358.2 204.6 L362.3 200.2 L366.3 195.7 L370.4 191.2 L374.4 186.8 L378.5 182.3 L382.5 177.9 L386.6 173.5 L390.6 169.2 L394.7 164.9 L398.7 160.6 L402.8 156.4 L406.8 152.3 L410.9 148.2 L414.9 144.2 L419.0 140.3 L423.0 136.5 L427.0 132.8 L431.1 129.1 L435.1 125.6 L439.2 122.2 L443.2 118.9 L447.3 115.7 L451.3 112.6 L455.4 109.7 L459.4 106.9 L463.5 104.3 L467.5 101.8 L471.6 99.5 L475.6 97.4 L479.7 95.4 L483.7 93.6 L487.8 91.9 L491.8 90.5 L495.9 89.3 L499.9 88.2 L504.0 87.4 L508.0 86.8",
+   "price": {
+    "t": "P = MR = D",
+    "y": 92.39999999999998
+   },
+   "qstar": {
+    "q": 10.0,
+    "t": "Q* = 10",
+    "x": 486.57142857142856
+   },
+   "rect": {
+    "h": 70.40000000000003,
+    "sign": "profit",
+    "w": 428.57142857142856,
+    "x": 58.0,
+    "y": 92.39999999999998
+   },
+   "ticks": [
+    {
+     "t": "$2",
+     "y": 303.6
+    },
+    {
+     "t": "$4",
+     "y": 233.2
+    },
+    {
+     "t": "$6",
+     "y": 162.8
+    },
+    {
+     "t": "$8",
+     "y": 92.39999999999998
+    },
+    {
+     "t": "$10",
+     "y": 22.0
+    },
+    {
+     "t": "2",
+     "x": 143.71428571428572
+    },
+    {
+     "t": "4",
+     "x": 229.42857142857142
+    },
+    {
+     "t": "6",
+     "x": 315.14285714285717
+    },
+    {
+     "t": "8",
+     "x": 400.85714285714283
+    }
+   ],
+   "w": 600,
+   "x0": 58,
+   "x1": 508,
+   "y0": 22,
+   "y1": 374
+  },
+  "good": "bottles",
+  "id": "R2",
+  "title": "Stone Hollow Vineyard — the profit case"
+ },
+ {
+  "biz": "Stone Hollow Vineyard",
+  "blurb": "The same vineyard, the same cost curves, a worse market: the price has fallen to $3.50. Marginal cost now meets the price at 6 bottles, where average total cost is $6 and average variable cost is $3. The first question is what the rectangle says; the second is what the vineyard should do about it.",
+  "case": {
+   "afc": 3.0,
+   "afcTxt": "$3",
+   "atc": 6.0,
+   "atcTxt": "$6",
+   "avc": 3.0,
+   "avcTxt": "$3",
+   "contribution": 3.0,
+   "contributionTxt": "$3",
+   "gap": -2.5,
+   "gapTxt": "$2.50",
+   "label": "Stone Hollow Vineyard at $3.50",
+   "lr": "exit",
+   "minAtc": 5.69,
+   "minAvc": 2.98,
+   "operate": 15.0,
+   "operateTxt": "$15",
+   "outcome": "loss",
+   "price": 3.5,
+   "priceTxt": "$3.50",
+   "profit": -15.0,
+   "profitTxt": "−$15",
+   "q": 6.0,
+   "qTxt": "6",
+   "shutdown": 18.0,
+   "shutdownTxt": "$18",
+   "sr": "produce",
+   "tc": 36.0,
+   "tcTxt": "$36",
+   "tfc": 18.0,
+   "tfcTxt": "$18",
+   "tr": 21.0,
+   "trTxt": "$21"
+  },
+  "geom": {
+   "atc": "M184.2 24.6 L188.2 33.5 L192.3 42.0 L196.3 49.9 L200.4 57.5 L204.4 64.6 L208.5 71.3 L212.5 77.7 L216.6 83.8 L220.6 89.5 L224.7 95.0 L228.7 100.1 L232.8 105.0 L236.8 109.7 L240.9 114.1 L244.9 118.2 L249.0 122.2 L253.0 125.9 L257.0 129.5 L261.1 132.8 L265.1 136.0 L269.2 139.0 L273.2 141.9 L277.3 144.5 L281.3 147.0 L285.4 149.4 L289.4 151.6 L293.5 153.7 L297.5 155.7 L301.6 157.5 L305.6 159.2 L309.7 160.8 L313.7 162.3 L317.8 163.7 L321.8 164.9 L325.9 166.1 L329.9 167.2 L334.0 168.1 L338.0 169.0 L342.0 169.8 L346.1 170.5 L350.1 171.1 L354.2 171.7 L358.2 172.2 L362.3 172.6 L366.3 172.9 L370.4 173.2 L374.4 173.4 L378.5 173.5 L382.5 173.6 L386.6 173.6 L390.6 173.6 L394.7 173.5 L398.7 173.4 L402.8 173.2 L406.8 173.0 L410.9 172.7 L414.9 172.4 L419.0 172.1 L423.0 171.7 L427.0 171.3 L431.1 170.9 L435.1 170.4 L439.2 169.9 L443.2 169.4 L447.3 168.9 L451.3 168.3 L455.4 167.7 L459.4 167.1 L463.5 166.5 L467.5 165.9 L471.6 165.2 L475.6 164.6 L479.7 163.9 L483.7 163.3 L487.8 162.6 L491.8 161.9 L495.9 161.3 L499.9 160.6 L504.0 159.9 L508.0 159.3",
+   "atcAt": {
+    "v": 6.0,
+    "y": 162.8
+   },
+   "avc": "M143.7 211.1 L147.8 214.5 L151.8 217.8 L155.9 220.9 L159.9 223.9 L164.0 226.9 L168.0 229.7 L172.0 232.3 L176.1 234.9 L180.1 237.4 L184.2 239.8 L188.2 242.0 L192.3 244.2 L196.3 246.2 L200.4 248.2 L204.4 250.0 L208.5 251.8 L212.5 253.5 L216.6 255.0 L220.6 256.5 L224.7 257.9 L228.7 259.2 L232.8 260.4 L236.8 261.5 L240.9 262.6 L244.9 263.5 L249.0 264.4 L253.0 265.2 L257.0 265.9 L261.1 266.6 L265.1 267.1 L269.2 267.6 L273.2 268.0 L277.3 268.4 L281.3 268.6 L285.4 268.8 L289.4 269.0 L293.5 269.0 L297.5 269.1 L301.6 269.0 L305.6 268.9 L309.7 268.7 L313.7 268.5 L317.8 268.2 L321.8 267.9 L325.9 267.5 L329.9 267.0 L334.0 266.5 L338.0 266.0 L342.0 265.4 L346.1 264.8 L350.1 264.1 L354.2 263.4 L358.2 262.6 L362.3 261.8 L366.3 261.0 L370.4 260.1 L374.4 259.2 L378.5 258.2 L382.5 257.3 L386.6 256.3 L390.6 255.2 L394.7 254.2 L398.7 253.1 L402.8 252.0 L406.8 250.8 L410.9 249.7 L414.9 248.5 L419.0 247.3 L423.0 246.1 L427.0 244.9 L431.1 243.7 L435.1 242.4 L439.2 241.2 L443.2 239.9 L447.3 238.6 L451.3 237.3 L455.4 236.0 L459.4 234.8 L463.5 233.5 L467.5 232.2 L471.6 230.9 L475.6 229.6 L479.7 228.3 L483.7 227.1 L487.8 225.8 L491.8 224.5 L495.9 223.3 L499.9 222.1 L504.0 220.8 L508.0 219.6",
+   "avcAt": {
+    "v": 3.0,
+    "y": 268.4
+   },
+   "h": 420,
+   "labels": [
+    {
+     "cls": "mc",
+     "t": "MC",
+     "x": 515.0,
+     "y": 90.78999999999996
+    },
+    {
+     "cls": "atc",
+     "t": "ATC",
+     "x": 515.0,
+     "y": 163.29139285714285
+    },
+    {
+     "cls": "avc",
+     "t": "AVC",
+     "x": 515.0,
+     "y": 223.63425
+    }
+   ],
+   "marks": [],
+   "mc": "M143.7 283.9 L147.8 288.1 L151.8 291.9 L155.9 295.4 L159.9 298.7 L164.0 301.6 L168.0 304.2 L172.0 306.5 L176.1 308.6 L180.1 310.4 L184.2 311.9 L188.2 313.1 L192.3 314.1 L196.3 314.8 L200.4 315.3 L204.4 315.5 L208.5 315.5 L212.5 315.2 L216.6 314.8 L220.6 314.1 L224.7 313.2 L228.7 312.1 L232.8 310.8 L236.8 309.3 L240.9 307.6 L244.9 305.8 L249.0 303.7 L253.0 301.5 L257.0 299.1 L261.1 296.6 L265.1 293.9 L269.2 291.1 L273.2 288.2 L277.3 285.1 L281.3 281.8 L285.4 278.5 L289.4 275.0 L293.5 271.5 L297.5 267.8 L301.6 264.0 L305.6 260.2 L309.7 256.3 L313.7 252.2 L317.8 248.1 L321.8 244.0 L325.9 239.8 L329.9 235.5 L334.0 231.2 L338.0 226.8 L342.0 222.4 L346.1 218.0 L350.1 213.6 L354.2 209.1 L358.2 204.6 L362.3 200.2 L366.3 195.7 L370.4 191.2 L374.4 186.8 L378.5 182.3 L382.5 177.9 L386.6 173.5 L390.6 169.2 L394.7 164.9 L398.7 160.6 L402.8 156.4 L406.8 152.3 L410.9 148.2 L414.9 144.2 L419.0 140.3 L423.0 136.5 L427.0 132.8 L431.1 129.1 L435.1 125.6 L439.2 122.2 L443.2 118.9 L447.3 115.7 L451.3 112.6 L455.4 109.7 L459.4 106.9 L463.5 104.3 L467.5 101.8 L471.6 99.5 L475.6 97.4 L479.7 95.4 L483.7 93.6 L487.8 91.9 L491.8 90.5 L495.9 89.3 L499.9 88.2 L504.0 87.4 L508.0 86.8",
+   "price": {
+    "t": "P = MR = D",
+    "y": 250.8
+   },
+   "qstar": {
+    "q": 6.0,
+    "t": "Q* = 6",
+    "x": 315.14285714285717
+   },
+   "rect": {
+    "h": 88.0,
+    "sign": "loss",
+    "w": 257.14285714285717,
+    "x": 58.0,
+    "y": 162.8
+   },
+   "ticks": [
+    {
+     "t": "$2",
+     "y": 303.6
+    },
+    {
+     "t": "$4",
+     "y": 233.2
+    },
+    {
+     "t": "$6",
+     "y": 162.8
+    },
+    {
+     "t": "$8",
+     "y": 92.39999999999998
+    },
+    {
+     "t": "$10",
+     "y": 22.0
+    },
+    {
+     "t": "2",
+     "x": 143.71428571428572
+    },
+    {
+     "t": "4",
+     "x": 229.42857142857142
+    },
+    {
+     "t": "6",
+     "x": 315.14285714285717
+    },
+    {
+     "t": "8",
+     "x": 400.85714285714283
+    }
+   ],
+   "w": 600,
+   "x0": 58,
+   "x1": 508,
+   "y0": 22,
+   "y1": 374
+  },
+  "good": "bottles",
+  "id": "R3",
+  "title": "Stone Hollow Vineyard — the loss, and whether to keep going"
+ },
+ {
+  "biz": "Larkspur Ski Rental",
+  "blurb": "Larkspur rents skis at the going rate of $20. On a thin off-season weekend marginal cost meets that price at 30 rentals, where average total cost is $34 and average variable cost is $23. The lease and the insurance are owed whether the shop opens or not. Should it open?",
+  "case": {
+   "afc": 11.0,
+   "afcTxt": "$11",
+   "atc": 34.0,
+   "atcTxt": "$34",
+   "avc": 23.0,
+   "avcTxt": "$23",
+   "contribution": -90.0,
+   "contributionTxt": "−$90",
+   "gap": -14.0,
+   "gapTxt": "$14",
+   "label": "Larkspur Ski Rental",
+   "lr": "exit",
+   "minAtc": 26.27,
+   "minAvc": 21.5,
+   "operate": 420.0,
+   "operateTxt": "$420",
+   "outcome": "loss",
+   "price": 20.0,
+   "priceTxt": "$20",
+   "profit": -420.0,
+   "profitTxt": "−$420",
+   "q": 30.0,
+   "qTxt": "30",
+   "shutdown": 330.0,
+   "shutdownTxt": "$330",
+   "sr": "shut down",
+   "tc": 1020.0,
+   "tcTxt": "$1,020",
+   "tfc": 330.0,
+   "tfcTxt": "$330",
+   "tr": 600.0,
+   "trTxt": "$600"
+  },
+  "geom": {
+   "atc": "M143.3 46.7 L147.3 54.0 L151.4 60.7 L155.4 66.9 L159.5 72.6 L163.5 78.0 L167.6 83.0 L171.6 87.7 L175.7 92.1 L179.7 96.2 L183.8 100.1 L187.8 103.8 L191.9 107.3 L195.9 110.6 L200.0 113.7 L204.1 116.7 L208.1 119.6 L212.2 122.3 L216.2 124.8 L220.3 127.3 L224.3 129.7 L228.4 131.9 L232.4 134.0 L236.5 136.1 L240.5 138.1 L244.6 140.0 L248.6 141.8 L252.7 143.5 L256.7 145.1 L260.8 146.7 L264.8 148.2 L268.9 149.7 L272.9 151.1 L277.0 152.4 L281.1 153.7 L285.1 155.0 L289.2 156.1 L293.2 157.3 L297.3 158.3 L301.3 159.4 L305.4 160.4 L309.4 161.3 L313.5 162.2 L317.5 163.0 L321.6 163.9 L325.6 164.6 L329.7 165.4 L333.7 166.1 L337.8 166.7 L341.8 167.3 L345.9 167.9 L349.9 168.5 L354.0 169.0 L358.1 169.5 L362.1 169.9 L366.2 170.3 L370.2 170.7 L374.3 171.1 L378.3 171.4 L382.4 171.7 L386.4 171.9 L390.5 172.2 L394.5 172.4 L398.6 172.6 L402.6 172.7 L406.7 172.8 L410.7 172.9 L414.8 173.0 L418.8 173.0 L422.9 173.0 L426.9 173.0 L431.0 172.9 L435.1 172.9 L439.1 172.8 L443.2 172.6 L447.2 172.5 L451.3 172.3 L455.3 172.1 L459.4 171.9 L463.4 171.6 L467.5 171.3 L471.5 171.0 L475.6 170.7 L479.6 170.4 L483.7 170.0 L487.7 169.6 L491.8 169.2 L495.8 168.7 L499.9 168.3 L503.9 167.8 L508.0 167.3",
+   "atcAt": {
+    "v": 34.0,
+    "y": 113.82608695652175
+   },
+   "avc": "M143.3 187.0 L147.3 187.9 L151.4 188.8 L155.4 189.6 L159.5 190.5 L163.5 191.3 L167.6 192.1 L171.6 192.9 L175.7 193.7 L179.7 194.5 L183.8 195.2 L187.8 195.9 L191.9 196.6 L195.9 197.3 L200.0 198.0 L204.1 198.6 L208.1 199.3 L212.2 199.9 L216.2 200.5 L220.3 201.0 L224.3 201.6 L228.4 202.1 L232.4 202.6 L236.5 203.1 L240.5 203.6 L244.6 204.1 L248.6 204.5 L252.7 204.9 L256.7 205.3 L260.8 205.7 L264.8 206.1 L268.9 206.4 L272.9 206.8 L277.0 207.1 L281.1 207.4 L285.1 207.6 L289.2 207.9 L293.2 208.1 L297.3 208.3 L301.3 208.5 L305.4 208.7 L309.4 208.9 L313.5 209.0 L317.5 209.1 L321.6 209.2 L325.6 209.3 L329.7 209.4 L333.7 209.4 L337.8 209.5 L341.8 209.5 L345.9 209.5 L349.9 209.4 L354.0 209.4 L358.1 209.3 L362.1 209.3 L366.2 209.2 L370.2 209.0 L374.3 208.9 L378.3 208.7 L382.4 208.6 L386.4 208.4 L390.5 208.2 L394.5 207.9 L398.6 207.7 L402.6 207.4 L406.7 207.1 L410.7 206.8 L414.8 206.5 L418.8 206.1 L422.9 205.8 L426.9 205.4 L431.0 205.0 L435.1 204.6 L439.1 204.1 L443.2 203.7 L447.2 203.2 L451.3 202.7 L455.3 202.2 L459.4 201.7 L463.4 201.1 L467.5 200.6 L471.5 200.0 L475.6 199.4 L479.6 198.7 L483.7 198.1 L487.7 197.4 L491.8 196.8 L495.8 196.1 L499.9 195.3 L503.9 194.6 L508.0 193.9",
+   "avcAt": {
+    "v": 23.0,
+    "y": 198.0
+   },
+   "h": 420,
+   "labels": [
+    {
+     "cls": "mc",
+     "t": "MC",
+     "x": 515.0,
+     "y": 113.04347826086956
+    },
+    {
+     "cls": "atc",
+     "t": "ATC",
+     "x": 515.0,
+     "y": 171.2738367658276
+    },
+    {
+     "cls": "avc",
+     "t": "AVC",
+     "x": 515.0,
+     "y": 197.8550724637681
+    }
+   ],
+   "marks": [],
+   "mc": "M143.3 206.3 L147.3 207.7 L151.4 209.0 L155.4 210.3 L159.5 211.6 L163.5 212.8 L167.6 213.9 L171.6 215.0 L175.7 216.0 L179.7 217.0 L183.8 217.9 L187.8 218.7 L191.9 219.5 L195.9 220.3 L200.0 220.9 L204.1 221.6 L208.1 222.1 L212.2 222.7 L216.2 223.1 L220.3 223.5 L224.3 223.9 L228.4 224.2 L232.4 224.4 L236.5 224.6 L240.5 224.7 L244.6 224.8 L248.6 224.8 L252.7 224.7 L256.7 224.6 L260.8 224.5 L264.8 224.3 L268.9 224.0 L272.9 223.7 L277.0 223.3 L281.1 222.9 L285.1 222.4 L289.2 221.8 L293.2 221.2 L297.3 220.6 L301.3 219.8 L305.4 219.1 L309.4 218.2 L313.5 217.4 L317.5 216.4 L321.6 215.4 L325.6 214.4 L329.7 213.3 L333.7 212.1 L337.8 210.9 L341.8 209.6 L345.9 208.3 L349.9 206.9 L354.0 205.4 L358.1 203.9 L362.1 202.4 L366.2 200.8 L370.2 199.1 L374.3 197.4 L378.3 195.6 L382.4 193.8 L386.4 191.9 L390.5 189.9 L394.5 187.9 L398.6 185.8 L402.6 183.7 L406.7 181.6 L410.7 179.3 L414.8 177.0 L418.8 174.7 L422.9 172.3 L426.9 169.9 L431.0 167.3 L435.1 164.8 L439.1 162.2 L443.2 159.5 L447.2 156.8 L451.3 154.0 L455.3 151.1 L459.4 148.2 L463.4 145.3 L467.5 142.3 L471.5 139.2 L475.6 136.1 L479.6 132.9 L483.7 129.6 L487.7 126.3 L491.8 123.0 L495.8 119.6 L499.9 116.1 L503.9 112.6 L508.0 109.0",
+   "price": {
+    "t": "P = MR = D",
+    "y": 220.95652173913044
+   },
+   "qstar": {
+    "q": 30.0,
+    "t": "Q* = 30",
+    "x": 200.10526315789474
+   },
+   "rect": {
+    "h": 107.13043478260869,
+    "sign": "loss",
+    "w": 142.10526315789474,
+    "x": 58.0,
+    "y": 113.82608695652175
+   },
+   "ticks": [
+    {
+     "t": "$10",
+     "y": 297.47826086956525
+    },
+    {
+     "t": "$20",
+     "y": 220.95652173913044
+    },
+    {
+     "t": "$30",
+     "y": 144.43478260869566
+    },
+    {
+     "t": "$40",
+     "y": 67.91304347826087
+    },
+    {
+     "t": "20",
+     "x": 152.73684210526318
+    },
+    {
+     "t": "40",
+     "x": 247.47368421052633
+    },
+    {
+     "t": "60",
+     "x": 342.2105263157895
+    },
+    {
+     "t": "80",
+     "x": 436.94736842105266
+    }
+   ],
+   "w": 600,
+   "x0": 58,
+   "x1": 508,
+   "y0": 22,
+   "y1": 374
+  },
+  "good": "rentals",
+  "id": "R4",
+  "title": "Larkspur Ski Rental — the off-season weekend"
+ },
+ {
+  "biz": "Four firms at once",
+  "blurb": "No rectangles in this one. Four firms, each with its price, the bottom of its AVC curve and the bottom of its ATC curve. Place each one in the chart: what it should do now, while its fixed costs are sunk, and what it should do in the long run, when they are not.",
+  "chart": [
+   {
+    "atcTxt": "$14",
+    "avcTxt": "$9",
+    "band": "profit",
+    "good": "loads",
+    "lr": "Stay in — profit draws entry",
+    "minAtc": 14,
+    "minAvc": 9,
+    "price": 18,
+    "priceTxt": "$18",
+    "sr": "Produce — economic profit",
+    "who": "Alder Lane Laundry"
+   },
+   {
+    "atcTxt": "$17",
+    "avcTxt": "$12",
+    "band": "loss",
+    "good": "trays",
+    "lr": "Exit — it cannot cover ATC",
+    "minAtc": 17,
+    "minAvc": 12,
+    "price": 12,
+    "priceTxt": "$12",
+    "sr": "Produce at a loss",
+    "who": "Pennywort Nursery"
+   },
+   {
+    "atcTxt": "$15",
+    "avcTxt": "$8",
+    "band": "break-even",
+    "good": "tubs",
+    "lr": "Stay in — break-even",
+    "minAtc": 15,
+    "minAvc": 8,
+    "price": 15,
+    "priceTxt": "$15",
+    "sr": "Produce — break-even",
+    "who": "Saltbox Creamery"
+   },
+   {
+    "atcTxt": "$16",
+    "avcTxt": "$10",
+    "band": "shut",
+    "good": "kits",
+    "lr": "Exit — it cannot cover ATC",
+    "minAtc": 16,
+    "minAvc": 10,
+    "price": 6,
+    "priceTxt": "$6",
+    "sr": "Shut down — produce nothing",
+    "who": "Tuckaway Camp Store"
+   }
+  ],
+  "good": "units",
+  "id": "R5",
+  "title": "Four firms, four rows of the chart"
+ },
+ {
+  "biz": "Bellhouse Bakery",
+  "blurb": "The bakery is a price-taker: at $4 a loaf it sells all it wants, and marginal cost meets that price at 200 loaves. This problem asks what happens as the price moves instead — and where the supply curve you drew in Unit 2 actually came from.",
+  "case": {
+   "afc": 0.9,
+   "afcTxt": "$0.90",
+   "atc": 3.7,
+   "atcTxt": "$3.70",
+   "avc": 2.8,
+   "avcTxt": "$2.80",
+   "contribution": 240.0,
+   "contributionTxt": "$240",
+   "gap": 0.3,
+   "gapTxt": "$0.30",
+   "label": "Bellhouse Bakery",
+   "lr": "stay",
+   "minAtc": 3.69,
+   "minAvc": 2.4,
+   "operate": -60.0,
+   "operateTxt": "$60",
+   "outcome": "profit",
+   "price": 4.0,
+   "priceTxt": "$4",
+   "profit": 60.0,
+   "profitTxt": "$60",
+   "q": 200.0,
+   "qTxt": "200",
+   "shutdown": 180.0,
+   "shutdownTxt": "$180",
+   "sr": "produce",
+   "tc": 740.0,
+   "tcTxt": "$740",
+   "tfc": 180.0,
+   "tfcTxt": "$180",
+   "tr": 800.0,
+   "trTxt": "$800"
+  },
+  "geom": {
+   "atc": "M148.3 30.5 L152.4 39.4 L156.6 47.6 L160.7 55.2 L164.8 62.1 L169.0 68.5 L173.1 74.4 L177.2 79.9 L181.4 85.0 L185.5 89.8 L189.6 94.2 L193.8 98.4 L197.9 102.3 L202.0 105.9 L206.2 109.4 L210.3 112.6 L214.4 115.6 L218.6 118.5 L222.7 121.2 L226.8 123.7 L231.0 126.1 L235.1 128.3 L239.2 130.5 L243.4 132.5 L247.5 134.3 L251.7 136.1 L255.8 137.8 L259.9 139.4 L264.1 140.9 L268.2 142.3 L272.3 143.6 L276.5 144.9 L280.6 146.0 L284.7 147.1 L288.9 148.2 L293.0 149.1 L297.1 150.0 L301.3 150.9 L305.4 151.6 L309.5 152.4 L313.7 153.0 L317.8 153.7 L321.9 154.2 L326.1 154.7 L330.2 155.2 L334.3 155.6 L338.5 156.0 L342.6 156.4 L346.7 156.7 L350.9 156.9 L355.0 157.1 L359.2 157.3 L363.3 157.4 L367.4 157.5 L371.6 157.6 L375.7 157.6 L379.8 157.6 L384.0 157.6 L388.1 157.5 L392.2 157.4 L396.4 157.3 L400.5 157.1 L404.6 156.9 L408.8 156.7 L412.9 156.4 L417.0 156.1 L421.2 155.8 L425.3 155.5 L429.4 155.1 L433.6 154.7 L437.7 154.3 L441.8 153.8 L446.0 153.3 L450.1 152.8 L454.2 152.3 L458.4 151.8 L462.5 151.2 L466.7 150.6 L470.8 149.9 L474.9 149.3 L479.1 148.6 L483.2 147.9 L487.3 147.2 L491.5 146.5 L495.6 145.7 L499.7 144.9 L503.9 144.1 L508.0 143.2",
+   "atcAt": {
+    "v": 3.7,
+    "y": 156.9333333333333
+   },
+   "avc": "M135.9 232.6 L140.0 232.7 L144.2 232.8 L148.3 232.9 L152.4 233.0 L156.6 233.1 L160.7 233.1 L164.8 233.2 L169.0 233.2 L173.1 233.2 L177.2 233.2 L181.4 233.2 L185.5 233.1 L189.6 233.1 L193.8 233.0 L197.9 232.9 L202.0 232.8 L206.2 232.7 L210.3 232.6 L214.4 232.5 L218.6 232.3 L222.7 232.1 L226.8 231.9 L231.0 231.7 L235.1 231.5 L239.2 231.3 L243.4 231.0 L247.5 230.8 L251.7 230.5 L255.8 230.2 L259.9 229.9 L264.1 229.6 L268.2 229.2 L272.3 228.9 L276.5 228.5 L280.6 228.1 L284.7 227.7 L288.9 227.3 L293.0 226.9 L297.1 226.5 L301.3 226.0 L305.4 225.5 L309.5 225.0 L313.7 224.5 L317.8 224.0 L321.9 223.5 L326.1 222.9 L330.2 222.4 L334.3 221.8 L338.5 221.2 L342.6 220.6 L346.7 220.0 L350.9 219.3 L355.0 218.7 L359.2 218.0 L363.3 217.3 L367.4 216.6 L371.6 215.9 L375.7 215.2 L379.8 214.4 L384.0 213.7 L388.1 212.9 L392.2 212.1 L396.4 211.3 L400.5 210.5 L404.6 209.6 L408.8 208.8 L412.9 207.9 L417.0 207.0 L421.2 206.1 L425.3 205.2 L429.4 204.3 L433.6 203.4 L437.7 202.4 L441.8 201.4 L446.0 200.5 L450.1 199.5 L454.2 198.4 L458.4 197.4 L462.5 196.4 L466.7 195.3 L470.8 194.2 L474.9 193.1 L479.1 192.0 L483.2 190.9 L487.3 189.8 L491.5 188.6 L495.6 187.5 L499.7 186.3 L503.9 185.1 L508.0 183.9",
+   "avcAt": {
+    "v": 2.8,
+    "y": 209.73333333333335
+   },
+   "h": 420,
+   "labels": [
+    {
+     "cls": "mc",
+     "t": "MC",
+     "x": 515.0,
+     "y": 55.15733333333333
+    },
+    {
+     "cls": "atc",
+     "t": "ATC",
+     "x": 515.0,
+     "y": 147.24594871794872
+    },
+    {
+     "cls": "avc",
+     "t": "AVC",
+     "x": 515.0,
+     "y": 187.8613333333333
+    }
+   ],
+   "marks": [],
+   "mc": "M135.9 235.2 L140.0 235.1 L144.2 235.0 L148.3 234.9 L152.4 234.8 L156.6 234.5 L160.7 234.3 L164.8 234.0 L169.0 233.6 L173.1 233.2 L177.2 232.8 L181.4 232.3 L185.5 231.8 L189.6 231.2 L193.8 230.6 L197.9 229.9 L202.0 229.2 L206.2 228.4 L210.3 227.6 L214.4 226.8 L218.6 225.9 L222.7 225.0 L226.8 224.0 L231.0 223.0 L235.1 221.9 L239.2 220.8 L243.4 219.6 L247.5 218.4 L251.7 217.1 L255.8 215.8 L259.9 214.5 L264.1 213.1 L268.2 211.7 L272.3 210.2 L276.5 208.7 L280.6 207.1 L284.7 205.5 L288.9 203.8 L293.0 202.1 L297.1 200.4 L301.3 198.6 L305.4 196.7 L309.5 194.8 L313.7 192.9 L317.8 190.9 L321.9 188.9 L326.1 186.9 L330.2 184.7 L334.3 182.6 L338.5 180.4 L342.6 178.1 L346.7 175.8 L350.9 173.5 L355.0 171.1 L359.2 168.7 L363.3 166.2 L367.4 163.7 L371.6 161.1 L375.7 158.5 L379.8 155.9 L384.0 153.2 L388.1 150.4 L392.2 147.6 L396.4 144.8 L400.5 141.9 L404.6 139.0 L408.8 136.0 L412.9 133.0 L417.0 129.9 L421.2 126.8 L425.3 123.7 L429.4 120.5 L433.6 117.2 L437.7 114.0 L441.8 110.6 L446.0 107.2 L450.1 103.8 L454.2 100.4 L458.4 96.8 L462.5 93.3 L466.7 89.7 L470.8 86.0 L474.9 82.3 L479.1 78.6 L483.2 74.8 L487.3 71.0 L491.5 67.1 L495.6 63.2 L499.7 59.2 L503.9 55.2 L508.0 51.2",
+   "minAvc": {
+    "t": "min AVC",
+    "v": 2.4000000151321,
+    "x": 173.42949999999996,
+    "y": 233.20000000000002
+   },
+   "price": {
+    "t": "P = MR = D",
+    "y": 139.33333333333334
+   },
+   "qstar": {
+    "q": 200.0,
+    "t": "Q* = 200",
+    "x": 404.15384615384613
+   },
+   "rect": {
+    "h": 17.599999999999966,
+    "sign": "profit",
+    "w": 346.15384615384613,
+    "x": 58.0,
+    "y": 139.33333333333334
+   },
+   "supply": "M173.4 233.2 L180.1 232.5 L186.8 231.6 L193.5 230.6 L200.2 229.5 L206.9 228.3 L213.6 227.0 L220.3 225.5 L227.0 224.0 L233.7 222.3 L240.3 220.5 L247.0 218.5 L253.7 216.5 L260.4 214.3 L267.1 212.1 L273.8 209.7 L280.5 207.1 L287.2 204.5 L293.9 201.8 L300.6 198.9 L307.3 195.9 L313.9 192.8 L320.6 189.6 L327.3 186.2 L334.0 182.8 L340.7 179.2 L347.4 175.5 L354.1 171.7 L360.8 167.7 L367.5 163.7 L374.2 159.5 L380.9 155.2 L387.6 150.8 L394.2 146.3 L400.9 141.6 L407.6 136.8 L414.3 132.0 L421.0 127.0 L427.7 121.8 L434.4 116.6 L441.1 111.2 L447.8 105.8 L454.5 100.2 L461.2 94.5 L467.9 88.6 L474.5 82.7 L481.2 76.6 L487.9 70.4 L494.6 64.1 L501.3 57.7 L508.0 51.2",
+   "ticks": [
+    {
+     "t": "$1",
+     "y": 315.3333333333333
+    },
+    {
+     "t": "$2",
+     "y": 256.6666666666667
+    },
+    {
+     "t": "$3",
+     "y": 198.0
+    },
+    {
+     "t": "$4",
+     "y": 139.33333333333334
+    },
+    {
+     "t": "$5",
+     "y": 80.66666666666669
+    },
+    {
+     "t": "$6",
+     "y": 22.0
+    },
+    {
+     "t": "50",
+     "x": 144.53846153846155
+    },
+    {
+     "t": "100",
+     "x": 231.07692307692307
+    },
+    {
+     "t": "150",
+     "x": 317.61538461538464
+    },
+    {
+     "t": "200",
+     "x": 404.15384615384613
+    }
+   ],
+   "w": 600,
+   "x0": 58,
+   "x1": 508,
+   "y0": 22,
+   "y1": 374
+  },
+  "good": "loaves",
+  "id": "R6",
+  "title": "Bellhouse Bakery — where supply comes from"
+ },
+ {
+  "biz": "Copperline Dry Cleaners",
+  "blurb": "Copperline charges the going price of $14 an order. The table below gives its marginal cost and its average total cost at six output levels. Three of those rows are tempting for the wrong reason. Find the quantity first, and only then read the cost off it.",
+  "case": {
+   "afc": 1.2,
+   "afcTxt": "$1.20",
+   "atc": 11.2,
+   "atcTxt": "$11.20",
+   "avc": 10.0,
+   "avcTxt": "$10",
+   "contribution": 200.0,
+   "contributionTxt": "$200",
+   "gap": 2.8,
+   "gapTxt": "$2.80",
+   "label": "Copperline Dry Cleaners",
+   "lr": "stay",
+   "minAtc": 11.03,
+   "minAvc": 9.6,
+   "operate": -140.0,
+   "operateTxt": "$140",
+   "outcome": "profit",
+   "price": 14.0,
+   "priceTxt": "$14",
+   "profit": 140.0,
+   "profitTxt": "$140",
+   "q": 50.0,
+   "qTxt": "50",
+   "shutdown": 60.0,
+   "shutdownTxt": "$60",
+   "sr": "produce",
+   "tc": 560.0,
+   "tcTxt": "$560",
+   "tfc": 60.0,
+   "tfcTxt": "$60",
+   "tr": 700.0,
+   "trTxt": "$700"
+  },
+  "geom": {
+   "atc": "M151.8 116.4 L155.7 121.0 L159.7 125.3 L163.6 129.4 L167.6 133.3 L171.5 137.0 L175.5 140.6 L179.5 143.9 L183.4 147.1 L187.4 150.2 L191.3 153.1 L195.3 155.9 L199.2 158.5 L203.2 161.1 L207.2 163.5 L211.1 165.8 L215.1 168.1 L219.0 170.2 L223.0 172.2 L227.0 174.1 L230.9 176.0 L234.9 177.7 L238.8 179.4 L242.8 181.0 L246.8 182.5 L250.7 183.9 L254.7 185.2 L258.6 186.5 L262.6 187.7 L266.5 188.8 L270.5 189.9 L274.5 190.8 L278.4 191.7 L282.4 192.6 L286.3 193.4 L290.3 194.1 L294.2 194.7 L298.2 195.3 L302.2 195.8 L306.1 196.2 L310.1 196.6 L314.0 196.9 L318.0 197.2 L322.0 197.3 L325.9 197.5 L329.9 197.5 L333.8 197.6 L337.8 197.5 L341.8 197.4 L345.7 197.2 L349.7 197.0 L353.6 196.7 L357.6 196.3 L361.5 195.9 L365.5 195.5 L369.5 194.9 L373.4 194.4 L377.4 193.7 L381.3 193.0 L385.3 192.3 L389.2 191.5 L393.2 190.6 L397.2 189.7 L401.1 188.7 L405.1 187.7 L409.0 186.6 L413.0 185.4 L417.0 184.2 L420.9 183.0 L424.9 181.7 L428.8 180.3 L432.8 178.9 L436.8 177.4 L440.7 175.9 L444.7 174.3 L448.6 172.6 L452.6 170.9 L456.5 169.2 L460.5 167.4 L464.5 165.5 L468.4 163.6 L472.4 161.7 L476.3 159.6 L480.3 157.6 L484.2 155.4 L488.2 153.2 L492.2 151.0 L496.1 148.7 L500.1 146.4 L504.0 144.0 L508.0 141.5",
+   "atcAt": {
+    "v": 11.2,
+    "y": 194.8
+   },
+   "avc": "M151.8 180.4 L155.7 182.4 L159.7 184.4 L163.6 186.2 L167.6 188.1 L171.5 189.9 L175.5 191.6 L179.5 193.3 L183.4 195.0 L187.4 196.6 L191.3 198.1 L195.3 199.6 L199.2 201.0 L203.2 202.4 L207.2 203.7 L211.1 205.0 L215.1 206.3 L219.0 207.4 L223.0 208.6 L227.0 209.6 L230.9 210.7 L234.9 211.6 L238.8 212.6 L242.8 213.4 L246.8 214.3 L250.7 215.0 L254.7 215.7 L258.6 216.4 L262.6 217.0 L266.5 217.6 L270.5 218.1 L274.5 218.6 L278.4 219.0 L282.4 219.3 L286.3 219.6 L290.3 219.9 L294.2 220.1 L298.2 220.2 L302.2 220.3 L306.1 220.4 L310.1 220.4 L314.0 220.3 L318.0 220.2 L322.0 220.1 L325.9 219.9 L329.9 219.6 L333.8 219.3 L337.8 218.9 L341.8 218.5 L345.7 218.1 L349.7 217.6 L353.6 217.0 L357.6 216.4 L361.5 215.7 L365.5 215.0 L369.5 214.2 L373.4 213.4 L377.4 212.5 L381.3 211.6 L385.3 210.6 L389.2 209.6 L393.2 208.5 L397.2 207.4 L401.1 206.2 L405.1 205.0 L409.0 203.7 L413.0 202.3 L417.0 200.9 L420.9 199.5 L424.9 198.0 L428.8 196.5 L432.8 194.9 L436.8 193.2 L440.7 191.5 L444.7 189.8 L448.6 188.0 L452.6 186.2 L456.5 184.2 L460.5 182.3 L464.5 180.3 L468.4 178.2 L472.4 176.1 L476.3 174.0 L480.3 171.8 L484.2 169.5 L488.2 167.2 L492.2 164.8 L496.1 162.4 L500.1 159.9 L504.0 157.4 L508.0 154.9",
+   "avcAt": {
+    "v": 10.0,
+    "y": 214.0
+   },
+   "h": 420,
+   "labels": [
+    {
+     "cls": "mc",
+     "t": "MC",
+     "x": 446.71875,
+     "y": 31.21812
+    },
+    {
+     "cls": "atc",
+     "t": "ATC",
+     "x": 515.0,
+     "y": 145.53066666666666
+    },
+    {
+     "cls": "avc",
+     "t": "AVC",
+     "x": 515.0,
+     "y": 173.864
+    }
+   ],
+   "marks": [],
+   "mc": "M151.8 228.4 L155.7 231.2 L159.7 233.8 L163.6 236.2 L167.6 238.5 L171.5 240.7 L175.5 242.7 L179.5 244.5 L183.4 246.2 L187.4 247.7 L191.3 249.1 L195.3 250.3 L199.2 251.4 L203.2 252.3 L207.2 253.0 L211.1 253.6 L215.1 254.1 L219.0 254.4 L223.0 254.5 L227.0 254.5 L230.9 254.3 L234.9 254.0 L238.8 253.5 L242.8 252.9 L246.8 252.1 L250.7 251.2 L254.7 250.1 L258.6 248.9 L262.6 247.5 L266.5 245.9 L270.5 244.2 L274.5 242.3 L278.4 240.3 L282.4 238.2 L286.3 235.8 L290.3 233.4 L294.2 230.7 L298.2 228.0 L302.2 225.0 L306.1 221.9 L310.1 218.7 L314.0 215.3 L318.0 211.7 L322.0 208.0 L325.9 204.1 L329.9 200.1 L333.8 196.0 L337.8 191.6 L341.8 187.2 L345.7 182.5 L349.7 177.7 L353.6 172.8 L357.6 167.7 L361.5 162.4 L365.5 157.0 L369.5 151.5 L373.4 145.8 L377.4 139.9 L381.3 133.9 L385.3 127.7 L389.2 121.4 L393.2 114.9 L397.2 108.3 L401.1 101.5 L405.1 94.5 L409.0 87.4 L413.0 80.2 L417.0 72.8 L420.9 65.2 L424.9 57.5 L428.8 49.6 L432.8 41.6 L436.8 33.5 L440.7 25.1",
+   "price": {
+    "t": "P = MR = D",
+    "y": 150.0
+   },
+   "qstar": {
+    "q": 50.0,
+    "t": "Q* = 50",
+    "x": 370.5
+   },
+   "rect": {
+    "h": 44.80000000000001,
+    "sign": "profit",
+    "w": 312.5,
+    "x": 58.0,
+    "y": 150.0
+   },
+   "ticks": [
+    {
+     "t": "$5",
+     "y": 294.0
+    },
+    {
+     "t": "$10",
+     "y": 214.0
+    },
+    {
+     "t": "$15",
+     "y": 134.0
+    },
+    {
+     "t": "$20",
+     "y": 54.0
+    },
+    {
+     "t": "20",
+     "x": 183.0
+    },
+    {
+     "t": "40",
+     "x": 308.0
+    },
+    {
+     "t": "60",
+     "x": 433.0
+    }
+   ],
+   "w": 600,
+   "x0": 58,
+   "x1": 508,
+   "y0": 22,
+   "y1": 374
+  },
+  "good": "orders",
+  "id": "R7",
+  "rows": [
+   {
+    "atc": 12.0,
+    "atcTxt": "$12",
+    "exact": true,
+    "mc": 7.6,
+    "mcTxt": "$7.60",
+    "q": 30,
+    "qTxt": "30"
+   },
+   {
+    "atc": 11.1,
+    "atcTxt": "$11.10",
+    "exact": true,
+    "mc": 9.6,
+    "mcTxt": "$9.60",
+    "q": 40,
+    "qTxt": "40"
+   },
+   {
+    "atc": 11.2,
+    "atcTxt": "$11.20",
+    "exact": true,
+    "mc": 14.0,
+    "mcTxt": "$14",
+    "q": 50,
+    "qTxt": "50"
+   },
+   {
+    "atc": 12.2,
+    "atcTxt": "$12.20",
+    "exact": true,
+    "mc": 20.8,
+    "mcTxt": "$20.80",
+    "q": 60,
+    "qTxt": "60"
+   },
+   {
+    "atc": 14.057142857142857,
+    "atcTxt": "$14.06",
+    "exact": true,
+    "mc": 30.0,
+    "mcTxt": "$30",
+    "q": 70,
+    "qTxt": "70"
+   }
+  ],
+  "title": "Copperline Dry Cleaners — which quantity, and in which order"
+ },
+ {
+  "biz": "Fenwick Print Shop",
+  "blurb": "Long-run framing, stated outright: the lease is up, the press can be sold, and nothing this shop pays is sunk any more. Every input is a choice. The best average total cost it can reach at any scale is $7.50 a run, and the going price is $6.",
+  "geom": {
+   "atc": "M123.9 24.7 L128.1 37.1 L132.4 48.0 L136.7 57.7 L140.9 66.4 L145.2 74.3 L149.5 81.4 L153.7 87.9 L158.0 93.8 L162.3 99.2 L166.5 104.1 L170.8 108.7 L175.1 112.9 L179.3 116.9 L183.6 120.5 L187.9 123.9 L192.1 127.0 L196.4 129.9 L200.7 132.7 L205.0 135.2 L209.2 137.6 L213.5 139.9 L217.8 142.0 L222.0 144.0 L226.3 145.9 L230.6 147.6 L234.8 149.3 L239.1 150.8 L243.4 152.3 L247.6 153.7 L251.9 155.0 L256.2 156.2 L260.4 157.4 L264.7 158.4 L269.0 159.5 L273.2 160.4 L277.5 161.3 L281.8 162.2 L286.0 163.0 L290.3 163.7 L294.6 164.4 L298.9 165.1 L303.1 165.7 L307.4 166.3 L311.7 166.8 L315.9 167.3 L320.2 167.8 L324.5 168.2 L328.7 168.6 L333.0 168.9 L337.3 169.2 L341.5 169.5 L345.8 169.8 L350.1 170.0 L354.3 170.2 L358.6 170.4 L362.9 170.5 L367.1 170.7 L371.4 170.8 L375.7 170.8 L380.0 170.9 L384.2 170.9 L388.5 170.9 L392.8 170.9 L397.0 170.9 L401.3 170.8 L405.6 170.7 L409.8 170.6 L414.1 170.5 L418.4 170.4 L422.6 170.2 L426.9 170.0 L431.2 169.8 L435.4 169.6 L439.7 169.4 L444.0 169.1 L448.2 168.9 L452.5 168.6 L456.8 168.3 L461.0 168.0 L465.3 167.7 L469.6 167.3 L473.9 166.9 L478.1 166.6 L482.4 166.2 L486.7 165.8 L490.9 165.3 L495.2 164.9 L499.5 164.5 L503.7 164.0 L508.0 163.5",
+   "avc": "M123.9 227.8 L128.1 227.8 L132.4 227.8 L136.7 227.7 L140.9 227.7 L145.2 227.7 L149.5 227.6 L153.7 227.6 L158.0 227.5 L162.3 227.4 L166.5 227.4 L170.8 227.3 L175.1 227.2 L179.3 227.1 L183.6 226.9 L187.9 226.8 L192.1 226.7 L196.4 226.6 L200.7 226.4 L205.0 226.2 L209.2 226.1 L213.5 225.9 L217.8 225.7 L222.0 225.5 L226.3 225.3 L230.6 225.1 L234.8 224.9 L239.1 224.7 L243.4 224.4 L247.6 224.2 L251.9 223.9 L256.2 223.7 L260.4 223.4 L264.7 223.1 L269.0 222.9 L273.2 222.6 L277.5 222.3 L281.8 221.9 L286.0 221.6 L290.3 221.3 L294.6 221.0 L298.9 220.6 L303.1 220.3 L307.4 219.9 L311.7 219.5 L315.9 219.1 L320.2 218.8 L324.5 218.4 L328.7 218.0 L333.0 217.5 L337.3 217.1 L341.5 216.7 L345.8 216.3 L350.1 215.8 L354.3 215.3 L358.6 214.9 L362.9 214.4 L367.1 213.9 L371.4 213.4 L375.7 212.9 L380.0 212.4 L384.2 211.9 L388.5 211.4 L392.8 210.9 L397.0 210.3 L401.3 209.8 L405.6 209.2 L409.8 208.6 L414.1 208.1 L418.4 207.5 L422.6 206.9 L426.9 206.3 L431.2 205.7 L435.4 205.1 L439.7 204.4 L444.0 203.8 L448.2 203.1 L452.5 202.5 L456.8 201.8 L461.0 201.2 L465.3 200.5 L469.6 199.8 L473.9 199.1 L478.1 198.4 L482.4 197.7 L486.7 197.0 L490.9 196.2 L495.2 195.5 L499.5 194.8 L503.7 194.0 L508.0 193.2",
+   "h": 420,
+   "labels": [
+    {
+     "cls": "mc",
+     "t": "MC",
+     "x": 515.0,
+     "y": 116.28461538461539
+    },
+    {
+     "cls": "atc",
+     "t": "ATC",
+     "x": 515.0,
+     "y": 167.5147592245153
+    },
+    {
+     "cls": "avc",
+     "t": "AVC",
+     "x": 515.0,
+     "y": 197.23333333333332
+    }
+   ],
+   "marks": [],
+   "mc": "M123.9 227.8 L128.1 227.6 L132.4 227.5 L136.7 227.3 L140.9 227.1 L145.2 226.8 L149.5 226.5 L153.7 226.2 L158.0 225.9 L162.3 225.6 L166.5 225.2 L170.8 224.8 L175.1 224.4 L179.3 223.9 L183.6 223.4 L187.9 222.9 L192.1 222.4 L196.4 221.8 L200.7 221.3 L205.0 220.7 L209.2 220.0 L213.5 219.4 L217.8 218.7 L222.0 218.0 L226.3 217.3 L230.6 216.5 L234.8 215.7 L239.1 214.9 L243.4 214.1 L247.6 213.2 L251.9 212.3 L256.2 211.4 L260.4 210.5 L264.7 209.5 L269.0 208.5 L273.2 207.5 L277.5 206.5 L281.8 205.4 L286.0 204.3 L290.3 203.2 L294.6 202.0 L298.9 200.9 L303.1 199.7 L307.4 198.5 L311.7 197.2 L315.9 195.9 L320.2 194.7 L324.5 193.3 L328.7 192.0 L333.0 190.6 L337.3 189.2 L341.5 187.8 L345.8 186.3 L350.1 184.9 L354.3 183.4 L358.6 181.8 L362.9 180.3 L367.1 178.7 L371.4 177.1 L375.7 175.5 L380.0 173.8 L384.2 172.1 L388.5 170.4 L392.8 168.7 L397.0 166.9 L401.3 165.2 L405.6 163.4 L409.8 161.5 L414.1 159.7 L418.4 157.8 L422.6 155.9 L426.9 153.9 L431.2 152.0 L435.4 150.0 L439.7 148.0 L444.0 145.9 L448.2 143.9 L452.5 141.8 L456.8 139.7 L461.0 137.5 L465.3 135.4 L469.6 133.2 L473.9 130.9 L478.1 128.7 L482.4 126.4 L486.7 124.1 L490.9 121.8 L495.2 119.5 L499.5 117.1 L503.7 114.7 L508.0 112.3",
+   "minAtc": {
+    "t": "min ATC",
+    "v": 7.500000000032771,
+    "x": 387.26950000000005,
+    "y": 170.92307692307693
+   },
+   "price": {
+    "t": "P = MR = D",
+    "y": 211.53846153846155
+   },
+   "ticks": [
+    {
+     "t": "$2",
+     "y": 319.84615384615387
+    },
+    {
+     "t": "$4",
+     "y": 265.6923076923077
+    },
+    {
+     "t": "$6",
+     "y": 211.53846153846155
+    },
+    {
+     "t": "$8",
+     "y": 157.3846153846154
+    },
+    {
+     "t": "$10",
+     "y": 103.23076923076923
+    },
+    {
+     "t": "$12",
+     "y": 49.076923076923094
+    },
+    {
+     "t": "20",
+     "x": 167.7560975609756
+    },
+    {
+     "t": "40",
+     "x": 277.5121951219512
+    },
+    {
+     "t": "60",
+     "x": 387.2682926829268
+    }
+   ],
+   "w": 600,
+   "x0": 58,
+   "x1": 508,
+   "y0": 22,
+   "y1": 374
+  },
+  "good": "runs",
+  "id": "R8",
+  "lr": {
+   "minAtc": 7.500000000032771,
+   "minAtcTxt": "$7.50",
+   "price": 6,
+   "priceTxt": "$6"
+  },
+  "title": "Fenwick Print Shop — the long run only"
+ },
+ {
+  "biz": "Quarry Lane Car Wash",
+  "blurb": "No price and no profit in this one, just one identity. At 120 washes Quarry Lane’s average total cost is $9.40 and its average variable cost is $6.90. That is everything needed to say what the fixed costs are.",
+  "geom": {
+   "atc": "M124.2 24.0 L128.4 38.1 L132.7 50.7 L137.0 61.9 L141.2 71.9 L145.5 81.0 L149.8 89.2 L154.0 96.6 L158.3 103.4 L162.6 109.6 L166.8 115.3 L171.1 120.6 L175.4 125.4 L179.6 129.9 L183.9 134.1 L188.1 138.0 L192.4 141.6 L196.7 144.9 L200.9 148.1 L205.2 151.0 L209.5 153.8 L213.7 156.3 L218.0 158.7 L222.3 161.0 L226.5 163.1 L230.8 165.1 L235.1 167.0 L239.3 168.8 L243.6 170.4 L247.9 172.0 L252.1 173.5 L256.4 174.8 L260.6 176.1 L264.9 177.3 L269.2 178.5 L273.4 179.6 L277.7 180.6 L282.0 181.5 L286.2 182.4 L290.5 183.2 L294.8 183.9 L299.0 184.7 L303.3 185.3 L307.6 185.9 L311.8 186.5 L316.1 187.0 L320.4 187.5 L324.6 187.9 L328.9 188.3 L333.1 188.6 L337.4 188.9 L341.7 189.2 L345.9 189.4 L350.2 189.6 L354.5 189.8 L358.7 189.9 L363.0 190.0 L367.3 190.1 L371.5 190.2 L375.8 190.2 L380.1 190.2 L384.3 190.1 L388.6 190.0 L392.9 190.0 L397.1 189.8 L401.4 189.7 L405.6 189.5 L409.9 189.3 L414.2 189.1 L418.4 188.8 L422.7 188.6 L427.0 188.3 L431.2 188.0 L435.5 187.6 L439.8 187.3 L444.0 186.9 L448.3 186.5 L452.6 186.1 L456.8 185.6 L461.1 185.2 L465.4 184.7 L469.6 184.2 L473.9 183.7 L478.1 183.1 L482.4 182.6 L486.7 182.0 L490.9 181.4 L495.2 180.8 L499.5 180.2 L503.7 179.5 L508.0 178.9",
+   "atcAt": {
+    "v": 9.4,
+    "y": 190.17777777777778
+   },
+   "avc": "M124.2 258.6 L128.4 258.6 L132.7 258.6 L137.0 258.6 L141.2 258.5 L145.5 258.4 L149.8 258.4 L154.0 258.3 L158.3 258.2 L162.6 258.1 L166.8 258.0 L171.1 257.9 L175.4 257.7 L179.6 257.6 L183.9 257.4 L188.1 257.3 L192.4 257.1 L196.7 256.9 L200.9 256.7 L205.2 256.5 L209.5 256.3 L213.7 256.0 L218.0 255.8 L222.3 255.5 L226.5 255.3 L230.8 255.0 L235.1 254.7 L239.3 254.4 L243.6 254.1 L247.9 253.8 L252.1 253.5 L256.4 253.1 L260.6 252.8 L264.9 252.4 L269.2 252.0 L273.4 251.6 L277.7 251.2 L282.0 250.8 L286.2 250.4 L290.5 250.0 L294.8 249.5 L299.0 249.1 L303.3 248.6 L307.6 248.1 L311.8 247.7 L316.1 247.2 L320.4 246.7 L324.6 246.1 L328.9 245.6 L333.1 245.1 L337.4 244.5 L341.7 243.9 L345.9 243.4 L350.2 242.8 L354.5 242.2 L358.7 241.6 L363.0 241.0 L367.3 240.3 L371.5 239.7 L375.8 239.0 L380.1 238.4 L384.3 237.7 L388.6 237.0 L392.9 236.3 L397.1 235.6 L401.4 234.9 L405.6 234.2 L409.9 233.4 L414.2 232.7 L418.4 231.9 L422.7 231.2 L427.0 230.4 L431.2 229.6 L435.5 228.8 L439.8 228.0 L444.0 227.1 L448.3 226.3 L452.6 225.4 L456.8 224.6 L461.1 223.7 L465.4 222.8 L469.6 221.9 L473.9 221.0 L478.1 220.1 L482.4 219.2 L486.7 218.2 L490.9 217.3 L495.2 216.3 L499.5 215.4 L503.7 214.4 L508.0 213.4",
+   "avcAt": {
+    "v": 6.9,
+    "y": 239.06666666666666
+   },
+   "h": 420,
+   "labels": [
+    {
+     "cls": "mc",
+     "t": "MC",
+     "x": 515.0,
+     "y": 112.0597222222222
+    },
+    {
+     "cls": "atc",
+     "t": "ATC",
+     "x": 515.0,
+     "y": 182.88170842411037
+    },
+    {
+     "cls": "avc",
+     "t": "AVC",
+     "x": 515.0,
+     "y": 217.39151234567902
+    }
+   ],
+   "marks": [],
+   "mc": "M124.2 258.5 L128.4 258.3 L132.7 258.1 L137.0 257.8 L141.2 257.5 L145.5 257.2 L149.8 256.8 L154.0 256.4 L158.3 256.0 L162.6 255.5 L166.8 255.0 L171.1 254.5 L175.4 253.9 L179.6 253.3 L183.9 252.7 L188.1 252.0 L192.4 251.3 L196.7 250.6 L200.9 249.8 L205.2 249.0 L209.5 248.2 L213.7 247.4 L218.0 246.5 L222.3 245.5 L226.5 244.6 L230.8 243.6 L235.1 242.5 L239.3 241.5 L243.6 240.4 L247.9 239.3 L252.1 238.1 L256.4 236.9 L260.6 235.7 L264.9 234.4 L269.2 233.1 L273.4 231.8 L277.7 230.5 L282.0 229.1 L286.2 227.6 L290.5 226.2 L294.8 224.7 L299.0 223.2 L303.3 221.6 L307.6 220.0 L311.8 218.4 L316.1 216.7 L320.4 215.1 L324.6 213.3 L328.9 211.6 L333.1 209.8 L337.4 208.0 L341.7 206.1 L345.9 204.2 L350.2 202.3 L354.5 200.4 L358.7 198.4 L363.0 196.4 L367.3 194.3 L371.5 192.2 L375.8 190.1 L380.1 188.0 L384.3 185.8 L388.6 183.6 L392.9 181.3 L397.1 179.0 L401.4 176.7 L405.6 174.4 L409.9 172.0 L414.2 169.6 L418.4 167.1 L422.7 164.6 L427.0 162.1 L431.2 159.6 L435.5 157.0 L439.8 154.4 L444.0 151.7 L448.3 149.0 L452.6 146.3 L456.8 143.6 L461.1 140.8 L465.4 138.0 L469.6 135.2 L473.9 132.3 L478.1 129.4 L482.4 126.4 L486.7 123.4 L490.9 120.4 L495.2 117.4 L499.5 114.3 L503.7 111.2 L508.0 108.1",
+   "qstar": {
+    "q": 120.0,
+    "t": "Q = 120",
+    "x": 375.6470588235294
+   },
+   "ticks": [
+    {
+     "t": "$5",
+     "y": 276.22222222222223
+    },
+    {
+     "t": "$10",
+     "y": 178.44444444444446
+    },
+    {
+     "t": "$15",
+     "y": 80.66666666666669
+    },
+    {
+     "t": "50",
+     "x": 190.35294117647058
+    },
+    {
+     "t": "100",
+     "x": 322.70588235294116
+    },
+    {
+     "t": "150",
+     "x": 455.05882352941177
+    }
+   ],
+   "w": 600,
+   "x0": 58,
+   "x1": 508,
+   "y0": 22,
+   "y1": 374
+  },
+  "good": "washes",
+  "id": "R9",
+  "tfcOnly": {
+   "afc": 2.5,
+   "afcTxt": "$2.50",
+   "atcTxt": "$9.40",
+   "avcTxt": "$6.90",
+   "q": 120,
+   "qTxt": "120",
+   "tfc": 300,
+   "tfcTxt": "$300"
+  },
+  "title": "Quarry Lane Car Wash — the gap is the fixed cost"
+ },
+ {
+  "biz": "Harbor Point Fishmonger",
+  "blurb": "The going price is $5.25 a crate. Marginal cost meets it at 80 crates, where average total cost is $5.75 and average variable cost is $4.90. Walk the whole chain: the rectangle, the short-run decision, what it costs either way, and then the long run.",
+  "case": {
+   "afc": 0.85,
+   "afcTxt": "$0.85",
+   "atc": 5.75,
+   "atcTxt": "$5.75",
+   "avc": 4.9,
+   "avcTxt": "$4.90",
+   "contribution": 28.0,
+   "contributionTxt": "$28",
+   "gap": -0.5,
+   "gapTxt": "$0.50",
+   "label": "Harbor Point Fishmonger",
+   "lr": "exit",
+   "minAtc": 5.68,
+   "minAvc": 4.75,
+   "operate": 40.0,
+   "operateTxt": "$40",
+   "outcome": "loss",
+   "price": 5.25,
+   "priceTxt": "$5.25",
+   "profit": -40.0,
+   "profitTxt": "−$40",
+   "q": 80.0,
+   "qTxt": "80",
+   "shutdown": 68.0,
+   "shutdownTxt": "$68",
+   "sr": "produce",
+   "tc": 460.0,
+   "tcTxt": "$460",
+   "tfc": 68.0,
+   "tfcTxt": "$68",
+   "tr": 420.0,
+   "trTxt": "$420"
+  },
+  "geom": {
+   "atc": "M134.2 28.8 L138.3 35.8 L142.5 42.1 L146.6 47.8 L150.8 53.0 L154.9 57.8 L159.1 62.1 L163.2 66.1 L167.4 69.7 L171.5 73.1 L175.7 76.3 L179.8 79.2 L184.0 81.9 L188.2 84.5 L192.3 86.8 L196.5 89.1 L200.6 91.1 L204.8 93.1 L208.9 94.9 L213.1 96.7 L217.2 98.3 L221.4 99.8 L225.5 101.3 L229.7 102.6 L233.8 103.9 L238.0 105.2 L242.2 106.3 L246.3 107.4 L250.5 108.4 L254.6 109.4 L258.8 110.4 L262.9 111.3 L267.1 112.1 L271.2 112.9 L275.4 113.7 L279.5 114.4 L283.7 115.1 L287.8 115.7 L292.0 116.3 L296.2 116.9 L300.3 117.4 L304.5 118.0 L308.6 118.5 L312.8 118.9 L316.9 119.4 L321.1 119.8 L325.2 120.2 L329.4 120.5 L333.5 120.9 L337.7 121.2 L341.8 121.5 L346.0 121.8 L350.2 122.1 L354.3 122.3 L358.5 122.6 L362.6 122.8 L366.8 123.0 L370.9 123.1 L375.1 123.3 L379.2 123.5 L383.4 123.6 L387.5 123.7 L391.7 123.8 L395.8 123.9 L400.0 124.0 L404.2 124.1 L408.3 124.1 L412.5 124.2 L416.6 124.2 L420.8 124.2 L424.9 124.2 L429.1 124.2 L433.2 124.2 L437.4 124.2 L441.5 124.1 L445.7 124.1 L449.8 124.0 L454.0 124.0 L458.2 123.9 L462.3 123.8 L466.5 123.7 L470.6 123.6 L474.8 123.5 L478.9 123.4 L483.1 123.2 L487.2 123.1 L491.4 122.9 L495.5 122.8 L499.7 122.6 L503.8 122.4 L508.0 122.3",
+   "atcAt": {
+    "v": 5.75,
+    "y": 121.0
+   },
+   "avc": "M134.2 164.8 L138.3 164.8 L142.5 164.8 L146.6 164.7 L150.8 164.7 L154.9 164.6 L159.1 164.6 L163.2 164.5 L167.4 164.4 L171.5 164.4 L175.7 164.3 L179.8 164.2 L184.0 164.1 L188.2 164.0 L192.3 163.9 L196.5 163.9 L200.6 163.8 L204.8 163.7 L208.9 163.5 L213.1 163.4 L217.2 163.3 L221.4 163.2 L225.5 163.1 L229.7 163.0 L233.8 162.8 L238.0 162.7 L242.2 162.6 L246.3 162.4 L250.5 162.3 L254.6 162.1 L258.8 162.0 L262.9 161.8 L267.1 161.6 L271.2 161.5 L275.4 161.3 L279.5 161.1 L283.7 160.9 L287.8 160.8 L292.0 160.6 L296.2 160.4 L300.3 160.2 L304.5 160.0 L308.6 159.8 L312.8 159.6 L316.9 159.4 L321.1 159.1 L325.2 158.9 L329.4 158.7 L333.5 158.5 L337.7 158.2 L341.8 158.0 L346.0 157.8 L350.2 157.5 L354.3 157.3 L358.5 157.0 L362.6 156.8 L366.8 156.5 L370.9 156.2 L375.1 156.0 L379.2 155.7 L383.4 155.4 L387.5 155.1 L391.7 154.9 L395.8 154.6 L400.0 154.3 L404.2 154.0 L408.3 153.7 L412.5 153.4 L416.6 153.1 L420.8 152.8 L424.9 152.4 L429.1 152.1 L433.2 151.8 L437.4 151.5 L441.5 151.1 L445.7 150.8 L449.8 150.5 L454.0 150.1 L458.2 149.8 L462.3 149.4 L466.5 149.1 L470.6 148.7 L474.8 148.3 L478.9 148.0 L483.1 147.6 L487.2 147.2 L491.4 146.8 L495.5 146.4 L499.7 146.1 L503.8 145.7 L508.0 145.3",
+   "avcAt": {
+    "v": 4.9,
+    "y": 158.39999999999998
+   },
+   "h": 420,
+   "labels": [
+    {
+     "cls": "mc",
+     "t": "MC",
+     "x": 515.0,
+     "y": 105.99348958333337
+    },
+    {
+     "cls": "atc",
+     "t": "ATC",
+     "x": 515.0,
+     "y": 126.25050080128207
+    },
+    {
+     "cls": "avc",
+     "t": "AVC",
+     "x": 515.0,
+     "y": 149.26588541666666
+    }
+   ],
+   "marks": [],
+   "mc": "M134.2 164.2 L138.3 164.0 L142.5 163.9 L146.6 163.7 L150.8 163.5 L154.9 163.3 L159.1 163.1 L163.2 162.9 L167.4 162.6 L171.5 162.4 L175.7 162.1 L179.8 161.9 L184.0 161.6 L188.2 161.3 L192.3 161.0 L196.5 160.6 L200.6 160.3 L204.8 160.0 L208.9 159.6 L213.1 159.2 L217.2 158.9 L221.4 158.5 L225.5 158.1 L229.7 157.6 L233.8 157.2 L238.0 156.8 L242.2 156.3 L246.3 155.8 L250.5 155.4 L254.6 154.9 L258.8 154.4 L262.9 153.9 L267.1 153.3 L271.2 152.8 L275.4 152.2 L279.5 151.7 L283.7 151.1 L287.8 150.5 L292.0 149.9 L296.2 149.3 L300.3 148.7 L304.5 148.0 L308.6 147.4 L312.8 146.7 L316.9 146.1 L321.1 145.4 L325.2 144.7 L329.4 144.0 L333.5 143.2 L337.7 142.5 L341.8 141.8 L346.0 141.0 L350.2 140.2 L354.3 139.5 L358.5 138.7 L362.6 137.9 L366.8 137.0 L370.9 136.2 L375.1 135.4 L379.2 134.5 L383.4 133.6 L387.5 132.8 L391.7 131.9 L395.8 131.0 L400.0 130.1 L404.2 129.1 L408.3 128.2 L412.5 127.2 L416.6 126.3 L420.8 125.3 L424.9 124.3 L429.1 123.3 L433.2 122.3 L437.4 121.3 L441.5 120.2 L445.7 119.2 L449.8 118.1 L454.0 117.0 L458.2 116.0 L462.3 114.9 L466.5 113.8 L470.6 112.6 L474.8 111.5 L478.9 110.4 L483.1 109.2 L487.2 108.0 L491.4 106.8 L495.5 105.6 L499.7 104.4 L503.8 103.2 L508.0 102.0",
+   "price": {
+    "t": "P = MR = D",
+    "y": 143.0
+   },
+   "qstar": {
+    "q": 80.0,
+    "t": "Q* = 80",
+    "x": 334.9230769230769
+   },
+   "rect": {
+    "h": 22.0,
+    "sign": "loss",
+    "w": 276.9230769230769,
+    "x": 58.0,
+    "y": 121.0
+   },
+   "ticks": [
+    {
+     "t": "$2",
+     "y": 286.0
+    },
+    {
+     "t": "$4",
+     "y": 198.0
+    },
+    {
+     "t": "$6",
+     "y": 110.0
+    },
+    {
+     "t": "$8",
+     "y": 22.0
+    },
+    {
+     "t": "20",
+     "x": 127.23076923076923
+    },
+    {
+     "t": "40",
+     "x": 196.46153846153845
+    },
+    {
+     "t": "60",
+     "x": 265.6923076923077
+    },
+    {
+     "t": "80",
+     "x": 334.9230769230769
+    },
+    {
+     "t": "100",
+     "x": 404.15384615384613
+    }
+   ],
+   "w": 600,
+   "x0": 58,
+   "x1": 508,
+   "y0": 22,
+   "y1": 374
+  },
+  "good": "crates",
+  "id": "R10",
+  "title": "Harbor Point Fishmonger — the whole chain"
+ }
+];
+const BANK = {
+ "initial": {
+  "R1": [
+   "curves"
+  ],
+  "R10": [
+   "curves"
+  ],
+  "R2": [
+   "curves"
+  ],
+  "R3": [
+   "curves"
+  ],
+  "R4": [
+   "curves"
+  ],
+  "R5": [
+   "chart"
+  ],
+  "R6": [
+   "curves"
+  ],
+  "R7": [
+   "curves",
+   "rows"
+  ],
+  "R8": [
+   "curves"
+  ],
+  "R9": [
+   "curves"
+  ]
+ },
+ "steps": {
+  "R1": [
+   {
+    "correct": 0,
+    "explain": "Every case sells at the same $9, because this firm is small enough that it takes the market price as given. So total revenue is $9 × 40 = $360. That is the whole of the revenue side: for a price-taker, price and marginal revenue are the same number.",
+    "note": "Panel: the cost curves, the price line, which is also MR and the demand this firm faces.",
+    "options": [
+     "Price × quantity",
+     "ATC × quantity",
+     "Marginal cost × quantity",
+     "(Price − ATC) × quantity"
+    ],
+    "prompt": "Profit is total revenue minus total cost. With the firm selling 40 cases at $9 each, what is its total revenue?",
+    "view": {
+     "show": [
+      "curves",
+      "price"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Average total cost is total cost spread over the units, so multiplying it back by the quantity returns the total: $7 × 40 = $280. AVC would leave the fixed costs out, and marginal cost is what the LAST unit added, not what the average unit costs.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "ATC × quantity",
+     "AVC × quantity",
+     "Marginal cost × quantity",
+     "Fixed cost × quantity"
+    ],
+    "prompt": "And total cost at that same quantity?",
+    "view": {
+     "show": [
+      "curves",
+      "price"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Both terms carry a Q, so it comes out front: profit = (P − ATC) × Q. Nothing has been assumed here — this is the same subtraction written so that the two pieces can be read straight off a diagram.",
+    "note": "Panel: the quantity where MC meets the price.",
+    "options": [
+     "(P − ATC) × Q",
+     "(P × ATC) − Q",
+     "P − (ATC × Q)",
+     "(P − ATC) ÷ Q"
+    ],
+    "prompt": "So profit = (P × Q) − (ATC × Q). Take the quantity out as a common factor. What is left?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "It is the vertical distance between the price line and the ATC curve, read at the quantity the firm actually produces. Here that is $9 − $7 = $2 a case. The gap between ATC and AVC is a different thing entirely — that one is average fixed cost.",
+    "note": "Panel: average total cost read at that quantity.",
+    "options": [
+     "The vertical gap between the price line and ATC",
+     "The vertical gap between ATC and AVC",
+     "The vertical gap between the price line and MC",
+     "The height of the price line above the horizontal axis"
+    ],
+    "prompt": "On the diagram, what is (P − ATC) at the firm’s quantity?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "A height times a width is a rectangle: $2 a case tall and 40 cases wide. That rectangle IS the profit — not a picture of it, the same number drawn. When the price line lies below ATC the gap is negative and the rectangle is a loss instead.",
+    "note": "Panel: the rectangle between the price line and ATC.",
+    "options": [
+     "A rectangle from zero out to the firm’s quantity",
+     "A triangle under the marginal cost curve",
+     "The area under the ATC curve",
+     "The height of the price line again"
+    ],
+    "prompt": "Multiply that per-unit gap by the quantity. What does that sweep out on the diagram?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "rect"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "($9 − $7) × 40 = $80. $360 is the revenue and $280 is the total cost; the profit is what is left between them, and on the diagram it is the shaded rectangle.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "$80",
+     "$360",
+     "$280",
+     "−$80"
+    ],
+    "prompt": "Put Thornbury’s numbers in. What is the profit?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "rect"
+     ]
+    }
+   }
+  ],
+  "R10": [
+   {
+    "correct": 0,
+    "explain": "$5.25 − $5.75 = −$0.50 a crate. Being above AVC is what will decide whether to keep fishing, but it is not what decides profit: that comparison is with average TOTAL cost.",
+    "note": "Panel: the cost curves, the price line, which is also MR and the demand this firm faces, 2 more marks.",
+    "options": [
+     "A loss — the price is $0.50 below ATC",
+     "A profit — the price is $0.50 above ATC",
+     "Break-even — the price equals ATC",
+     "A profit, because the price is above average variable cost"
+    ],
+    "prompt": "The price is $5.25 and average total cost at 80 crates is $5.75. Profit or loss?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "($5.25 − $5.75) × 80 = −$40. That is the rectangle between the price line and the ATC curve, out to 80 crates. Hold on to the figure: the rest of this problem is about whether $40 is the worst the fishmonger can do, and it is not.",
+    "note": "Panel: the rectangle between the price line and ATC.",
+    "options": [
+     "−$40",
+     "−$68",
+     "−$28",
+     "−$420"
+    ],
+    "prompt": "How big is the loss?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "rect"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "$5.25 covers the $4.90 of variable cost and leaves $0.35 a crate over, and that leftover is money toward costs that are owed whether the boat goes out or not. \"A loss is a loss\" is the instinct this whole module exists to correct.",
+    "note": "Panel: average variable cost read at that quantity.",
+    "options": [
+     "Keep going — the price covers variable cost with something to spare",
+     "Stop — a loss is a loss",
+     "Keep going — the loss will shrink as the season goes on",
+     "Stop — the price is below average total cost"
+    ],
+    "prompt": "Average variable cost at that quantity is $4.90. What should the fishmonger do this season?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "($5.75 − $4.90) × 80 = $68. The gap between the two average cost curves is average fixed cost, $0.85 a crate, and over 80 crates that comes to $68 — the mooring, the insurance and the loan on the boat, none of which care whether the boat leaves the harbor.",
+    "note": "Panel: the gap between ATC and AVC, which is average fixed cost.",
+    "options": [
+     "$68",
+     "$460",
+     "$40",
+     "$28"
+    ],
+    "prompt": "What are the fixed costs?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect",
+      "gap"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "$40 against $68, so fishing is $28 better: the crates bring in $28 more than they cost to catch, and that $28 goes against the fixed costs. The firm is not choosing between a loss and no loss — it is choosing between two losses, and taking the smaller one.",
+    "note": "Panel: the two losses side by side.",
+    "options": [
+     "Fishing, by $28",
+     "Tying up, by $28",
+     "Fishing, by $40",
+     "Neither — they come to the same"
+    ],
+    "prompt": "Fishing loses $40. Tying up the boat loses $68. Which is better, and by how much?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect",
+      "gap",
+      "compare"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "The short-run case for carrying on rests entirely on fixed costs being owed whatever happens. Once the boat can be sold and the mooring given up, nothing is owed regardless, and a price that never covers average total cost is a reason to go. Expanding would not save it either — it is already at the quantity where MC meets the price, and going further would only add units that cost more than they bring in.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "Leave the industry",
+     "Stay — it is covering its variable costs",
+     "Stay — the fixed costs will eventually be paid off",
+     "Expand, to spread the fixed costs over more crates"
+    ],
+    "prompt": "If $5.25 is the price from now on, what should the fishmonger do in the long run?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect",
+      "gap",
+      "compare"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "The price clears variable cost but not total cost, which is the third row: carry on while the fixed costs are sunk, leave once they are not. Every figure in this problem followed from that one position — the loss, the contribution, the decision now and the decision later.",
+    "note": "Panel: this firm’s row of the chart.",
+    "options": [
+     "min AVC ≤ P < min ATC — produce now, exit later",
+     "P > min ATC — produce now, stay later",
+     "P < min AVC — shut down now, exit later",
+     "P = min ATC — break-even now and later"
+    ],
+    "prompt": "Which row of the chart is this firm in?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect",
+      "gap",
+      "compare",
+      "row"
+     ]
+    }
+   }
+  ],
+  "R2": [
+   {
+    "correct": 0,
+    "explain": "The price clears average total cost by $2 a bottle, so every bottle the vineyard sells adds that much to profit. Above ATC is profit, below it is a loss, and the size of either depends on how many units carry that gap.",
+    "note": "Panel: the cost curves, the price line, which is also MR and the demand this firm faces, 2 more marks.",
+    "options": [
+     "An economic profit — the price is above ATC",
+     "A loss — the price is below ATC",
+     "Neither — the price and ATC are equal",
+     "There is not enough here to say"
+    ],
+    "prompt": "The price is $8 and average total cost at the chosen quantity is $6. Is this firm making a profit, a loss, or neither?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "$8 − $6 = $2. The height of the rectangle is always the price minus average TOTAL cost, never the price itself and never AVC: it is what is left after every cost, fixed and variable, has been covered.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "$2 a bottle",
+     "$8 a bottle",
+     "$6 a bottle",
+     "$4.20 a bottle"
+    ],
+    "prompt": "How tall is the profit rectangle — that is, how much does each bottle clear?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "It runs from zero out to the quantity the firm actually produces, 10 bottles. Profit is the per-unit gap repeated once for every unit sold, which is why the quantity matters as much as the gap does.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "10 bottles",
+     "5 bottles",
+     "As wide as the diagram",
+     "It has no width — profit is a per-unit figure"
+    ],
+    "prompt": "And how wide is it?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "($8 − $6) × 10 = $20. Revenue is $80 and total cost is $60, and the difference between them is the shaded rectangle. Notice that neither the revenue nor the total cost had to be worked out to get there: the per-unit gap and the quantity were enough.",
+    "note": "Panel: the rectangle between the price line and ATC.",
+    "options": [
+     "$20",
+     "$80",
+     "$60",
+     "$2"
+    ],
+    "prompt": "So what is the vineyard’s economic profit?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "rect"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "The quantity is settled before ATC is looked at: the firm makes every unit whose marginal cost is within the price, which puts it at 10 bottles. Only then is ATC read, at that already-fixed quantity, to find out how tall the rectangle is. Choosing the quantity where ATC is lowest would mean giving up units that still add to profit.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "No — the quantity comes from MC meeting the price, and ATC only sizes the rectangle",
+     "Yes — the firm produces where ATC is at its lowest",
+     "Yes — the firm produces where ATC is closest to the price",
+     "No — the quantity comes from where ATC crosses AVC"
+    ],
+    "prompt": "Does the ATC curve decide where the vineyard produces?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "rect"
+     ]
+    }
+   }
+  ],
+  "R3": [
+   {
+    "correct": 0,
+    "explain": "The price is $2.50 below average total cost, so the gap has changed sign: every bottle now falls $2.50 short of what it cost on average. Selling bottles is not the same as making money on them.",
+    "note": "Panel: the cost curves, the price line, which is also MR and the demand this firm faces, 2 more marks.",
+    "options": [
+     "A loss — the price line lies below ATC",
+     "A profit — the price line lies above ATC",
+     "Neither — the price line meets ATC",
+     "A profit, because the firm is still selling bottles"
+    ],
+    "prompt": "The price has fallen to $3.50 and average total cost at the new quantity is $6. What does the rectangle show now?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "($3.50 − $6) × 6 = −$15. The rectangle is the same construction as before, only upside down: $2.50 of shortfall on each of 6 bottles, drawn between the price line and the ATC curve above it. Note how much smaller the quantity is than it was at $8 — the lower price pulled the firm back along its MC curve as well as pushing the rectangle below the line.",
+    "note": "Panel: the rectangle between the price line and ATC.",
+    "options": [
+     "−$15",
+     "−$18",
+     "−$2.50",
+     "−$21"
+    ],
+    "prompt": "How big is the loss?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "rect"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Fixed costs are sunk in the short run: they are owed either way, so they cannot tell the firm anything about what to do next. What is still in the firm’s hands is the variable cost, which it only pays if it produces. So the question is whether the price covers that: P against AVC. Comparing with ATC answers a different question — whether the firm is profitable, which it already knows it is not.",
+    "note": "Panel: average variable cost read at that quantity.",
+    "options": [
+     "The price against average VARIABLE cost",
+     "The price against average TOTAL cost",
+     "The price against marginal cost",
+     "Total revenue against fixed cost"
+    ],
+    "prompt": "The vineyard owes its fixed costs this season whether it bottles anything or not. Which comparison decides whether it should keep producing?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "rect",
+      "avcAt"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "$3.50 covers the $3 of variable cost with $0.50 a bottle left over, and that leftover goes toward the fixed costs the vineyard owes anyway. Producing at a loss is the right call here. Raising the price is not on the menu: a price-taker that asks more than $3.50 sells nothing.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "Keep producing, even though it is losing money",
+     "Shut down — it is losing money",
+     "Keep producing only if the loss is smaller than the fixed cost",
+     "Raise the price until it covers ATC"
+    ],
+    "prompt": "The price is $3.50 and average variable cost at this quantity is $3. What should the vineyard do?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "The gap between average total and average variable cost is average FIXED cost: $6 − $3 = $3 a bottle. Multiply by the 6 bottles and the fixed cost is $18. This works at any quantity, because AFC × Q is just TFC written two ways.",
+    "note": "Panel: the gap between ATC and AVC, which is average fixed cost.",
+    "options": [
+     "$18",
+     "$36",
+     "−−$15",
+     "$21"
+    ],
+    "prompt": "Use the gap between ATC and AVC. What are the vineyard’s total fixed costs?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect",
+      "gap"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Shutting down stops the variable costs and stops the revenue, but the fixed costs are owed regardless: the lease and the insurance do not care whether the press runs. So closing means a loss of exactly $18, the fixed cost, with nothing coming in against it.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "$18 — the whole fixed cost",
+     "Nothing — no output, no loss",
+     "$15 — the same as producing",
+     "$3 — only what it was clearing"
+    ],
+    "prompt": "Suppose it shut the doors instead and bottled nothing. What would it lose then?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect",
+      "gap"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "$18 − $15 = $3. That is the whole argument for staying open at a loss, in one line: the vineyard loses $15 by bottling and $18 by closing, so bottling is $3 better. A firm that shuts down to \"stop the bleeding\" here would be choosing the bigger loss.",
+    "note": "Panel: the two losses side by side.",
+    "options": [
+     "$3",
+     "$15",
+     "$18",
+     "Nothing — they come to the same"
+    ],
+    "prompt": "So put the two side by side: producing loses $15, closing loses $18. By how much does producing beat closing?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect",
+      "gap",
+      "compare"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Each bottle sells for $3.50 and costs $3 in variable cost, leaving $0.50 to put toward the fixed costs: ($3.50 − $3) × 6 = $3. The loss of $15 is the fixed cost of $18 less that $3 of contribution. This is why the test is P against AVC — the moment the price drops below AVC there is no contribution left to make.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "(P − AVC) × Q — what each bottle puts toward fixed cost",
+     "(P − ATC) × Q — the loss the vineyard is making",
+     "(ATC − AVC) × Q — the fixed cost owed either way",
+     "P × Q — the revenue the bottles bring in"
+    ],
+    "prompt": "Where does that $3 come from?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect",
+      "gap",
+      "compare"
+     ]
+    }
+   }
+  ],
+  "R4": [
+   {
+    "correct": 0,
+    "explain": "($20 − $34) × 30 = −$420. Each rental falls $14 short of what it costs on average, and there are 30 of them. That is a bigger hole than the vineyard’s, and yet the size of the loss is not what decides whether to open the doors — the next step is.",
+    "note": "Panel: the cost curves, the price line, which is also MR and the demand this firm faces, 3 more marks.",
+    "options": [
+     "−$420",
+     "−$330",
+     "$420",
+     "−$14"
+    ],
+    "prompt": "At $20 a rental and an average total cost of $34, what would the weekend’s rectangle come to?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "rect"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "$20 does not reach the $23 of variable cost, so every rental taken loses $3 on the variable side alone, before the lease is even considered. \"The fixed costs are owed either way\" is true and is exactly why they do not enter the decision; what decides it is that the price fails to cover the costs the shop could avoid.",
+    "note": "Panel: average variable cost read at that quantity.",
+    "options": [
+     "Shut down — the price does not even cover variable cost",
+     "Open — something is better than nothing",
+     "Open — the fixed costs are owed either way",
+     "Shut down — the shop is making a loss"
+    ],
+    "prompt": "Average variable cost at that level is $23. What does the short-run test say?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "($34 − $23) × 30 = $330. The gap between average total and average variable cost is average fixed cost, $11 a rental here, and over 30 rentals that is $330.",
+    "note": "Panel: the gap between ATC and AVC, which is average fixed cost.",
+    "options": [
+     "$330",
+     "$1,020",
+     "$600",
+     "$420"
+    ],
+    "prompt": "What are the fixed costs for the weekend?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect",
+      "gap"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "$420 against $330: opening is $90 worse. Closing still costs the $330 of fixed cost, which is painful and unavoidable; opening on top of that would hand over another $90 in wages and wax that the rentals do not cover. This is the mirror image of the vineyard, and the same test decided both.",
+    "note": "Panel: the two losses side by side.",
+    "options": [
+     "Close — opening would add $90 to the loss",
+     "Open — opening would cut the loss by $90",
+     "Close — closing costs nothing at all",
+     "Either — the two come to the same"
+    ],
+    "prompt": "Opening loses $420. Closing loses $330. What should Larkspur do, and what does it save?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect",
+      "gap",
+      "compare"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Each rental brings in $20 and costs $23 to serve, so it loses $3 before any fixed cost: ($23 − $20) × 30 = $90. A firm below its AVC makes its loss worse with every unit it produces, which is exactly what \"shut down\" means — produce zero, pay the fixed cost, and wait.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "(AVC − P) × Q — the variable cost the rentals fail to cover",
+     "(ATC − P) × Q — the loss the weekend would make",
+     "(ATC − AVC) × Q — the fixed cost owed either way",
+     "P × Q — the revenue the rentals would bring in"
+    ],
+    "prompt": "What is that $90, in terms of the numbers given?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect",
+      "gap",
+      "compare"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "In the long run the lease can be given up and the skis sold, so there are no sunk costs left to protect: the only question is whether the price covers ALL cost per unit, and $20 does not come close to the $34 this shop needs on average. The short-run argument for staying open has nothing to work with once nothing is owed regardless.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "Leave the industry — nothing is sunk in the long run",
+     "Keep the shop and open only in season",
+     "Stay — the fixed costs will be paid off eventually",
+     "Stay — the price may recover on its own"
+    ],
+    "prompt": "If the price stayed at $20 for good, what should the shop do in the long run?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "atcAt",
+      "avcAt",
+      "rect",
+      "gap",
+      "compare"
+     ]
+    }
+   }
+  ],
+  "R5": [
+   {
+    "correct": 0,
+    "explain": "The price clears the bottom of ATC, so there is a quantity at which every cost is covered and something is left over: $18 against $14. This is the top row of the chart, and the only row where the firm is actually ahead.",
+    "note": "Panel: the four firms, the short-run call for firm 1.",
+    "options": [
+     "Produce — economic profit",
+     "Produce — break-even",
+     "Produce at a loss",
+     "Shut down — produce nothing"
+    ],
+    "prompt": "Alder Lane Laundry: the price is $18, the bottom of its AVC curve is $9 and the bottom of its ATC curve is $14. What should it do in the SHORT run?",
+    "view": {
+     "show": [
+      "chart",
+      "sr0"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "The price is exactly the bottom of AVC, which is the shutdown price itself. At $12 the firm covers its variable costs and not a cent more, so it contributes nothing toward fixed cost — producing and closing lose exactly the same amount, the whole fixed cost. The chart puts P = min AVC on the producing side by convention; nothing is lost either way.",
+    "note": "Panel: the short-run call for firm 2.",
+    "options": [
+     "Produce at a loss",
+     "Produce — economic profit",
+     "Produce — break-even",
+     "Shut down — produce nothing"
+    ],
+    "prompt": "Pennywort Nursery: the price is $12, the bottom of its AVC curve is $12 and the bottom of its ATC curve is $17. What should it do in the SHORT run?",
+    "view": {
+     "show": [
+      "chart",
+      "sr0",
+      "sr1"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "The price sits exactly at the bottom of ATC: $15 = $15. Total revenue equals total cost, so economic profit is zero. That is not a loss — it is the break-even row, and in the long run it is where a competitive industry settles.",
+    "note": "Panel: the short-run call for firm 3.",
+    "options": [
+     "Produce — break-even",
+     "Produce — economic profit",
+     "Produce at a loss",
+     "Shut down — produce nothing"
+    ],
+    "prompt": "Saltbox Creamery: the price is $15, the bottom of its AVC curve is $8 and the bottom of its ATC curve is $15. What should it do in the SHORT run?",
+    "view": {
+     "show": [
+      "chart",
+      "sr0",
+      "sr1",
+      "sr2"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "At $6 the price does not even reach the $10 bottom of AVC, so every unit widens the loss beyond the fixed cost the store owes anyway. Produce nothing: that is the bottom row of the chart.",
+    "note": "Panel: the short-run call for firm 4.",
+    "options": [
+     "Shut down — produce nothing",
+     "Produce — economic profit",
+     "Produce — break-even",
+     "Produce at a loss"
+    ],
+    "prompt": "Tuckaway Camp Store: the price is $6, the bottom of its AVC curve is $10 and the bottom of its ATC curve is $16. What should it do in the SHORT run?",
+    "view": {
+     "show": [
+      "chart",
+      "sr0",
+      "sr1",
+      "sr2",
+      "sr3"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "In the long run the only test is whether the price covers average total cost, so the firms below the bottom of their ATC curve go: Pennywort Nursery at $12 against $17, and Tuckaway Camp Store at $6 against $16. Alder Lane Laundry is above its ATC and stays; Saltbox Creamery is exactly at it and stays, earning precisely what its resources would earn elsewhere.",
+    "note": "Panel: the long-run call for firm 1, the long-run call for firm 2, 2 more marks.",
+    "options": [
+     "Pennywort Nursery and Tuckaway Camp Store",
+     "Tuckaway Camp Store alone",
+     "Pennywort Nursery, Saltbox Creamery and Tuckaway Camp Store",
+     "None of them — each is covering its variable costs"
+    ],
+    "prompt": "Now the long run, when nothing is sunk any more. Which of the four should leave the industry?",
+    "view": {
+     "show": [
+      "chart",
+      "sr0",
+      "sr1",
+      "sr2",
+      "sr3",
+      "lr0",
+      "lr1",
+      "lr2",
+      "lr3"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "In the short run the fixed costs are owed whatever happens, so the firm asks only whether the price beats the costs it can still avoid: minimum AVC. In the long run every input can be walked away from, so there is nothing to protect and the bar rises to the full cost per unit: minimum ATC. Same firm, same curves — different question, because a different set of costs is escapable.",
+    "note": "Panel: the summary chart.",
+    "options": [
+     "The threshold rises from minimum AVC to minimum ATC, because nothing is sunk in the long run",
+     "The threshold falls from minimum ATC to minimum AVC, because costs fall over time",
+     "Nothing changes — the same test answers both",
+     "The firm stops being a price-taker in the long run"
+    ],
+    "prompt": "What changes between the two columns of the chart?",
+    "view": {
+     "show": [
+      "chart",
+      "sr0",
+      "sr1",
+      "sr2",
+      "sr3",
+      "lr0",
+      "lr1",
+      "lr2",
+      "lr3",
+      "summary"
+     ]
+    }
+   }
+  ],
+  "R6": [
+   {
+    "correct": 0,
+    "explain": "The rule does not change when the price does: make every loaf whose marginal cost is within the price. A higher price makes more loaves worth baking, so the firm slides up its own MC curve to the point where MC has caught up with $5. Its cost curves have not moved at all.",
+    "note": "Panel: the cost curves, the price line, which is also MR and the demand this firm faces, 1 more marks.",
+    "options": [
+     "Further right, where marginal cost has risen to $5",
+     "At the same quantity — its costs have not changed",
+     "Further left, because higher prices mean fewer sales",
+     "Wherever average total cost is lowest"
+    ],
+    "prompt": "At $4 a loaf Bellhouse makes 200 loaves. If the price rose to $5, where would it produce?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Each price picks the quantity where MC meets it, so the pairs of price and quantity the firm would choose ARE the points of its MC curve. That is the whole trick: a supply curve is a list of \"at this price, this much\", and the MC curve is already that list.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "The marginal cost curve itself",
+     "The average total cost curve",
+     "The average variable cost curve",
+     "The demand curve facing the firm"
+    ],
+    "prompt": "Do that for every price in turn. What curve do the chosen quantities trace out?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Below minimum AVC no quantity covers even the variable cost, so every loaf adds to the loss and the right output is zero. That price — the bottom of AVC — is the shutdown price. Below minimum ATC the firm is losing money but still contributing toward its fixed costs, which is a reason to carry on, not to stop.",
+    "note": "Panel: the bottom of AVC, the shutdown price.",
+    "options": [
+     "Below the bottom of its AVC curve",
+     "Below the bottom of its ATC curve",
+     "Below the bottom of its MC curve",
+     "Below the price where it breaks even"
+    ],
+    "prompt": "Below which price would Bellhouse produce nothing at all?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "minAvc"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "The firm answers \"how much at this price?\" by reading up its MC curve — but only while the price is at or above the bottom of AVC. Below that its answer is zero, so the lower stretch of MC is never a quantity the firm would supply. The highlighted segment is the supply curve.",
+    "note": "Panel: the stretch of MC that is the short-run supply curve.",
+    "options": [
+     "The marginal cost curve at and above the bottom of AVC",
+     "The whole marginal cost curve",
+     "The marginal cost curve at and above the bottom of ATC",
+     "The average variable cost curve above its own minimum"
+    ],
+    "prompt": "So which part of the diagram is this firm’s short-run supply curve?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "minAvc",
+      "supply"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Add up what every firm would supply at each price and you have market supply, and what every firm would supply is its own MC above its own shutdown price. The upward slope of that Unit 2 curve is nothing more mysterious than rising marginal cost, firm by firm — and the market supply curve has a bottom edge for the same reason each firm’s does.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "It is the horizontal sum of the firms’ MC curves above their shutdown prices",
+     "It is the sum of the firms’ ATC curves",
+     "It comes from consumers’ willingness to pay, not from costs",
+     "It is the MC curve of the largest firm in the market"
+    ],
+    "prompt": "What does that say about the market supply curve you drew back in Unit 2?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "minAvc",
+      "supply"
+     ]
+    }
+   }
+  ],
+  "R7": [
+   {
+    "correct": 0,
+    "explain": "The quantity comes from marginal cost against the price, and the table has MC at $14 exactly at 50 orders. 40 is where average total cost is lowest, 70 is where ATC has climbed to meet the price, and 30 is where marginal cost is lowest — three tempting rows, none of which is the question. Nothing about average cost picks the quantity.",
+    "note": "Panel: the cost curves, the price line, which is also MR and the demand this firm faces, 1 more marks.",
+    "options": [
+     "50 orders",
+     "40 orders",
+     "70 orders",
+     "30 orders"
+    ],
+    "prompt": "Copperline takes $14 an order. Using the table, how many orders should it take on?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "rows"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "At 50 orders the table gives $11.20. This is the order of operations the whole problem is about: MC and the price fix the quantity, and ATC is then read off at that quantity to size the rectangle. Reading ATC first and hunting for a flattering value gets both answers wrong.",
+    "note": "Panel: the quantity where MC meets the price, average total cost read at that quantity.",
+    "options": [
+     "$11.20",
+     "$11.10",
+     "$14.06",
+     "$12"
+    ],
+    "prompt": "Now, and only now, read the average total cost at that quantity. What is it?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "rows",
+      "atcAt"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "($14 − $11.20) × 50 = $140. The rectangle is $2.80 an order tall and 50 orders wide. Had the quantity been read off the ATC column instead, every figure after it would have been wrong as well — which is why the order of the two readings matters more than either one of them.",
+    "note": "Panel: the rectangle between the price line and ATC.",
+    "options": [
+     "$140",
+     "$700",
+     "$560",
+     "$2.80"
+    ],
+    "prompt": "So what is Copperline’s profit?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "rows",
+      "atcAt",
+      "rect"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Cheapest per unit is not the same as most profit in total. At 40 orders each order costs $11.10 on average against $11.20 at 50 — but the orders in between all have a marginal cost inside the $14 price, so each of them adds something. Stopping at the bottom of ATC throws those away: the profit there is smaller than the $140 at 50 orders.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "Because orders 41 through 50 each still bring in more than they cost",
+     "Because average total cost is not a cost the firm actually pays",
+     "Because the firm cannot choose a quantity that low",
+     "Because average total cost is lowest where marginal cost is highest"
+    ],
+    "prompt": "Why is 40 orders wrong, when average total cost is lowest there?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "rows",
+      "atcAt",
+      "rect"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Two curves, two different jobs. Marginal cost answers \"how many?\" by telling the firm which units are worth making. Average total cost answers \"how did that turn out?\" by giving the height of the rectangle at the quantity already chosen. Where ATC and MC cross is simply the bottom of ATC, which is a fact about the curve and not an instruction to the firm.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "MC meets the price to fix the quantity; ATC is then read there to size the rectangle",
+     "ATC fixes the quantity; MC is then read there to size the rectangle",
+     "The quantity is wherever the gap between the price and ATC is widest",
+     "The quantity is wherever ATC and MC cross"
+    ],
+    "prompt": "State the order of operations in one line.",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "q",
+      "rows",
+      "atcAt",
+      "rect"
+     ]
+    }
+   }
+  ],
+  "R8": [
+   {
+    "correct": 0,
+    "explain": "The short-run test exists only because fixed costs are owed whatever the firm does. In the long run the lease ends, the press can be sold, and every cost is escapable — so there is nothing to protect by producing at a loss. The only question left is whether the price covers the full cost per unit.",
+    "note": "Panel: the cost curves, the price line, which is also MR and the demand this firm faces, 1 more marks.",
+    "options": [
+     "The price against the lowest average TOTAL cost it can reach",
+     "The price against the lowest average VARIABLE cost it can reach",
+     "The price against marginal cost at its current output",
+     "Total revenue against the fixed costs of the lease"
+    ],
+    "prompt": "Nothing this shop pays is sunk any more. Which comparison decides whether it stays in the industry?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "minAtc"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "$6 is below $7.50, so there is no scale at which this shop covers its costs. At its best possible quantity it still loses money, and in the long run it has no reason to accept that: the resources go somewhere they earn at least what they are worth elsewhere.",
+    "note": "Panel: the decision this price forces.",
+    "options": [
+     "Leave the industry",
+     "Stay, and produce where MC meets the price",
+     "Stay, and produce where ATC is lowest",
+     "Stay in the short run and decide later"
+    ],
+    "prompt": "The price is $6 and the best average total cost Fenwick can reach is $7.50. What should it do?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "minAtc",
+      "verdict"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Covering AVC matters when something is owed regardless, because the leftover goes toward it. In the long run nothing is owed regardless: the shop can walk away from every one of its costs. So the AVC test has nothing to bite on, and a firm that cannot cover ATC leaves however comfortably it covers AVC.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "No — there are no fixed costs left to contribute toward",
+     "Yes — covering AVC is always a reason to keep producing",
+     "Yes — it would mean the shop is profitable after all",
+     "No — average variable cost is the same thing as average total cost"
+    ],
+    "prompt": "Would it change the answer to learn that the price is above the shop’s average variable cost?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "minAtc",
+      "verdict"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Each departure takes its output off the market, so market supply shifts left and the price rises. Exit stops when the price has climbed back to the bottom of ATC and the firms still in are breaking even — which is the long-run equilibrium the next module is about. No single shop moves the price, but the exits together do.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "Supply falls and the price is pushed up toward the bottom of ATC",
+     "Supply falls and the price is pushed down further",
+     "Supply rises as the remaining shops take the work",
+     "Nothing — one shop leaving cannot move a competitive market"
+    ],
+    "prompt": "As shops like Fenwick leave the industry, what happens in the market?",
+    "view": {
+     "show": [
+      "curves",
+      "price",
+      "minAtc",
+      "verdict"
+     ]
+    }
+   }
+  ],
+  "R9": [
+   {
+    "correct": 0,
+    "explain": "Average total cost is average variable plus average fixed, so the gap between the two curves IS average fixed cost: $9.40 − $6.90 = $2.50 a wash. Fixed costs do have a per-unit figure — that is the whole point of AFC — it just falls as the output it is spread over rises.",
+    "note": "Panel: the cost curves, the quantity where MC meets the price, 1 more marks.",
+    "options": [
+     "$2.50",
+     "$9.40",
+     "$6.90",
+     "$0 — fixed costs are not per-unit"
+    ],
+    "prompt": "At 120 washes, average total cost is $9.40 and average variable cost is $6.90. What is average FIXED cost there?",
+    "view": {
+     "show": [
+      "curves",
+      "q",
+      "gap"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "AFC is TFC spread over the units, so multiplying it back gives the total: $2.50 × 120 = $300. No price is needed — fixed cost is a fact about the firm’s commitments, not about what it sells its washes for.",
+    "note": "Panel: the fixed cost that gap comes to.",
+    "options": [
+     "$300",
+     "$1,128",
+     "$828",
+     "It cannot be worked out without the price"
+    ],
+    "prompt": "So what are the total fixed costs?",
+    "view": {
+     "show": [
+      "curves",
+      "q",
+      "gap",
+      "tfc"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "Total fixed cost is a flat commitment: the rent and the loan do not notice how many cars came through. What changes is AFC, which is that same $300 divided among more washes — $2.50 at 120 washes, $2 at 150. That falling gap between ATC and AVC on the diagram is exactly this.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "It stays at $300 — only average fixed cost falls",
+     "It rises, because more washes cost more",
+     "It falls, because it is spread over more washes",
+     "It stays the same and so does average fixed cost"
+    ],
+    "prompt": "Suppose the car wash handled 150 washes instead. What happens to the $300?",
+    "view": {
+     "show": [
+      "curves",
+      "q",
+      "gap",
+      "tfc"
+     ]
+    }
+   },
+   {
+    "correct": 0,
+    "explain": "It is an identity, not a result: ATC = AVC + AFC at any output, so the gap is always AFC and AFC × Q is always TFC. That is what makes it such a useful reading — pick any quantity on the diagram, measure the gap, multiply by the quantity, and the fixed cost falls out.",
+    "note": "Panel: the diagram stays as it is for this step.",
+    "options": [
+     "At every quantity",
+     "Only where ATC is at its lowest",
+     "Only where MC crosses AVC",
+     "Only at the profit-maximizing quantity"
+    ],
+    "prompt": "At which quantities does TFC = (ATC − AVC) × Q hold?",
+    "view": {
+     "show": [
+      "curves",
+      "q",
+      "gap",
+      "tfc"
+     ]
+    }
+   }
+  ]
+ }
+};
+const STEPS = BANK.steps, INITIAL = BANK.initial;
+const BANDS = [
+  { min: 90, label: 'Secure',       tone: 'good',
+    note: 'The rectangle, the shutdown test and the long-run test are all doing their own work.' },
+  { min: 78, label: 'Solid',        tone: 'good',
+    note: 'The chain holds. Look back at any step where the short run and the long run came apart.' },
+  { min: 60, label: 'Getting there', tone: 'mid',
+    note: 'The arithmetic is mostly there. The part to drill is which cost curve answers which question.' },
+  { min: 35, label: 'Needs review',  tone: 'poor',
+    note: 'Go back to the two tests: P against AVC decides whether to produce now, P against ATC whether to stay at all.' },
+  { min: 0,  label: 'Start again',   tone: 'poor',
+    note: 'Work one problem slowly: find the gap between the price line and ATC, multiply by the quantity, then ask what the fixed costs do.' },
+];
+
+/* ======================================================================
+   The diagram
+   ====================================================================== */
+const money = v => (v < 0 ? '−$' : '$')
+  + Math.abs(Number(v)).toLocaleString('en-US',
+      { minimumFractionDigits: Math.abs(v % 1) > 1e-9 ? 2 : 0, maximumFractionDigits: 2 });
+
+function drawGraph(prob, show){
+  const g = prob.geom;
+  if(!g) return '';
+  const has = k => show.indexOf(k) >= 0;
+  const bits = [];
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+  (g.ticks || []).forEach(t => {
+    if(t.y !== undefined){
+      bits.push(`<line class="gridline" x1="${g.x0}" y1="${t.y}" x2="${g.x1}" y2="${t.y}"/>`);
+      bits.push(`<text class="tick" x="${g.x0 - 8}" y="${t.y + 4}" text-anchor="end">${esc(t.t)}</text>`);
+    } else {
+      bits.push(`<text class="tick" x="${t.x}" y="${g.y1 + 18}" text-anchor="middle">${esc(t.t)}</text>`);
+    }
+  });
+  bits.push(`<line class="axis" x1="${g.x0}" y1="${g.y0 - 6}" x2="${g.x0}" y2="${g.y1}"/>`);
+  bits.push(`<line class="axis" x1="${g.x0}" y1="${g.y1}" x2="${g.x1 + 8}" y2="${g.y1}"/>`);
+  bits.push(`<text class="tick" x="${g.x1 + 10}" y="${g.y1 + 18}" text-anchor="end">Quantity</text>`);
+
+  /* the rectangle goes under the curves so the lines stay readable across it */
+  if(has('rect') && g.rect){
+    const cls = g.rect.sign === 'loss' ? 'rect-loss' : 'rect-profit';
+    bits.push(`<rect class="${cls}" x="${g.rect.x}" y="${g.rect.y}" width="${g.rect.w}" `
+            + `height="${g.rect.h}"/>`);
+  }
+  if(has('supply') && g.supply)
+    bits.push(`<path class="curve supply" d="${g.supply}"/>`);
+  bits.push(`<path class="curve atc" d="${g.atc}"/>`);
+  bits.push(`<path class="curve avc" d="${g.avc}"/>`);
+  bits.push(`<path class="curve mc" d="${g.mc}"/>`);
+  (g.labels || []).forEach(l =>
+    bits.push(`<text class="lab ${l.cls}" x="${l.x}" y="${l.y}">${esc(l.t)}</text>`));
+
+  if(has('price') && g.price){
+    bits.push(`<line class="priceline" x1="${g.x0}" y1="${g.price.y}" x2="${g.x1 + 4}" y2="${g.price.y}"/>`);
+    bits.push(`<text class="flag" x="${g.x0 + 6}" y="${g.price.y - 7}">${esc(g.price.t)}</text>`);
+  }
+  if(has('q') && g.qstar){
+    bits.push(`<line class="qline" x1="${g.qstar.x}" y1="${g.y0 - 4}" x2="${g.qstar.x}" y2="${g.y1}"/>`);
+    bits.push(`<text class="flag" x="${g.qstar.x}" y="${g.y1 + 34}" text-anchor="middle">${esc(g.qstar.t)}</text>`);
+  }
+  if(has('atcAt') && g.atcAt && g.qstar){
+    bits.push(`<circle class="marker atc" cx="${g.qstar.x}" cy="${g.atcAt.y}" r="4.5"/>`);
+    bits.push(`<text class="lab atc" x="${g.qstar.x + 9}" y="${g.atcAt.y + 4}">ATC ${esc(money(g.atcAt.v))}</text>`);
+  }
+  if(has('avcAt') && g.avcAt && g.qstar){
+    bits.push(`<circle class="marker avc" cx="${g.qstar.x}" cy="${g.avcAt.y}" r="4.5"/>`);
+    bits.push(`<text class="lab avc" x="${g.qstar.x + 9}" y="${g.avcAt.y + 15}">AVC ${esc(money(g.avcAt.v))}</text>`);
+  }
+  if(has('gap') && g.atcAt && g.avcAt && g.qstar){
+    const x = g.qstar.x - 11;
+    bits.push(`<line class="gapline" x1="${x}" y1="${g.atcAt.y}" x2="${x}" y2="${g.avcAt.y}"/>`);
+    bits.push(`<line class="gapline" x1="${x - 5}" y1="${g.atcAt.y}" x2="${x + 5}" y2="${g.atcAt.y}"/>`);
+    bits.push(`<line class="gapline" x1="${x - 5}" y1="${g.avcAt.y}" x2="${x + 5}" y2="${g.avcAt.y}"/>`);
+    bits.push(`<text class="flag gold" x="${x}" y="${g.atcAt.y - 7}" `
+            + `text-anchor="middle">AFC</text>`);
+  }
+  if(has('minAvc') && g.minAvc){
+    bits.push(`<circle class="marker avc" cx="${g.minAvc.x}" cy="${g.minAvc.y}" r="4.5"/>`);
+    bits.push(`<text class="lab avc" x="${g.minAvc.x}" y="${g.minAvc.y + 19}" text-anchor="middle">`
+            + `${esc(g.minAvc.t)}</text>`);
+  }
+  if(has('minAtc') && g.minAtc){
+    bits.push(`<circle class="marker atc" cx="${g.minAtc.x}" cy="${g.minAtc.y}" r="4.5"/>`);
+    bits.push(`<text class="lab atc" x="${g.minAtc.x}" y="${g.minAtc.y - 10}" text-anchor="middle">`
+            + `${esc(g.minAtc.t)} ${esc(money(g.minAtc.v))}</text>`);
+  }
+  return `<svg viewBox="0 0 ${g.w} ${g.h}" role="img" aria-label="cost curves for this firm">`
+       + bits.join('') + '</svg>';
+}
+
+function legend(prob, show){
+  if(!prob.geom) return '';
+  const items = [['mc', 'MC'], ['avc', 'AVC'], ['atc', 'ATC']];
+  let out = items.map(([c, t]) =>
+    `<span><i class="swatch" style="background:var(--${c === 'mc' ? 'orange' :
+      c === 'avc' ? 'teal' : 'indigo'})"></i>${t}</span>`).join('');
+  if(show.indexOf('price') >= 0)
+    out += '<span><i class="swatch" style="background:var(--ink)"></i>P = MR = D</span>';
+  if(show.indexOf('supply') >= 0)
+    out += '<span><i class="swatch" style="background:var(--orange);opacity:.33"></i>short-run supply</span>';
+  return out;
+}
+
+/* ======================================================================
+   The numbers under the diagram
+   ====================================================================== */
+function row(label, cells, cls){
+  return `<tr class="${cls || ''}"><td class="q-head">${label}</td>${cells}</tr>`;
+}
+const cell = (shown, txt, cls) => shown
+  ? `<td class="fig ${cls || ''}">${txt}</td>` : '<td class="blank">—</td>';
+
+function everShown(prob){
+  return STEPS[prob.id].reduce((a, st) => a.concat(st.view.show), INITIAL[prob.id].slice());
+}
+
+function drawNumbers(prob, show){
+  const has = k => show.indexOf(k) >= 0;
+  /* a row no step of this problem will ever fill is a blank the student waits on
+     forever, so the table is built from what this problem's own steps will reveal */
+  const ever = everShown(prob), will = k => ever.indexOf(k) >= 0;
+  const c = prob.case;
+  if(prob.chart) return drawChart(prob, show);
+  const rows = [];
+  if(prob.tfcOnly){
+    const t = prob.tfcOnly;
+    rows.push(row('Output', `<td>${t.qTxt} washes</td>`, 'given'));
+    rows.push(row('Average total cost', `<td>${t.atcTxt}</td>`, 'given'));
+    rows.push(row('Average variable cost', `<td>${t.avcTxt}</td>`, 'given'));
+    rows.push(row('Average fixed cost', cell(has('gap'), t.afcTxt, 'gold')));
+    rows.push(row('Total fixed cost', cell(has('tfc'), t.tfcTxt, 'gold')));
+  } else if(prob.lr){
+    const l = prob.lr;
+    rows.push(row('Price', `<td>${l.priceTxt}</td>`, 'given'));
+    rows.push(row('Best average total cost', cell(has('minAtc'), l.minAtcTxt, 'gold'), 'given'));
+    rows.push(row('Long-run decision', cell(has('verdict'), 'Exit', 'neg')));
+  } else if(c){
+    rows.push(row('Price', `<td>${c.priceTxt}</td>`, 'given'));
+    if(will('q')) rows.push(row('Quantity where MC = P', cell(has('q'), c.qTxt + ' ' + prob.good)));
+    if(will('atcAt')) rows.push(row('ATC at that quantity', cell(has('atcAt'), c.atcTxt)));
+    if(will('avcAt') || will('gap'))
+      rows.push(row('AVC at that quantity', cell(has('avcAt') || has('gap'), c.avcTxt)));
+    if(will('rect'))
+      rows.push(row(c.profit < 0 ? 'Loss (the rectangle)' : 'Profit (the rectangle)',
+                    cell(has('rect'), c.profitTxt, c.profit < 0 ? 'neg' : 'pos')));
+    if(will('gap'))
+      rows.push(row('Total fixed cost', cell(has('gap'), c.tfcTxt, 'gold')));
+    if(will('compare')){
+      rows.push(row('If it produces', cell(has('compare'),
+        c.profit < 0 ? '−' + c.operateTxt : c.profitTxt, c.profit < 0 ? 'neg' : 'pos')));
+      rows.push(row('If it shuts down', cell(has('compare'), '−' + c.shutdownTxt, 'neg')));
+      rows.push(row('Short-run call', has('compare')
+        ? `<td class="band-sr">${c.sr === 'produce' ? 'Produce' : 'Shut down'}</td>`
+        : '<td class="blank">\u2014</td>'));
+    }
+    if(will('row'))
+      rows.push(row('Long-run call', cell(has('row'),
+        c.lr === 'stay' ? 'Stay in' : c.lr === 'exit' ? 'Exit' : 'Indifferent',
+        c.lr === 'stay' ? 'pos' : 'neg')));
+  }
+  if(prob.rows && has('rows')){
+    const t = prob.rows.map(r =>
+      `<tr><td class="q-head">${r.qTxt} ${prob.good}</td><td>${r.mcTxt}</td><td>${r.atcTxt}</td></tr>`).join('');
+    return '<table class="data-table"><thead><tr><th class="corner">Output</th><th>MC</th>'
+         + `<th>ATC</th></tr></thead><tbody>${t}</tbody></table>`
+         + (rows.length ? `<table class="data-table" style="margin-top:12px"><tbody>${rows.join('')}</tbody></table>` : '');
+  }
+  return rows.length
+    ? `<table class="data-table"><tbody>${rows.join('')}</tbody></table>` : '';
+}
+
+const CHART_ROWS = [
+  ['P &gt; min ATC', 'Produce — economic profit', 'Stay in — profit draws entry'],
+  ['P = min ATC', 'Produce — break-even', 'Stay in — break-even'],
+  ['min AVC ≤ P &lt; min ATC', 'Produce at a loss', 'Exit — it cannot cover ATC'],
+  ['P &lt; min AVC', 'Shut down — produce nothing', 'Exit — it cannot cover ATC'],
+];
+
+function drawChart(prob, show){
+  const has = k => show.indexOf(k) >= 0;
+  const body = prob.chart.map((r, i) =>
+    `<tr><td class="q-head">${r.who}</td><td>${r.priceTxt}</td><td>${r.avcTxt}</td>`
+    + `<td>${r.atcTxt}</td>`
+    + (has('sr' + i) ? `<td class="band-sr">${r.sr}</td>` : '<td class="blank">—</td>')
+    + (has('lr' + i) ? `<td class="band-lr">${r.lr}</td>` : '<td class="blank">—</td>')
+    + '</tr>').join('');
+  let out = '<table class="data-table"><thead><tr><th class="corner">Firm</th><th>P</th>'
+          + '<th>min AVC</th><th>min ATC</th><th>Short run</th><th>Long run</th></tr></thead>'
+          + `<tbody>${body}</tbody></table>`;
+  if(has('summary')){
+    const rows = CHART_ROWS.map(r =>
+      `<tr><td class="q-head">${r[0]}</td><td class="band-sr">${r[1]}</td>`
+      + `<td class="band-lr">${r[2]}</td></tr>`).join('');
+    out += '<table class="data-table" style="margin-top:14px"><thead><tr>'
+         + '<th class="corner">Where the price sits</th><th>Short run</th><th>Long run</th>'
+         + `</tr></thead><tbody>${rows}</tbody></table>`
+         + '<p class="chart-cap">The same four rows, without the firms.</p>';
+  }
+  return out;
+}
+
+function drawPanel(prob, show){
+  document.getElementById('panelTitle').textContent =
+    prob.chart ? 'Four firms' : (prob.biz + ' — its costs');
+  document.getElementById('legendWrap').innerHTML = legend(prob, show);
+  document.getElementById('graphWrap').innerHTML = drawGraph(prob, show);
+  document.getElementById('tableWrap').innerHTML = drawNumbers(prob, show);
+}
+
+/* ======================================================================
+   The step-through
+   ====================================================================== */
+let order = [], pIndex = 0, sIndex = 0, answered = false, optionOrder = [];
+let score = { correct: 0, total: 0 }, perProblem = {};
+
+function shuffledIndices(n){
+  const a = [...Array(n).keys()];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function currentProblem(){ return PROBLEMS[order[pIndex]]; }
+function currentSteps(){ return STEPS[currentProblem().id]; }
+function currentStep(){ return currentSteps()[sIndex]; }
+
+/* what the panel held at the END of the previous step is what it holds while
+   this one is being answered, so a step never shows its own answer */
+function priorShow(){
+  const p = currentProblem();
+  if(sIndex === 0) return INITIAL[p.id];
+  return currentSteps()[sIndex - 1].view.show;
+}
+
+function init(){
+  order = shuffledIndices(PROBLEMS.length);
+  pIndex = 0; sIndex = 0;
+  score = { correct: 0, total: 0 };
+  perProblem = {};
+  PROBLEMS.forEach(p => perProblem[p.id] = { correct: 0, total: 0 });
+  document.getElementById('mainArea').style.display = '';
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+  loadProblem();
+}
+
+function loadProblem(){
+  const p = currentProblem();
+  document.getElementById('bizName').textContent = p.biz;
+  document.getElementById('blurbText').textContent = p.blurb;
+  sIndex = 0;
+  loadStep();
+}
+
+function loadStep(){
+  answered = false;
+  const p = currentProblem(), st = currentStep();
+  document.getElementById('problemCount').textContent = `Problem ${pIndex + 1} of ${order.length}`;
+  document.getElementById('stepCount').textContent = `Step ${sIndex + 1} of ${currentSteps().length}`;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('promptText').textContent = st.prompt;
+  document.getElementById('feedback').classList.remove('show');
+
+  drawPanel(p, priorShow());
+  const note = document.getElementById('graphNote');
+  note.classList.add('waiting');
+  note.textContent = 'Answer, and the diagram fills in what the answer means.';
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  const lastStep = sIndex === currentSteps().length - 1;
+  const lastProblem = pIndex === order.length - 1;
+  nextBtn.textContent = !lastStep ? 'Next step' : (!lastProblem ? 'Next problem' : 'See your results');
+
+  optionOrder = shuffledIndices(st.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(k => {
+    const b = document.createElement('button');
+    b.className = 'choice-btn';
+    b.textContent = st.options[k];
+    b.addEventListener('click', () => handleAnswer(st, k, b));
+    wrap.appendChild(b);
+  });
+}
+
+function handleAnswer(st, chosen, btnEl){
+  if(answered) return;
+  answered = true;
+  const p = currentProblem();
+  const right = chosen === st.correct;
+  score.total++;
+  if(right) score.correct++;
+  perProblem[p.id].total++;
+  if(right) perProblem[p.id].correct++;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === st.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const v = document.getElementById('feedbackVerdict');
+  v.textContent = right ? 'Correct.' : `Not quite — the answer is “${st.options[st.correct]}.”`;
+  v.className = 'feedback-verdict ' + (right ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = st.explain;
+
+  /* the diagram moves once the answer is in, and the same way either way */
+  drawPanel(p, st.view.show);
+  const note = document.getElementById('graphNote');
+  note.classList.remove('waiting');
+  note.textContent = st.note;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if(sIndex < currentSteps().length - 1){ sIndex++; loadStep(); }
+  else if(pIndex < order.length - 1){ pIndex++; loadProblem(); }
+  else showResults();
+});
+
+function showResults(){
+  document.getElementById('mainArea').style.display = 'none';
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(100 * score.correct / score.total);
+  const band = BANDS.find(b => pct >= b.min);
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent = `${score.correct} / ${score.total}  (${pct}%)`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  PROBLEMS.filter(p => perProblem[p.id].total > 0).forEach(p => {
+    const t = perProblem[p.id];
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${p.title}</td>`
+                 + `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
