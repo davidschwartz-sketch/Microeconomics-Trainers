@@ -80,6 +80,16 @@
   .count-group{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
   .card-count{font-size:13px;font-weight:700;color:var(--ink-soft);}
   .step-count{font-size:13px;font-weight:700;color:var(--teal);}
+  .mode-toggle{
+    display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+    font-size:12.5px;font-weight:700;color:var(--ink-soft);
+    background:var(--surface);border:1px solid var(--border);border-radius:999px;
+    padding:3px 11px 3px 8px;
+  }
+  .mode-toggle:hover{border-color:var(--accent);}
+  .mode-toggle input{accent-color:var(--accent);width:14px;height:14px;margin:0;cursor:pointer;}
+  .mode-toggle.on{color:var(--orange);border-color:var(--orange);background:#FDF3EE;}
+
   .score-badge{
     font-size:13px;font-weight:700;color:var(--accent);
     background:#FBF1DC;border:1px solid #EAD4A0;padding:4px 11px;border-radius:999px;
@@ -233,6 +243,10 @@
   details.traps-note p, details.traps-note{color:var(--ink-soft);}
   details.traps-note[open] summary{margin-bottom:6px;}
 
+  .hard-note{
+    margin:10px 0 0;font-size:12.5px;color:var(--orange);font-style:italic;line-height:1.5;
+  }
+
   /* ---- the trap tally ---- */
   .tally{border-top:1px solid var(--border);margin-top:16px;padding-top:14px;}
   .tally-head{
@@ -291,6 +305,10 @@
     <div class="count-group">
       <span class="card-count" id="problemCount">Problem 1 of 8</span>
       <span class="step-count" id="priceNote"></span>
+      <label class="mode-toggle" for="hardMode">
+        <input type="checkbox" id="hardMode">
+        <span>Harder: hide the profit column until you answer</span>
+      </label>
     </div>
     <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
   </div>
@@ -1764,6 +1782,9 @@ const TRAPS = [
    The table
    ====================================================================== */
 function drawTable(prob, picked, reveal){
+  const hideProfit = hardMode && !reveal;
+  document.getElementById('panelTitle').textContent =
+    hideProfit ? 'The table, less the profit column' : 'The table, in full';
   const rows = prob.rows.map(r => {
     const cls = [];
     if(reveal && r.q === prob.qstar) cls.push('q-star');
@@ -1776,11 +1797,14 @@ function drawTable(prob, picked, reveal){
       + `<td class="q-cell">${r.q}</td>`
       + `<td>${r.trTxt}</td><td>${r.tcTxt}</td>`
       + `<td>${r.mrTxt}</td><td class="${mcCls}">${r.mcTxt}</td>`
-      + `<td>${r.profitTxt}</td></tr>`;
+      + (hideProfit ? '' : `<td>${r.profitTxt}</td>`) + '</tr>';
   });
   return '<table class="data-table"><thead><tr>'
-    + `<th class="corner">Q</th><th>TR</th><th>TC</th><th>MR</th><th>MC</th><th>Profit</th>`
-    + `</tr></thead><tbody>${rows.join('')}</tbody></table>`;
+    + '<th class="corner">Q</th><th>TR</th><th>TC</th><th>MR</th><th>MC</th>'
+    + (hideProfit ? '' : '<th>Profit</th>')
+    + `</tr></thead><tbody>${rows.join('')}</tbody></table>`
+    + (hideProfit ? '<p class="hard-note">The profit column is hidden. Work it from MR against '
+                  + 'MC \u2014 it comes back with the answer.</p>' : '');
 }
 
 /* ======================================================================
@@ -1829,6 +1853,8 @@ function drawTally(open){
    ====================================================================== */
 let order = [], pIndex = 0, answered = false, optionOrder = [];
 let score = { correct: 0, total: 0 };
+/* the harder run, kept across a restart: a student who chose it meant to */
+let hardMode = false, lastPicked = null;
 
 function shuffledIndices(n){
   const a = [...Array(n).keys()];
@@ -1866,6 +1892,7 @@ function loadProblem(){
     `Price: ${p.priceTxt} per unit, so MR = ${p.priceTxt}`;
   document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
   document.getElementById('feedback').classList.remove('show');
+  lastPicked = null;
   document.getElementById('tableWrap').innerHTML = drawTable(p, null, false);
 
   const note = document.getElementById('graphNote');
@@ -1898,7 +1925,8 @@ function handleAnswer(card, chosen, btnEl){
   score.total++;
   if(right){ score.correct++; firstTry++; }
   else tally[opt.trap]++;
-  answers.push({ id: p.id, title: p.title, right: right,
+  lastPicked = opt.q;
+  answers.push({ id: p.id, title: p.title, right: right, hard: hardMode,
                  trap: right ? null : opt.trap, text: opt.text });
   document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
 
@@ -1929,6 +1957,15 @@ function handleAnswer(card, chosen, btnEl){
   document.getElementById('nextBtn').disabled = false;
 }
 
+document.getElementById('hardMode').addEventListener('change', e => {
+  hardMode = e.target.checked;
+  e.target.parentElement.classList.toggle('on', hardMode);
+  /* redraw the table as it should look right now: hidden while the question is
+     open, shown again once the answer is in */
+  document.getElementById('tableWrap').innerHTML =
+    drawTable(currentProblem(), lastPicked, answered);
+});
+
 document.getElementById('nextBtn').addEventListener('click', () => {
   if(pIndex < order.length - 1){ pIndex++; loadProblem(); }
   else showResults();
@@ -1957,6 +1994,8 @@ function showResults(){
     body.appendChild(tr);
   };
   line('Right first time', `${firstTry} of ${answers.length}`, firstTry === answers.length ? 'full' : '');
+  const hard = answers.filter(a => a.hard).length;
+  if(hard) line('Answered with the profit column hidden', `${hard} of ${answers.length}`, 'full');
   TRAPS.forEach(t => line(`Fell for the ${t.inline} trap`,
                           timesTxt(tally[t.key]), tally[t.key] ? 'low' : ''));
 
