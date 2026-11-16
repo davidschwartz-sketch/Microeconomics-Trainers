@@ -222,6 +222,17 @@
   table.data-table td.mc-under{color:var(--teal);}
   table.data-table tr.dim-row td{color:var(--muted);}
 
+  details.traps-note{margin-top:8px;}
+  details.traps-note summary{
+    cursor:pointer;font-weight:700;color:var(--ink);width:fit-content;
+    list-style:none;border-bottom:1px dotted var(--ink-soft);padding-bottom:1px;
+  }
+  details.traps-note summary::-webkit-details-marker{display:none;}
+  details.traps-note summary::before{content:'\25B8\00a0';color:var(--accent);}
+  details.traps-note[open] summary::before{content:'\25BE\00a0';}
+  details.traps-note p, details.traps-note{color:var(--ink-soft);}
+  details.traps-note[open] summary{margin-bottom:6px;}
+
   /* ---- the trap tally ---- */
   .tally{border-top:1px solid var(--border);margin-top:16px;padding-top:14px;}
   .tally-head{
@@ -244,6 +255,7 @@
   .tally-count.hit{color:var(--incorrect);}
   .tally-count.right{color:var(--correct);}
   .tally-foot{font-size:12.5px;color:var(--ink-soft);font-style:italic;margin-top:12px;}
+  .tally-held{font-size:13.5px;color:var(--ink-soft);font-style:italic;line-height:1.5;}
 </style>
 </head>
 <body>
@@ -265,10 +277,14 @@
     <span class="term">Stop at the LAST such unit</span>
     <br>A small firm in a competitive market sells all it wants at the going price without moving
     it, so every extra unit adds exactly that price to revenue: <b>MR = P</b>. Make a unit whenever
-    it brings in at least what it costs, and keep going while that is still true. The three ways
-    to get this wrong are <b>chasing revenue</b> to the bottom of the table, <b>stopping at the
-    fattest margin</b> instead of the last positive one, and <b>hunting for a row where MC exactly
-    equals MR</b> &mdash; which, with whole units, usually does not exist.
+    it brings in at least what it costs, and keep going while that is still true.
+    <details class="traps-note">
+      <summary>The three ways to get this wrong</summary>
+      <b>Chasing revenue</b> to the bottom of the table, <b>stopping at the fattest margin</b>
+      instead of the last positive one, and <b>hunting for a row where MC exactly equals MR</b>
+      &mdash; which, with whole units, usually does not exist. Worth reading once you have
+      finished a run; reading it first does half the work for you.
+    </details>
   </div>
 
   <div class="meta-row" id="metaRow">
@@ -1781,8 +1797,16 @@ function blankTally(){
 
 function timesTxt(n){ return n === 0 ? 'never' : (n === 1 ? 'once' : n + ' times'); }
 
-function drawTally(){
+function drawTally(open){
   const body = document.getElementById('tallyBody');
+  if(!open){
+    body.innerHTML = '<div class="tally-held">Held back until you answer \u2014 it names the '
+      + 'three traps, and the point is to find the quantity by the rule rather than by '
+      + 'eliminating a list.</div>';
+    document.getElementById('tallyFoot').textContent = answers.length
+      ? `${answers.length} answered so far.` : '';
+    return;
+  }
   body.innerHTML = TRAPS.map(t => {
     const n = tally[t.key];
     return `<div class="tally-row"><span><span class="tally-name ${t.cls}">${t.name}</span>`
@@ -1826,7 +1850,7 @@ function init(){
   document.getElementById('metaRow').style.display = '';
   document.getElementById('resetRow').style.display = '';
   document.getElementById('resultsPanel').classList.remove('show');
-  drawTally();
+  drawTally(false);
   loadProblem();
 }
 
@@ -1853,6 +1877,7 @@ function loadProblem(){
   nextBtn.disabled = true;
   nextBtn.textContent = pIndex === order.length - 1 ? 'See your results' : 'Next problem';
 
+  drawTally(false);
   optionOrder = shuffledIndices(card.options.length);
   const wrap = document.getElementById('optionsWrap');
   wrap.innerHTML = '';
@@ -1900,7 +1925,7 @@ function handleAnswer(card, chosen, btnEl){
         ? `Marked: ${p.qstar} — the profit peak. No row has MC equal to ${p.priceTxt}, and none has to.`
         : `Marked: your ${opt.q} against the profit peak at ${p.qstar}.`);
 
-  drawTally();
+  drawTally(true);
   document.getElementById('nextBtn').disabled = false;
 }
 
