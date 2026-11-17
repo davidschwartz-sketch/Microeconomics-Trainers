@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept Check: Unit 3 — Production, Cost and Perfect Competition</title>
+<style>
+  :root{
+    --bg: #FBF6EE;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EBDA;
+    --border: #E7DCC6;
+    --ink: #2B2118;
+    --ink-soft: #6B5D4C;
+    --accent: #D9A441;
+    --correct: #2F7D4F;
+    --correct-soft: #E5F2E9;
+    --incorrect: #C23B3B;
+    --incorrect-soft: #FBEAEA;
+    --demand: #2F6F62;
+    --supply: #C1542C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;
+    padding:28px 20px 60px;
+  }
+  .app{max-width:760px;margin:0 auto;}
+
+  header{
+    margin-bottom:20px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--border);
+  }
+  header h1{
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+  }
+
+  .mode-row{
+    display:flex;
+    align-items:center;
+    gap:10px 12px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .mode-label{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+  }
+  .segmented{
+    display:inline-flex;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--surface);
+  }
+  .segmented button{
+    border:none;
+    background:transparent;
+    padding:7px 14px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .segmented button + button{border-left:1px solid var(--border);}
+  .segmented button:hover[aria-pressed="false"]{background:#FFFBF2;}
+  .segmented button[aria-pressed="true"]{
+    background:var(--accent);
+    color:var(--ink);
+  }
+  .mode-hint{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  @media (max-width:560px){
+    .segmented{width:100%;}
+    .segmented button{flex:1;padding:8px 6px;font-size:12px;}
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .count-group{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .card-count{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .score-badge{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px;
+  }
+
+  .method-badge{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--accent);
+    background:#FBF1DC;
+    border:1px solid #EAD4A0;
+    padding:3px 9px;
+    border-radius:6px;
+    margin-bottom:12px;
+  }
+  .scenario{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .formula-note{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:10px 13px;
+    margin-bottom:18px;
+  }
+  .formula-note b{color:var(--ink);}
+
+  .table-wrap{overflow-x:auto;margin-bottom:20px;}
+  table.data-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.data-table th, table.data-table td{
+    border:1px solid var(--border);
+    padding:9px 11px;
+    text-align:center;
+    white-space:nowrap;
+  }
+  table.data-table th{
+    background:var(--surface-alt);
+    font-weight:700;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  table.data-table td.row-label{
+    font-weight:700;
+    text-align:left;
+    color:var(--ink-soft);
+  }
+  table.data-table td.p-cell{color:var(--supply); font-weight:700;}
+  table.data-table td.wrap-cell{
+    text-align:left;
+    white-space:normal;
+    font-weight:600;
+  }
+  table.data-table td.q-cell{color:var(--demand); font-weight:700;}
+
+  .graph-wrap{
+    margin-bottom:20px;
+    text-align:center;
+  }
+  .graph-wrap svg{width:100%;max-width:480px;height:auto;}
+
+  .prompt{
+    font-size:18px;
+    font-weight:600;
+    line-height:1.4;
+    color:var(--ink);
+    margin-bottom:18px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .choice-btn{
+    text-align:left;
+    padding:13px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){
+    border-color:var(--accent);
+    background:#FFFBF2;
+  }
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{
+    background:var(--correct-soft);
+    border-color:var(--correct);
+    color:var(--correct);
+  }
+  .choice-btn.incorrect{
+    background:var(--incorrect-soft);
+    border-color:var(--incorrect);
+    color:var(--incorrect);
+  }
+
+  .feedback{
+    display:none;
+    margin-bottom:16px;
+  }
+  .feedback.show{display:block;}
+  .feedback-verdict{
+    font-weight:800;
+    font-size:15px;
+    margin-bottom:6px;
+  }
+  .feedback-verdict.correct{color:var(--correct);}
+  .feedback-verdict.incorrect{color:var(--incorrect);}
+  .feedback-explain{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    padding:12px 14px;
+    border-radius:0 8px 8px 0;
+  }
+
+  .controls{
+    display:flex;
+    justify-content:flex-end;
+  }
+  .btn{
+    padding:11px 20px;
+    border-radius:10px;
+    border:none;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover{background:#453427;}
+  .btn:disabled{opacity:.4;cursor:default;}
+
+  .results-panel{display:none;}
+  .results-panel.show{display:block;}
+  .results-band{
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .results-band.good{color:var(--correct);}
+  .results-band.mid{color:var(--accent);}
+  .results-band.poor{color:var(--incorrect);}
+  .results-score{
+    font-size:34px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    margin-bottom:10px;
+  }
+  .results-note{
+    font-size:15px;
+    color:var(--ink-soft);
+    margin-bottom:20px;
+  }
+  table.data-table th.topic-head, table.data-table td.topic-cell{
+    text-align:left;
+    white-space:normal;
+  }
+  table.data-table td.topic-cell{font-weight:600;color:var(--ink);}
+  table.data-table td.topic-score{font-weight:700;}
+  table.data-table td.topic-score.full{color:var(--correct);}
+  table.data-table td.topic-score.low{color:var(--incorrect);}
+  .results-caveat{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+    line-height:1.5;
+    border-top:1px solid var(--border);
+    padding-top:14px;
+    margin:18px 0 20px;
+  }
+
+  footer.reset-row{
+    margin-top:20px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Concept Check: Unit 3</h1>
+    <p>The terms and ideas of Unit 3 &mdash; production and returns, the cost curves, scale, the two profits, choosing a quantity, and when a firm operates, shuts down or leaves</p>
+  </header>
+
+  <div class="meta-row" id="metaRow">
+    <div class="count-group">
+      <span class="card-count" id="cardCount">Card 1 of 55</span>
+    </div>
+    <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="panel" id="quizPanel">
+    <span class="method-badge" id="categoryTag"></span>
+
+    <div class="prompt" id="promptText">Loading&hellip;</div>
+
+    <div class="options" id="optionsWrap"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-verdict" id="feedbackVerdict"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn" disabled>Next card</button>
+    </div>
+  </div>
+
+  <div class="panel results-panel" id="resultsPanel">
+    <div class="results-band" id="resultsBand"></div>
+    <div class="results-score" id="resultsScore"></div>
+    <div class="results-note" id="resultsNote"></div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th class="topic-head">Area</th><th>Score</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <p class="results-caveat">These bands say whether the Unit 3 vocabulary is secure &mdash; they are not an AP score
+    prediction. The exam covers every unit, counts free response for a third of the grade, and gives you no
+    feedback until it is over. Treat a strong result here as one topic secured, not as a score.</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="againBtn">Start again</button>
+    </div>
+  </div>
+
+  <footer class="reset-row" id="resetRow">
+    <button class="link-btn" id="resetBtn">Start over</button>
+  </footer>
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Almost all of this is definitional, and the two numeric cards are checked in
+   a scratch script against the identities they come from. What else that script
+   checks is the shape of the bank: the seven areas at the sizes the unit calls
+   for, the correct option written first in every card (the page shuffles them
+   on screen, so a fixed slot cannot leak the answer), no repeated option inside
+   a card, no option length that gives the answer away, and -- for each of the
+   five confusable pairs this unit turns on -- an explanation that says what
+   SEPARATES the two rather than defining both in turn.
+--------------------------------------------------------------------------- */
+const CARDS = [
+
+  /* ---- production, the short run, and returns ---- */
+  { category:"Production & Returns",
+    prompt:"What makes a period of time \"the short run\" for a firm?",
+    options:["At least one input cannot be varied — the plant or the land is fixed",
+             "The firm has been trading for less than a year and has not settled into its market",
+             "The firm can vary every input it uses, but only by small amounts at a time",
+             "Output is fixed, even though the firm can hire as many workers as it likes"], correct:0,
+    explain:"The short run is defined by a FIXED input, not by a number of months. One input — the plot, the kitchen, the press — cannot be changed, so output can only be varied by using more or less of the variable inputs alongside it. In the long run every input, the plant included, is a choice." },
+
+  { category:"Production & Returns",
+    prompt:"What is total product?",
+    options:["The total output a firm produces with a given quantity of inputs",
+             "The total revenue a firm earns from selling everything it produces",
+             "The output of the last worker the firm took on",
+             "The average output per worker across the whole workforce"], correct:0,
+    explain:"Total product is output, counted in units of the good — crates, loaves, washes. It is not money: revenue is total product multiplied by price, and that is a different quantity entirely. The last worker’s own contribution is marginal product, and output per worker is average product." },
+
+  { category:"Production & Returns",
+    prompt:"What is the marginal product of labor?",
+    options:["The change in total product when one more worker is added",
+             "Total product divided by the number of workers employed",
+             "The total product of all the workers the firm currently employs",
+             "The extra revenue the firm earns from employing one more worker"], correct:0,
+    explain:"MPL is the CHANGE in total product from one more worker — the slope of the total product curve. Total product divided by workers is AVERAGE product, and the extra revenue a worker brings in is a different idea again: it is the marginal product priced out." },
+
+  { category:"Production & Returns",
+    prompt:"The law of diminishing marginal returns says what?",
+    options:["Adding more of a variable input to a fixed input eventually lowers the marginal product of each extra unit",
+             "Adding more of every input together eventually lowers the output the firm gets in total",
+             "Total product eventually falls as more workers are added to the production process",
+             "Average product falls from the very first worker the firm takes on"], correct:0,
+    explain:"The word that matters is EVENTUALLY, and the setting that matters is a FIXED input. Early workers may raise each other’s productivity; past some point the fixed plot or kitchen is crowded and each additional worker adds less than the one before. Note that marginal product falling is not total product falling — output still rises, just more slowly." },
+
+  { category:"Production & Returns",
+    prompt:"Why can diminishing marginal returns only happen in the short run?",
+    options:["It needs a fixed input for the variable input to be crowded against",
+             "It needs the firm to be unable to raise its price, which is only true in the short run",
+             "It needs time for the firm to train its workers, which it only has in the short run",
+             "It needs the firm to be making a loss, which it can only sustain in the short run"], correct:0,
+    explain:"Diminishing returns is a story about one input piling up against another that cannot change — more cooks, one kitchen. In the long run the kitchen can be enlarged too, so nothing is being crowded, and the question becomes how output responds when EVERYTHING grows together. That is returns to scale, a different idea." },
+
+  { category:"Production & Returns",
+    prompt:"Which statement correctly separates diminishing returns from returns to scale?",
+    options:["Diminishing returns is short run and varies ONE input against a fixed one; returns to scale is long run and varies ALL inputs together",
+             "Diminishing returns is long run and varies ALL inputs together; returns to scale is short run and varies ONE input against a fixed one",
+             "Diminishing returns is about cost per unit falling; returns to scale is about cost per unit rising as a firm grows larger",
+             "Diminishing returns applies to competitive firms and returns to scale applies to firms that are large enough to set a price"], correct:0,
+    explain:"Two separations, and they travel together. SHORT RUN against LONG RUN, and ONE input against ALL inputs. Both ideas describe how output answers more input, which is why they blur — but a firm hiring a fifth worker for one fixed plot is in the first story, and a firm doubling its plots AND its workers is in the second." },
+
+  { category:"Production & Returns",
+    prompt:"A firm doubles every input it uses and finds that output more than doubles. What is this?",
+    options:["Increasing returns to scale",
+             "Diminishing marginal returns",
+             "Economies of scope, since the firm is producing more of everything",
+             "Constant returns to scale, since every input was scaled by the same factor"], correct:0,
+    explain:"Scaling ALL inputs by the same factor and getting more than that factor back in output is increasing returns to scale. Diminishing returns cannot be the answer: nothing here was held fixed. Constant returns would mean output exactly doubled." },
+
+  { category:"Production & Returns",
+    prompt:"A firm scales every input by a factor of three and output rises by a factor of two. What does it have?",
+    options:["Decreasing returns to scale",
+             "Increasing returns to scale",
+             "Diminishing marginal returns to the variable input",
+             "Constant returns to scale"], correct:0,
+    explain:"Output rose by less than the inputs did, so this is decreasing returns to scale — often a coordination problem, with more layers of management between the decision and the work. The tempting wrong answer is increasing returns, on the grounds that output went up at all; what matters is whether it went up by MORE than the inputs did, and here it went up by less. Diminishing returns is not available: nothing was held fixed." },
+
+  { category:"Production & Returns",
+    prompt:"What is the average product of labor?",
+    options:["Total product divided by the number of workers",
+             "The change in total product from the last worker hired",
+             "Total product divided by total cost",
+             "The output of the most productive worker the firm employs"], correct:0,
+    explain:"APL is output per worker: total product divided by workers. The change from the LAST worker is marginal product, and the two move together in a particular way — while MPL is above APL the average is pulled up, and once MPL falls below it the average is pulled down." },
+
+  /* ---- the cost curves and how they fit together ---- */
+  { category:"Cost Curves",
+    prompt:"Which statement about total fixed cost is correct?",
+    options:["It is owed even at zero output, and it does not change as output rises",
+             "It falls as output rises, because it is spread over more units",
+             "It rises with output, but more slowly than total variable cost does",
+             "It is zero in the short run and positive only in the long run"], correct:0,
+    explain:"TFC is a flat commitment — the lease, the insurance, the loan — owed whether the firm produces a thousand units or none. What falls as output rises is AVERAGE fixed cost, the same total spread over more units. In the LONG run there are no fixed costs at all, which is the opposite of the last option." },
+
+  { category:"Cost Curves",
+    prompt:"Total cost is made up of what?",
+    options:["Total fixed cost plus total variable cost",
+             "Total fixed cost plus marginal cost at the current output",
+             "Average total cost plus average variable cost",
+             "Total fixed cost multiplied by total variable cost"], correct:0,
+    explain:"TC = TFC + TVC, at every quantity, and it is the identity the whole set of cost curves is built out of. Marginal cost is the cost of one more unit, not a component of the total; adding two AVERAGES together gives a per-unit figure rather than a total; and the two parts are added, never multiplied — a firm with no fixed costs would otherwise have no total cost at all." },
+
+  { category:"Cost Curves",
+    prompt:"Why does average fixed cost fall as output rises?",
+    options:["The same fixed total is divided among more units, so each unit carries less of it",
+             "Fixed costs themselves shrink once a firm is producing at a higher volume",
+             "Suppliers give discounts on fixed inputs to firms that produce more",
+             "Average fixed cost falls only until output reaches the plant’s capacity, then rises"], correct:0,
+    explain:"AFC = TFC ÷ Q with a FIXED numerator, so it falls for the whole of the curve and keeps falling — approaching zero without ever reaching it. The fixed total itself does not move; only the share each unit carries does." },
+
+  { category:"Cost Curves",
+    prompt:"Which identity is correct?",
+    options:["ATC = AFC + AVC",
+             "ATC = AFC × AVC",
+             "ATC = AVC − AFC",
+             "ATC = TFC + AVC"], correct:0,
+    explain:"Divide TC = TFC + TVC by Q and the identity comes out per unit: ATC = AFC + AVC. It also runs backwards, which is the useful direction on a diagram — the vertical gap between ATC and AVC at any quantity IS average fixed cost." },
+
+  { category:"Cost Curves",
+    prompt:"What is marginal cost?",
+    options:["The change in total cost from producing one more unit",
+             "Total cost divided by the number of units produced",
+             "The cost of the variable inputs used at the current output",
+             "The change in average total cost from producing one more unit"], correct:0,
+    explain:"MC = ΔTC ÷ ΔQ, the cost of the NEXT unit. Total cost per unit is average total cost, a different figure that changes much more slowly. Note that MC can be read off TVC just as well as off TC: the fixed part adds nothing to the change." },
+
+  { category:"Cost Curves",
+    prompt:"How does marginal cost connect to the production side of the firm?",
+    options:["MC = the wage divided by the marginal product of labor",
+             "MC = the wage multiplied by the marginal product of labor",
+             "MC = the marginal product of labor divided by the wage",
+             "MC = the wage divided by the average product of labor"], correct:0,
+    explain:"One more unit of output needs 1 ÷ MPL extra workers, and each costs the wage, so MC = w ÷ MPL. The relationship is upside down: where marginal product is at its highest, marginal cost is at its lowest, and as MPL falls through diminishing returns MC rises. Dividing by AVERAGE product gives AVC, not MC." },
+
+  { category:"Cost Curves",
+    prompt:"Where does the marginal cost curve cross average variable cost and average total cost?",
+    options:["At the minimum point of each of them",
+             "At the maximum point of each of them",
+             "At the same quantity for both, since the two curves have the same minimum",
+             "Wherever marginal cost itself is at its lowest"], correct:0,
+    explain:"MC cuts each average curve at that curve’s own MINIMUM, and it is simple arithmetic about averages: while the next unit costs less than the running average, the average is pulled down; once it costs more, the average is pulled up. The two minima are at different quantities, because ATC still has falling AFC in it, which keeps ATC falling after AVC has turned." },
+
+  { category:"Cost Curves",
+    prompt:"At 120 washes a car wash has an average total cost of $9.40 and an average variable cost of $6.90. What are its total fixed costs?",
+    options:["$300",
+             "$828",
+             "$1,128",
+             "$2.50"], correct:0,
+    explain:"The gap between ATC and AVC is average FIXED cost: $9.40 − $6.90 = $2.50 a wash. Multiply by the 120 washes and the fixed cost is $300. $2.50 is the per-unit figure, not the total; $828 is total variable cost and $1,128 is total cost." },
+
+  { category:"Cost Curves",
+    prompt:"What happens to the gap between ATC and AVC as output rises?",
+    options:["It narrows, because average fixed cost is shrinking",
+             "It widens, because fixed costs are spread over more units",
+             "It stays the same, because total fixed cost does not change",
+             "It narrows until the two curves cross, after which ATC lies below AVC"], correct:0,
+    explain:"The gap IS average fixed cost, and AFC falls as output rises, so the two curves draw closer and closer without meeting. ATC can never fall to AVC, let alone below it: there is always some fixed cost left to carry, however thinly it is spread." },
+
+  { category:"Cost Curves",
+    prompt:"Which of these correctly links the production curves to the cost curves?",
+    options:["Marginal cost is at its minimum where marginal product is at its maximum",
+             "Marginal cost is at its minimum where average product is at its maximum",
+             "Average total cost is at its minimum where marginal product is at its maximum",
+             "Average variable cost is at its minimum where marginal product is at its maximum"], correct:0,
+    explain:"The cost curves are the production curves turned upside down and priced at the wage. MC = w ÷ MPL, so MC bottoms out exactly where MPL peaks; AVC = w ÷ APL, so AVC bottoms out where APL peaks. Those two peaks are at DIFFERENT quantities, which is why the two cost minima are at different quantities too." },
+
+  /* ---- the long run: scale and LRATC ---- */
+  { category:"Scale & LRATC",
+    prompt:"What are economies of scale?",
+    options:["The stretch of the long-run average cost curve where cost per unit falls as the firm gets larger",
+             "The stretch of the long-run average cost curve where cost per unit rises as the firm gets larger",
+             "The fall in average fixed cost as a firm produces more from its existing plant",
+             "The saving a firm makes by producing several different goods rather than one"], correct:0,
+    explain:"Economies of scale are about the SIZE OF THE FIRM, not about using one plant more intensively: spreading large investments across more output, specializing the workforce, buying inputs in bulk. Falling AFC within one plant is a short-run story, and savings from producing several goods are economies of SCOPE." },
+
+  { category:"Scale & LRATC",
+    prompt:"A firm grows past a certain size and its cost per unit begins to rise. What is the usual reason?",
+    options:["Coordination strains — more layers between the decision and the work",
+             "Its fixed costs rise, so average fixed cost rises with them",
+             "Diminishing marginal returns to its variable input set in",
+             "It has run out of workers to hire at the going wage"], correct:0,
+    explain:"Diseconomies of scale are a management problem before they are anything else: communication slows, accountability thins, and decisions take longer the bigger the organization gets. Diminishing returns is the wrong answer because nothing is fixed here — the firm is scaling everything, which is what makes this the long run." },
+
+  { category:"Scale & LRATC",
+    prompt:"What is the long-run average total cost curve?",
+    options:["The lower envelope of every possible plant size’s short-run ATC curve",
+             "The average of all the possible plant sizes’ short-run ATC curves",
+             "The short-run ATC curve of the largest plant the firm could build",
+             "The curve joining the minimum points of every possible plant size’s ATC curve"], correct:0,
+    explain:"For each output, the long-run curve takes the cheapest plant available for that output, so it runs underneath all the short-run curves and touches each one at the output that plant is best for. It is a lower envelope, not an average — and the last option is the classic error, which the next cards take up." },
+
+  { category:"Scale & LRATC",
+    prompt:"Why does the long-run ATC curve NOT pass through the minimum point of every short-run ATC curve?",
+    options:["Each plant is used at the output it is cheapest FOR, which is usually not that plant’s own cheapest output",
+             "Because the long-run curve is an average of the short-run curves, so it misses their minima",
+             "Because the long-run curve lies above the short-run curves everywhere except at one point",
+             "Because a plant’s minimum ATC is not a cost the firm can actually achieve"], correct:0,
+    explain:"The long-run curve answers \"what is the cheapest way to make THIS output?\" On the falling stretch, a bigger plant run below its own best output still beats a smaller plant run flat out, so the tangency sits to the LEFT of the small plant’s minimum. Only the plant at the bottom of the long-run curve is touched at its own minimum." },
+
+  { category:"Scale & LRATC",
+    prompt:"What is minimum efficient scale?",
+    options:["The smallest output at which long-run average cost reaches its lowest value",
+             "The output at which a firm’s short-run average total cost is lowest",
+             "The smallest plant a firm can build and still cover its fixed costs",
+             "The output at which a firm first begins to earn an economic profit"], correct:0,
+    explain:"MES is about the LONG-RUN curve and it is the SMALLEST output that reaches the minimum. A firm at MES has captured every economy of scale available; a firm below it is paying more per unit than a larger rival, which is what makes MES matter for how many firms an industry can hold." },
+
+  { category:"Scale & LRATC",
+    prompt:"A long-run ATC curve reaches $40 at 500 units and stays flat at $40 all the way to 900 units. What is minimum efficient scale?",
+    options:["500 units",
+             "900 units",
+             "700 units, the middle of the flat range",
+             "There is no minimum efficient scale when the bottom is flat"], correct:0,
+    explain:"MES is the SMALLEST output at the lowest cost, so it is where the flat stretch begins: 500 units. The flat range tells you something else useful — that firms anywhere from 500 to 900 units compete on equal cost terms, so the industry can hold several sizes at once." },
+
+  { category:"Scale & LRATC",
+    prompt:"What does it mean to say a firm is \"in the long run\"?",
+    options:["Every input, including the size of the plant, is something the firm chooses",
+             "The firm has had time to recover whatever fixed costs it has already paid",
+             "At least one input is still fixed, but the firm can change the others freely",
+             "The firm’s costs have stopped changing from one period to the next"], correct:0,
+    explain:"The long run is defined by what is VARIABLE, not by a length of time: every input is a choice, including the plant. That is why the long run has no fixed costs, and why the question \"which plant should I build?\" only exists there." },
+
+  /* ---- accounting profit and economic profit ---- */
+  { category:"Profit Types",
+    prompt:"Which statement correctly separates explicit costs from implicit costs?",
+    options:["Explicit costs are money actually paid out; implicit costs are the value of resources the owner already supplies, with no money changing hands",
+             "Explicit costs are the ones that appear on a tax return; implicit costs are the ones an accountant has not got round to recording yet",
+             "Explicit costs are fixed costs and implicit costs are variable costs",
+             "Explicit costs are paid in the short run; implicit costs are paid in the long run"], correct:0,
+    explain:"The separation is whether MONEY LEAVES THE FIRM. Wages, rent and materials are explicit: someone outside was paid. The owner’s forgone salary and the rent their own building could have fetched are implicit: no money changes hands, and they are real costs all the same. Both are costs; only explicit ones reach accounting profit." },
+
+  { category:"Profit Types",
+    prompt:"A baker owns her shop outright and could rent it out for $30,000 a year. What is that $30,000 to her bakery?",
+    options:["An implicit cost — the value of a use she gave up",
+             "An explicit cost — the building has to be paid for one way or another",
+             "Not a cost at all, since she pays no rent",
+             "A fixed cost that appears in the bakery’s accounting profit"], correct:0,
+    explain:"No money changes hands, so no accountant records it — and the forgone rent is a real cost of using the building for baking rather than letting it. \"Not a cost at all\" is exactly the slip the term implicit cost exists to prevent: owning a resource does not make using it free." },
+
+  { category:"Profit Types",
+    prompt:"How is accounting profit calculated?",
+    options:["Total revenue minus explicit costs",
+             "Total revenue minus implicit costs",
+             "Total revenue minus explicit costs minus implicit costs",
+             "Total revenue minus total fixed costs"], correct:0,
+    explain:"Accounting profit subtracts the money that actually went out of the firm. It is a real and useful figure — it is what the tax return is built on — but it is not the figure that answers whether the owner should be in this business rather than another." },
+
+  { category:"Profit Types",
+    prompt:"How is economic profit calculated?",
+    options:["Total revenue minus explicit costs minus implicit costs",
+             "Total revenue minus explicit costs",
+             "Accounting profit minus total fixed costs",
+             "Accounting profit plus the owner’s forgone salary"], correct:0,
+    explain:"Economic profit subtracts BOTH kinds of cost, which is the same as taking accounting profit and subtracting the implicit costs from it. The last option has the sign backwards: a forgone salary is a cost, so it comes off, never on." },
+
+  { category:"Profit Types",
+    prompt:"What is normal profit?",
+    options:["The accounting profit at which economic profit is exactly zero",
+             "The accounting profit a typical firm in the industry earns in an average year",
+             "The economic profit a firm earns when it is operating at its efficient scale",
+             "The profit left after tax but before the owner takes anything out"], correct:0,
+    explain:"Normal profit is the level of accounting profit that exactly covers the implicit costs: the owner is earning precisely what their time and money would earn in their next-best use, no better and no worse. Zero economic profit sounds alarming and is not — it is the resting point of a competitive industry." },
+
+  { category:"Profit Types",
+    prompt:"Can a firm’s economic profit ever be greater than its accounting profit?",
+    options:["No — implicit costs are never negative, so subtracting them can only lower the figure",
+             "Yes — whenever the firm’s implicit costs are smaller than its explicit costs",
+             "Yes — whenever the owner has no better use for their time than this business",
+             "No — the two figures are always exactly equal in a competitive industry"], correct:0,
+    explain:"Economic profit starts from accounting profit and takes MORE away, so it can never end up higher. The most it can do is tie, which happens when the implicit costs are exactly zero. An owner with no better use for their time has LOW implicit costs, not negative ones." },
+
+  { category:"Profit Types",
+    prompt:"Two shops report the same revenue, the same explicit costs and therefore the same accounting profit. Can the right decision differ between them?",
+    options:["Yes — if their implicit costs differ, their economic profits differ and so can the decision",
+             "No — identical books mean an identical situation and an identical decision",
+             "Yes — but only if one of them is in the short run and the other is in the long run",
+             "No — unless one of them has made an arithmetic error in its accounts"], correct:0,
+    explain:"This is the whole reason the unit distinguishes the two profits. One owner may be giving up a $30,000 alternative and the other a $90,000 one; the books cannot see that, and the decision turns on it. Same accounting profit, opposite correct answers — stay for one, switch for the other." },
+
+  { category:"Profit Types",
+    prompt:"An owner is deciding whether to keep running her business or take a job elsewhere. Which figure answers that?",
+    options:["The sign of her economic profit",
+             "The sign of her accounting profit",
+             "Whether her revenue covers her explicit costs",
+             "Whether her accounting profit is larger than her fixed costs"], correct:0,
+    explain:"Economic profit above zero means this business beats the best alternative she gave up for it, so she stays; below zero means the alternative is worth more, so she switches. Accounting profit cannot answer the question because the alternative she is weighing is exactly what it leaves out." },
+
+  /* ---- choosing the quantity ---- */
+  { category:"Profit Maximization",
+    prompt:"What is the profit-maximizing rule for any firm?",
+    options:["Produce where marginal revenue equals marginal cost",
+             "Produce where average total cost is at its minimum",
+             "Produce where total revenue is at its maximum",
+             "Produce where the gap between price and average total cost is widest"], correct:0,
+    explain:"MR = MC is the rule, and it works by the same logic everywhere: keep making units while each one adds more than it costs, stop when it does not. Maximizing revenue ignores cost entirely, and the widest per-unit gap is the fattest-margin trap — it gives up units that still add to profit." },
+
+  { category:"Profit Maximization",
+    prompt:"For a perfectly competitive firm, what is marginal revenue?",
+    options:["The market price, for every unit it sells",
+             "The market price minus the average cost of the unit",
+             "Total revenue divided by the number of units sold, which falls as it sells more",
+             "A falling amount, since the firm has to lower its price to sell more"], correct:0,
+    explain:"The firm is too small to move the price, so every extra unit sells at the same going price: MR = P, and the line is flat. The last option describes a firm with market power, which faces a downward-sloping demand curve of its own and has to cut the price to sell more." },
+
+  { category:"Profit Maximization",
+    prompt:"With whole units, marginal cost often jumps past marginal revenue without ever landing exactly on it. What should the firm do?",
+    options:["Produce the last unit for which MR is at least MC",
+             "Produce until marginal cost first exceeds marginal revenue, then make that unit too",
+             "Produce nothing, since the MR = MC condition cannot be met",
+             "Produce the unit where MC and MR are closest in value, whichever side it falls"], correct:0,
+    explain:"\"Set MR = MC\" is shorthand for a smooth curve. In a table of whole units you take every unit that adds at least as much as it costs and stop at the last one. Making the unit where MC has already passed MR adds a unit that loses money, and \"no such quantity\" abandons a profitable firm over a rounding artifact." },
+
+  { category:"Profit Maximization",
+    prompt:"Why is \"produce as much as you possibly can\" the wrong rule for a price-taking firm?",
+    options:["Revenue keeps rising with output, but past some point cost rises faster, so profit falls",
+             "Because selling more would force the market price down",
+             "Because the firm would run out of buyers before it ran out of capacity",
+             "Because average fixed cost rises once output passes the plant’s capacity"], correct:0,
+    explain:"Every unit adds the same price to revenue, so revenue does keep climbing — that is exactly what makes the trap tempting. But marginal cost eventually climbs past the price, and from there each extra unit shrinks profit. A price taker is not held back by the market price falling: it cannot move the price at all." },
+
+  { category:"Profit Maximization",
+    prompt:"A firm notices that its third unit clears the biggest per-unit margin of any unit it makes. Why is stopping there a mistake?",
+    options:["Later units can still add something to profit, even if they add less",
+             "The third unit’s margin is not really the biggest once fixed costs are included",
+             "Per-unit margins are not a real measure of anything a firm cares about",
+             "Stopping early raises average fixed cost, which wipes out the margin"], correct:0,
+    explain:"The biggest margin marks the best single unit, not the best stopping point. While marginal cost is still within the price, every further unit adds SOMETHING, and adding something is still adding. Stopping at the fattest margin leaves that extra profit on the table." },
+
+  { category:"Profit Maximization",
+    prompt:"Which curve determines the profit-maximizing QUANTITY for a price-taking firm?",
+    options:["Marginal cost, where it meets the price line",
+             "Average total cost, where it is at its lowest",
+             "Average total cost, where it is closest to the price line",
+             "Average variable cost, where it meets the price line"], correct:0,
+    explain:"The quantity comes from MC against the price, and nothing else. ATC has a different job: read at that already-chosen quantity, it gives the HEIGHT of the profit or loss rectangle. Choosing the quantity where ATC is lowest would mean giving up units that still add to profit." },
+
+  /* ---- operate, shut down, or exit ---- */
+  { category:"Operate, Shut Down or Exit",
+    prompt:"How is a firm’s profit or loss read off a cost diagram?",
+    options:["As the rectangle (P − ATC) × Q at the chosen quantity",
+             "As the rectangle (P − AVC) × Q at the chosen quantity",
+             "As the area under the marginal cost curve up to the chosen quantity",
+             "As the vertical gap between the price line and average total cost"], correct:0,
+    explain:"Profit = TR − TC = (P × Q) − (ATC × Q) = (P − ATC) × Q: a height times a width, so a rectangle. The gap on its own is the per-unit figure — the height of the rectangle, not its area — and (P − AVC) × Q leaves the fixed costs out." },
+
+  { category:"Operate, Shut Down or Exit",
+    prompt:"In the short run, a firm should keep producing at a loss as long as what is true?",
+    options:["The price is at least average variable cost",
+             "The price is at least average total cost",
+             "The loss is smaller than the firm’s total variable cost",
+             "The firm expects the price to recover within the year"], correct:0,
+    explain:"Fixed costs are sunk in the short run: owed whether the firm produces or not, so they cannot decide anything. What the firm still controls is the variable cost, so the question is whether the price covers that. If it does, the surplus goes toward the fixed costs the firm owes anyway, and producing loses less than closing." },
+
+  { category:"Operate, Shut Down or Exit",
+    prompt:"What is the shutdown price?",
+    options:["The minimum of average variable cost",
+             "The minimum of average total cost",
+             "The price at which the firm’s economic profit is exactly zero",
+             "The price at which marginal cost begins to rise"], correct:0,
+    explain:"At the bottom of AVC the firm is covering its variable costs exactly and contributing nothing toward fixed cost; below it, every unit produced makes the loss worse than simply closing. The minimum of ATC is the BREAK-EVEN price, which is a different and higher bar." },
+
+  { category:"Operate, Shut Down or Exit",
+    prompt:"Which part of a competitive firm’s cost curves is its short-run supply curve?",
+    options:["Marginal cost, at and above the minimum of average variable cost",
+             "Marginal cost, at and above the minimum of average total cost",
+             "Average variable cost, above its own minimum",
+             "The whole of the marginal cost curve"], correct:0,
+    explain:"Each price picks the quantity where MC meets it, so the firm’s answers to \"how much at this price?\" ARE points on its MC curve — but only down to the shutdown price. Below the bottom of AVC the answer is zero, so that lower stretch of MC is never supplied." },
+
+  { category:"Operate, Shut Down or Exit",
+    prompt:"In the long run, what must a firm cover to stay in the industry?",
+    options:["Average total cost — nothing is sunk, so every cost has to be covered",
+             "Average variable cost — the same test as the short run",
+             "Average fixed cost — the costs it cannot avoid",
+             "Marginal cost at its chosen quantity"], correct:0,
+    explain:"In the long run the lease ends and the equipment can be sold: nothing is owed regardless, so there is nothing to protect by producing at a loss. The bar rises from the bottom of AVC to the bottom of ATC, and a firm that cannot clear it leaves." },
+
+  { category:"Operate, Shut Down or Exit",
+    prompt:"Which statement correctly separates shutting down from exiting?",
+    options:["Shutting down is a short-run choice to produce nothing while still paying fixed costs; exiting is a long-run choice to leave the industry with nothing left to pay",
+             "Shutting down is a long-run choice to leave the industry; exiting is a short-run choice to produce nothing for a while",
+             "Shutting down happens when a firm makes a loss; exiting happens when it makes a bigger loss",
+             "Shutting down applies to firms with fixed costs; exiting applies to firms without them"], correct:0,
+    explain:"A shut-down firm still EXISTS: it produces zero, pays its fixed costs, and can reopen when the price recovers. An exited firm is gone — the lease ended, the equipment sold, nothing left to owe. Short run against long run, temporary against permanent, and triggered by P below min AVC against P below min ATC." },
+
+  { category:"Operate, Shut Down or Exit",
+    prompt:"A firm shuts down in the short run. What is its loss?",
+    options:["Exactly its total fixed cost",
+             "Zero, since it is no longer producing anything",
+             "Its total fixed cost plus its total variable cost",
+             "Whatever it was losing before it shut down"], correct:0,
+    explain:"Shutting down stops the variable costs and the revenue together, but the fixed costs are owed regardless, so the loss is exactly TFC. That is the figure \"produce at a loss\" has to beat: operating is better whenever it loses LESS than the fixed cost alone would." },
+
+  { category:"Operate, Shut Down or Exit",
+    prompt:"At its chosen quantity a firm’s price is above AVC but below ATC. What follows?",
+    options:["It produces at a loss in the short run, and its loss is smaller than its fixed cost",
+             "It shuts down in the short run, because it is not covering average total cost",
+             "It produces at a loss, and its loss is exactly equal to its fixed cost",
+             "It breaks even, because the price is between the two average cost curves"], correct:0,
+    explain:"Above AVC means every unit contributes something toward the fixed cost, so operating beats closing — by exactly (P − AVC) × Q. Below ATC means it is still a loss. In the long run this firm exits, since it never covers its full cost per unit, but in the short run it keeps going." },
+
+  /* ---- perfect competition and long-run equilibrium ---- */
+  { category:"Perfect Competition",
+    prompt:"Which of these is an assumption of perfect competition?",
+    options:["Many buyers and sellers, each too small to move the market price",
+             "A handful of large sellers, each watching what the others charge",
+             "Sellers offering noticeably different versions of the product",
+             "Barriers that make it costly for a new firm to enter the industry"], correct:0,
+    explain:"The four assumptions are many small buyers and sellers, a standardized product, free entry and exit, and full information. Each rules out a way of having market power: being large, being different, being protected from entry, or knowing something buyers do not." },
+
+  { category:"Perfect Competition",
+    prompt:"Which statement correctly separates the demand curve a competitive FIRM faces from the MARKET demand curve?",
+    options:["The firm faces a horizontal line at the market price; the market’s own demand curve slopes downward",
+             "The firm faces a downward-sloping curve; the market’s own demand curve is horizontal at the going price",
+             "Both slope downward, but the firm’s is steeper because it sells less",
+             "Both are horizontal, since the price is set by the market and nobody can change it"], correct:0,
+    explain:"The market curve is the ordinary downward-sloping one from Unit 2: lower the price and the MARKET buys more. One firm is a speck of that market — it can sell all it wants at the going price and nothing above it — so what IT faces is a flat line: D = MR = AR = P. One word separates them: the market curve is downward-sloping, while the single firm’s is horizontal — and the firm’s flat line sits AT the price the market curve produced." },
+
+  { category:"Perfect Competition",
+    prompt:"A competitive industry is earning positive economic profit. What happens next?",
+    options:["New firms enter, industry supply shifts right, and the price falls until the profit is gone",
+             "Existing firms expand, industry supply shifts left, and the price rises further",
+             "New firms enter, industry supply shifts left, and the price rises until the profit is gone",
+             "Nothing changes, since each firm is too small to affect the market price"], correct:0,
+    explain:"Positive economic profit is a signal that resources earn more here than elsewhere, and free entry lets outsiders act on it. More firms means more supply at every price, so the market price falls — and it keeps falling until economic profit reaches zero and the reason to enter is gone." },
+
+  { category:"Perfect Competition",
+    prompt:"A competitive industry is making losses. What does the adjustment look like?",
+    options:["Firms exit, industry supply shifts left, and the price rises until the losses stop",
+             "Firms exit, industry supply shifts right, and the price falls further",
+             "Firms cut their prices to attract buyers, and the losses deepen",
+             "Firms shut down temporarily and reopen once the price has recovered on its own"], correct:0,
+    explain:"Exit is the mirror image of entry: each departure takes output off the market, supply shifts left and the price rises, until the survivors are breaking even. Cutting price is not available to a price taker, and shutting down is a short-run move that leaves the industry’s supply unchanged in the long run." },
+
+  { category:"Perfect Competition",
+    prompt:"What is the condition for long-run equilibrium in a perfectly competitive industry?",
+    options:["P = MR = MC = minimum ATC, so economic profit is exactly zero",
+             "P = MR = MC, with ATC sitting above the price so firms take a loss",
+             "P = MR = MC = minimum AVC, so firms are just willing to keep producing",
+             "P = MR = MC, with ATC sitting below the price so firms earn a profit"], correct:0,
+    explain:"Everything ties together at one point: the firm is maximizing profit (P = MC), it is a price taker (P = MR), and entry or exit has pushed the price down or up to the bottom of ATC, so economic profit is exactly zero. Minimum AVC is the shutdown price, which is where a firm stops producing, not where an industry settles." },
+
+  { category:"Perfect Competition",
+    prompt:"Which statement correctly separates P = MC from P = minimum ATC?",
+    options:["P = MC pins down the quantity and holds whenever a price taker maximizes profit; P = minimum ATC is the zero-profit condition and holds only in long-run equilibrium",
+             "P = MC is the zero-profit condition and holds only in long-run equilibrium; P = minimum ATC pins down the quantity at every moment",
+             "Both hold at every moment for a price-taking firm, and they pick out the same quantity",
+             "P = MC holds in the short run and P = minimum ATC holds in the short run too, but only for firms that are breaking even"], correct:0,
+    explain:"P = MC is a QUANTITY rule and it is true while the firm is making a profit, breaking even or taking a loss — it says nothing about how the firm is doing. P = minimum ATC is a much stronger claim about the PRICE: it is true only in long-run equilibrium, after entry or exit has finished adjusting it, and it is the statement that economic profit is zero." },
+
+  { category:"Perfect Competition",
+    prompt:"An industry’s long-run supply curve slopes upward. What does that tell you?",
+    options:["It is an increasing-cost industry: expansion bids up the price of its inputs",
+             "It is a constant-cost industry: entry leaves input prices where they were",
+             "It is a decreasing-cost industry: expansion lowers the cost of its inputs",
+             "Its firms have market power, so they raise the price as the industry grows"], correct:0,
+    explain:"In a constant-cost industry entry leaves input prices alone and the long-run supply curve is horizontal — price returns to the same minimum ATC each time. If expansion bids up the price of a specialized input, costs rise with the industry and long-run supply slopes up; if expansion lowers input costs, it slopes down." },
+];
+
+/* ------------------------------------------------------------ state + helpers */
+/* Results bands. Banding uses the ROUNDED percentage -- the same number shown
+   to the student -- so the label can never disagree with the figure beside it.
+   Raw-score ranges over this 51-card bank, checked in the scratch script:
+     Mastered 46-51 | Strong 41-45 | Developing 36-40 | Shaky 28-35 | below 28
+   Blind guessing on 4 options averages 13/51, which lands in the bottom band. */
+const BANDS = [
+  { min: 90, label: 'Mastered', tone: 'good',
+    note: 'The vocabulary is secure. You can tell diminishing returns from returns to scale, explicit costs from implicit ones, and shutting down from exiting — and you can say what every term in the unit actually means.' },
+  { min: 80, label: 'Strong', tone: 'good',
+    note: 'Solid command of the terms. Look at the areas below where you dropped marks, then run it again.' },
+  { min: 70, label: 'Developing', tone: 'mid',
+    note: 'Most of it is there, but some definitions are still blurred at the edges. The breakdown below shows which.' },
+  { min: 55, label: 'Shaky', tone: 'poor',
+    note: 'Enough of the vocabulary is unsettled to cost you marks on questions you could otherwise answer. Review the areas below before drilling again.' },
+  { min: 0, label: 'Needs Review', tone: 'poor',
+    note: 'Go back to the Unit 3 notes and the definitions first. More practice without review will not close a gap this size.' },
+];
+
+let order = [];
+let index = 0;
+let answered = false;
+let optionOrder = [];               // display position -> index in card.options
+let score = { correct: 0, total: 0 };
+let perArea = {};                   // category -> { correct, total }, for the breakdown
+
+function shuffledIndices(n){
+  const arr = [...Array(n).keys()];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+const AREAS = [...new Set(CARDS.map(c => c.category))];
+
+function init(){
+  order = shuffledIndices(CARDS.length);
+  index = 0;
+  score = { correct: 0, total: 0 };
+  perArea = {};
+  AREAS.forEach(a => perArea[a] = { correct: 0, total: 0 });
+  showQuiz();
+  loadCard();
+}
+
+function loadCard(){
+  answered = false;
+  const card = CARDS[order[index]];
+  document.getElementById('cardCount').textContent = `Card ${index + 1} of ${CARDS.length}`;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+  document.getElementById('categoryTag').textContent = card.category;
+  document.getElementById('promptText').textContent = card.prompt;
+  document.getElementById('feedback').classList.remove('show');
+  document.getElementById('feedbackVerdict').textContent = '';
+  document.getElementById('feedbackExplain').textContent = '';
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  nextBtn.textContent = index === CARDS.length - 1 ? 'See your results' : 'Next card';
+
+  /* Every card is written with its correct option first, so the options MUST be
+     shuffled here or the answer would sit in slot 1 every time. */
+  optionOrder = shuffledIndices(card.options.length);
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  optionOrder.forEach(origIndex => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = card.options[origIndex];
+    btn.addEventListener('click', () => handleAnswer(card, origIndex, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+function handleAnswer(card, chosenIndex, btnEl){
+  if(answered) return;
+  answered = true;
+
+  const isCorrect = chosenIndex === card.correct;
+  score.total++;
+  if(isCorrect) score.correct++;
+  const tally = perArea[card.category];
+  tally.total++;
+  if(isCorrect) tally.correct++;
+  document.getElementById('scoreBadge').textContent = `Score: ${score.correct} / ${score.total}`;
+
+  [...document.getElementById('optionsWrap').children].forEach((b, pos) => {
+    b.disabled = true;
+    if(optionOrder[pos] === card.correct) b.classList.add('correct');
+    else if(b === btnEl) b.classList.add('incorrect');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.classList.add('show');
+  const verdict = document.getElementById('feedbackVerdict');
+  verdict.textContent = isCorrect
+    ? 'Correct.'
+    : `Not quite \u2014 the answer is "${card.options[card.correct]}."`;
+  verdict.className = 'feedback-verdict ' + (isCorrect ? 'correct' : 'incorrect');
+  document.getElementById('feedbackExplain').textContent = card.explain;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if(index < CARDS.length - 1){
+    index++;
+    loadCard();
+  } else {
+    showResults();
+  }
+});
+
+function showQuiz(){
+  document.getElementById('quizPanel').style.display = '';
+  document.getElementById('metaRow').style.display = '';
+  document.getElementById('resetRow').style.display = '';
+  document.getElementById('resultsPanel').classList.remove('show');
+}
+
+function showResults(){
+  document.getElementById('quizPanel').style.display = 'none';
+  document.getElementById('metaRow').style.display = 'none';
+  document.getElementById('resetRow').style.display = 'none';
+
+  const pct = Math.round(100 * score.correct / score.total);
+  const band = BANDS.find(b => pct >= b.min);
+  const bandEl = document.getElementById('resultsBand');
+  bandEl.textContent = band.label;
+  bandEl.className = 'results-band ' + band.tone;
+  document.getElementById('resultsScore').textContent =
+    `${score.correct} / ${score.total}  (${pct}%)`;
+  document.getElementById('resultsNote').textContent = band.note;
+
+  // breakdown in the fixed teaching order, not the shuffled order they saw
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  AREAS.forEach(a => {
+    const t = perArea[a];
+    const cls = t.correct === t.total ? 'full' : (t.correct / t.total < 0.5 ? 'low' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="topic-cell">${a}</td>` +
+                   `<td class="topic-score ${cls}">${t.correct} / ${t.total}</td>`;
+    body.appendChild(tr);
+  });
+
+  document.getElementById('resultsPanel').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('againBtn').addEventListener('click', init);
+document.getElementById('resetBtn').addEventListener('click', init);
+
+init();
+</script>
+</body>
+</html>
