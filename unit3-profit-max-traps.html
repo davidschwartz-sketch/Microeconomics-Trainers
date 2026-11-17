@@ -80,15 +80,25 @@
   .count-group{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
   .card-count{font-size:13px;font-weight:700;color:var(--ink-soft);}
   .step-count{font-size:13px;font-weight:700;color:var(--teal);}
-  .mode-toggle{
-    display:inline-flex;align-items:center;gap:7px;cursor:pointer;
-    font-size:12.5px;font-weight:700;color:var(--ink-soft);
-    background:var(--surface);border:1px solid var(--border);border-radius:999px;
-    padding:3px 11px 3px 8px;
+  .mode-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 14px;}
+  .btn-toggle{
+    display:inline-flex;align-items:center;gap:10px;cursor:pointer;
+    font-family:inherit;font-size:14.5px;font-weight:700;color:var(--ink);
+    background:var(--surface);border:1.5px solid var(--border);border-radius:10px;
+    padding:11px 18px;transition:border-color .15s ease, background .15s ease, color .15s ease;
   }
-  .mode-toggle:hover{border-color:var(--accent);}
-  .mode-toggle input{accent-color:var(--accent);width:14px;height:14px;margin:0;cursor:pointer;}
-  .mode-toggle.on{color:var(--orange);border-color:var(--orange);background:#FDF3EE;}
+  .btn-toggle:hover{border-color:var(--orange);background:#FDF3EE;}
+  .btn-toggle .dot{
+    width:13px;height:13px;border-radius:50%;border:2px solid var(--muted);
+    display:inline-block;flex:none;
+  }
+  .btn-toggle[aria-pressed="true"]{
+    background:var(--orange);border-color:var(--orange);color:#FFFFFF;
+  }
+  .btn-toggle[aria-pressed="true"]:hover{background:#A8441F;border-color:#A8441F;}
+  .btn-toggle[aria-pressed="true"] .dot{border-color:#FFFFFF;background:#FFFFFF;}
+  .mode-why{font-size:13px;color:var(--ink-soft);max-width:48ch;line-height:1.45;}
+  .mode-why b{color:var(--ink);}
 
   .score-badge{
     font-size:13px;font-weight:700;color:var(--accent);
@@ -278,9 +288,9 @@
   <header>
     <div class="title-block">
       <h1>Finding the Profit-Maximizing Quantity</h1>
-      <p>Eight price-taking firms, eight complete tables, one question each. The arithmetic is
-      already done for you &mdash; the whole difficulty is knowing which row to stop at, and
-      there are three well-worn ways to stop at the wrong one.</p>
+      <p>Eight price-taking firms, eight tables, one question each. The whole difficulty is
+      knowing which row to stop at, and there are three well-worn ways to stop at the wrong
+      one.</p>
     </div>
   </header>
 
@@ -305,12 +315,18 @@
     <div class="count-group">
       <span class="card-count" id="problemCount">Problem 1 of 8</span>
       <span class="step-count" id="priceNote"></span>
-      <label class="mode-toggle" for="hardMode">
-        <input type="checkbox" id="hardMode">
-        <span>Harder: hide the profit column until you answer</span>
-      </label>
     </div>
     <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
+  </div>
+
+  <div class="mode-row">
+    <button type="button" class="btn-toggle" id="hardMode" aria-pressed="false">
+      <span class="dot" aria-hidden="true"></span>
+      <span id="hardModeLabel">AP-style: hide the profit column</span>
+    </button>
+    <span class="mode-why" id="hardModeWhy">An exam table hands you output, revenue and cost
+    &mdash; not the profit. Turn this on and the profit column is hidden until you answer, so the
+    only way through is MR against MC.</span>
   </div>
 
   <div class="main" id="mainArea">
@@ -1803,8 +1819,9 @@ function drawTable(prob, picked, reveal){
     + '<th class="corner">Q</th><th>TR</th><th>TC</th><th>MR</th><th>MC</th>'
     + (hideProfit ? '' : '<th>Profit</th>')
     + `</tr></thead><tbody>${rows.join('')}</tbody></table>`
-    + (hideProfit ? '<p class="hard-note">The profit column is hidden. Work it from MR against '
-                  + 'MC \u2014 it comes back with the answer.</p>' : '');
+    + (hideProfit ? '<p class="hard-note">The profit column is hidden, the way an exam table '
+                  + 'usually gives it. Work it from MR against MC \u2014 it comes back with the '
+                  + 'answer.</p>' : '');
 }
 
 /* ======================================================================
@@ -1957,9 +1974,16 @@ function handleAnswer(card, chosen, btnEl){
   document.getElementById('nextBtn').disabled = false;
 }
 
-document.getElementById('hardMode').addEventListener('change', e => {
-  hardMode = e.target.checked;
-  e.target.parentElement.classList.toggle('on', hardMode);
+document.getElementById('hardMode').addEventListener('click', e => {
+  hardMode = !hardMode;
+  const btn = document.getElementById('hardMode');
+  btn.setAttribute('aria-pressed', hardMode ? 'true' : 'false');
+  document.getElementById('hardModeLabel').textContent = hardMode
+    ? 'AP-style on \u2014 profit column hidden' : 'AP-style: hide the profit column';
+  document.getElementById('hardModeWhy').textContent = hardMode
+    ? 'The profit column comes back with each answer, so the feedback can still point at it.'
+    : 'An exam table hands you output, revenue and cost \u2014 not the profit. Turn this on and '
+    + 'the profit column is hidden until you answer, so the only way through is MR against MC.';
   /* redraw the table as it should look right now: hidden while the question is
      open, shown again once the answer is in */
   document.getElementById('tableWrap').innerHTML =
