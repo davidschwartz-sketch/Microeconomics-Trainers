@@ -80,25 +80,15 @@
   .count-group{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
   .card-count{font-size:13px;font-weight:700;color:var(--ink-soft);}
   .step-count{font-size:13px;font-weight:700;color:var(--teal);}
-  .mode-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 14px;}
-  .btn-toggle{
-    display:inline-flex;align-items:center;gap:10px;cursor:pointer;
-    font-family:inherit;font-size:14.5px;font-weight:700;color:var(--ink);
-    background:var(--surface);border:1.5px solid var(--border);border-radius:10px;
-    padding:11px 18px;transition:border-color .15s ease, background .15s ease, color .15s ease;
+  .difficulty-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
+  .difficulty-label{font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft);}
+  .seg{display:inline-flex; border:1px solid var(--border); border-radius:999px; overflow:hidden; background:var(--surface);}
+  .seg button{
+    background:none; border:none; cursor:pointer; font:inherit; font-size:13px; font-weight:700;
+    padding:6px 14px; color:var(--ink-soft);
   }
-  .btn-toggle:hover{border-color:var(--orange);background:#FDF3EE;}
-  .btn-toggle .dot{
-    width:13px;height:13px;border-radius:50%;border:2px solid var(--muted);
-    display:inline-block;flex:none;
-  }
-  .btn-toggle[aria-pressed="true"]{
-    background:var(--orange);border-color:var(--orange);color:#FFFFFF;
-  }
-  .btn-toggle[aria-pressed="true"]:hover{background:#A8441F;border-color:#A8441F;}
-  .btn-toggle[aria-pressed="true"] .dot{border-color:#FFFFFF;background:#FFFFFF;}
-  .mode-why{font-size:13px;color:var(--ink-soft);max-width:48ch;line-height:1.45;}
-  .mode-why b{color:var(--ink);}
+  .seg button.active{background:var(--accent); color:#2B2118;}
+  .difficulty-note{font-size:12.5px; color:var(--ink-soft); font-style:italic;}
 
   .score-badge{
     font-size:13px;font-weight:700;color:var(--accent);
@@ -319,14 +309,14 @@
     <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
   </div>
 
-  <div class="mode-row">
-    <button type="button" class="btn-toggle" id="hardMode" aria-pressed="false">
-      <span class="dot" aria-hidden="true"></span>
-      <span id="hardModeLabel">AP-style: hide the profit column</span>
-    </button>
-    <span class="mode-why" id="hardModeWhy">An exam table hands you output, revenue and cost
-    &mdash; not the profit. Turn this on and the profit column is hidden until you answer, so the
-    only way through is MR against MC.</span>
+  <div class="difficulty-row" id="difficultyRow">
+    <span class="difficulty-label">Difficulty</span>
+    <span class="seg">
+      <button id="lvl1Btn" class="active" type="button">Helpful Review</button>
+      <button id="lvl2Btn" type="button">AP-style</button>
+    </span>
+    <span class="difficulty-note" id="difficultyNote">The whole table stays on screen, profit
+    column and all.</span>
   </div>
 
   <div class="main" id="mainArea">
@@ -1870,7 +1860,9 @@ function drawTally(open){
    ====================================================================== */
 let order = [], pIndex = 0, answered = false, optionOrder = [];
 let score = { correct: 0, total: 0 };
-/* the harder run, kept across a restart: a student who chose it meant to */
+/* 1 = Helpful Review, 2 = AP-style. The level is kept across a restart: a student
+   who chose it meant to. */
+let level = 1;
 let hardMode = false, lastPicked = null;
 
 function shuffledIndices(n){
@@ -1974,21 +1966,31 @@ function handleAnswer(card, chosen, btnEl){
   document.getElementById('nextBtn').disabled = false;
 }
 
-document.getElementById('hardMode').addEventListener('click', e => {
-  hardMode = !hardMode;
-  const btn = document.getElementById('hardMode');
-  btn.setAttribute('aria-pressed', hardMode ? 'true' : 'false');
-  document.getElementById('hardModeLabel').textContent = hardMode
-    ? 'AP-style on \u2014 profit column hidden' : 'AP-style: hide the profit column';
-  document.getElementById('hardModeWhy').textContent = hardMode
-    ? 'The profit column comes back with each answer, so the feedback can still point at it.'
-    : 'An exam table hands you output, revenue and cost \u2014 not the profit. Turn this on and '
-    + 'the profit column is hidden until you answer, so the only way through is MR against MC.';
-  /* redraw the table as it should look right now: hidden while the question is
-     open, shown again once the answer is in */
+/* ================= DIFFICULTY ================= */
+const LEVEL_NOTE = {
+  1: 'The whole table stays on screen, profit column and all.',
+  2: 'The profit column is hidden until you answer \u2014 the way an exam table gives it.',
+};
+function applyDifficulty(){
+  hardMode = level === 2;
+  document.getElementById('difficultyNote').textContent = LEVEL_NOTE[level];
+  [1, 2].forEach(n =>
+    document.getElementById('lvl' + n + 'Btn').classList.toggle('active', level === n));
+}
+
+/* Changing level mid-question redraws the table as it should look right now:
+   the profit column held back while the question is open, back once the answer
+   is in. The answer itself is untouched and is not scored twice. */
+function setLevel(n){
+  if(n === level) return;
+  level = n;
+  applyDifficulty();
   document.getElementById('tableWrap').innerHTML =
     drawTable(currentProblem(), lastPicked, answered);
-});
+}
+[1, 2].forEach(n =>
+  document.getElementById('lvl' + n + 'Btn').addEventListener('click', () => setLevel(n)));
+applyDifficulty();
 
 document.getElementById('nextBtn').addEventListener('click', () => {
   if(pIndex < order.length - 1){ pIndex++; loadProblem(); }
@@ -2019,7 +2021,8 @@ function showResults(){
   };
   line('Right first time', `${firstTry} of ${answers.length}`, firstTry === answers.length ? 'full' : '');
   const hard = answers.filter(a => a.hard).length;
-  if(hard) line('Answered with the profit column hidden', `${hard} of ${answers.length}`, 'full');
+  if(hard) line('Answered AP-style \u2014 profit column hidden',
+                `${hard} of ${answers.length}`, 'full');
   TRAPS.forEach(t => line(`Fell for the ${t.inline} trap`,
                           timesTxt(tally[t.key]), tally[t.key] ? 'low' : ''));
 
