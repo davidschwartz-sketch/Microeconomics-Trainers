@@ -69,6 +69,16 @@
     font-weight:600;
   }
 
+  .difficulty-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
+  .difficulty-label{font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft);}
+  .seg{display:inline-flex; border:1px solid var(--border); border-radius:999px; overflow:hidden; background:var(--surface);}
+  .seg button{
+    background:none; border:none; cursor:pointer; font:inherit; font-size:13px; font-weight:700;
+    padding:6px 14px; color:var(--ink-soft);
+  }
+  .seg button.active{background:var(--accent); color:#2B2118;}
+  .difficulty-note{font-size:12.5px; color:var(--ink-soft); font-style:italic;}
+
   .meta-row{
     display:flex;
     justify-content:space-between;
@@ -224,6 +234,9 @@
   .curve.supply{stroke:var(--orange);stroke-width:10;opacity:.28;stroke-linecap:round;}
   .priceline{stroke:var(--ink);stroke-width:2;}
   .qline{stroke:var(--ink-soft);stroke-width:1.4;stroke-dasharray:5 4;}
+  .priceline.alt{stroke:var(--teal);stroke-width:1.8;stroke-dasharray:7 4;}
+  .qline.alt{stroke:var(--teal);stroke-width:1.2;stroke-dasharray:4 4;}
+  text.flag.alt{fill:var(--teal);}
   .rect-profit{fill:var(--correct);fill-opacity:.22;stroke:var(--correct);stroke-width:1.6;}
   .rect-loss{fill:var(--incorrect);fill-opacity:.2;stroke:var(--incorrect);stroke-width:1.6;}
   .gapline{stroke:var(--accent);stroke-width:2.4;}
@@ -264,7 +277,17 @@
     </div>
   </header>
 
-  <div class="identities">
+  <div class="difficulty-row" id="difficultyRow">
+    <span class="difficulty-label">Difficulty</span>
+    <span class="seg">
+      <button id="lvl1Btn" class="active" type="button">Helpful Review</button>
+      <button id="lvl2Btn" type="button">AP-style</button>
+    </span>
+    <span class="difficulty-note" id="difficultyNote">The formulas and definitions stay on
+    screen.</span>
+  </div>
+
+  <div class="identities" id="identities">
     <b>The chain.</b>
     <span class="term">Profit = (P &minus; ATC) &times; Q</span>
     <span class="term">Short run: produce if P &ge; AVC</span>
@@ -634,7 +657,7 @@ const PROBLEMS = [
  },
  {
   "biz": "Stone Hollow Vineyard",
-  "blurb": "The same vineyard, the same cost curves, a worse market: the price has fallen to $3.50. Marginal cost now meets the price at 6 bottles, where average total cost is $6 and average variable cost is $3. The first question is what the rectangle says; the second is what the vineyard should do about it.",
+  "blurb": "Stone Hollow sells into a weak market this season: the going price is $3.50 a bottle. Marginal cost meets that price at 6 bottles, where average total cost is $6 and average variable cost is $3. The first question is what the rectangle says; the second is what the vineyard should do about it.",
   "case": {
    "afc": 3.0,
    "afcTxt": "$3",
@@ -997,6 +1020,13 @@ const PROBLEMS = [
    "trTxt": "$800"
   },
   "geom": {
+   "alt": {
+    "price": 5.0,
+    "q": 241.96,
+    "t": "if P = $5",
+    "x": 476.7769230769231,
+    "y": 80.66666666666669
+   },
    "atc": "M148.3 30.5 L152.4 39.4 L156.6 47.6 L160.7 55.2 L164.8 62.1 L169.0 68.5 L173.1 74.4 L177.2 79.9 L181.4 85.0 L185.5 89.8 L189.6 94.2 L193.8 98.4 L197.9 102.3 L202.0 105.9 L206.2 109.4 L210.3 112.6 L214.4 115.6 L218.6 118.5 L222.7 121.2 L226.8 123.7 L231.0 126.1 L235.1 128.3 L239.2 130.5 L243.4 132.5 L247.5 134.3 L251.7 136.1 L255.8 137.8 L259.9 139.4 L264.1 140.9 L268.2 142.3 L272.3 143.6 L276.5 144.9 L280.6 146.0 L284.7 147.1 L288.9 148.2 L293.0 149.1 L297.1 150.0 L301.3 150.9 L305.4 151.6 L309.5 152.4 L313.7 153.0 L317.8 153.7 L321.9 154.2 L326.1 154.7 L330.2 155.2 L334.3 155.6 L338.5 156.0 L342.6 156.4 L346.7 156.7 L350.9 156.9 L355.0 157.1 L359.2 157.3 L363.3 157.4 L367.4 157.5 L371.6 157.6 L375.7 157.6 L379.8 157.6 L384.0 157.6 L388.1 157.5 L392.2 157.4 L396.4 157.3 L400.5 157.1 L404.6 156.9 L408.8 156.7 L412.9 156.4 L417.0 156.1 L421.2 155.8 L425.3 155.5 L429.4 155.1 L433.6 154.7 L437.7 154.3 L441.8 153.8 L446.0 153.3 L450.1 152.8 L454.2 152.3 L458.4 151.8 L462.5 151.2 L466.7 150.6 L470.8 149.9 L474.9 149.3 L479.1 148.6 L483.2 147.9 L487.3 147.2 L491.5 146.5 L495.6 145.7 L499.7 144.9 L503.9 144.1 L508.0 143.2",
    "atcAt": {
     "v": 3.7,
@@ -1107,7 +1137,7 @@ const PROBLEMS = [
  },
  {
   "biz": "Copperline Dry Cleaners",
-  "blurb": "Copperline charges the going price of $14 an order. The table below gives its marginal cost and its average total cost at six output levels. Three of those rows are tempting for the wrong reason. Find the quantity first, and only then read the cost off it.",
+  "blurb": "Copperline charges the going price of $14 an order. The table below gives its marginal cost and its average total cost at five output levels. Three of those rows are tempting for the wrong reason. Find the quantity first, and only then read the cost off it.",
   "case": {
    "afc": 1.2,
    "afcTxt": "$1.20",
@@ -2026,7 +2056,7 @@ const BANK = {
      "Neither — the price line meets ATC",
      "A profit, because the firm is still selling bottles"
     ],
-    "prompt": "The price has fallen to $3.50 and average total cost at the new quantity is $6. What does the rectangle show now?",
+    "prompt": "The price is $3.50 a bottle and average total cost at that quantity is $6. What does the rectangle show?",
     "view": {
      "show": [
       "curves",
@@ -2038,7 +2068,7 @@ const BANK = {
    },
    {
     "correct": 0,
-    "explain": "($3.50 − $6) × 6 = −$15. The rectangle is the same construction as before, only upside down: $2.50 of shortfall on each of 6 bottles, drawn between the price line and the ATC curve above it. Note how much smaller the quantity is than it was at $8 — the lower price pulled the firm back along its MC curve as well as pushing the rectangle below the line.",
+    "explain": "($3.50 − $6) × 6 = −$15. The construction is the one a profit uses, only upside down: $2.50 of shortfall on each of 6 bottles, drawn between the price line and the ATC curve above it. A rectangle on the far side of the price line is a loss, and its size still turns on both how far short each bottle falls and how many bottles there are.",
     "note": "Panel: the rectangle between the price line and ATC.",
     "options": [
      "−$15",
@@ -2181,7 +2211,7 @@ const BANK = {
      "(ATC − AVC) × Q — the fixed cost owed either way",
      "P × Q — the revenue the bottles bring in"
     ],
-    "prompt": "Where does that $3 come from?",
+    "prompt": "That $3 by which producing beats closing has a name and a formula. Which is it?",
     "view": {
      "show": [
       "curves",
@@ -2199,7 +2229,7 @@ const BANK = {
   "R4": [
    {
     "correct": 0,
-    "explain": "($20 − $34) × 30 = −$420. Each rental falls $14 short of what it costs on average, and there are 30 of them. That is a bigger hole than the vineyard’s, and yet the size of the loss is not what decides whether to open the doors — the next step is.",
+    "explain": "($20 − $34) × 30 = −$420. Each rental falls $14 short of what it costs on average, and there are 30 of them. Hold the figure in mind: the size of the loss is not what decides whether to open the doors — the next step is.",
     "note": "Panel: the cost curves, the price line, which is also MR and the demand this firm faces, 3 more marks.",
     "options": [
      "−$420",
@@ -2265,7 +2295,7 @@ const BANK = {
    },
    {
     "correct": 0,
-    "explain": "$420 against $330: opening is $90 worse. Closing still costs the $330 of fixed cost, which is painful and unavoidable; opening on top of that would hand over another $90 in wages and wax that the rentals do not cover. This is the mirror image of the vineyard, and the same test decided both.",
+    "explain": "$420 against $330: opening is $90 worse. Closing still costs the $330 of fixed cost, which is painful and unavoidable; opening on top of that would hand over another $90 in wages and wax that the rentals do not cover. A firm that closes is not choosing to lose nothing; it is choosing the smaller of two losses, and here the smaller one is the closed shop.",
     "note": "Panel: the two losses side by side.",
     "options": [
      "Close — opening would add $90 to the loss",
@@ -2297,7 +2327,7 @@ const BANK = {
      "(ATC − AVC) × Q — the fixed cost owed either way",
      "P × Q — the revenue the rentals would bring in"
     ],
-    "prompt": "What is that $90, in terms of the numbers given?",
+    "prompt": "That $90 of extra loss from opening — what is it, in terms of the numbers given?",
     "view": {
      "show": [
       "curves",
@@ -2470,8 +2500,8 @@ const BANK = {
   "R6": [
    {
     "correct": 0,
-    "explain": "The rule does not change when the price does: make every loaf whose marginal cost is within the price. A higher price makes more loaves worth baking, so the firm slides up its own MC curve to the point where MC has caught up with $5. Its cost curves have not moved at all.",
-    "note": "Panel: the cost curves, the price line, which is also MR and the demand this firm faces, 1 more marks.",
+    "explain": "The rule does not change when the price does: make every loaf whose marginal cost is within the price. A higher price makes more loaves worth baking, so the firm slides up its own MC curve to the point where MC has caught up with $5 — the second price line now on the diagram, with the quantity it picks marked below it. Its cost curves have not moved at all.",
+    "note": "Panel: the cost curves, the price line, which is also MR and the demand this firm faces, 2 more marks.",
     "options": [
      "Further right, where marginal cost has risen to $5",
      "At the same quantity — its costs have not changed",
@@ -2483,13 +2513,14 @@ const BANK = {
      "show": [
       "curves",
       "price",
-      "q"
+      "q",
+      "alt"
      ]
     }
    },
    {
     "correct": 0,
-    "explain": "Each price picks the quantity where MC meets it, so the pairs of price and quantity the firm would choose ARE the points of its MC curve. That is the whole trick: a supply curve is a list of \"at this price, this much\", and the MC curve is already that list.",
+    "explain": "Each price picks the quantity where MC meets it, so the pairs of price and quantity the firm would choose ARE the points of its MC curve. That is the whole trick: a supply curve is a list of \"at this price, this much\", and the MC curve is already that list. The two price lines on the diagram are two of those pairs.",
     "note": "Panel: the diagram stays as it is for this step.",
     "options": [
      "The marginal cost curve itself",
@@ -2502,7 +2533,8 @@ const BANK = {
      "show": [
       "curves",
       "price",
-      "q"
+      "q",
+      "alt"
      ]
     }
    },
@@ -2516,12 +2548,13 @@ const BANK = {
      "Below the bottom of its MC curve",
      "Below the price where it breaks even"
     ],
-    "prompt": "Below which price would Bellhouse produce nothing at all?",
+    "prompt": "In the SHORT run, below which price would Bellhouse produce nothing at all?",
     "view": {
      "show": [
       "curves",
       "price",
       "q",
+      "alt",
       "minAvc"
      ]
     }
@@ -2542,6 +2575,7 @@ const BANK = {
       "curves",
       "price",
       "q",
+      "alt",
       "minAvc",
       "supply"
      ]
@@ -2563,6 +2597,7 @@ const BANK = {
       "curves",
       "price",
       "q",
+      "alt",
       "minAvc",
       "supply"
      ]
@@ -2808,7 +2843,7 @@ const BANK = {
      "It falls, because it is spread over more washes",
      "It stays the same and so does average fixed cost"
     ],
-    "prompt": "Suppose the car wash handled 150 washes instead. What happens to the $300?",
+    "prompt": "Suppose the car wash handled 150 washes instead. What happens to the $300 of total fixed cost?",
     "view": {
      "show": [
       "curves",
@@ -2899,6 +2934,13 @@ function drawGraph(prob, show){
     bits.push(`<line class="priceline" x1="${g.x0}" y1="${g.price.y}" x2="${g.x1 + 4}" y2="${g.price.y}"/>`);
     bits.push(`<text class="flag" x="${g.x0 + 6}" y="${g.price.y - 7}">${esc(g.price.t)}</text>`);
   }
+  if(has('alt') && g.alt){
+    bits.push(`<line class="priceline alt" x1="${g.x0}" y1="${g.alt.y}" x2="${g.x1 + 4}" `
+            + `y2="${g.alt.y}"/>`);
+    bits.push(`<text class="flag alt" x="${g.x0 + 6}" y="${g.alt.y - 7}">${esc(g.alt.t)}</text>`);
+    bits.push(`<line class="qline alt" x1="${g.alt.x}" y1="${g.alt.y}" x2="${g.alt.x}" `
+            + `y2="${g.y1}"/>`);
+  }
   if(has('q') && g.qstar){
     bits.push(`<line class="qline" x1="${g.qstar.x}" y1="${g.y0 - 4}" x2="${g.qstar.x}" y2="${g.y1}"/>`);
     bits.push(`<text class="flag" x="${g.qstar.x}" y="${g.y1 + 34}" text-anchor="middle">${esc(g.qstar.t)}</text>`);
@@ -2981,7 +3023,8 @@ function drawNumbers(prob, show){
     rows.push(row('Long-run decision', cell(has('verdict'), 'Exit', 'neg')));
   } else if(c){
     rows.push(row('Price', `<td>${c.priceTxt}</td>`, 'given'));
-    if(will('q')) rows.push(row('Quantity where MC = P', cell(has('q'), c.qTxt + ' ' + prob.good)));
+    if(will('q')) rows.push(row(level === 2 ? 'Quantity' : 'Quantity where MC = P',
+                                cell(has('q'), c.qTxt + ' ' + prob.good)));
     if(will('atcAt')) rows.push(row('ATC at that quantity', cell(has('atcAt'), c.atcTxt)));
     if(will('avcAt') || will('gap'))
       rows.push(row('AVC at that quantity', cell(has('avcAt') || has('gap'), c.avcTxt)));
@@ -3057,6 +3100,10 @@ function drawPanel(prob, show){
    ====================================================================== */
 let order = [], pIndex = 0, sIndex = 0, answered = false, optionOrder = [];
 let score = { correct: 0, total: 0 }, perProblem = {};
+/* 1 = Helpful Review, 2 = AP-style. Kept across a restart: a student who chose it
+   meant to. At level 2 the formulas and definitions come off the page -- the strip
+   of identities at the top, and the row label that gives the rule away. */
+let level = 1;
 
 function shuffledIndices(n){
   const a = [...Array(n).keys()];
@@ -3163,6 +3210,30 @@ function handleAnswer(st, chosen, btnEl){
 
   document.getElementById('nextBtn').disabled = false;
 }
+
+/* ================= DIFFICULTY ================= */
+const LEVEL_NOTE = {
+  1: 'The formulas and definitions stay on screen.',
+  2: 'The formulas and definitions are off the page \u2014 the rules have to come from you.',
+};
+function applyDifficulty(){
+  document.getElementById('identities').style.display = level === 1 ? '' : 'none';
+  document.getElementById('difficultyNote').textContent = LEVEL_NOTE[level];
+  [1, 2].forEach(n =>
+    document.getElementById('lvl' + n + 'Btn').classList.toggle('active', level === n));
+}
+
+/* Changing level redraws the panel as it should look right now. The answer itself is
+   untouched and is not scored twice. */
+function setLevel(n){
+  if(n === level) return;
+  level = n;
+  applyDifficulty();
+  drawPanel(currentProblem(), answered ? currentStep().view.show : priorShow());
+}
+[1, 2].forEach(n =>
+  document.getElementById('lvl' + n + 'Btn').addEventListener('click', () => setLevel(n)));
+applyDifficulty();
 
 document.getElementById('nextBtn').addEventListener('click', () => {
   if(sIndex < currentSteps().length - 1){ sIndex++; loadStep(); }
