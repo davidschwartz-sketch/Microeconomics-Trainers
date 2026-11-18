@@ -342,7 +342,7 @@
 
   <div class="meta-row" id="metaRow">
     <div class="count-group">
-      <span class="card-count" id="cardCount">Card 1 of 55</span>
+      <span class="card-count" id="cardCount">Card 1 of 59</span>
     </div>
     <span class="score-badge" id="scoreBadge">Score: 0 / 0</span>
   </div>
@@ -483,7 +483,7 @@ const CARDS = [
              "It falls as output rises, because it is spread over more units",
              "It rises with output, but more slowly than total variable cost does",
              "It is zero in the short run and positive only in the long run"], correct:0,
-    explain:"TFC is a flat commitment — the lease, the insurance, the loan — owed whether the firm produces a thousand units or none. What falls as output rises is AVERAGE fixed cost, the same total spread over more units. In the LONG run there are no fixed costs at all, which is the opposite of the last option." },
+    explain:"TFC is a flat commitment — the lease, the insurance, the loan — owed whether the firm produces a thousand units or none. What falls as output rises is AVERAGE fixed cost, the same total spread over more units. In the LONG run there are no fixed costs at all, which is the opposite of what the “zero in the short run” option claims." },
 
   { category:"Cost Curves",
     prompt:"Total cost is made up of what?",
@@ -580,7 +580,7 @@ const CARDS = [
              "The average of all the possible plant sizes’ short-run ATC curves",
              "The short-run ATC curve of the largest plant the firm could build",
              "The curve joining the minimum points of every possible plant size’s ATC curve"], correct:0,
-    explain:"For each output, the long-run curve takes the cheapest plant available for that output, so it runs underneath all the short-run curves and touches each one at the output that plant is best for. It is a lower envelope, not an average — and the last option is the classic error, which the next cards take up." },
+    explain:"For each output, the long-run curve takes the cheapest plant available for that output, so it runs underneath all the short-run curves and touches each one at the output that plant is best for. It is a lower envelope, not an average — and “joins the minimum points” is the classic error, which the next cards take up." },
 
   { category:"Scale & LRATC",
     prompt:"Why does the long-run ATC curve NOT pass through the minimum point of every short-run ATC curve?",
@@ -645,7 +645,7 @@ const CARDS = [
              "Total revenue minus explicit costs",
              "Accounting profit minus total fixed costs",
              "Accounting profit plus the owner’s forgone salary"], correct:0,
-    explain:"Economic profit subtracts BOTH kinds of cost, which is the same as taking accounting profit and subtracting the implicit costs from it. The last option has the sign backwards: a forgone salary is a cost, so it comes off, never on." },
+    explain:"Economic profit subtracts BOTH kinds of cost, which is the same as taking accounting profit and subtracting the implicit costs from it. Adding the owner’s forgone salary has the sign backwards: a forgone salary is a cost, so it comes off, never on." },
 
   { category:"Profit Types",
     prompt:"What is normal profit?",
@@ -694,7 +694,7 @@ const CARDS = [
              "The market price minus the average cost of the unit",
              "Total revenue divided by the number of units sold, which falls as it sells more",
              "A falling amount, since the firm has to lower its price to sell more"], correct:0,
-    explain:"The firm is too small to move the price, so every extra unit sells at the same going price: MR = P, and the line is flat. The last option describes a firm with market power, which faces a downward-sloping demand curve of its own and has to cut the price to sell more." },
+    explain:"The firm is too small to move the price, so every extra unit sells at the same going price: MR = P, and the line is flat. Having to lower the price to sell more describes a firm with market power, which faces a downward-sloping demand curve of its own." },
 
   { category:"Profit Maximization",
     prompt:"With whole units, marginal cost often jumps past marginal revenue without ever landing exactly on it. What should the firm do?",
@@ -841,6 +841,38 @@ const CARDS = [
              "Both hold at every moment for a price-taking firm, and they pick out the same quantity",
              "P = MC holds in the short run and P = minimum ATC holds in the short run too, but only for firms that are breaking even"], correct:0,
     explain:"P = MC is a QUANTITY rule and it is true while the firm is making a profit, breaking even or taking a loss — it says nothing about how the firm is doing. P = minimum ATC is a much stronger claim about the PRICE: it is true only in long-run equilibrium, after entry or exit has finished adjusting it, and it is the statement that economic profit is zero." },
+
+  { category:"Perfect Competition",
+    prompt:"What does it mean for a perfectly competitive firm to be productively efficient in the long run?",
+    options:["It is producing at the minimum of its ATC curve — the lowest cost per unit the good can be made for",
+             "It is producing the quantity that earns it the largest profit it could possibly earn",
+             "It is producing as much as its plant will allow, so nothing it owns sits idle",
+             "It is charging a lower price than any other firm in the industry charges"], correct:0,
+    explain:"Productive efficiency is about COST, and nothing else: at the bottom of ATC there is no cheaper way to make this output, so nothing is being wasted in the making of it. In long-run equilibrium a competitive firm is pushed there by entry and exit — not by choosing it. The largest possible profit is zero economic profit here, and a price taker cannot charge differently from anyone else in the first place." },
+
+  { category:"Perfect Competition",
+    prompt:"What does it mean for a market to be allocatively efficient?",
+    options:["The price buyers pay equals the marginal cost of the last unit, so exactly the right quantity is produced",
+             "Every firm in the market is producing at the lowest average total cost it can achieve",
+             "Every firm in the market ends up earning the same economic profit as every other firm",
+             "The market has no deadweight loss, because no tax has been placed on the good"], correct:0,
+    explain:"Allocative efficiency is about QUANTITY. The price a buyer pays measures what the last unit is worth to them — their marginal benefit — and marginal cost measures what it cost to make, so P = MC means the last unit made was worth exactly what it cost. Produce less and someone would gladly pay more than the next unit costs; produce more and resources are going into this good that another good needs more. “Producing at the lowest average total cost” is productive efficiency wearing this one’s name, which is the slip to watch for." },
+
+  { category:"Perfect Competition",
+    prompt:"A firm produces where P = min ATC but NOT where P = MC. Which efficiency does it achieve?",
+    options:["Productive efficiency only — it is making its output at least cost, but the quantity is not the right one",
+             "Allocative efficiency only — the quantity is right, but it is not being made as cheaply as it could be",
+             "Both of them — a firm sitting at the bottom of its ATC curve is efficient in every sense there is",
+             "Neither of them — efficiency of either kind needs P = MC and P = min ATC to hold together"], correct:0,
+    explain:"The two conditions are independent, which is the whole point of giving them separate names. P = min ATC is a statement about COST — met here, so the good is being made as cheaply as it can be. P = MC is a statement about QUANTITY — not met, so the amount being made is wrong: the last unit was worth either more or less to buyers than it cost to make. A firm can be productively efficient while producing the wrong amount of the good, and perfect competition in long-run equilibrium is notable precisely because it is not." },
+
+  { category:"Perfect Competition",
+    prompt:"Why is perfect competition’s long-run equilibrium used as the benchmark that other market structures are judged against?",
+    options:["It reaches both efficiencies at once — the right quantity of the good, made at the lowest cost per unit",
+             "Its firms earn zero economic profit, so none of the owners takes anything out of the market at all",
+             "Its price is the lowest price at which any market structure could supply the good to buyers",
+             "Its firms produce where marginal revenue equals marginal cost, which other structures do not do"], correct:0,
+    explain:"Free entry and exit and price-taking deliver P = MC and P = min ATC together, which is allocative AND productive efficiency at the same time — something other structures typically fail. That is what makes it the measuring stick: monopoly, and markets with externalities, are read as departures from it. Zero economic profit is how the price got to min ATC rather than a benefit in itself, and MR = MC is EVERY firm’s rule in every structure — what is special here is that MR equals the price." },
 
   { category:"Perfect Competition",
     prompt:"An industry’s long-run supply curve slopes upward. What does that tell you?",
